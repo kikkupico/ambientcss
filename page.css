@@ -1,0 +1,39 @@
+body {
+  background-color: #ECECEC;
+}
+
+.container {
+  display: grid;
+  min-height: 90vh;
+  min-width: 100%;
+  column-gap: 30px;
+  gap: 30px;
+}
+
+.content {
+  justify-self: center;
+  align-self: center;
+}
+
+.box {
+  padding: 7rem;
+  border-radius: 7px;
+  margin: 30px;
+  background: rgb(222, 222, 222);
+}
+
+.logo {
+  font-family: "Josefin Sans", sans-serif;
+  text-align: center;
+  font-size: 49px;
+  color: #333;
+}
+
+.circle {
+  width: 64px;
+  min-height: 64px;
+  content: " ";
+  margin: 30px;
+  border-radius: 50%;
+  background: rgb(222, 222, 222);
+}

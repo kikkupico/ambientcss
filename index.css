@@ -1,0 +1,119 @@
+:root {
+  --amb-light-x: -1;
+  --amb-light-y: -1;
+  --amb-key-light-intensity: 1;
+  --amb-fill-light-intensity: 0.8;
+  --amb-light-distance: 0px;
+  --amb-fillet: 0;
+  --amb-chamfer: 0;
+  --amb-thickness: 0;
+  --amb-elevation: 0;
+  --amb-shadow-blend: 2;
+}
+
+.amb-fillet {
+  --amb-fillet: 1;
+}
+
+.amb-chamfer {
+  --amb-chamfer: 1;
+}
+
+.amb-elevation-1 {
+  --amb-elevation: 1;
+}
+
+.amb-elevation-2 {
+  --amb-elevation: 4;
+}
+
+.amb-elevation-3 {
+  --amb-elevation: 8;
+}
+
+.ambient {
+  box-shadow: calc(var(--amb-light-x) * var(--amb-elevation) * -1px)
+      calc(var(--amb-light-y) * var(--amb-elevation) * -1px) 0px 1px
+      rgb(
+        0 0 0 /
+          calc(
+            calc(
+                var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
+              ) * 0.2 / var(--amb-elevation) * 2
+          )
+      ),
+    calc(var(--amb-light-x) * var(--amb-elevation) * -1.2px)
+      calc(var(--amb-light-y) * var(--amb-elevation) * -1.2px)
+      calc(var(--amb-shadow-blend) * 1px) 1px
+      rgb(
+        0 0 0 /
+          calc(
+            calc(
+                var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
+              ) * 0.2 / var(--amb-elevation) * 2
+          )
+      ),
+    calc(var(--amb-light-x) * var(--amb-elevation) * -1.4px)
+      calc(var(--amb-light-y) * var(--amb-elevation) * -1.4px)
+      calc(var(--amb-shadow-blend) * 1px) 1px
+      rgb(
+        0 0 0 /
+          calc(
+            calc(
+                var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
+              ) * 0.2 / var(--amb-elevation) * 2
+          )
+      ),
+    calc(var(--amb-light-x) * var(--amb-elevation) * -1.6px)
+      calc(var(--amb-light-y) * var(--amb-elevation) * -1.6px)
+      calc(var(--amb-shadow-blend) * 1px) 1px
+      rgb(
+        0 0 0 /
+          calc(
+            calc(
+                var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
+              ) * 0.2 / var(--amb-elevation) * 2
+          )
+      ),
+    calc(var(--amb-light-x) * var(--amb-elevation) * -1.8px)
+      calc(var(--amb-light-y) * var(--amb-elevation) * -1.8px)
+      calc(var(--amb-shadow-blend) * 1px) 1px
+      rgb(
+        0 0 0 /
+          calc(
+            calc(
+                var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
+              ) * 0.2 / var(--amb-elevation) * 2
+          )
+      ),
+    inset calc(var(--amb-light-x) * -1px) calc(var(--amb-light-y) * -1px) 0px
+      0px
+      rgb(
+        255 255 255 / calc(var(--amb-fillet) * var(--amb-key-light-intensity))
+      ),
+    inset calc(var(--amb-light-x) * 1px) calc(var(--amb-light-y) * 1px) 0px 0px
+      rgb(
+        0 0 0 /
+          calc(
+            var(--amb-fillet) *
+              calc(
+                var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
+              )
+          )
+      ),
+    inset calc(var(--amb-light-x) * -2px) calc(var(--amb-light-y) * -2px) 2px
+      0px
+      rgb(
+        255 255 255 / calc(var(--amb-chamfer) * var(--amb-key-light-intensity))
+      ),
+    inset calc(var(--amb-light-x) * 2px) calc(var(--amb-light-y) * 2px) 2px 0px
+      rgb(
+        0 0 0 /
+          calc(
+            var(--amb-chamfer) *
+              calc(
+                var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
+              )
+          )
+      );
+}
