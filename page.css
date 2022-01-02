@@ -1,5 +1,7 @@
 body {
-  background-color: #ECECEC;
+  background-color: hsl(240, 20%, 15%);
+  font-family: "Josefin Sans", sans-serif;
+  transition: background-color 3s;
 }
 
 .container {
@@ -19,14 +21,12 @@ body {
   padding: 7rem;
   border-radius: 7px;
   margin: 30px;
-  background: rgb(222, 222, 222);
 }
 
 .logo {
-  font-family: "Josefin Sans", sans-serif;
   text-align: center;
   font-size: 49px;
-  color: #333;
+  color: #aaa;
 }
 
 .circle {
@@ -35,5 +35,21 @@ body {
   content: " ";
   margin: 30px;
   border-radius: 50%;
-  background: rgb(222, 222, 222);
+}
+
+.custom {
+  border: 1px solid rgb(0 0 0 / 0.4);
+  background-color: inherit;
+  outline: none;
+  padding: 0.5rem;
+  border-radius: 12px;
+  text-transform: uppercase;
+  width: 64px;
+  font-weight: 600;
+  color: #aaa;
+  text-shadow: 0 0 14px rgb(255 255 255 / 0.35);
+}
+
+.custom:focus {
+  border: 1px solid lightcoral;
 }

@@ -1,22 +1,31 @@
 :root {
-  --amb-light-x: 0;
+  --amb-light-x: 1;
   --amb-light-y: -1;
-  --amb-key-light-intensity: 0.9;
-  --amb-fill-light-intensity: 0.6;
+  --amb-key-light-intensity: 0.3;
+  --amb-fill-light-intensity: 0;
   --amb-light-distance: 0px;
   --amb-fillet: 0;
   --amb-chamfer: 0;
   --amb-thickness: 0;
   --amb-elevation: 0;
-  --amb-shadow-blend: 2;
+  --amb-fillet-width: 1;
 }
 
 .amb-fillet {
   --amb-fillet: 1;
 }
 
+.amb-fillet-2 {
+  --amb-fillet: 1;
+  --amb-fillet-width: 2;
+}
+
 .amb-chamfer {
   --amb-chamfer: 1;
+}
+
+.amb-elevation-0 {
+  --amb-elevation: 0;
 }
 
 .amb-elevation-1 {
@@ -53,12 +62,13 @@
       calc(var(--amb-light-x) * (-15 / 3) * var(--amb-elevation) * 1px)
       calc(var(--amb-light-y) * (-15 / 3) * var(--amb-elevation) * 1px)
       calc(var(--amb-light-y) * (-12 / 3) * var(--amb-elevation) * 1px),
-    inset calc(var(--amb-light-x) * -1px) calc(var(--amb-light-y) * -1px) 0px
-      0px
+    inset calc(var(--amb-light-x) * var(--amb-fillet-width) * -1px)
+      calc(var(--amb-light-y) * var(--amb-fillet-width) * -1px) 0px 0px
       rgb(
         255 255 255 / calc(var(--amb-fillet) * var(--amb-key-light-intensity))
       ),
-    inset calc(var(--amb-light-x) * 1px) calc(var(--amb-light-y) * 1px) 0px 0px
+    inset calc(var(--amb-light-x) * var(--amb-fillet-width) * 1px)
+      calc(var(--amb-light-y) * var(--amb-fillet-width) * 1px) 0px 0px
       rgb(
         0 0 0 /
           calc(
@@ -78,26 +88,6 @@
         0 0 0 /
           calc(
             var(--amb-chamfer) *
-              calc(
-                var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
-              )
-          )
-      );
-}
-
-.shadow-longer {
-  box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px,
-    rgba(0, 0, 0, 0.22) 0px 15px 12px,
-    inset calc(var(--amb-light-x) * -1px) calc(var(--amb-light-y) * -1px) 0px
-      0px
-      rgb(
-        255 255 255 / calc(var(--amb-fillet) * var(--amb-key-light-intensity))
-      ),
-    inset calc(var(--amb-light-x) * 1px) calc(var(--amb-light-y) * 1px) 0px 0px
-      rgb(
-        0 0 0 /
-          calc(
-            var(--amb-fillet) *
               calc(
                 var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
               )
