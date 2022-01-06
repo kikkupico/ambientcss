@@ -45,23 +45,11 @@
         0,
         0,
         0,
-        calc(var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
+        calc((var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)))
       )
-      calc(var(--amb-light-x) * (-19 / 3) * var(--amb-elevation) * 1px)
-      calc(var(--amb-light-y) * (-19 / 3) * var(--amb-elevation) * 1px)
-      calc(var(--amb-light-y) * (-38 / 3) * var(--amb-elevation) * 1px),
-    rgba(
-        0,
-        0,
-        0,
-        calc(
-          (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)) *
-            0.75
-        )
-      )
-      calc(var(--amb-light-x) * (-15 / 3) * var(--amb-elevation) * 1px)
-      calc(var(--amb-light-y) * (-15 / 3) * var(--amb-elevation) * 1px)
-      calc(var(--amb-light-y) * (-12 / 3) * var(--amb-elevation) * 1px),
+      calc(var(--amb-light-x) * var(--amb-elevation) * -8px)
+      calc(var(--amb-light-y) * var(--amb-elevation) * -8px)
+      calc(var(--amb-elevation) * 8px) calc(var(--amb-elevation) * -4px),
     inset calc(var(--amb-light-x) * var(--amb-fillet-width) * -1px)
       calc(var(--amb-light-y) * var(--amb-fillet-width) * -1px) 0px 0px
       rgb(

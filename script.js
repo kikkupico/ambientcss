@@ -16,16 +16,16 @@ async function animateVar(variable, cond, step) {
 document
   .getElementById("button-day")
   .addEventListener("click", async function setDay() {
-    document.body.style.backgroundColor = "hsl(20, 20%, 95%)";
+    document.body.style.backgroundColor = "rgb(239,240,242)";
     animateVar("--amb-light-x", (val) => val > -1, -1 / 60);
-    animateVar("--amb-key-light-intensity", (val) => val < 0.9, 0.6 / 20);
-    animateVar("--amb-fill-light-intensity", (val) => val < 0.6, 0.6 / 20);
+    animateVar("--amb-key-light-intensity", (val) => val < 0.9, 0.3 / 60);
+    animateVar("--amb-fill-light-intensity", (val) => val < 0.6, 0.3 / 60);
   });
 document
   .getElementById("button-night")
   .addEventListener("click", async function setDay() {
-    document.body.style.backgroundColor = "hsl(240, 20%, 15%)";
+    document.body.style.backgroundColor = "rgb(36,43,60)";
     animateVar("--amb-light-x", (val) => val < 1, 1 / 60);
-    animateVar("--amb-key-light-intensity", (val) => val > 0.3, -0.6 / 20);
-    animateVar("--amb-fill-light-intensity", (val) => val > 0, -0.6 / 20);
+    animateVar("--amb-key-light-intensity", (val) => val > 0.3, -0.3 / 60);
+    animateVar("--amb-fill-light-intensity", (val) => val > 0, -0.3 / 60);
   });
