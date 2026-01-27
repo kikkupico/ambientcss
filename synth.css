@@ -1,0 +1,323 @@
+/* Synth Control Panel */
+.synth-panel {
+  background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
+  border-radius: 12px;
+  padding: 24px;
+  margin: 30px;
+  border: 1px solid #333;
+  /* Uses ambient classes for lighting */
+}
+
+.synth-panel-title {
+  color: #888;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.control-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.control-label {
+  color: #666;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+/* ===== SYNTH KNOB ===== */
+.synth-knob {
+  position: relative;
+  width: 60px;
+  height: 60px;
+}
+
+.synth-knob input[type="range"] {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.knob-body {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4a4a4a 0%, #2a2a2a 50%, #1a1a1a 100%);
+  border: 1px solid #222;
+  /* Uses ambient classes for lighting */
+}
+
+.knob-inner {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #3a3a3a 0%, #252525 100%);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.4),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.05);
+}
+
+.knob-pointer {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  width: 3px;
+  height: 12px;
+  margin-left: -1.5px;
+  background: linear-gradient(180deg, #fff 0%, #aaa 100%);
+  border-radius: 2px;
+  transform-origin: center 18px;
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
+}
+
+.knob-ring {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: conic-gradient(from 225deg, #ff6b35 0deg, #ff6b35 var(--knob-angle, 0deg), #333 var(--knob-angle, 0deg), #333 270deg) border-box;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* ===== SYNTH SLIDER (FADER) ===== */
+.synth-slider {
+  position: relative;
+  width: 40px;
+  height: 120px;
+}
+
+.slider-track {
+  position: absolute;
+  left: 50%;
+  top: 10px;
+  width: 8px;
+  height: 100px;
+  margin-left: -4px;
+  background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%);
+  border-radius: 4px;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.8),
+    0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.slider-fill {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  width: 4px;
+  margin-left: -2px;
+  background: linear-gradient(180deg, #ff6b35 0%, #ff8c42 100%);
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(255, 107, 53, 0.5);
+  pointer-events: none;
+}
+
+.slider-cap {
+  position: absolute;
+  left: 50%;
+  width: 30px;
+  height: 20px;
+  margin-left: -15px;
+  background: linear-gradient(180deg, #555 0%, #333 50%, #222 100%);
+  border-radius: 3px;
+  pointer-events: none;
+  /* Uses ambient classes for lighting */
+}
+
+.slider-cap::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 4px;
+  right: 4px;
+  height: 3px;
+  background: linear-gradient(90deg, #222 0%, #444 50%, #222 100%);
+  border-radius: 1px;
+}
+
+.synth-slider input[type="range"] {
+  position: absolute;
+  width: 120px;
+  height: 40px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(-90deg);
+  opacity: 0;
+  cursor: pointer;
+  z-index: 10;
+}
+
+/* ===== TOGGLE SWITCH ===== */
+.synth-toggle {
+  position: relative;
+  width: 60px;
+  height: 30px;
+}
+
+.synth-toggle input[type="checkbox"] {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.toggle-body {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%);
+  border-radius: 15px;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.5),
+    0 1px 0 rgba(255, 255, 255, 0.1);
+  border: 1px solid #222;
+}
+
+.toggle-indicator {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 22px;
+  height: 22px;
+  background: linear-gradient(180deg, #444 0%, #333 100%);
+  border-radius: 50%;
+  transition: left 0.2s ease, background 0.2s ease;
+  /* Uses ambient classes for lighting */
+}
+
+.synth-toggle input:checked ~ .toggle-indicator {
+  left: 34px;
+  background: linear-gradient(180deg, #ff6b35 0%, #cc5530 100%);
+}
+
+/* ===== HORIZONTAL FADER (Day/Night) ===== */
+.synth-hfader {
+  position: relative;
+  width: 200px;
+  height: 40px;
+}
+
+.hfader-track {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  right: 10px;
+  height: 8px;
+  margin-top: -4px;
+  background: linear-gradient(90deg, #1a1a3a 0%, #3a2a1a 100%);
+  border-radius: 4px;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.8),
+    0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.hfader-label-left,
+.hfader-label-right {
+  position: absolute;
+  top: -16px;
+  font-size: 8px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.hfader-label-left { left: 10px; }
+.hfader-label-right { right: 10px; }
+
+.hfader-cap {
+  position: absolute;
+  top: 50%;
+  width: 24px;
+  height: 34px;
+  margin-top: -17px;
+  background: linear-gradient(90deg, #555 0%, #444 20%, #333 80%, #222 100%);
+  border-radius: 4px;
+  pointer-events: none;
+  /* Uses ambient classes for lighting */
+}
+
+.hfader-cap::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: 10px;
+  width: 3px;
+  background: linear-gradient(180deg, #222 0%, #444 50%, #222 100%);
+  border-radius: 1px;
+}
+
+.synth-hfader input[type="range"] {
+  position: absolute;
+  width: 180px;
+  height: 40px;
+  left: 10px;
+  top: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 10;
+}
+
+/* ===== DEMO BLOCK ===== */
+.demo-block {
+  width: 200px;
+  height: 200px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: box-shadow 0.1s ease;
+}
+
+/* ===== LED INDICATORS ===== */
+.led {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #222;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.led.on {
+  background: radial-gradient(circle at 30% 30%, #ff8c42 0%, #ff6b35 50%, #cc4420 100%);
+  box-shadow: 0 0 8px rgba(255, 107, 53, 0.8), 0 0 16px rgba(255, 107, 53, 0.4);
+}
+
+.led.blue.on {
+  background: radial-gradient(circle at 30% 30%, #42a5ff 0%, #3590ff 50%, #2070cc 100%);
+  box-shadow: 0 0 8px rgba(66, 165, 255, 0.8), 0 0 16px rgba(66, 165, 255, 0.4);
+}

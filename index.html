@@ -3,6 +3,7 @@
   <head>
     <link href="page.css" rel="stylesheet" />
     <link href="index.css" rel="stylesheet" />
+    <link href="synth.css" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -16,19 +17,112 @@
         <div class="box logo ambient amb-fillet amb-elevation-3">
           a m b i e n t <br />
           <div style="font-size: 35px">CSS</div>
-          <button
-            id="button-day"
-            class="custom ambient amb-fillet-1 amb-elevation-0"
-          >
-            <span style="mix-blend-mode: exclusion">day</span>
-          </button>
-          <button
-            id="button-night"
-            class="custom ambient amb-fillet-1 amb-elevation-0"
-          >
-            <span style="mix-blend-mode: exclusion">night</span>
-          </button>
         </div>
+
+        <!-- Demo Block -->
+        <div class="row">
+          <div id="demo-block" class="demo-block ambient amb-fillet amb-elevation-2">
+            demo
+          </div>
+        </div>
+
+        <!-- Synth Control Panel -->
+        <div class="synth-panel ambient amb-fillet amb-elevation-2">
+          <div class="synth-panel-title">Lighting Controls</div>
+
+          <!-- Day/Night Fader -->
+          <div class="control-group" style="margin-bottom: 24px;">
+            <div class="synth-hfader" id="daynight-fader">
+              <span class="hfader-label-left">Night</span>
+              <span class="hfader-label-right">Day</span>
+              <div class="hfader-track"></div>
+              <div class="hfader-cap ambient amb-fillet amb-elevation-1" id="daynight-cap"></div>
+              <input type="range" id="daynight" min="0" max="100" value="0" />
+            </div>
+            <div class="control-label">Ambience</div>
+          </div>
+
+          <div class="control-row">
+            <!-- Elevation Knob -->
+            <div class="control-group">
+              <div class="synth-knob" id="elevation-knob">
+                <div class="knob-ring" id="elevation-ring"></div>
+                <div class="knob-body ambient amb-fillet amb-elevation-2"></div>
+                <div class="knob-inner"></div>
+                <div class="knob-pointer" id="elevation-pointer"></div>
+                <input type="range" id="elevation" min="0" max="3" value="2" step="1" />
+              </div>
+              <div class="control-label">Elevation</div>
+            </div>
+
+            <!-- Light X Knob -->
+            <div class="control-group">
+              <div class="synth-knob" id="lightx-knob">
+                <div class="knob-ring" id="lightx-ring"></div>
+                <div class="knob-body ambient amb-fillet amb-elevation-2"></div>
+                <div class="knob-inner"></div>
+                <div class="knob-pointer" id="lightx-pointer"></div>
+                <input type="range" id="lightx" min="-100" max="100" value="100" />
+              </div>
+              <div class="control-label">Light X</div>
+            </div>
+
+            <!-- Light Y Knob -->
+            <div class="control-group">
+              <div class="synth-knob" id="lighty-knob">
+                <div class="knob-ring" id="lighty-ring"></div>
+                <div class="knob-body ambient amb-fillet amb-elevation-2"></div>
+                <div class="knob-inner"></div>
+                <div class="knob-pointer" id="lighty-pointer"></div>
+                <input type="range" id="lighty" min="-100" max="100" value="-100" />
+              </div>
+              <div class="control-label">Light Y</div>
+            </div>
+
+            <!-- Key Light Slider -->
+            <div class="control-group">
+              <div class="synth-slider" id="keylight-slider">
+                <div class="slider-track"></div>
+                <div class="slider-fill" id="keylight-fill"></div>
+                <div class="slider-cap ambient amb-fillet amb-elevation-1" id="keylight-cap"></div>
+                <input type="range" id="keylight" min="0" max="100" value="30" />
+              </div>
+              <div class="control-label">Key</div>
+            </div>
+
+            <!-- Fill Light Slider -->
+            <div class="control-group">
+              <div class="synth-slider" id="filllight-slider">
+                <div class="slider-track"></div>
+                <div class="slider-fill" id="filllight-fill"></div>
+                <div class="slider-cap ambient amb-fillet amb-elevation-1" id="filllight-cap"></div>
+                <input type="range" id="filllight" min="0" max="100" value="0" />
+              </div>
+              <div class="control-label">Fill</div>
+            </div>
+
+            <!-- Fillet Toggle -->
+            <div class="control-group">
+              <div class="synth-toggle">
+                <input type="checkbox" id="fillet" checked />
+                <div class="toggle-body"></div>
+                <div class="toggle-indicator ambient amb-fillet amb-elevation-1"></div>
+              </div>
+              <div class="control-label">Fillet</div>
+            </div>
+
+            <!-- Chamfer Toggle -->
+            <div class="control-group">
+              <div class="synth-toggle">
+                <input type="checkbox" id="chamfer" />
+                <div class="toggle-body"></div>
+                <div class="toggle-indicator ambient amb-fillet amb-elevation-1"></div>
+              </div>
+              <div class="control-label">Chamfer</div>
+            </div>
+          </div>
+        </div>
+
         <div class="row">
           <div class="circle ambient amb-fillet amb-elevation-0"></div>
           <div class="circle ambient amb-fillet amb-elevation-1"></div>
