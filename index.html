@@ -1,42 +1,106 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <link href="page.css" rel="stylesheet" />
-    <link href="index.css" rel="stylesheet" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300&display=swap"
-      rel="stylesheet"
-    />
-  </head>
-  <body>
-    <div class="container">
-      <div class="content">
-        <div class="box logo ambient amb-fillet amb-elevation-3">
-          a m b i e n t <br />
-          <div style="font-size: 35px">CSS</div>
-          <button
-            id="button-day"
-            class="custom ambient amb-fillet-1 amb-elevation-0"
-          >
-            <span style="mix-blend-mode: exclusion">day</span>
-          </button>
-          <button
-            id="button-night"
-            class="custom ambient amb-fillet-1 amb-elevation-0"
-          >
-            <span style="mix-blend-mode: exclusion">night</span>
-          </button>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ambient CSS Synth Rack</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="page.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="rack-container">
+        <header class="rack-header">
+            <h1 class="brand">AMBIENT <span class="version">V1.0</span></h1>
+            <div class="power-section">
+                <span class="label">POWER</span>
+                <div class="button-group">
+                    <button id="button-day" class="amb-btn ambient amb-fillet" style="padding: 5px 10px; font-size: 0.7rem;">DAY</button>
+                    <button id="button-night" class="amb-btn ambient amb-fillet" style="padding: 5px 10px; font-size: 0.7rem;">NIGHT</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="rack-row">
+            <!-- Module: Geometry -->
+            <div class="module">
+                <h2 class="module-title">GEOMETRY</h2>
+                <div class="module-content">
+                    <div class="control-group">
+                        <label>ELEVATION</label>
+                        <div class="row">
+                            <div class="box ambient amb-elevation-1 amb-fillet">1</div>
+                            <div class="box ambient amb-elevation-3 amb-fillet">3</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label>THICKNESS</label>
+                        <div class="row">
+                            <div class="box ambient amb-thickness-1 amb-elevation-1 amb-fillet">1</div>
+                            <div class="box ambient amb-thickness-3 amb-elevation-1 amb-fillet">3</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label>EDGES</label>
+                        <div class="row">
+                            <div class="box ambient amb-elevation-1 amb-fillet-2">FILLET</div>
+                            <div class="box ambient amb-elevation-1 amb-chamfer">CHAMFER</div>
+                            <div class="box ambient amb-groove" style="display:flex; justify-content:center; align-items:center;">GROOVE</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screws">
+                    <div class="screw">+</div><div class="screw">+</div>
+                    <div class="screw">+</div><div class="screw">+</div>
+                </div>
+            </div>
+
+            <!-- Module: Materials -->
+            <div class="module">
+                <h2 class="module-title">MATERIALS</h2>
+                <div class="module-content">
+                    <div class="control-group">
+                        <label>FINISH</label>
+                        <div class="row">
+                            <div class="box ambient amb-elevation-1 amb-fillet amb-matte">MATTE</div>
+                            <div class="box ambient amb-elevation-1 amb-fillet amb-shiny">SHINY</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label>EMISSION</label>
+                        <div class="row">
+                            <div class="box amb-emitter amb-fillet">GLOW</div>
+                        </div>
+                    </div>
+                </div>
+                 <div class="screws">
+                    <div class="screw">+</div><div class="screw">+</div>
+                    <div class="screw">+</div><div class="screw">+</div>
+                </div>
+            </div>
+
+            <!-- Module: Controls -->
+            <div class="module">
+                <h2 class="module-title">CONTROLS</h2>
+                <div class="module-content">
+                    <div class="control-group">
+                        <label>INPUT</label>
+                        <input type="text" class="amb-input" placeholder="WAVEFORM">
+                    </div>
+                    <div class="control-group">
+                        <label>TRIGGER</label>
+                        <button class="amb-btn ambient amb-fillet">PUSH ME</button>
+                    </div>
+                </div>
+                 <div class="screws">
+                    <div class="screw">+</div><div class="screw">+</div>
+                    <div class="screw">+</div><div class="screw">+</div>
+                </div>
+            </div>
         </div>
-        <div class="row">
-          <div class="circle ambient amb-fillet amb-elevation-0"></div>
-          <div class="circle ambient amb-fillet amb-elevation-1"></div>
-          <div class="circle ambient amb-fillet amb-elevation-2"></div>
-          <div class="circle ambient amb-fillet amb-elevation-3"></div>
-        </div>
-      </div>
     </div>
     <script src="script.js"></script>
-  </body>
+</body>
 </html>

@@ -1,72 +1,147 @@
 body {
-  background-color: rgb(36, 43, 60);
-  background-image: linear-gradient(
-    45deg,
-    rgba(0, 0, 0, 0.1) 0%,
-    rgba(255, 255, 255, 0.1) 100%
-  );
-  font-family: "Josefin Sans", sans-serif;
-  transition: background-color 3s ease-in;
+    background-color: #2b2b2b;
+    color: #ddd;
+    font-family: 'Josefin Sans', sans-serif;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 3s ease-in;
 }
 
-.container {
-  display: grid;
-  min-height: 90vh;
-  min-width: 100%;
-  column-gap: 30px;
-  gap: 30px;
+.rack-container {
+    background-color: #1a1a1a;
+    border: 4px solid #444;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 1000px;
+    width: 100%;
 }
 
-.content {
-  justify-self: center;
-  align-self: center;
+.rack-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #222;
+    border-radius: 4px;
+    border-bottom: 2px solid #000;
 }
 
-.box {
-  padding: 7rem;
-  border-radius: 7px;
-  margin: 30px;
+.brand {
+    font-weight: 300;
+    letter-spacing: 4px;
+    margin: 0;
+    font-size: 1.5rem;
+    color: #eee;
+    text-shadow: 0 0 5px rgba(255,255,255,0.2);
 }
 
-.logo {
-  text-align: center;
-  font-size: 49px;
-  color: #aaa;
+.version {
+    font-size: 0.8rem;
+    color: #666;
+    vertical-align: super;
 }
 
-.circle {
-  width: 64px;
-  min-height: 64px;
-  content: " ";
-  margin: 30px;
-  border-radius: 50%;
+.power-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.custom {
-  cursor: pointer;
-  border: 1px solid rgb(0 0 0 / 0.4);
-  background-color: inherit;
-  padding: 0.5rem;
-  border-radius: 12px;
-  text-transform: uppercase;
-  width: 64px;
-  font-weight: 600;
-  color: #aaa;
-  text-shadow: 0 0 14px rgb(255 255 255 / 0.35);
+.rack-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    background-color: #000;
+    padding: 4px;
+    border-radius: 4px;
+    justify-content: center;
 }
 
-.custom:focus {
-  /* border: 1px solid lightcoral; */
-  outline: 4px double pink;
-  outline-offset: 2px;
+.module {
+    background-color: #333;
+    padding: 20px;
+    min-width: 200px;
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border-radius: 2px;
 }
 
-.custom:hover {
-  border-color: coral;
+.module-title {
+    font-size: 0.9rem;
+    text-align: center;
+    letter-spacing: 2px;
+    margin: 0 0 10px 0;
+    color: #888;
+    border-bottom: 1px solid #444;
+    padding-bottom: 5px;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.control-group label {
+    font-size: 0.7rem;
+    color: #aaa;
+    letter-spacing: 1px;
 }
 
 .row {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
 }
+
+.box {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: #aaa;
+    border-radius: 4px;
+    background-color: #333;
+    /* Ensure text shadow works for clarity */
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.screws {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+}
+.screw {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: linear-gradient(135deg, #444, #222);
+    border-radius: 50%;
+    color: #111;
+    font-size: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 1px 1px 2px rgba(0,0,0,0.5), 1px 1px 2px rgba(0,0,0,0.5);
+}
+.screw:nth-child(1) { top: 6px; left: 6px; }
+.screw:nth-child(2) { top: 6px; right: 6px; }
+.screw:nth-child(3) { bottom: 6px; left: 6px; }
+.screw:nth-child(4) { bottom: 6px; right: 6px; }

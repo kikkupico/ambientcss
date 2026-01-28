@@ -40,17 +40,20 @@
   --amb-elevation: 3;
 }
 
+.amb-thickness-1 {
+  --amb-thickness: 1;
+}
+
+.amb-thickness-2 {
+  --amb-thickness: 2;
+}
+
+.amb-thickness-3 {
+  --amb-thickness: 3;
+}
+
 .ambient {
-  box-shadow: rgba(
-        0,
-        0,
-        0,
-        calc((var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)))
-      )
-      calc(var(--amb-light-x) * var(--amb-elevation) * -8px)
-      calc(var(--amb-light-y) * var(--amb-elevation) * -8px)
-      calc(var(--amb-elevation) * 8px) calc(var(--amb-elevation) * -4px),
-    inset calc(var(--amb-light-x) * var(--amb-fillet-width) * -1px)
+  box-shadow: inset calc(var(--amb-light-x) * var(--amb-fillet-width) * -1px)
       calc(var(--amb-light-y) * var(--amb-fillet-width) * -1px) 0px 0px
       rgb(
         255 255 255 / calc(var(--amb-fillet) * var(--amb-key-light-intensity))
@@ -80,5 +83,122 @@
                 var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
               )
           )
+      ),
+    calc(var(--amb-light-x) * var(--amb-thickness) * -1px)
+      calc(var(--amb-light-y) * var(--amb-thickness) * -1px) 0px 0px
+      rgba(0, 0, 0, 1),
+    calc(var(--amb-light-x) * var(--amb-elevation) * -8px)
+      calc(var(--amb-light-y) * var(--amb-elevation) * -8px)
+      calc(var(--amb-elevation) * 8px) calc(var(--amb-elevation) * -4px)
+      rgba(
+        0,
+        0,
+        0,
+        calc((var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)))
       );
+}
+
+.amb-groove {
+  --amb-elevation: 0;
+  --amb-thickness: 0;
+  --amb-fillet: 0;
+  --amb-chamfer: 0;
+  box-shadow: inset calc(var(--amb-light-x) * 1px)
+      calc(var(--amb-light-y) * 1px) 0px 0px
+      rgb(
+        255 255 255 / calc(var(--amb-key-light-intensity))
+      ),
+    inset calc(var(--amb-light-x) * -1px)
+      calc(var(--amb-light-y) * -1px) 0px 0px
+      rgb(
+        0 0 0 /
+          calc(
+            calc(
+                var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
+              )
+          )
+      ) !important;
+}
+
+.amb-emitter {
+  --amb-emitter-color: #4CAF50;
+  box-shadow: 0 0 10px var(--amb-emitter-color), 0 0 20px var(--amb-emitter-color) !important;
+  background-color: var(--amb-emitter-color);
+  color: rgba(255,255,255,0.9);
+  border: 1px solid rgba(255,255,255,0.2);
+  text-shadow: 0 0 2px rgba(0,0,0,0.5);
+}
+
+.amb-shiny {
+  background-image: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.0) 50%,
+    rgba(0, 0, 0, 0.1) 100%
+  );
+}
+
+.amb-matte {
+  background-image: none;
+}
+
+.amb-btn {
+  padding: 12px 24px;
+  border: none;
+  background-color: inherit;
+  color: #bbb;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  --amb-elevation: 2;
+  --amb-thickness: 1;
+  --amb-fillet: 1;
+  transition: all 0.1s ease;
+}
+
+.amb-btn:active {
+  --amb-elevation: 1;
+  transform: translate(1px, 1px); /* Optional: physical movement */
+}
+
+.amb-input {
+  border: none;
+  padding: 12px;
+  background-color: rgba(0, 0, 0, 0.2);
+  color: #ddd;
+  font-family: inherit;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+
+  /* Groove Logic */
+  --amb-elevation: 0;
+  --amb-thickness: 0;
+  --amb-fillet: 0;
+  --amb-chamfer: 0;
+
+  box-shadow: inset calc(var(--amb-light-x) * 1px)
+      calc(var(--amb-light-y) * 1px) 0px 0px
+      rgb(
+        255 255 255 / calc(var(--amb-key-light-intensity))
+      ),
+    inset calc(var(--amb-light-x) * -1px)
+      calc(var(--amb-light-y) * -1px) 0px 0px
+      rgb(
+        0 0 0 /
+          calc(
+            calc(
+                var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
+              )
+          )
+      ) !important;
+}
+
+.amb-input:focus {
+  outline: none;
+  background-color: rgba(0, 0, 0, 0.3);
 }
