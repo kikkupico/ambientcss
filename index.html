@@ -1,42 +1,247 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="page.css" rel="stylesheet" />
     <link href="index.css" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;500&display=swap"
       rel="stylesheet"
     />
+    <title>Ambient CSS v0.1</title>
   </head>
-  <body>
-    <div class="container">
-      <div class="content">
-        <div class="box logo ambient amb-fillet amb-elevation-3">
-          a m b i e n t <br />
-          <div style="font-size: 35px">CSS</div>
+  <body class="theme-night">
+    <main class="rack">
+      <header
+        class="rack-header ambient amb-elevation-3 amb-fillet amb-thickness-2 amb-surface-1"
+      >
+        <div class="logo">
+          ambient css
+          <span>lighting rack · v0.1</span>
+        </div>
+        <div class="header-controls">
+          <span class="badge ambient amb-fillet amb-surface-3">lite</span>
+          <span class="badge ambient amb-fillet amb-surface-3">full</span>
+          <span class="badge ambient amb-fillet amb-surface-3">extra</span>
           <button
             id="button-day"
-            class="custom ambient amb-fillet-1 amb-elevation-0"
+            class="amb-button ambient amb-fillet amb-elevation-1 amb-surface-bright"
           >
-            <span style="mix-blend-mode: exclusion">day</span>
+            Day
           </button>
           <button
             id="button-night"
-            class="custom ambient amb-fillet-1 amb-elevation-0"
+            class="amb-button ambient amb-fillet amb-elevation-1 amb-surface-2"
           >
-            <span style="mix-blend-mode: exclusion">night</span>
+            Night
           </button>
         </div>
-        <div class="row">
-          <div class="circle ambient amb-fillet amb-elevation-0"></div>
-          <div class="circle ambient amb-fillet amb-elevation-1"></div>
-          <div class="circle ambient amb-fillet amb-elevation-2"></div>
-          <div class="circle ambient amb-fillet amb-elevation-3"></div>
+      </header>
+
+      <section class="module-grid">
+        <article class="module ambient amb-fillet amb-elevation-2 amb-surface-2">
+          <div class="module-header">
+            <span>Lighting</span>
+            <span class="amb-label">core</span>
+          </div>
+          <div class="module-body">
+            <p>
+              Ambient CSS treats every surface like a miniature stage: a key and
+              fill light define the shadow vector, brightness, and softness.
+            </p>
+            <div class="knob-row">
+              <div class="knob ambient amb-fillet amb-elevation-1">key</div>
+              <div class="knob ambient amb-fillet amb-elevation-1">fill</div>
+              <div class="knob ambient amb-fillet amb-elevation-1">angle</div>
+            </div>
+            <div class="screen ambient amb-fillet amb-surface-screen">
+              <div class="amb-readout">Vars</div>
+              <div class="amb-readout">--amb-light-x / --amb-light-y</div>
+              <div class="amb-readout">--amb-key-light-intensity</div>
+              <div class="amb-readout">--amb-fill-light-intensity</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="module ambient amb-fillet amb-elevation-2 amb-surface-2">
+          <div class="module-header">
+            <span>Depth</span>
+            <span class="amb-label">lite</span>
+          </div>
+          <div class="module-body">
+            <p>
+              Elevation controls the external shadow, while thickness adds depth
+              inside the object. Grooves are best when elevation and thickness
+              are zero.
+            </p>
+            <div class="sample-grid">
+              <div
+                class="sample-card ambient amb-fillet amb-elevation-0 amb-surface-3"
+              >
+                flat
+              </div>
+              <div
+                class="sample-card ambient amb-fillet amb-elevation-1 amb-surface-3"
+              >
+                lift 1
+              </div>
+              <div
+                class="sample-card ambient amb-fillet amb-elevation-2 amb-surface-3"
+              >
+                lift 2
+              </div>
+              <div
+                class="sample-card ambient amb-fillet amb-elevation-3 amb-surface-3"
+              >
+                lift 3
+              </div>
+            </div>
+            <div class="sample-grid">
+              <div
+                class="sample-card ambient amb-chamfer amb-thickness-2 amb-surface-3"
+              >
+                chamfer
+              </div>
+              <div
+                class="sample-card ambient amb-fillet amb-thickness-2 amb-surface-3"
+              >
+                fillet
+              </div>
+              <div
+                class="sample-card ambient amb-groove amb-surface-3"
+              >
+                groove
+              </div>
+              <div
+                class="sample-card ambient amb-fillet amb-elevation-1 amb-thickness-2 amb-surface-3"
+              >
+                stack
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="module ambient amb-fillet amb-elevation-2 amb-surface-2">
+          <div class="module-header">
+            <span>Finishes</span>
+            <span class="amb-label">full</span>
+          </div>
+          <div class="module-body">
+            <p>
+              Finishes change the surface sheen. Combine them with surface
+              colors to build matte plastics, brushed metal, or translucent
+              glass.
+            </p>
+            <div class="sample-grid">
+              <div
+                class="sample-card ambient amb-fillet amb-matte amb-surface-3"
+              >
+                matte
+              </div>
+              <div
+                class="sample-card ambient amb-fillet amb-shiny amb-surface-3"
+              >
+                shiny
+              </div>
+              <div
+                class="sample-card ambient amb-fillet amb-translucent amb-surface-3"
+              >
+                glass
+              </div>
+            </div>
+            <div class="sample-grid">
+              <div
+                class="sample-card ambient amb-fillet amb-elevation-1 amb-emitter amb-surface-accent"
+              >
+                emitter
+              </div>
+              <div
+                class="sample-card ambient amb-fillet amb-elevation-1 amb-surface-bright"
+              >
+                bright
+              </div>
+              <div
+                class="sample-card ambient amb-fillet amb-elevation-1 amb-surface-1"
+              >
+                mid
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="module ambient amb-fillet amb-elevation-2 amb-surface-2">
+          <div class="module-header">
+            <span>Components</span>
+            <span class="amb-label">full</span>
+          </div>
+          <div class="module-body">
+            <p>
+              Ambient components reuse the same lighting and edge system so
+              controls inherit the ambient glow and depth automatically.
+            </p>
+            <div class="component-row">
+              <button
+                class="amb-button ambient amb-fillet amb-elevation-1 amb-surface-accent"
+              >
+                Trigger
+              </button>
+              <button
+                class="amb-button ambient amb-fillet amb-elevation-1 amb-surface-3"
+              >
+                Shift
+              </button>
+              <button
+                class="amb-button ambient amb-fillet amb-groove amb-surface-3"
+              >
+                Cut
+              </button>
+            </div>
+            <div class="component-row">
+              <label class="amb-label" for="patch">Patch</label>
+              <input
+                id="patch"
+                class="amb-input ambient amb-fillet amb-thickness-1 amb-surface-3"
+                placeholder="/synth/arp"
+              />
+              <button
+                class="amb-toggle ambient amb-fillet amb-elevation-1 amb-surface-3 is-on"
+                type="button"
+                aria-label="Enable modulation"
+              ></button>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <article class="module ambient amb-fillet amb-elevation-2 amb-surface-1">
+        <div class="module-header">
+          <span>Documentation</span>
+          <span class="amb-label">extra</span>
         </div>
-      </div>
-    </div>
+        <div class="module-body">
+          <p>
+            Use the <strong>.ambient</strong> class on any element, then layer in
+            modifiers:
+          </p>
+          <ul>
+            <li><strong>Edges:</strong> .amb-fillet, .amb-chamfer, .amb-groove</li>
+            <li><strong>Depth:</strong> .amb-elevation-1-4, .amb-thickness-1-3</li>
+            <li><strong>Finishes:</strong> .amb-matte, .amb-shiny, .amb-translucent</li>
+            <li><strong>Emitters:</strong> .amb-emitter for glowing UI accents</li>
+          </ul>
+          <p>
+            Override any lighting variable directly in CSS for custom rigs. Pair
+            with the included buttons, toggles, and readouts for a full synth
+            interface toolkit.
+          </p>
+        </div>
+      </article>
+
+      <p class="footer-note">Ambient CSS: built for tactile UIs and synth dreams.</p>
+    </main>
     <script src="script.js"></script>
   </body>
 </html>

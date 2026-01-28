@@ -1,31 +1,38 @@
+const root = document.documentElement;
+
 async function sleep(x) {
   return new Promise((resolve) => setTimeout(resolve, x));
 }
 
-let style = getComputedStyle(document.body);
-let wait = Math.round(3000 / 180);
+let wait = Math.round(1600 / 120);
 
 async function animateVar(variable, cond, step) {
-  while (cond(parseFloat(style.getPropertyValue(variable)))) {
-    let curr = parseFloat(style.getPropertyValue(variable));
-    document.documentElement.style.setProperty(variable, curr + step);
+  while (cond(parseFloat(getComputedStyle(root).getPropertyValue(variable)))) {
+    let curr = parseFloat(getComputedStyle(root).getPropertyValue(variable));
+    root.style.setProperty(variable, curr + step);
     await sleep(wait);
   }
+}
+
+function setTheme(theme) {
+  document.body.classList.remove("theme-day", "theme-night");
+  document.body.classList.add(theme);
 }
 
 document
   .getElementById("button-day")
   .addEventListener("click", async function setDay() {
-    document.body.style.backgroundColor = "rgb(239,240,242)";
+    setTheme("theme-day");
     animateVar("--amb-light-x", (val) => val > -1, -1 / 60);
-    animateVar("--amb-key-light-intensity", (val) => val < 0.9, 0.3 / 60);
-    animateVar("--amb-fill-light-intensity", (val) => val < 0.6, 0.3 / 60);
+    animateVar("--amb-key-light-intensity", (val) => val < 0.85, 0.3 / 60);
+    animateVar("--amb-fill-light-intensity", (val) => val < 0.55, 0.3 / 60);
   });
+
 document
   .getElementById("button-night")
-  .addEventListener("click", async function setDay() {
-    document.body.style.backgroundColor = "rgb(36,43,60)";
+  .addEventListener("click", async function setNight() {
+    setTheme("theme-night");
     animateVar("--amb-light-x", (val) => val < 1, 1 / 60);
-    animateVar("--amb-key-light-intensity", (val) => val > 0.3, -0.3 / 60);
-    animateVar("--amb-fill-light-intensity", (val) => val > 0, -0.3 / 60);
+    animateVar("--amb-key-light-intensity", (val) => val > 0.35, -0.3 / 60);
+    animateVar("--amb-fill-light-intensity", (val) => val > 0.1, -0.3 / 60);
   });

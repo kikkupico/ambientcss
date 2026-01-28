@@ -1,14 +1,109 @@
 :root {
   --amb-light-x: 1;
   --amb-light-y: -1;
-  --amb-key-light-intensity: 0.3;
-  --amb-fill-light-intensity: 0;
-  --amb-light-distance: 0px;
+  --amb-key-light-intensity: 0.35;
+  --amb-fill-light-intensity: 0.1;
+  --amb-light-distance: 10px;
   --amb-fillet: 0;
   --amb-chamfer: 0;
+  --amb-groove: 0;
   --amb-thickness: 0;
   --amb-elevation: 0;
   --amb-fillet-width: 1;
+  --amb-groove-width: 4;
+  --amb-emitter: 0;
+  --amb-sheen: 0.25;
+  --amb-opacity: 1;
+  --amb-glow: 0.35;
+  --amb-surface: #2e3648;
+  --amb-radius: 16px;
+}
+
+.ambient {
+  position: relative;
+  border-radius: var(--amb-radius);
+  background-color: var(--amb-surface);
+  background-image: linear-gradient(
+    135deg,
+    rgb(255 255 255 / calc(var(--amb-sheen) * 0.45)),
+    rgb(255 255 255 / calc(var(--amb-sheen) * 0.08)) 45%,
+    rgb(0 0 0 / calc(var(--amb-sheen) * 0.35)) 100%
+  );
+  color: inherit;
+  opacity: var(--amb-opacity);
+  box-shadow: rgba(
+        0,
+        0,
+        0,
+        calc(
+          (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)) *
+            (1 - var(--amb-emitter))
+        )
+      )
+      calc(var(--amb-light-x) * var(--amb-elevation) * -10px)
+      calc(var(--amb-light-y) * var(--amb-elevation) * -10px)
+      calc(var(--amb-elevation) * 12px) calc(var(--amb-elevation) * -4px),
+    inset calc(var(--amb-light-x) * var(--amb-thickness) * -2px)
+      calc(var(--amb-light-y) * var(--amb-thickness) * -2px)
+      calc(var(--amb-thickness) * 4px) 0px
+      rgb(
+        255 255 255 /
+          calc(var(--amb-thickness) * var(--amb-key-light-intensity) * 0.12)
+      ),
+    inset calc(var(--amb-light-x) * var(--amb-thickness) * 2px)
+      calc(var(--amb-light-y) * var(--amb-thickness) * 2px)
+      calc(var(--amb-thickness) * 4px) 0px
+      rgb(
+        0 0 0 /
+          calc(
+            var(--amb-thickness) *
+              (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)) *
+              0.15
+          )
+      ),
+    inset calc(var(--amb-light-x) * var(--amb-fillet-width) * -1px)
+      calc(var(--amb-light-y) * var(--amb-fillet-width) * -1px) 0px 0px
+      rgb(
+        255 255 255 / calc(var(--amb-fillet) * var(--amb-key-light-intensity))
+      ),
+    inset calc(var(--amb-light-x) * var(--amb-fillet-width) * 1px)
+      calc(var(--amb-light-y) * var(--amb-fillet-width) * 1px) 0px 0px
+      rgb(
+        0 0 0 /
+          calc(
+            var(--amb-fillet) *
+              (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
+          )
+      ),
+    inset calc(var(--amb-light-x) * -2px) calc(var(--amb-light-y) * -2px) 2px
+      0px
+      rgb(
+        255 255 255 / calc(var(--amb-chamfer) * var(--amb-key-light-intensity))
+      ),
+    inset calc(var(--amb-light-x) * 2px) calc(var(--amb-light-y) * 2px) 2px 0px
+      rgb(
+        0 0 0 /
+          calc(
+            var(--amb-chamfer) *
+              (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
+          )
+      ),
+    inset calc(var(--amb-light-x) * var(--amb-groove-width) * 1px)
+      calc(var(--amb-light-y) * var(--amb-groove-width) * 1px) 0px 0px
+      rgb(
+        0 0 0 /
+          calc(
+            var(--amb-groove) *
+              (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
+          )
+      ),
+    inset calc(var(--amb-light-x) * var(--amb-groove-width) * -1px)
+      calc(var(--amb-light-y) * var(--amb-groove-width) * -1px) 0px 0px
+      rgb(
+        255 255 255 / calc(var(--amb-groove) * var(--amb-key-light-intensity))
+      ),
+    0 0 calc(var(--amb-emitter) * 24px)
+      rgb(210 240 255 / calc(var(--amb-emitter) * var(--amb-glow)));
 }
 
 .amb-fillet {
@@ -22,6 +117,10 @@
 
 .amb-chamfer {
   --amb-chamfer: 1;
+}
+
+.amb-groove {
+  --amb-groove: 1;
 }
 
 .amb-elevation-0 {
@@ -40,45 +139,132 @@
   --amb-elevation: 3;
 }
 
-.ambient {
-  box-shadow: rgba(
-        0,
-        0,
-        0,
-        calc((var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)))
-      )
-      calc(var(--amb-light-x) * var(--amb-elevation) * -8px)
-      calc(var(--amb-light-y) * var(--amb-elevation) * -8px)
-      calc(var(--amb-elevation) * 8px) calc(var(--amb-elevation) * -4px),
-    inset calc(var(--amb-light-x) * var(--amb-fillet-width) * -1px)
-      calc(var(--amb-light-y) * var(--amb-fillet-width) * -1px) 0px 0px
-      rgb(
-        255 255 255 / calc(var(--amb-fillet) * var(--amb-key-light-intensity))
-      ),
-    inset calc(var(--amb-light-x) * var(--amb-fillet-width) * 1px)
-      calc(var(--amb-light-y) * var(--amb-fillet-width) * 1px) 0px 0px
-      rgb(
-        0 0 0 /
-          calc(
-            var(--amb-fillet) *
-              calc(
-                var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
-              )
-          )
-      ),
-    inset calc(var(--amb-light-x) * -2px) calc(var(--amb-light-y) * -2px) 2px
-      0px
-      rgb(
-        255 255 255 / calc(var(--amb-chamfer) * var(--amb-key-light-intensity))
-      ),
-    inset calc(var(--amb-light-x) * 2px) calc(var(--amb-light-y) * 2px) 2px 0px
-      rgb(
-        0 0 0 /
-          calc(
-            var(--amb-chamfer) *
-              calc(
-                var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
-              )
-          )
-      );
+.amb-elevation-4 {
+  --amb-elevation: 4;
+}
+
+.amb-thickness-0 {
+  --amb-thickness: 0;
+}
+
+.amb-thickness-1 {
+  --amb-thickness: 1;
+}
+
+.amb-thickness-2 {
+  --amb-thickness: 2;
+}
+
+.amb-thickness-3 {
+  --amb-thickness: 3;
+}
+
+.amb-emitter {
+  --amb-emitter: 1;
+}
+
+.amb-matte {
+  --amb-sheen: 0.08;
+}
+
+.amb-shiny {
+  --amb-sheen: 0.8;
+}
+
+.amb-translucent {
+  --amb-opacity: 0.68;
+  --amb-sheen: 0.5;
+}
+
+.amb-surface-1 {
+  --amb-surface: var(--amb-surface-1, #2a3144);
+}
+
+.amb-surface-2 {
+  --amb-surface: var(--amb-surface-2, #323a4f);
+}
+
+.amb-surface-3 {
+  --amb-surface: var(--amb-surface-3, #3a435c);
+}
+
+.amb-surface-accent {
+  --amb-surface: var(--amb-surface-accent, #5d74d8);
+}
+
+.amb-surface-bright {
+  --amb-surface: var(--amb-surface-bright, #cbd1e4);
+  color: var(--amb-surface-ink, #1a1f2d);
+}
+
+.amb-surface-screen {
+  --amb-surface: var(--amb-surface-screen, #0b0f1b);
+  color: var(--amb-surface-ink, #9df7ff);
+}
+
+.amb-button,
+.amb-input,
+.amb-toggle {
+  font: inherit;
+  border: none;
+  color: inherit;
+  background: none;
+}
+
+.amb-button {
+  padding: 0.55rem 1.2rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.amb-button:focus-visible,
+.amb-input:focus-visible {
+  outline: 3px solid rgb(255 176 193 / 0.6);
+  outline-offset: 2px;
+}
+
+.amb-input {
+  padding: 0.6rem 0.8rem;
+  min-width: 180px;
+}
+
+.amb-toggle {
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 3px;
+}
+
+.amb-toggle::after {
+  content: "";
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.85;
+  transform: translateX(var(--amb-toggle-pos, 0));
+  transition: transform 0.25s ease;
+}
+
+.amb-toggle.is-on {
+  --amb-toggle-pos: 18px;
+}
+
+.amb-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.amb-readout {
+  font-family: "Courier New", monospace;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
