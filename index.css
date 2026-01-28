@@ -1,8 +1,8 @@
 :root {
   --amb-light-x: 1;
   --amb-light-y: -1;
-  --amb-key-light-intensity: 0.35;
-  --amb-fill-light-intensity: 0.1;
+  --amb-key-light-intensity: 0.4;
+  --amb-fill-light-intensity: 0.15;
   --amb-light-distance: 10px;
   --amb-fillet: 0;
   --amb-chamfer: 0;
@@ -10,13 +10,14 @@
   --amb-thickness: 0;
   --amb-elevation: 0;
   --amb-fillet-width: 1;
-  --amb-groove-width: 4;
+  --amb-groove-width: 3;
   --amb-emitter: 0;
-  --amb-sheen: 0.25;
+  --amb-sheen: 0.2;
   --amb-opacity: 1;
-  --amb-glow: 0.35;
-  --amb-surface: #2e3648;
-  --amb-radius: 16px;
+  --amb-glow: 0.45;
+  --amb-surface: #2c3034;
+  --amb-radius: 10px;
+  --amb-bevel: 1;
 }
 
 .ambient {
@@ -24,10 +25,10 @@
   border-radius: var(--amb-radius);
   background-color: var(--amb-surface);
   background-image: linear-gradient(
-    135deg,
-    rgb(255 255 255 / calc(var(--amb-sheen) * 0.45)),
-    rgb(255 255 255 / calc(var(--amb-sheen) * 0.08)) 45%,
-    rgb(0 0 0 / calc(var(--amb-sheen) * 0.35)) 100%
+    145deg,
+    rgb(255 255 255 / calc(var(--amb-sheen) * 0.35)),
+    rgb(255 255 255 / calc(var(--amb-sheen) * 0.08)) 48%,
+    rgb(0 0 0 / calc(var(--amb-sheen) * 0.45)) 100%
   );
   color: inherit;
   opacity: var(--amb-opacity);
@@ -40,9 +41,9 @@
             (1 - var(--amb-emitter))
         )
       )
-      calc(var(--amb-light-x) * var(--amb-elevation) * -10px)
-      calc(var(--amb-light-y) * var(--amb-elevation) * -10px)
-      calc(var(--amb-elevation) * 12px) calc(var(--amb-elevation) * -4px),
+      calc(var(--amb-light-x) * var(--amb-elevation) * -8px)
+      calc(var(--amb-light-y) * var(--amb-elevation) * -8px)
+      calc(var(--amb-elevation) * 10px) calc(var(--amb-elevation) * -3px),
     inset calc(var(--amb-light-x) * var(--amb-thickness) * -2px)
       calc(var(--amb-light-y) * var(--amb-thickness) * -2px)
       calc(var(--amb-thickness) * 4px) 0px
@@ -58,7 +59,7 @@
           calc(
             var(--amb-thickness) *
               (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)) *
-              0.15
+              0.16
           )
       ),
     inset calc(var(--amb-light-x) * var(--amb-fillet-width) * -1px)
@@ -102,8 +103,13 @@
       rgb(
         255 255 255 / calc(var(--amb-groove) * var(--amb-key-light-intensity))
       ),
-    0 0 calc(var(--amb-emitter) * 24px)
-      rgb(210 240 255 / calc(var(--amb-emitter) * var(--amb-glow)));
+    inset 0 0 0 1px
+      rgb(
+        255 255 255 /
+          calc(var(--amb-bevel) * var(--amb-key-light-intensity) * 0.4)
+      ),
+    0 0 calc(var(--amb-emitter) * 18px)
+      rgb(255 180 80 / calc(var(--amb-emitter) * var(--amb-glow)));
 }
 
 .amb-fillet {
@@ -177,29 +183,30 @@
 }
 
 .amb-surface-1 {
-  --amb-surface: var(--amb-surface-1, #2a3144);
+  --amb-surface: var(--amb-surface-1, #232629);
 }
 
 .amb-surface-2 {
-  --amb-surface: var(--amb-surface-2, #323a4f);
+  --amb-surface: var(--amb-surface-2, #2b2f33);
 }
 
 .amb-surface-3 {
-  --amb-surface: var(--amb-surface-3, #3a435c);
+  --amb-surface: var(--amb-surface-3, #34393f);
 }
 
 .amb-surface-accent {
-  --amb-surface: var(--amb-surface-accent, #5d74d8);
+  --amb-surface: var(--amb-surface-accent, #ff8b1a);
+  color: #1a0f00;
 }
 
 .amb-surface-bright {
-  --amb-surface: var(--amb-surface-bright, #cbd1e4);
-  color: var(--amb-surface-ink, #1a1f2d);
+  --amb-surface: var(--amb-surface-bright, #e6e6e6);
+  color: var(--amb-surface-ink, #151515);
 }
 
 .amb-surface-screen {
-  --amb-surface: var(--amb-surface-screen, #0b0f1b);
-  color: var(--amb-surface-ink, #9df7ff);
+  --amb-surface: var(--amb-surface-screen, #101113);
+  color: var(--amb-surface-ink, #ffb46c);
 }
 
 .amb-button,
@@ -212,27 +219,27 @@
 }
 
 .amb-button {
-  padding: 0.55rem 1.2rem;
+  padding: 0.4rem 0.8rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   cursor: pointer;
 }
 
 .amb-button:focus-visible,
 .amb-input:focus-visible {
-  outline: 3px solid rgb(255 176 193 / 0.6);
+  outline: 2px solid rgb(255 140 60 / 0.6);
   outline-offset: 2px;
 }
 
 .amb-input {
-  padding: 0.6rem 0.8rem;
-  min-width: 180px;
+  padding: 0.45rem 0.6rem;
+  min-width: 140px;
 }
 
 .amb-toggle {
-  width: 44px;
-  height: 24px;
+  width: 40px;
+  height: 20px;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
@@ -242,8 +249,8 @@
 
 .amb-toggle::after {
   content: "";
-  width: 18px;
-  height: 18px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   background: currentColor;
   opacity: 0.85;
@@ -252,11 +259,11 @@
 }
 
 .amb-toggle.is-on {
-  --amb-toggle-pos: 18px;
+  --amb-toggle-pos: 16px;
 }
 
 .amb-label {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   opacity: 0.7;
@@ -264,7 +271,88 @@
 
 .amb-readout {
   font-family: "Courier New", monospace;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
+}
+
+.amb-knob {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  position: relative;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.amb-knob::after {
+  content: "";
+  position: absolute;
+  width: 4px;
+  height: 20px;
+  background: currentColor;
+  opacity: 0.8;
+  border-radius: 999px;
+  top: 8px;
+}
+
+.amb-knob::before {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 8px rgb(0 0 0 / 0.4);
+  opacity: 0.6;
+}
+
+.amb-fader {
+  width: 56px;
+  display: grid;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.amb-fader-track {
+  width: 14px;
+  height: 90px;
+  margin: 0 auto;
+  border-radius: 999px;
+  position: relative;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.08), rgb(0 0 0 / 0.5));
+}
+
+.amb-fader-track::after {
+  content: "";
+  position: absolute;
+  left: -6px;
+  right: -6px;
+  height: 18px;
+  border-radius: 6px;
+  background: currentColor;
+  opacity: 0.8;
+  top: var(--amb-fader-pos, 55%);
+  transform: translateY(-50%);
+  box-shadow: inset 0 0 4px rgb(0 0 0 / 0.5);
+}
+
+.amb-switch {
+  width: 18px;
+  height: 34px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  font-size: 0.55rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.amb-led {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ff8b1a;
+  box-shadow: 0 0 8px rgb(255 140 60 / 0.8);
 }
