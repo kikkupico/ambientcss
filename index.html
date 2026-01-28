@@ -1,585 +1,798 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ambient CSS - Physically-Based Lighting for Skeumorphic Interfaces</title>
-    <link href="page.css" rel="stylesheet" />
-    <link href="index.css" rel="stylesheet" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap"
-      rel="stylesheet"
-    />
-  </head>
-  <body>
-    <div class="rack">
-      <div class="rack-rails">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ambient CSS - Physically-Based Lighting for Synth Interfaces</title>
+  <link href="index.css" rel="stylesheet">
+  <link href="page.css" rel="stylesheet">
+</head>
+<body>
 
-        <!-- Hero Module -->
-        <div class="module ambient amb-fillet-2 amb-elevation-2">
-          <div class="module-screws">
-            <div class="screw ambient amb-chamfer"></div>
-            <div class="screw ambient amb-chamfer"></div>
-          </div>
-          <div class="module-body module-hero">
-            <div class="hero-logo">a m b i e n t</div>
-            <div class="hero-subtitle">CSS</div>
-            <p class="hero-tagline">
-              A pure CSS framework for realistic, physically-based lighting and shadows.
-              Perfect for skeumorphic interfaces inspired by synthesizers and classic hardware.
-            </p>
-            <div class="hero-controls">
-              <button id="button-day" class="btn-day ambient amb-fillet amb-elevation-1">Day</button>
-              <button id="button-night" class="btn-night ambient amb-fillet amb-elevation-1">Night</button>
-            </div>
-            <div class="led-strip" style="display: inline-flex;">
-              <div class="led ambient amb-emitter amb-emit-red amb-emit-dim"></div>
-              <div class="led ambient amb-emitter amb-emit-amber amb-emit-dim"></div>
-              <div class="led ambient amb-emitter amb-emit-green amb-emit-bright"></div>
-              <div class="led ambient amb-emitter amb-emit-green amb-emit-bright"></div>
-              <div class="led ambient amb-emitter amb-emit-green"></div>
-            </div>
-          </div>
-          <div class="module-screws">
-            <div class="screw ambient amb-chamfer"></div>
-            <div class="screw ambient amb-chamfer"></div>
-          </div>
-        </div>
-
-        <!-- Elevation Module -->
-        <div class="module ambient amb-fillet-2 amb-elevation-1">
-          <div class="module-header">
-            <h2 class="module-title">Elevation Control</h2>
-            <span class="module-brand">AMB-ELV</span>
-          </div>
-          <div class="module-body">
-            <p class="section-desc">
-              Elevation controls how high an element appears to float above the surface.
-              Higher elevations cast longer, softer shadows based on the light direction.
-            </p>
-            <div class="demo-panel ambient amb-groove-2">
-              <div class="demo-title">Elevation Levels (0-3)</div>
-              <div class="demo-row">
-                <div class="demo-item">
-                  <div class="sample-circle ambient amb-fillet amb-elevation-0"></div>
-                  <span class="demo-item-label">Level 0</span>
-                </div>
-                <div class="demo-item">
-                  <div class="sample-circle ambient amb-fillet amb-elevation-1"></div>
-                  <span class="demo-item-label">Level 1</span>
-                </div>
-                <div class="demo-item">
-                  <div class="sample-circle ambient amb-fillet amb-elevation-2"></div>
-                  <span class="demo-item-label">Level 2</span>
-                </div>
-                <div class="demo-item">
-                  <div class="sample-circle ambient amb-fillet amb-elevation-3"></div>
-                  <span class="demo-item-label">Level 3</span>
-                </div>
-              </div>
-            </div>
-            <div class="code-display">
-              <code>&lt;div class="ambient amb-elevation-0"&gt;</code> ... <code>&lt;/div&gt;</code><br>
-              <code>&lt;div class="ambient amb-elevation-3"&gt;</code> ... <code>&lt;/div&gt;</code>
-            </div>
-          </div>
-        </div>
-
-        <!-- Edge Styles Module -->
-        <div class="module ambient amb-fillet-2 amb-elevation-1">
-          <div class="module-header">
-            <h2 class="module-title">Edge Processor</h2>
-            <span class="module-brand">AMB-EDG</span>
-          </div>
-          <div class="module-body">
-            <p class="section-desc">
-              Edge styles define how light interacts with element borders.
-              Choose from fillet (rounded), chamfer (beveled), or groove (inset) effects.
-            </p>
-            <div class="grid-3">
-              <div class="demo-panel ambient amb-groove-2">
-                <div class="demo-title">Fillet (Rounded)</div>
-                <div class="demo-row">
-                  <div class="demo-item">
-                    <div class="sample-box ambient amb-fillet-1 amb-elevation-1"></div>
-                    <span class="demo-item-label">Fillet 1</span>
-                  </div>
-                  <div class="demo-item">
-                    <div class="sample-box ambient amb-fillet-2 amb-elevation-1"></div>
-                    <span class="demo-item-label">Fillet 2</span>
-                  </div>
-                  <div class="demo-item">
-                    <div class="sample-box ambient amb-fillet-3 amb-elevation-1"></div>
-                    <span class="demo-item-label">Fillet 3</span>
-                  </div>
-                </div>
-              </div>
-              <div class="demo-panel ambient amb-groove-2">
-                <div class="demo-title">Chamfer (Beveled)</div>
-                <div class="demo-row">
-                  <div class="demo-item">
-                    <div class="sample-box ambient amb-chamfer-1 amb-elevation-1"></div>
-                    <span class="demo-item-label">Chamfer 1</span>
-                  </div>
-                  <div class="demo-item">
-                    <div class="sample-box ambient amb-chamfer-2 amb-elevation-1"></div>
-                    <span class="demo-item-label">Chamfer 2</span>
-                  </div>
-                  <div class="demo-item">
-                    <div class="sample-box ambient amb-chamfer-3 amb-elevation-1"></div>
-                    <span class="demo-item-label">Chamfer 3</span>
-                  </div>
-                </div>
-              </div>
-              <div class="demo-panel ambient amb-groove-2">
-                <div class="demo-title">Groove (Inset)</div>
-                <div class="demo-row">
-                  <div class="demo-item">
-                    <div class="sample-box ambient amb-groove-1"></div>
-                    <span class="demo-item-label">Groove 1</span>
-                  </div>
-                  <div class="demo-item">
-                    <div class="sample-box ambient amb-groove-2"></div>
-                    <span class="demo-item-label">Groove 2</span>
-                  </div>
-                  <div class="demo-item">
-                    <div class="sample-box ambient amb-groove-3"></div>
-                    <span class="demo-item-label">Groove 3</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="code-display">
-              <code>&lt;div class="ambient amb-fillet-2"&gt;</code> Rounded edges<br>
-              <code>&lt;div class="ambient amb-chamfer-2"&gt;</code> Beveled edges<br>
-              <code>&lt;div class="ambient amb-groove-2"&gt;</code> Inset edges
-            </div>
-          </div>
-        </div>
-
-        <!-- Thickness Module -->
-        <div class="module ambient amb-fillet-2 amb-elevation-1">
-          <div class="module-header">
-            <h2 class="module-title">Thickness Generator</h2>
-            <span class="module-brand">AMB-THK</span>
-          </div>
-          <div class="module-body">
-            <p class="section-desc">
-              Thickness adds visual depth to the element itself, creating a sense of material weight
-              separate from elevation shadows.
-            </p>
-            <div class="demo-panel ambient amb-groove-2">
-              <div class="demo-title">Thickness Levels</div>
-              <div class="demo-row">
-                <div class="demo-item">
-                  <div class="sample-rect ambient amb-fillet amb-thickness-0 amb-elevation-1"></div>
-                  <span class="demo-item-label">Thickness 0</span>
-                </div>
-                <div class="demo-item">
-                  <div class="sample-rect ambient amb-fillet amb-thickness-1 amb-elevation-1"></div>
-                  <span class="demo-item-label">Thickness 1</span>
-                </div>
-                <div class="demo-item">
-                  <div class="sample-rect ambient amb-fillet amb-thickness-2 amb-elevation-1"></div>
-                  <span class="demo-item-label">Thickness 2</span>
-                </div>
-                <div class="demo-item">
-                  <div class="sample-rect ambient amb-fillet amb-thickness-3 amb-elevation-1"></div>
-                  <span class="demo-item-label">Thickness 3</span>
-                </div>
-              </div>
-            </div>
-            <div class="code-display">
-              <code>&lt;div class="ambient amb-thickness-2 amb-elevation-1"&gt;</code>
-            </div>
-          </div>
-        </div>
-
-        <!-- Emitter Module -->
-        <div class="module ambient amb-fillet-2 amb-elevation-1">
-          <div class="module-header">
-            <h2 class="module-title">Emitter Array</h2>
-            <span class="module-brand">AMB-EMT</span>
-          </div>
-          <div class="module-body">
-            <p class="section-desc">
-              Emitters are glowing elements that cast light outward instead of shadows.
-              Perfect for LEDs, displays, status indicators, and backlit controls.
-            </p>
-            <div class="grid-2">
-              <div class="demo-panel ambient amb-groove-2">
-                <div class="demo-title">Emitter Colors</div>
-                <div class="demo-row">
-                  <div class="demo-item">
-                    <div class="sample-circle ambient amb-emitter amb-emit-warm amb-emit-bright"></div>
-                    <span class="demo-item-label">Warm</span>
-                  </div>
-                  <div class="demo-item">
-                    <div class="sample-circle ambient amb-emitter amb-emit-cool amb-emit-bright"></div>
-                    <span class="demo-item-label">Cool</span>
-                  </div>
-                  <div class="demo-item">
-                    <div class="sample-circle ambient amb-emitter amb-emit-red amb-emit-bright"></div>
-                    <span class="demo-item-label">Red</span>
-                  </div>
-                  <div class="demo-item">
-                    <div class="sample-circle ambient amb-emitter amb-emit-green amb-emit-bright"></div>
-                    <span class="demo-item-label">Green</span>
-                  </div>
-                  <div class="demo-item">
-                    <div class="sample-circle ambient amb-emitter amb-emit-blue amb-emit-bright"></div>
-                    <span class="demo-item-label">Blue</span>
-                  </div>
-                  <div class="demo-item">
-                    <div class="sample-circle ambient amb-emitter amb-emit-purple amb-emit-bright"></div>
-                    <span class="demo-item-label">Purple</span>
-                  </div>
-                  <div class="demo-item">
-                    <div class="sample-circle ambient amb-emitter amb-emit-amber amb-emit-bright"></div>
-                    <span class="demo-item-label">Amber</span>
-                  </div>
-                </div>
-              </div>
-              <div class="demo-panel ambient amb-groove-2">
-                <div class="demo-title">Intensity Levels</div>
-                <div class="demo-row">
-                  <div class="demo-item">
-                    <div class="sample-circle ambient amb-emitter amb-emit-green amb-emit-dim"></div>
-                    <span class="demo-item-label">Dim</span>
-                  </div>
-                  <div class="demo-item">
-                    <div class="sample-circle ambient amb-emitter amb-emit-green"></div>
-                    <span class="demo-item-label">Normal</span>
-                  </div>
-                  <div class="demo-item">
-                    <div class="sample-circle ambient amb-emitter amb-emit-green amb-emit-bright"></div>
-                    <span class="demo-item-label">Bright</span>
-                  </div>
-                  <div class="demo-item">
-                    <div class="sample-circle ambient amb-emitter amb-emit-green amb-emit-intense"></div>
-                    <span class="demo-item-label">Intense</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="code-display">
-              <code>&lt;div class="ambient amb-emitter amb-emit-green amb-emit-bright"&gt;</code>
-            </div>
-          </div>
-        </div>
-
-        <!-- Finishes Module -->
-        <div class="module ambient amb-fillet-2 amb-elevation-1">
-          <div class="module-header">
-            <h2 class="module-title">Surface Finish</h2>
-            <span class="module-brand">AMB-FIN</span>
-          </div>
-          <div class="module-body">
-            <p class="section-desc">
-              Material finishes change how light reflects off surfaces. Choose matte for diffuse lighting,
-              shiny for specular highlights, or translucent for glass-like effects.
-            </p>
-            <div class="demo-panel ambient amb-groove-2">
-              <div class="demo-title">Available Finishes</div>
-              <div class="demo-row">
-                <div class="demo-item">
-                  <div class="sample-box ambient amb-fillet amb-matte amb-elevation-1"></div>
-                  <span class="demo-item-label">Matte</span>
-                </div>
-                <div class="demo-item">
-                  <div class="sample-box ambient amb-fillet amb-shiny amb-elevation-1"></div>
-                  <span class="demo-item-label">Shiny</span>
-                </div>
-                <div class="demo-item">
-                  <div class="sample-box ambient amb-fillet amb-translucent amb-elevation-1" style="background-color: rgba(100, 150, 200, 0.5);"></div>
-                  <span class="demo-item-label">Translucent</span>
-                </div>
-              </div>
-            </div>
-            <div class="code-display">
-              <code>&lt;div class="ambient amb-matte"&gt;</code> Default finish<br>
-              <code>&lt;div class="ambient amb-shiny"&gt;</code> Specular highlight<br>
-              <code>&lt;div class="ambient amb-translucent"&gt;</code> Glass-like
-            </div>
-          </div>
-        </div>
-
-        <!-- Components Module -->
-        <div class="module ambient amb-fillet-2 amb-elevation-1">
-          <div class="module-header">
-            <h2 class="module-title">Component Library</h2>
-            <span class="module-brand">AMB-CMP</span>
-          </div>
-          <div class="module-body">
-            <p class="section-desc">
-              Pre-styled interactive components that automatically respond to user interaction
-              with realistic pressed states and hover effects.
-            </p>
-
-            <!-- Buttons -->
-            <div class="demo-panel ambient amb-groove-2">
-              <div class="demo-title">Buttons</div>
-              <div class="demo-row">
-                <button class="amb-btn ambient">Default</button>
-                <button class="amb-btn ambient amb-accent-blue" style="color: white;">Primary</button>
-                <button class="amb-btn ambient amb-accent-green" style="color: white;">Success</button>
-                <button class="amb-btn ambient amb-accent-red" style="color: white;">Danger</button>
-              </div>
-              <div class="code-display">
-                <code>&lt;button class="amb-btn ambient"&gt;</code>Click me<code>&lt;/button&gt;</code>
-              </div>
-            </div>
-
-            <!-- Inputs -->
-            <div class="demo-panel ambient amb-groove-2">
-              <div class="demo-title">Inputs</div>
-              <div class="demo-row">
-                <input type="text" class="amb-input ambient" placeholder="Text input..." style="width: 180px; color: #bbb;">
-                <select class="amb-select ambient" style="color: #bbb;">
-                  <option>Select option</option>
-                  <option>Option 1</option>
-                  <option>Option 2</option>
-                </select>
-              </div>
-              <div class="code-display">
-                <code>&lt;input class="amb-input ambient" type="text"&gt;</code><br>
-                <code>&lt;select class="amb-select ambient"&gt;</code>
-              </div>
-            </div>
-
-            <!-- Synth Controls -->
-            <div class="demo-panel ambient amb-groove-2">
-              <div class="demo-title">Synth Controls</div>
-              <div class="demo-row">
-                <div class="control-group">
-                  <div class="amb-knob ambient"></div>
-                  <span class="control-label">Knob</span>
-                </div>
-                <div class="control-group">
-                  <div class="amb-led ambient amb-emit-green on"></div>
-                  <span class="control-label">LED On</span>
-                </div>
-                <div class="control-group">
-                  <div class="amb-led ambient amb-emit-red off"></div>
-                  <span class="control-label">LED Off</span>
-                </div>
-                <div class="control-group">
-                  <div class="amb-jack ambient"></div>
-                  <span class="control-label">Jack</span>
-                </div>
-                <div class="control-group">
-                  <div class="amb-screw ambient"></div>
-                  <span class="control-label">Screw</span>
-                </div>
-              </div>
-              <div class="code-display">
-                <code>&lt;div class="amb-knob ambient"&gt;</code> Rotary control<br>
-                <code>&lt;div class="amb-led ambient amb-emit-green on"&gt;</code> LED indicator<br>
-                <code>&lt;div class="amb-jack ambient"&gt;</code> Connector jack
-              </div>
-            </div>
-
-            <!-- Panels -->
-            <div class="demo-panel ambient amb-groove-2">
-              <div class="demo-title">Panels</div>
-              <div class="grid-2">
-                <div class="amb-panel ambient" style="text-align: center;">
-                  <span class="control-label">Raised Panel</span>
-                </div>
-                <div class="amb-panel-inset ambient" style="text-align: center;">
-                  <span class="control-label">Inset Panel</span>
-                </div>
-              </div>
-              <div class="code-display">
-                <code>&lt;div class="amb-panel ambient"&gt;</code> Raised panel<br>
-                <code>&lt;div class="amb-panel-inset ambient"&gt;</code> Inset panel
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- CSS Variables Module -->
-        <div class="module ambient amb-fillet-2 amb-elevation-1">
-          <div class="module-header">
-            <h2 class="module-title">Variable Reference</h2>
-            <span class="module-brand">AMB-VAR</span>
-          </div>
-          <div class="module-body">
-            <p class="section-desc">
-              Customize the lighting environment using CSS custom properties.
-              All values can be animated for dynamic lighting transitions.
-            </p>
-            <div class="demo-panel ambient amb-groove-2">
-              <table class="doc-table">
-                <thead>
-                  <tr>
-                    <th>Variable</th>
-                    <th>Default</th>
-                    <th>Description</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><code>--amb-light-x</code></td>
-                    <td>1</td>
-                    <td>Light direction X (-1 to 1)</td>
-                  </tr>
-                  <tr>
-                    <td><code>--amb-light-y</code></td>
-                    <td>-1</td>
-                    <td>Light direction Y (-1 to 1)</td>
-                  </tr>
-                  <tr>
-                    <td><code>--amb-key-light-intensity</code></td>
-                    <td>0.3</td>
-                    <td>Main light strength (0 to 1)</td>
-                  </tr>
-                  <tr>
-                    <td><code>--amb-fill-light-intensity</code></td>
-                    <td>0</td>
-                    <td>Fill light strength (0 to 1)</td>
-                  </tr>
-                  <tr>
-                    <td><code>--amb-elevation</code></td>
-                    <td>0</td>
-                    <td>Element elevation (0 to 3)</td>
-                  </tr>
-                  <tr>
-                    <td><code>--amb-thickness</code></td>
-                    <td>0</td>
-                    <td>Element thickness (0 to 3)</td>
-                  </tr>
-                  <tr>
-                    <td><code>--amb-emit-color</code></td>
-                    <td>255, 200, 100</td>
-                    <td>RGB values for emitter glow</td>
-                  </tr>
-                  <tr>
-                    <td><code>--amb-emit-intensity</code></td>
-                    <td>0.5</td>
-                    <td>Emitter brightness (0 to 1)</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- Quick Start Module -->
-        <div class="module ambient amb-fillet-2 amb-elevation-1">
-          <div class="module-header">
-            <h2 class="module-title">Quick Start</h2>
-            <span class="module-brand">AMB-QST</span>
-          </div>
-          <div class="module-body">
-            <p class="section-desc">
-              Get started with Ambient CSS in seconds. Include the stylesheet and
-              start adding classes to your elements.
-            </p>
-            <div class="demo-panel ambient amb-groove-2">
-              <div class="demo-title">1. Include the CSS</div>
-              <div class="code-display">
-                <code>&lt;link href="index.css" rel="stylesheet"&gt;</code>
-              </div>
-            </div>
-            <div class="demo-panel ambient amb-groove-2">
-              <div class="demo-title">2. Add Ambient Classes</div>
-              <div class="code-display">
-                <code>&lt;div class="ambient amb-fillet amb-elevation-2"&gt;</code><br>
-                &nbsp;&nbsp;Your content here<br>
-                <code>&lt;/div&gt;</code>
-              </div>
-            </div>
-            <div class="demo-panel ambient amb-groove-2">
-              <div class="demo-title">3. Customize Lighting (Optional)</div>
-              <div class="code-display">
-                :root {<br>
-                &nbsp;&nbsp;<code>--amb-light-x: -1;</code> /* Light from left */<br>
-                &nbsp;&nbsp;<code>--amb-key-light-intensity: 0.5;</code> /* Brighter */<br>
-                }
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Class Reference Module -->
-        <div class="module ambient amb-fillet-2 amb-elevation-1">
-          <div class="module-header">
-            <h2 class="module-title">Class Reference</h2>
-            <span class="module-brand">AMB-REF</span>
-          </div>
-          <div class="module-body">
-            <div class="grid-2">
-              <div class="demo-panel ambient amb-groove-2">
-                <div class="demo-title">Edge Classes</div>
-                <table class="doc-table">
-                  <tbody>
-                    <tr><td><code>.amb-fillet</code></td><td>Rounded edge</td></tr>
-                    <tr><td><code>.amb-fillet-1/2/3</code></td><td>Fillet widths</td></tr>
-                    <tr><td><code>.amb-chamfer</code></td><td>Beveled edge</td></tr>
-                    <tr><td><code>.amb-chamfer-1/2/3</code></td><td>Chamfer widths</td></tr>
-                    <tr><td><code>.amb-groove</code></td><td>Inset edge</td></tr>
-                    <tr><td><code>.amb-groove-1/2/3</code></td><td>Groove widths</td></tr>
-                  </tbody>
-                </table>
-              </div>
-              <div class="demo-panel ambient amb-groove-2">
-                <div class="demo-title">Property Classes</div>
-                <table class="doc-table">
-                  <tbody>
-                    <tr><td><code>.amb-elevation-0/1/2/3</code></td><td>Shadow depth</td></tr>
-                    <tr><td><code>.amb-thickness-0/1/2/3</code></td><td>Visual weight</td></tr>
-                    <tr><td><code>.amb-pressed</code></td><td>Pressed state</td></tr>
-                    <tr><td><code>.amb-emitter</code></td><td>Glowing element</td></tr>
-                    <tr><td><code>.amb-matte</code></td><td>Matte finish</td></tr>
-                    <tr><td><code>.amb-shiny</code></td><td>Specular finish</td></tr>
-                    <tr><td><code>.amb-translucent</code></td><td>Glass finish</td></tr>
-                  </tbody>
-                </table>
-              </div>
-              <div class="demo-panel ambient amb-groove-2">
-                <div class="demo-title">Emitter Classes</div>
-                <table class="doc-table">
-                  <tbody>
-                    <tr><td><code>.amb-emit-warm</code></td><td>Warm white glow</td></tr>
-                    <tr><td><code>.amb-emit-cool</code></td><td>Cool blue glow</td></tr>
-                    <tr><td><code>.amb-emit-red/green/blue</code></td><td>Color glows</td></tr>
-                    <tr><td><code>.amb-emit-purple/amber</code></td><td>Accent glows</td></tr>
-                    <tr><td><code>.amb-emit-dim</code></td><td>Low intensity</td></tr>
-                    <tr><td><code>.amb-emit-bright</code></td><td>High intensity</td></tr>
-                    <tr><td><code>.amb-emit-intense</code></td><td>Maximum glow</td></tr>
-                  </tbody>
-                </table>
-              </div>
-              <div class="demo-panel ambient amb-groove-2">
-                <div class="demo-title">Component Classes</div>
-                <table class="doc-table">
-                  <tbody>
-                    <tr><td><code>.amb-btn</code></td><td>Button styling</td></tr>
-                    <tr><td><code>.amb-input</code></td><td>Text input</td></tr>
-                    <tr><td><code>.amb-select</code></td><td>Dropdown select</td></tr>
-                    <tr><td><code>.amb-panel</code></td><td>Raised panel</td></tr>
-                    <tr><td><code>.amb-panel-inset</code></td><td>Inset panel</td></tr>
-                    <tr><td><code>.amb-knob</code></td><td>Rotary control</td></tr>
-                    <tr><td><code>.amb-led</code></td><td>LED indicator</td></tr>
-                    <tr><td><code>.amb-jack</code></td><td>Connector port</td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Footer -->
-        <footer class="rack-footer">
-          <p>Ambient CSS v0.1 - Physically-based lighting for skeumorphic interfaces</p>
-          <p>Inspired by synthesizer interfaces and the original iPhone</p>
-        </footer>
-
+<div class="synth">
+  <!-- Header -->
+  <div class="synth-header">
+    <div class="synth-title-area">
+      <div class="synth-logo">AMBIENT<span>CSS</span></div>
+      <div class="synth-display ambient" style="min-width: 100px;">v0.1</div>
+    </div>
+    <div class="synth-master-controls">
+      <div class="ctrl">
+        <div class="synth-led on ambient"></div>
+        <span class="ctrl-label">Power</span>
+      </div>
+      <div class="ctrl">
+        <div class="synth-knob-lg ambient"></div>
+        <span class="ctrl-label">Master</span>
       </div>
     </div>
-    <script src="script.js"></script>
-  </body>
+  </div>
+
+  <!-- Row 1: LFO, VCO, Filter -->
+  <div class="synth-row">
+    <!-- LFO-1 -->
+    <div class="synth-module">
+      <div class="synth-module-header">LFO-1</div>
+      <div class="synth-module-body">
+        <div class="ctrl">
+          <div class="synth-fader">
+            <div class="synth-fader-track ambient">
+              <div class="synth-fader-cap ambient"></div>
+            </div>
+          </div>
+          <span class="ctrl-label">Rate</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-fader">
+            <div class="synth-fader-track ambient">
+              <div class="synth-fader-cap ambient" style="top: 50%"></div>
+            </div>
+          </div>
+          <span class="ctrl-label">Delay</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-waveform">
+            <div class="synth-waveform-btn ambient active">
+              <svg viewBox="0 0 16 10"><polyline points="1,9 8,1 8,9 15,1"/></svg>
+            </div>
+            <div class="synth-waveform-btn ambient">
+              <svg viewBox="0 0 16 10"><polyline points="1,9 4,1 12,1 15,9"/></svg>
+            </div>
+          </div>
+          <span class="ctrl-label">Wave</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-switch ambient">
+            <div class="synth-switch-handle ambient"></div>
+          </div>
+          <span class="ctrl-label">Sync</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- VCO MOD -->
+    <div class="synth-module">
+      <div class="synth-module-header">VCO Mod</div>
+      <div class="synth-module-body">
+        <div class="ctrl">
+          <div class="synth-fader">
+            <div class="synth-fader-track ambient">
+              <div class="synth-fader-cap ambient" style="top: 20%"></div>
+            </div>
+          </div>
+          <span class="ctrl-label">LFO-1</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-fader">
+            <div class="synth-fader-track ambient">
+              <div class="synth-fader-cap ambient" style="top: 70%"></div>
+            </div>
+          </div>
+          <span class="ctrl-label">ENV-1</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-switch-3 ambient">
+            <div class="synth-switch-handle ambient"></div>
+          </div>
+          <span class="ctrl-label">Dest</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PULSE WIDTH -->
+    <div class="synth-module w-sm">
+      <div class="synth-module-header">PWM</div>
+      <div class="synth-module-body">
+        <div class="ctrl">
+          <div class="synth-knob-md ambient"></div>
+          <span class="ctrl-label">PW</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-knob-md ambient"></div>
+          <span class="ctrl-label">PWM</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- VCO-1 -->
+    <div class="synth-module w-lg">
+      <div class="synth-module-header">VCO-1</div>
+      <div class="synth-module-body">
+        <div class="ctrl">
+          <div class="synth-knob-sm ambient"></div>
+          <span class="ctrl-label">Range</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-waveform">
+            <div class="synth-waveform-btn ambient">
+              <svg viewBox="0 0 16 10"><polyline points="1,9 8,1 8,9 15,1"/></svg>
+            </div>
+            <div class="synth-waveform-btn ambient active">
+              <svg viewBox="0 0 16 10"><polyline points="1,9 1,1 8,1 8,9 15,9 15,1"/></svg>
+            </div>
+            <div class="synth-waveform-btn ambient">
+              <svg viewBox="0 0 16 10"><polyline points="1,5 4,1 8,9 12,1 15,5"/></svg>
+            </div>
+          </div>
+          <span class="ctrl-label">Wave</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-switch ambient down">
+            <div class="synth-switch-handle ambient"></div>
+          </div>
+          <span class="ctrl-label">Sync</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-switch ambient">
+            <div class="synth-switch-handle ambient"></div>
+          </div>
+          <span class="ctrl-label">Kybd</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- VCO-2 -->
+    <div class="synth-module w-xl">
+      <div class="synth-module-header">VCO-2</div>
+      <div class="synth-module-body">
+        <div class="ctrl">
+          <div class="synth-knob-sm ambient"></div>
+          <span class="ctrl-label">Range</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-knob-lg ambient"></div>
+          <span class="ctrl-label">Tune</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-waveform">
+            <div class="synth-waveform-btn ambient active">
+              <svg viewBox="0 0 16 10"><polyline points="1,9 8,1 8,9 15,1"/></svg>
+            </div>
+            <div class="synth-waveform-btn ambient">
+              <svg viewBox="0 0 16 10"><polyline points="1,9 1,1 8,1 8,9 15,9 15,1"/></svg>
+            </div>
+            <div class="synth-waveform-btn ambient">
+              <svg viewBox="0 0 16 10"><polyline points="1,5 4,1 8,9 12,1 15,5"/></svg>
+            </div>
+            <div class="synth-waveform-btn ambient">
+              <svg viewBox="0 0 16 10"><path d="M1,5 Q4,1 8,5 Q12,9 15,5" fill="none"/></svg>
+            </div>
+          </div>
+          <span class="ctrl-label">Wave</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-switch-3 ambient up">
+            <div class="synth-switch-handle ambient"></div>
+          </div>
+          <span class="ctrl-label">Low<br>Freq</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 2: Mixer, VCF, VCA, Envelopes -->
+  <div class="synth-row">
+    <!-- MIXER -->
+    <div class="synth-module">
+      <div class="synth-module-header">Mixer</div>
+      <div class="synth-module-body tall">
+        <div class="ctrl">
+          <div class="synth-fader">
+            <div class="synth-fader-track synth-fader-track-tall ambient">
+              <div class="synth-fader-cap ambient" style="top: 20%"></div>
+            </div>
+          </div>
+          <span class="ctrl-label">VCO-1</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-fader">
+            <div class="synth-fader-track synth-fader-track-tall ambient">
+              <div class="synth-fader-cap ambient" style="top: 35%"></div>
+            </div>
+          </div>
+          <span class="ctrl-label">VCO-2</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-fader">
+            <div class="synth-fader-track synth-fader-track-tall ambient">
+              <div class="synth-fader-cap ambient" style="top: 80%"></div>
+            </div>
+          </div>
+          <span class="ctrl-label">Noise</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- VCF -->
+    <div class="synth-module w-lg">
+      <div class="synth-module-header">VCF</div>
+      <div class="synth-module-body tall">
+        <div class="ctrl">
+          <div class="synth-knob-lg ambient"></div>
+          <span class="ctrl-label">Freq</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-knob-lg ambient"></div>
+          <span class="ctrl-label">Res</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-fader">
+            <div class="synth-fader-track synth-fader-track-tall ambient">
+              <div class="synth-fader-cap ambient" style="top: 40%"></div>
+            </div>
+          </div>
+          <span class="ctrl-label">Env</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-fader">
+            <div class="synth-fader-track synth-fader-track-tall ambient">
+              <div class="synth-fader-cap ambient" style="top: 60%"></div>
+            </div>
+          </div>
+          <span class="ctrl-label">Mod</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-fader">
+            <div class="synth-fader-track synth-fader-track-tall ambient">
+              <div class="synth-fader-cap ambient" style="top: 50%"></div>
+            </div>
+          </div>
+          <span class="ctrl-label">Kybd</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- VCA -->
+    <div class="synth-module w-sm">
+      <div class="synth-module-header">VCA</div>
+      <div class="synth-module-body tall">
+        <div class="ctrl">
+          <div class="synth-fader">
+            <div class="synth-fader-track synth-fader-track-tall ambient">
+              <div class="synth-fader-cap ambient" style="top: 15%"></div>
+            </div>
+          </div>
+          <span class="ctrl-label">Level</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-switch ambient">
+            <div class="synth-switch-handle ambient"></div>
+          </div>
+          <span class="ctrl-label">Env</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENV-1 -->
+    <div class="synth-module w-lg">
+      <div class="synth-module-header">ENV-1</div>
+      <div class="synth-module-body tall">
+        <div class="ctrl">
+          <div class="synth-env-display ambient">
+            <svg viewBox="0 0 80 40">
+              <polygon class="fill" points="5,35 15,5 30,15 60,15 75,35"/>
+              <polyline points="5,35 15,5 30,15 60,15 75,35"/>
+            </svg>
+          </div>
+        </div>
+        <div class="ctrl">
+          <div class="synth-fader">
+            <div class="synth-fader-track synth-fader-track-tall ambient">
+              <div class="synth-fader-cap ambient" style="top: 25%"></div>
+            </div>
+          </div>
+          <span class="ctrl-label">A</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-fader">
+            <div class="synth-fader-track synth-fader-track-tall ambient">
+              <div class="synth-fader-cap ambient" style="top: 40%"></div>
+            </div>
+          </div>
+          <span class="ctrl-label">D</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-fader">
+            <div class="synth-fader-track synth-fader-track-tall ambient">
+              <div class="synth-fader-cap ambient" style="top: 30%"></div>
+            </div>
+          </div>
+          <span class="ctrl-label">S</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-fader">
+            <div class="synth-fader-track synth-fader-track-tall ambient">
+              <div class="synth-fader-cap ambient" style="top: 50%"></div>
+            </div>
+          </div>
+          <span class="ctrl-label">R</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENV-2 -->
+    <div class="synth-module w-lg">
+      <div class="synth-module-header">ENV-2</div>
+      <div class="synth-module-body tall">
+        <div class="ctrl">
+          <div class="synth-env-display ambient">
+            <svg viewBox="0 0 80 40">
+              <polygon class="fill" points="5,35 20,5 35,20 55,20 75,35"/>
+              <polyline points="5,35 20,5 35,20 55,20 75,35"/>
+            </svg>
+          </div>
+        </div>
+        <div class="ctrl">
+          <div class="synth-fader">
+            <div class="synth-fader-track synth-fader-track-tall ambient">
+              <div class="synth-fader-cap ambient" style="top: 35%"></div>
+            </div>
+          </div>
+          <span class="ctrl-label">A</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-fader">
+            <div class="synth-fader-track synth-fader-track-tall ambient">
+              <div class="synth-fader-cap ambient" style="top: 45%"></div>
+            </div>
+          </div>
+          <span class="ctrl-label">D</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-fader">
+            <div class="synth-fader-track synth-fader-track-tall ambient">
+              <div class="synth-fader-cap ambient" style="top: 40%"></div>
+            </div>
+          </div>
+          <span class="ctrl-label">S</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-fader">
+            <div class="synth-fader-track synth-fader-track-tall ambient">
+              <div class="synth-fader-cap ambient" style="top: 55%"></div>
+            </div>
+          </div>
+          <span class="ctrl-label">R</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 3: Effects, Performance -->
+  <div class="synth-row">
+    <!-- LFO-2 -->
+    <div class="synth-module w-md">
+      <div class="synth-module-header">LFO-2</div>
+      <div class="synth-module-body">
+        <div class="ctrl">
+          <div class="synth-knob-md ambient"></div>
+          <span class="ctrl-label">Rate</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-switch ambient">
+            <div class="synth-switch-handle ambient"></div>
+          </div>
+          <span class="ctrl-label">VCO</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-switch ambient down">
+            <div class="synth-switch-handle ambient"></div>
+          </div>
+          <span class="ctrl-label">VCF</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BENDER -->
+    <div class="synth-module w-sm">
+      <div class="synth-module-header">Bend</div>
+      <div class="synth-module-body">
+        <div class="ctrl">
+          <div class="synth-wheel ambient">
+            <div class="synth-wheel-surface"></div>
+          </div>
+          <span class="ctrl-label">Pitch</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- GLIDE -->
+    <div class="synth-module w-sm">
+      <div class="synth-module-header">Glide</div>
+      <div class="synth-module-body">
+        <div class="ctrl">
+          <div class="synth-knob-md ambient"></div>
+          <span class="ctrl-label">Time</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-switch ambient">
+            <div class="synth-switch-handle ambient"></div>
+          </div>
+          <span class="ctrl-label">On</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- UNISON -->
+    <div class="synth-module w-md">
+      <div class="synth-module-header">Unison</div>
+      <div class="synth-module-body">
+        <div class="ctrl">
+          <div class="synth-knob-md ambient"></div>
+          <span class="ctrl-label">Detune</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-knob-sm ambient"></div>
+          <span class="ctrl-label">Voices</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHORUS -->
+    <div class="synth-module w-md">
+      <div class="synth-module-header">Chorus</div>
+      <div class="synth-module-body">
+        <div class="ctrl">
+          <div class="synth-knob-md ambient"></div>
+          <span class="ctrl-label">Rate</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-knob-md ambient"></div>
+          <span class="ctrl-label">Depth</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-led green on ambient"></div>
+          <span class="ctrl-label">On</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- OUTPUT -->
+    <div class="synth-module">
+      <div class="synth-module-header">Output</div>
+      <div class="synth-module-body">
+        <div class="ctrl">
+          <div class="synth-vu">
+            <div class="synth-vu-segment red active"></div>
+            <div class="synth-vu-segment yellow active"></div>
+            <div class="synth-vu-segment yellow active"></div>
+            <div class="synth-vu-segment green active"></div>
+            <div class="synth-vu-segment green active"></div>
+            <div class="synth-vu-segment green active"></div>
+            <div class="synth-vu-segment green active"></div>
+            <div class="synth-vu-segment green"></div>
+          </div>
+        </div>
+        <div class="ctrl">
+          <div class="synth-jack ambient"></div>
+          <span class="ctrl-label">L</span>
+        </div>
+        <div class="ctrl">
+          <div class="synth-jack ambient"></div>
+          <span class="ctrl-label">R</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="synth-footer">
+    <span>Ambient CSS v0.1 - Physically-based lighting for synth interfaces</span>
+    <span>Pure CSS, no JavaScript required</span>
+  </div>
+</div>
+
+<!-- Documentation -->
+<div class="synth" style="margin-top: 30px;">
+  <div class="docs-section">
+    <h2>Component Reference</h2>
+
+    <h3>Rotary Knobs</h3>
+    <div class="showcase-row">
+      <div class="showcase-item">
+        <div class="synth-knob-lg ambient"></div>
+        <span class="showcase-label">Large</span>
+      </div>
+      <div class="showcase-item">
+        <div class="synth-knob-md ambient"></div>
+        <span class="showcase-label">Medium</span>
+      </div>
+      <div class="showcase-item">
+        <div class="synth-knob-sm ambient"></div>
+        <span class="showcase-label">Small</span>
+      </div>
+    </div>
+    <div class="code-block">
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"synth-knob-lg ambient"</span><span class="tag">&gt;&lt;/div&gt;</span><br>
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"synth-knob-md ambient"</span><span class="tag">&gt;&lt;/div&gt;</span><br>
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"synth-knob-sm ambient"</span><span class="tag">&gt;&lt;/div&gt;</span>
+    </div>
+
+    <h3>Vertical Faders</h3>
+    <div class="showcase-row">
+      <div class="showcase-item">
+        <div class="synth-fader">
+          <div class="synth-fader-track ambient">
+            <div class="synth-fader-cap ambient" style="top: 20%"></div>
+          </div>
+        </div>
+        <span class="showcase-label">Standard</span>
+      </div>
+      <div class="showcase-item">
+        <div class="synth-fader">
+          <div class="synth-fader-track synth-fader-track-tall ambient">
+            <div class="synth-fader-cap ambient" style="top: 40%"></div>
+          </div>
+        </div>
+        <span class="showcase-label">Tall</span>
+      </div>
+    </div>
+    <div class="code-block">
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"synth-fader"</span><span class="tag">&gt;</span><br>
+      &nbsp;&nbsp;<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"synth-fader-track ambient"</span><span class="tag">&gt;</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"synth-fader-cap ambient"</span><span class="tag">&gt;&lt;/div&gt;</span><br>
+      &nbsp;&nbsp;<span class="tag">&lt;/div&gt;</span><br>
+      <span class="tag">&lt;/div&gt;</span>
+    </div>
+
+    <h3>Toggle Switches</h3>
+    <div class="showcase-row">
+      <div class="showcase-item">
+        <div class="synth-switch ambient">
+          <div class="synth-switch-handle ambient"></div>
+        </div>
+        <span class="showcase-label">2-Way Up</span>
+      </div>
+      <div class="showcase-item">
+        <div class="synth-switch ambient down">
+          <div class="synth-switch-handle ambient"></div>
+        </div>
+        <span class="showcase-label">2-Way Down</span>
+      </div>
+      <div class="showcase-item">
+        <div class="synth-switch-3 ambient up">
+          <div class="synth-switch-handle ambient"></div>
+        </div>
+        <span class="showcase-label">3-Way Up</span>
+      </div>
+      <div class="showcase-item">
+        <div class="synth-switch-3 ambient">
+          <div class="synth-switch-handle ambient"></div>
+        </div>
+        <span class="showcase-label">3-Way Mid</span>
+      </div>
+      <div class="showcase-item">
+        <div class="synth-switch-3 ambient down">
+          <div class="synth-switch-handle ambient"></div>
+        </div>
+        <span class="showcase-label">3-Way Down</span>
+      </div>
+    </div>
+    <div class="code-block">
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"synth-switch ambient"</span><span class="tag">&gt;</span><br>
+      &nbsp;&nbsp;<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"synth-switch-handle ambient"</span><span class="tag">&gt;&lt;/div&gt;</span><br>
+      <span class="tag">&lt;/div&gt;</span><br><br>
+      <span class="comment">&lt;!-- Add "down" class for down position --&gt;</span><br>
+      <span class="comment">&lt;!-- Use synth-switch-3 for 3-position, with "up", "down", or neither --&gt;</span>
+    </div>
+
+    <h3>Waveform Selectors</h3>
+    <div class="showcase-row">
+      <div class="showcase-item">
+        <div class="synth-waveform">
+          <div class="synth-waveform-btn ambient active">
+            <svg viewBox="0 0 16 10"><polyline points="1,9 8,1 8,9 15,1"/></svg>
+          </div>
+          <div class="synth-waveform-btn ambient">
+            <svg viewBox="0 0 16 10"><polyline points="1,9 1,1 8,1 8,9 15,9 15,1"/></svg>
+          </div>
+          <div class="synth-waveform-btn ambient">
+            <svg viewBox="0 0 16 10"><polyline points="1,5 4,1 8,9 12,1 15,5"/></svg>
+          </div>
+          <div class="synth-waveform-btn ambient">
+            <svg viewBox="0 0 16 10"><path d="M1,5 Q4,1 8,5 Q12,9 15,5" fill="none"/></svg>
+          </div>
+        </div>
+        <span class="showcase-label">Saw / Square / Tri / Sine</span>
+      </div>
+    </div>
+
+    <h3>LEDs & Indicators</h3>
+    <div class="showcase-row">
+      <div class="showcase-item">
+        <div class="synth-led ambient"></div>
+        <span class="showcase-label">Off</span>
+      </div>
+      <div class="showcase-item">
+        <div class="synth-led on ambient"></div>
+        <span class="showcase-label">Red On</span>
+      </div>
+      <div class="showcase-item">
+        <div class="synth-led green on ambient"></div>
+        <span class="showcase-label">Green On</span>
+      </div>
+      <div class="showcase-item">
+        <div class="synth-led amber on ambient"></div>
+        <span class="showcase-label">Amber On</span>
+      </div>
+    </div>
+
+    <h3>Displays</h3>
+    <div class="showcase-row">
+      <div class="showcase-item">
+        <div class="synth-display ambient">127</div>
+        <span class="showcase-label">Green LCD</span>
+      </div>
+      <div class="showcase-item">
+        <div class="synth-display synth-display-orange ambient">440</div>
+        <span class="showcase-label">Orange LCD</span>
+      </div>
+    </div>
+
+    <h3>VU Meter</h3>
+    <div class="showcase-row">
+      <div class="showcase-item">
+        <div class="synth-vu">
+          <div class="synth-vu-segment red"></div>
+          <div class="synth-vu-segment red"></div>
+          <div class="synth-vu-segment yellow"></div>
+          <div class="synth-vu-segment yellow active"></div>
+          <div class="synth-vu-segment green active"></div>
+          <div class="synth-vu-segment green active"></div>
+          <div class="synth-vu-segment green active"></div>
+          <div class="synth-vu-segment green active"></div>
+        </div>
+        <span class="showcase-label">VU Meter</span>
+      </div>
+    </div>
+
+    <h3>Wheels & Special Controls</h3>
+    <div class="showcase-row">
+      <div class="showcase-item">
+        <div class="synth-wheel ambient">
+          <div class="synth-wheel-surface"></div>
+        </div>
+        <span class="showcase-label">Pitch/Mod Wheel</span>
+      </div>
+      <div class="showcase-item">
+        <div class="synth-jack ambient"></div>
+        <span class="showcase-label">Jack</span>
+      </div>
+      <div class="showcase-item">
+        <div class="synth-screw ambient"></div>
+        <span class="showcase-label">Screw</span>
+      </div>
+      <div class="showcase-item">
+        <div class="synth-encoder">
+          <div class="synth-encoder-inner ambient"></div>
+        </div>
+        <span class="showcase-label">Encoder</span>
+      </div>
+    </div>
+
+    <h3>Envelope Display</h3>
+    <div class="showcase-row">
+      <div class="showcase-item">
+        <div class="synth-env-display ambient">
+          <svg viewBox="0 0 80 40">
+            <polygon class="fill" points="5,35 15,5 30,15 60,15 75,35"/>
+            <polyline points="5,35 15,5 30,15 60,15 75,35"/>
+          </svg>
+        </div>
+        <span class="showcase-label">ADSR Visualization</span>
+      </div>
+    </div>
+
+    <h3>Section Headers</h3>
+    <div class="showcase-row">
+      <div class="synth-section-header ambient">VCO-1</div>
+      <div class="synth-section-header ambient">Filter</div>
+      <div class="synth-section-header ambient">Envelope</div>
+    </div>
+
+    <h3>Buttons</h3>
+    <div class="showcase-row">
+      <div class="showcase-item">
+        <button class="synth-btn ambient">Default</button>
+      </div>
+      <div class="showcase-item">
+        <button class="synth-btn ambient active">Active</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="docs-section">
+    <h2>Core Framework Classes</h2>
+    <table class="docs-table">
+      <thead>
+        <tr>
+          <th>Class</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>.ambient</code></td><td>Base class - enables lighting calculations</td></tr>
+        <tr><td><code>.amb-fillet</code></td><td>Rounded edge highlight/shadow</td></tr>
+        <tr><td><code>.amb-fillet-1/2/3</code></td><td>Fillet width variants</td></tr>
+        <tr><td><code>.amb-chamfer</code></td><td>Beveled edge highlight/shadow</td></tr>
+        <tr><td><code>.amb-chamfer-1/2/3</code></td><td>Chamfer width variants</td></tr>
+        <tr><td><code>.amb-groove</code></td><td>Inset/recessed appearance</td></tr>
+        <tr><td><code>.amb-groove-1/2/3</code></td><td>Groove depth variants</td></tr>
+        <tr><td><code>.amb-elevation-0/1/2/3</code></td><td>Drop shadow depth</td></tr>
+        <tr><td><code>.amb-thickness-0/1/2/3</code></td><td>Material thickness shadow</td></tr>
+        <tr><td><code>.amb-emitter</code></td><td>Glowing element</td></tr>
+        <tr><td><code>.amb-emit-red/green/amber</code></td><td>Emitter colors</td></tr>
+        <tr><td><code>.amb-shiny</code></td><td>Specular highlight finish</td></tr>
+        <tr><td><code>.amb-pressed</code></td><td>Pressed/active state</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="docs-section">
+    <h2>CSS Variables</h2>
+    <table class="docs-table">
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Default</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>--amb-light-x</code></td><td>1</td><td>Light direction X (-1 to 1)</td></tr>
+        <tr><td><code>--amb-light-y</code></td><td>-1</td><td>Light direction Y (-1 to 1)</td></tr>
+        <tr><td><code>--amb-key-light-intensity</code></td><td>0.4</td><td>Main light strength</td></tr>
+        <tr><td><code>--amb-fill-light-intensity</code></td><td>0.1</td><td>Fill light strength</td></tr>
+        <tr><td><code>--synth-accent</code></td><td>#ff6600</td><td>Accent color (orange)</td></tr>
+        <tr><td><code>--synth-panel-bg</code></td><td>#2a2a2a</td><td>Panel background</td></tr>
+        <tr><td><code>--synth-text</code></td><td>#cccccc</td><td>Text color</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="docs-section">
+    <h2>Quick Start</h2>
+    <div class="code-block">
+      <span class="comment">&lt;!-- 1. Include the CSS --&gt;</span><br>
+      <span class="tag">&lt;link</span> <span class="attr">href</span>=<span class="string">"index.css"</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span><span class="tag">&gt;</span><br><br>
+      <span class="comment">&lt;!-- 2. Create a knob --&gt;</span><br>
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"synth-knob-md ambient"</span><span class="tag">&gt;&lt;/div&gt;</span><br><br>
+      <span class="comment">&lt;!-- 3. Create a fader --&gt;</span><br>
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"synth-fader"</span><span class="tag">&gt;</span><br>
+      &nbsp;&nbsp;<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"synth-fader-track ambient"</span><span class="tag">&gt;</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"synth-fader-cap ambient"</span><span class="tag">&gt;&lt;/div&gt;</span><br>
+      &nbsp;&nbsp;<span class="tag">&lt;/div&gt;</span><br>
+      <span class="tag">&lt;/div&gt;</span><br><br>
+      <span class="comment">&lt;!-- 4. Create a glowing LED --&gt;</span><br>
+      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"synth-led green on ambient"</span><span class="tag">&gt;&lt;/div&gt;</span>
+    </div>
+  </div>
+
+  <div class="synth-footer">
+    <span>Built with Ambient CSS</span>
+    <span>Inspired by classic synthesizer interfaces</span>
+  </div>
+</div>
+
+</body>
 </html>

@@ -1,558 +1,441 @@
 /* ==========================================================================
-   Ambient CSS Documentation Page Styles
-   Synth Rack Theme
+   Ambient CSS - Synth Panel Layout
+   JP-80 Style Documentation
    ========================================================================== */
 
-/* --------------------------------------------------------------------------
-   Base Styles
-   -------------------------------------------------------------------------- */
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
-  padding: 0;
-  background-color: rgb(36, 43, 60);
-  background-image:
-    linear-gradient(45deg, rgba(0, 0, 0, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%),
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0, 0, 0, 0.03) 2px,
-      rgba(0, 0, 0, 0.03) 4px
-    );
-  font-family: "Josefin Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-  color: #bbb;
+  background: #1a1a1a;
+  font-family: 'Arial Narrow', Arial, sans-serif;
+  color: var(--synth-text);
   min-height: 100vh;
-  transition: background-color 3s ease-in;
+  padding: 20px;
 }
 
 /* --------------------------------------------------------------------------
-   Synth Rack Container
+   Main Synth Container
    -------------------------------------------------------------------------- */
-.rack {
-  max-width: 1200px;
+.synth {
+  max-width: 1100px;
   margin: 0 auto;
+  background: linear-gradient(180deg, #2d2d2d 0%, #252525 50%, #1f1f1f 100%);
+  border-radius: 8px;
   padding: 20px;
-}
-
-.rack-rails {
-  position: relative;
-  padding: 10px 30px;
-}
-
-/* Rail holes decoration */
-.rack-rails::before,
-.rack-rails::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 20px;
-  background-image:
-    repeating-linear-gradient(
-      to bottom,
-      transparent 0px,
-      transparent 15px,
-      rgb(60, 65, 75) 15px,
-      rgb(60, 65, 75) 20px,
-      transparent 20px,
-      transparent 35px
-    );
-}
-
-.rack-rails::before {
-  left: 0;
-}
-
-.rack-rails::after {
-  right: 0;
+  box-shadow:
+    0 4px 20px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.05);
 }
 
 /* --------------------------------------------------------------------------
-   Module (Each "device" in the rack)
+   Header Area
    -------------------------------------------------------------------------- */
-.module {
-  background-color: rgb(55, 62, 78);
-  border-radius: 8px;
+.synth-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #333;
   margin-bottom: 15px;
-  overflow: hidden;
 }
 
-.module-header {
-  background-color: rgb(45, 52, 68);
-  padding: 12px 20px;
+.synth-logo {
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: -1px;
+  color: #fff;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.synth-logo span {
+  color: var(--synth-accent);
+}
+
+.synth-title-area {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
-}
-
-.module-title {
-  font-size: 14px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  color: #999;
-  margin: 0;
-}
-
-.module-brand {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #666;
-}
-
-.module-body {
-  padding: 20px;
-}
-
-/* --------------------------------------------------------------------------
-   Header Module (Hero/Logo)
-   -------------------------------------------------------------------------- */
-.module-hero {
-  text-align: center;
-  background: linear-gradient(180deg, rgb(50, 57, 73) 0%, rgb(45, 52, 68) 100%);
-}
-
-.hero-logo {
-  font-size: 48px;
-  letter-spacing: 8px;
-  color: #888;
-  margin-bottom: 10px;
-  text-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.1),
-    0 -1px 0 rgba(0, 0, 0, 0.3);
-}
-
-.hero-subtitle {
-  font-size: 28px;
-  color: #777;
-  margin-bottom: 20px;
-}
-
-.hero-tagline {
-  font-size: 14px;
-  color: #666;
-  max-width: 500px;
-  margin: 0 auto 30px;
-  line-height: 1.6;
-}
-
-.hero-controls {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  padding: 20px 0;
-}
-
-/* --------------------------------------------------------------------------
-   Controls Row (Inside modules)
-   -------------------------------------------------------------------------- */
-.controls-row {
-  display: flex;
-  flex-wrap: wrap;
   gap: 20px;
-  align-items: flex-start;
 }
 
-.control-group {
+.synth-master-controls {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-
-.control-label {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #777;
+  gap: 20px;
+  align-items: flex-end;
 }
 
 /* --------------------------------------------------------------------------
-   Demo Panels
+   Section Row (horizontal strip of modules)
    -------------------------------------------------------------------------- */
-.demo-panel {
-  background-color: rgb(50, 57, 73);
-  border-radius: 6px;
-  padding: 15px;
-  margin-bottom: 15px;
+.synth-row {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 2px;
 }
 
-.demo-panel:last-child {
-  margin-bottom: 0;
+/* --------------------------------------------------------------------------
+   Module Section
+   -------------------------------------------------------------------------- */
+.synth-module {
+  background: var(--synth-panel-bg);
+  border-radius: 3px;
+  overflow: hidden;
+  flex: 1;
+  min-width: 0;
 }
 
-.demo-title {
-  font-size: 12px;
+.synth-module-header {
+  background: var(--synth-accent);
+  color: #000;
+  font-size: 9px;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: #888;
-  margin-bottom: 15px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 3px 8px;
+  text-align: center;
 }
 
-.demo-row {
+.synth-module-body {
+  padding: 10px 8px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  align-items: center;
-  margin-bottom: 15px;
+  gap: 8px;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100px;
 }
 
-.demo-row:last-child {
-  margin-bottom: 0;
+.synth-module-body.tall {
+  min-height: 130px;
 }
 
-.demo-item {
+/* Fixed width modules */
+.synth-module.w-sm { flex: 0 0 80px; }
+.synth-module.w-md { flex: 0 0 120px; }
+.synth-module.w-lg { flex: 0 0 180px; }
+.synth-module.w-xl { flex: 0 0 240px; }
+
+/* --------------------------------------------------------------------------
+   Control with Label
+   -------------------------------------------------------------------------- */
+.ctrl {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 3px;
 }
 
-.demo-item-label {
-  font-size: 10px;
+.ctrl-label {
+  font-size: 7px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.ctrl-value {
+  font-size: 8px;
+  color: #aaa;
+  text-align: center;
+}
+
+/* --------------------------------------------------------------------------
+   Fader with Scale
+   -------------------------------------------------------------------------- */
+.fader-group {
+  display: flex;
+  gap: 2px;
+}
+
+.fader-scale {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 80px;
+  font-size: 7px;
+  color: #555;
+  padding: 2px 0;
+}
+
+.fader-scale.right {
+  text-align: left;
+  padding-left: 2px;
+}
+
+.fader-scale.left {
+  text-align: right;
+  padding-right: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   Switch Labels
+   -------------------------------------------------------------------------- */
+.switch-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.switch-labels {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 28px;
+  font-size: 6px;
   color: #666;
   text-transform: uppercase;
 }
 
-/* --------------------------------------------------------------------------
-   Sample Shapes for Demos
-   -------------------------------------------------------------------------- */
-.sample-box {
-  width: 60px;
-  height: 60px;
-  border-radius: 8px;
-  background-color: inherit;
-}
-
-.sample-circle {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background-color: inherit;
-}
-
-.sample-rect {
-  width: 80px;
-  height: 40px;
-  border-radius: 6px;
-  background-color: inherit;
-}
-
-.sample-pill {
-  width: 100px;
-  height: 30px;
-  border-radius: 15px;
-  background-color: inherit;
+.switch-labels-3 {
+  height: 36px;
 }
 
 /* --------------------------------------------------------------------------
-   Code Display
+   Waveform Icons (SVG)
    -------------------------------------------------------------------------- */
-.code-display {
-  background-color: rgb(30, 35, 45);
-  border-radius: 4px;
-  padding: 12px 15px;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-  font-size: 12px;
-  color: #aaa;
-  overflow-x: auto;
-  margin: 10px 0;
+.wave-saw {
+  stroke-linecap: round;
 }
 
-.code-display code {
-  color: #88c8ff;
+.wave-square {
+  stroke-linecap: square;
 }
 
-.code-display .tag {
-  color: #ff8888;
+.wave-tri {
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-.code-display .class {
-  color: #88ff88;
-}
-
-.code-display .attr {
-  color: #ffcc88;
+.wave-sine {
+  stroke-linecap: round;
 }
 
 /* --------------------------------------------------------------------------
-   Grid Layouts
+   Section Divider
    -------------------------------------------------------------------------- */
-.grid-2 {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
-}
-
-.grid-3 {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
-}
-
-.grid-4 {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 15px;
-}
-
-@media (max-width: 768px) {
-  .grid-2,
-  .grid-3,
-  .grid-4 {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* --------------------------------------------------------------------------
-   Interactive Elements
-   -------------------------------------------------------------------------- */
-.btn-day,
-.btn-night {
-  cursor: pointer;
-  border: 1px solid rgba(0, 0, 0, 0.3);
-  background-color: rgb(65, 72, 88);
-  padding: 10px 20px;
-  border-radius: 6px;
-  text-transform: uppercase;
-  font-weight: 600;
-  font-size: 12px;
-  letter-spacing: 1px;
-  color: #999;
-  transition: all 0.2s ease;
-}
-
-.btn-day:hover,
-.btn-night:hover {
-  background-color: rgb(75, 82, 98);
-  color: #bbb;
-}
-
-.btn-day:active,
-.btn-night:active {
-  transform: translateY(1px);
-}
-
-/* --------------------------------------------------------------------------
-   LED Strip
-   -------------------------------------------------------------------------- */
-.led-strip {
-  display: flex;
-  gap: 6px;
-  padding: 8px;
-  background-color: rgb(30, 35, 45);
-  border-radius: 4px;
-}
-
-.led {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: rgb(40, 45, 55);
-}
-
-/* --------------------------------------------------------------------------
-   VU Meter
-   -------------------------------------------------------------------------- */
-.vu-meter {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding: 8px;
-  background-color: rgb(30, 35, 45);
-  border-radius: 4px;
-}
-
-.vu-segment {
-  width: 24px;
-  height: 5px;
-  border-radius: 2px;
-  background-color: rgb(40, 45, 55);
-}
-
-/* --------------------------------------------------------------------------
-   Display Screen
-   -------------------------------------------------------------------------- */
-.display-screen {
-  background-color: rgb(20, 35, 30);
-  border-radius: 4px;
-  padding: 10px 15px;
-  font-family: 'Monaco', 'Menlo', monospace;
-  font-size: 14px;
-  color: rgb(100, 255, 150);
-  text-shadow: 0 0 10px rgba(100, 255, 150, 0.5);
-  min-width: 120px;
-}
-
-/* --------------------------------------------------------------------------
-   Section Descriptions
-   -------------------------------------------------------------------------- */
-.section-desc {
-  font-size: 13px;
-  color: #888;
-  line-height: 1.6;
-  margin-bottom: 20px;
-}
-
-/* --------------------------------------------------------------------------
-   Feature List
-   -------------------------------------------------------------------------- */
-.feature-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.feature-list li {
-  padding: 8px 0;
-  padding-left: 20px;
-  position: relative;
-  font-size: 13px;
-  color: #888;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-}
-
-.feature-list li:last-child {
-  border-bottom: none;
-}
-
-.feature-list li::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: rgb(100, 180, 255);
-  box-shadow: 0 0 6px rgba(100, 180, 255, 0.5);
-}
-
-/* --------------------------------------------------------------------------
-   Documentation Table
-   -------------------------------------------------------------------------- */
-.doc-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-}
-
-.doc-table th,
-.doc-table td {
-  text-align: left;
-  padding: 10px 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.doc-table th {
-  color: #999;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-size: 10px;
-}
-
-.doc-table td {
-  color: #777;
-}
-
-.doc-table code {
-  background-color: rgba(0, 0, 0, 0.2);
-  padding: 2px 6px;
-  border-radius: 3px;
-  font-family: 'Monaco', 'Menlo', monospace;
-  font-size: 11px;
-  color: #88c8ff;
-}
-
-/* --------------------------------------------------------------------------
-   Screw Decorations
-   -------------------------------------------------------------------------- */
-.module-screws {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 15px;
-  background-color: rgb(45, 52, 68);
-}
-
-.screw {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, rgb(80, 85, 95) 0%, rgb(50, 55, 65) 100%);
-  position: relative;
-}
-
-.screw::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 6px;
-  height: 1px;
-  background: rgba(0, 0, 0, 0.4);
+.synth-divider {
+  width: 2px;
+  background: #1a1a1a;
+  margin: 0 1px;
 }
 
 /* --------------------------------------------------------------------------
    Footer
    -------------------------------------------------------------------------- */
-.rack-footer {
-  text-align: center;
-  padding: 30px;
+.synth-footer {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
   color: #555;
-  font-size: 12px;
 }
 
-.rack-footer a {
-  color: #777;
+.synth-footer a {
+  color: var(--synth-accent);
   text-decoration: none;
 }
 
-.rack-footer a:hover {
+/* --------------------------------------------------------------------------
+   Documentation Sections
+   -------------------------------------------------------------------------- */
+.docs-section {
+  margin-top: 30px;
+  padding: 20px;
+  background: #222;
+  border-radius: 6px;
+}
+
+.docs-section h2 {
+  font-size: 14px;
+  color: var(--synth-accent);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #333;
+}
+
+.docs-section h3 {
+  font-size: 11px;
   color: #999;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 15px 0 10px;
+}
+
+.docs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.docs-card {
+  background: #2a2a2a;
+  border-radius: 4px;
+  padding: 15px;
+}
+
+.docs-card-title {
+  font-size: 10px;
+  color: var(--synth-accent);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+.docs-card-demo {
+  display: flex;
+  justify-content: center;
+  padding: 15px;
+  background: #1a1a1a;
+  border-radius: 3px;
+  margin-bottom: 10px;
+}
+
+.docs-card-code {
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 9px;
+  color: #888;
+  background: #1a1a1a;
+  padding: 8px;
+  border-radius: 3px;
+  overflow-x: auto;
+}
+
+.docs-card-code code {
+  color: #6cf;
+}
+
+/* --------------------------------------------------------------------------
+   Component Showcase
+   -------------------------------------------------------------------------- */
+.showcase-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  padding: 15px;
+  background: #1f1f1f;
+  border-radius: 4px;
+  margin-bottom: 15px;
+}
+
+.showcase-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.showcase-label {
+  font-size: 8px;
+  color: #666;
+  text-transform: uppercase;
+}
+
+/* --------------------------------------------------------------------------
+   Code Block
+   -------------------------------------------------------------------------- */
+.code-block {
+  background: #0f0f0f;
+  border-radius: 4px;
+  padding: 12px 15px;
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 11px;
+  color: #aaa;
+  overflow-x: auto;
+  margin: 10px 0;
+}
+
+.code-block .tag { color: #f77; }
+.code-block .attr { color: #7bf; }
+.code-block .string { color: #7f7; }
+.code-block .comment { color: #666; }
+
+/* --------------------------------------------------------------------------
+   Table
+   -------------------------------------------------------------------------- */
+.docs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 10px;
+}
+
+.docs-table th,
+.docs-table td {
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid #333;
+}
+
+.docs-table th {
+  color: #888;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+}
+
+.docs-table td {
+  color: #aaa;
+}
+
+.docs-table code {
+  background: #1a1a1a;
+  padding: 2px 6px;
+  border-radius: 2px;
+  font-family: 'Monaco', monospace;
+  font-size: 9px;
+  color: #6cf;
 }
 
 /* --------------------------------------------------------------------------
    Responsive
    -------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .synth-row {
+    flex-wrap: wrap;
+  }
+
+  .synth-module {
+    flex: 1 1 calc(50% - 2px);
+    min-width: 140px;
+  }
+
+  .synth-module.w-sm,
+  .synth-module.w-md,
+  .synth-module.w-lg,
+  .synth-module.w-xl {
+    flex: 1 1 auto;
+  }
+}
+
 @media (max-width: 600px) {
-  .rack {
+  body {
     padding: 10px;
   }
 
-  .rack-rails {
-    padding: 10px 15px;
+  .synth {
+    padding: 10px;
   }
 
-  .rack-rails::before,
-  .rack-rails::after {
-    display: none;
+  .synth-header {
+    flex-direction: column;
+    gap: 15px;
   }
 
-  .module-body {
-    padding: 15px;
+  .synth-module {
+    flex: 1 1 100%;
   }
 
-  .hero-logo {
-    font-size: 32px;
-    letter-spacing: 4px;
-  }
-
-  .hero-subtitle {
-    font-size: 20px;
-  }
-
-  .controls-row {
-    justify-content: center;
+  .synth-module-body {
+    flex-wrap: wrap;
   }
 }
