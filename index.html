@@ -1,40 +1,583 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ambient CSS - Physically-Based Lighting for Skeumorphic Interfaces</title>
     <link href="page.css" rel="stylesheet" />
     <link href="index.css" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap"
       rel="stylesheet"
     />
   </head>
   <body>
-    <div class="container">
-      <div class="content">
-        <div class="box logo ambient amb-fillet amb-elevation-3">
-          a m b i e n t <br />
-          <div style="font-size: 35px">CSS</div>
-          <button
-            id="button-day"
-            class="custom ambient amb-fillet-1 amb-elevation-0"
-          >
-            <span style="mix-blend-mode: exclusion">day</span>
-          </button>
-          <button
-            id="button-night"
-            class="custom ambient amb-fillet-1 amb-elevation-0"
-          >
-            <span style="mix-blend-mode: exclusion">night</span>
-          </button>
+    <div class="rack">
+      <div class="rack-rails">
+
+        <!-- Hero Module -->
+        <div class="module ambient amb-fillet-2 amb-elevation-2">
+          <div class="module-screws">
+            <div class="screw ambient amb-chamfer"></div>
+            <div class="screw ambient amb-chamfer"></div>
+          </div>
+          <div class="module-body module-hero">
+            <div class="hero-logo">a m b i e n t</div>
+            <div class="hero-subtitle">CSS</div>
+            <p class="hero-tagline">
+              A pure CSS framework for realistic, physically-based lighting and shadows.
+              Perfect for skeumorphic interfaces inspired by synthesizers and classic hardware.
+            </p>
+            <div class="hero-controls">
+              <button id="button-day" class="btn-day ambient amb-fillet amb-elevation-1">Day</button>
+              <button id="button-night" class="btn-night ambient amb-fillet amb-elevation-1">Night</button>
+            </div>
+            <div class="led-strip" style="display: inline-flex;">
+              <div class="led ambient amb-emitter amb-emit-red amb-emit-dim"></div>
+              <div class="led ambient amb-emitter amb-emit-amber amb-emit-dim"></div>
+              <div class="led ambient amb-emitter amb-emit-green amb-emit-bright"></div>
+              <div class="led ambient amb-emitter amb-emit-green amb-emit-bright"></div>
+              <div class="led ambient amb-emitter amb-emit-green"></div>
+            </div>
+          </div>
+          <div class="module-screws">
+            <div class="screw ambient amb-chamfer"></div>
+            <div class="screw ambient amb-chamfer"></div>
+          </div>
         </div>
-        <div class="row">
-          <div class="circle ambient amb-fillet amb-elevation-0"></div>
-          <div class="circle ambient amb-fillet amb-elevation-1"></div>
-          <div class="circle ambient amb-fillet amb-elevation-2"></div>
-          <div class="circle ambient amb-fillet amb-elevation-3"></div>
+
+        <!-- Elevation Module -->
+        <div class="module ambient amb-fillet-2 amb-elevation-1">
+          <div class="module-header">
+            <h2 class="module-title">Elevation Control</h2>
+            <span class="module-brand">AMB-ELV</span>
+          </div>
+          <div class="module-body">
+            <p class="section-desc">
+              Elevation controls how high an element appears to float above the surface.
+              Higher elevations cast longer, softer shadows based on the light direction.
+            </p>
+            <div class="demo-panel ambient amb-groove-2">
+              <div class="demo-title">Elevation Levels (0-3)</div>
+              <div class="demo-row">
+                <div class="demo-item">
+                  <div class="sample-circle ambient amb-fillet amb-elevation-0"></div>
+                  <span class="demo-item-label">Level 0</span>
+                </div>
+                <div class="demo-item">
+                  <div class="sample-circle ambient amb-fillet amb-elevation-1"></div>
+                  <span class="demo-item-label">Level 1</span>
+                </div>
+                <div class="demo-item">
+                  <div class="sample-circle ambient amb-fillet amb-elevation-2"></div>
+                  <span class="demo-item-label">Level 2</span>
+                </div>
+                <div class="demo-item">
+                  <div class="sample-circle ambient amb-fillet amb-elevation-3"></div>
+                  <span class="demo-item-label">Level 3</span>
+                </div>
+              </div>
+            </div>
+            <div class="code-display">
+              <code>&lt;div class="ambient amb-elevation-0"&gt;</code> ... <code>&lt;/div&gt;</code><br>
+              <code>&lt;div class="ambient amb-elevation-3"&gt;</code> ... <code>&lt;/div&gt;</code>
+            </div>
+          </div>
         </div>
+
+        <!-- Edge Styles Module -->
+        <div class="module ambient amb-fillet-2 amb-elevation-1">
+          <div class="module-header">
+            <h2 class="module-title">Edge Processor</h2>
+            <span class="module-brand">AMB-EDG</span>
+          </div>
+          <div class="module-body">
+            <p class="section-desc">
+              Edge styles define how light interacts with element borders.
+              Choose from fillet (rounded), chamfer (beveled), or groove (inset) effects.
+            </p>
+            <div class="grid-3">
+              <div class="demo-panel ambient amb-groove-2">
+                <div class="demo-title">Fillet (Rounded)</div>
+                <div class="demo-row">
+                  <div class="demo-item">
+                    <div class="sample-box ambient amb-fillet-1 amb-elevation-1"></div>
+                    <span class="demo-item-label">Fillet 1</span>
+                  </div>
+                  <div class="demo-item">
+                    <div class="sample-box ambient amb-fillet-2 amb-elevation-1"></div>
+                    <span class="demo-item-label">Fillet 2</span>
+                  </div>
+                  <div class="demo-item">
+                    <div class="sample-box ambient amb-fillet-3 amb-elevation-1"></div>
+                    <span class="demo-item-label">Fillet 3</span>
+                  </div>
+                </div>
+              </div>
+              <div class="demo-panel ambient amb-groove-2">
+                <div class="demo-title">Chamfer (Beveled)</div>
+                <div class="demo-row">
+                  <div class="demo-item">
+                    <div class="sample-box ambient amb-chamfer-1 amb-elevation-1"></div>
+                    <span class="demo-item-label">Chamfer 1</span>
+                  </div>
+                  <div class="demo-item">
+                    <div class="sample-box ambient amb-chamfer-2 amb-elevation-1"></div>
+                    <span class="demo-item-label">Chamfer 2</span>
+                  </div>
+                  <div class="demo-item">
+                    <div class="sample-box ambient amb-chamfer-3 amb-elevation-1"></div>
+                    <span class="demo-item-label">Chamfer 3</span>
+                  </div>
+                </div>
+              </div>
+              <div class="demo-panel ambient amb-groove-2">
+                <div class="demo-title">Groove (Inset)</div>
+                <div class="demo-row">
+                  <div class="demo-item">
+                    <div class="sample-box ambient amb-groove-1"></div>
+                    <span class="demo-item-label">Groove 1</span>
+                  </div>
+                  <div class="demo-item">
+                    <div class="sample-box ambient amb-groove-2"></div>
+                    <span class="demo-item-label">Groove 2</span>
+                  </div>
+                  <div class="demo-item">
+                    <div class="sample-box ambient amb-groove-3"></div>
+                    <span class="demo-item-label">Groove 3</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="code-display">
+              <code>&lt;div class="ambient amb-fillet-2"&gt;</code> Rounded edges<br>
+              <code>&lt;div class="ambient amb-chamfer-2"&gt;</code> Beveled edges<br>
+              <code>&lt;div class="ambient amb-groove-2"&gt;</code> Inset edges
+            </div>
+          </div>
+        </div>
+
+        <!-- Thickness Module -->
+        <div class="module ambient amb-fillet-2 amb-elevation-1">
+          <div class="module-header">
+            <h2 class="module-title">Thickness Generator</h2>
+            <span class="module-brand">AMB-THK</span>
+          </div>
+          <div class="module-body">
+            <p class="section-desc">
+              Thickness adds visual depth to the element itself, creating a sense of material weight
+              separate from elevation shadows.
+            </p>
+            <div class="demo-panel ambient amb-groove-2">
+              <div class="demo-title">Thickness Levels</div>
+              <div class="demo-row">
+                <div class="demo-item">
+                  <div class="sample-rect ambient amb-fillet amb-thickness-0 amb-elevation-1"></div>
+                  <span class="demo-item-label">Thickness 0</span>
+                </div>
+                <div class="demo-item">
+                  <div class="sample-rect ambient amb-fillet amb-thickness-1 amb-elevation-1"></div>
+                  <span class="demo-item-label">Thickness 1</span>
+                </div>
+                <div class="demo-item">
+                  <div class="sample-rect ambient amb-fillet amb-thickness-2 amb-elevation-1"></div>
+                  <span class="demo-item-label">Thickness 2</span>
+                </div>
+                <div class="demo-item">
+                  <div class="sample-rect ambient amb-fillet amb-thickness-3 amb-elevation-1"></div>
+                  <span class="demo-item-label">Thickness 3</span>
+                </div>
+              </div>
+            </div>
+            <div class="code-display">
+              <code>&lt;div class="ambient amb-thickness-2 amb-elevation-1"&gt;</code>
+            </div>
+          </div>
+        </div>
+
+        <!-- Emitter Module -->
+        <div class="module ambient amb-fillet-2 amb-elevation-1">
+          <div class="module-header">
+            <h2 class="module-title">Emitter Array</h2>
+            <span class="module-brand">AMB-EMT</span>
+          </div>
+          <div class="module-body">
+            <p class="section-desc">
+              Emitters are glowing elements that cast light outward instead of shadows.
+              Perfect for LEDs, displays, status indicators, and backlit controls.
+            </p>
+            <div class="grid-2">
+              <div class="demo-panel ambient amb-groove-2">
+                <div class="demo-title">Emitter Colors</div>
+                <div class="demo-row">
+                  <div class="demo-item">
+                    <div class="sample-circle ambient amb-emitter amb-emit-warm amb-emit-bright"></div>
+                    <span class="demo-item-label">Warm</span>
+                  </div>
+                  <div class="demo-item">
+                    <div class="sample-circle ambient amb-emitter amb-emit-cool amb-emit-bright"></div>
+                    <span class="demo-item-label">Cool</span>
+                  </div>
+                  <div class="demo-item">
+                    <div class="sample-circle ambient amb-emitter amb-emit-red amb-emit-bright"></div>
+                    <span class="demo-item-label">Red</span>
+                  </div>
+                  <div class="demo-item">
+                    <div class="sample-circle ambient amb-emitter amb-emit-green amb-emit-bright"></div>
+                    <span class="demo-item-label">Green</span>
+                  </div>
+                  <div class="demo-item">
+                    <div class="sample-circle ambient amb-emitter amb-emit-blue amb-emit-bright"></div>
+                    <span class="demo-item-label">Blue</span>
+                  </div>
+                  <div class="demo-item">
+                    <div class="sample-circle ambient amb-emitter amb-emit-purple amb-emit-bright"></div>
+                    <span class="demo-item-label">Purple</span>
+                  </div>
+                  <div class="demo-item">
+                    <div class="sample-circle ambient amb-emitter amb-emit-amber amb-emit-bright"></div>
+                    <span class="demo-item-label">Amber</span>
+                  </div>
+                </div>
+              </div>
+              <div class="demo-panel ambient amb-groove-2">
+                <div class="demo-title">Intensity Levels</div>
+                <div class="demo-row">
+                  <div class="demo-item">
+                    <div class="sample-circle ambient amb-emitter amb-emit-green amb-emit-dim"></div>
+                    <span class="demo-item-label">Dim</span>
+                  </div>
+                  <div class="demo-item">
+                    <div class="sample-circle ambient amb-emitter amb-emit-green"></div>
+                    <span class="demo-item-label">Normal</span>
+                  </div>
+                  <div class="demo-item">
+                    <div class="sample-circle ambient amb-emitter amb-emit-green amb-emit-bright"></div>
+                    <span class="demo-item-label">Bright</span>
+                  </div>
+                  <div class="demo-item">
+                    <div class="sample-circle ambient amb-emitter amb-emit-green amb-emit-intense"></div>
+                    <span class="demo-item-label">Intense</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="code-display">
+              <code>&lt;div class="ambient amb-emitter amb-emit-green amb-emit-bright"&gt;</code>
+            </div>
+          </div>
+        </div>
+
+        <!-- Finishes Module -->
+        <div class="module ambient amb-fillet-2 amb-elevation-1">
+          <div class="module-header">
+            <h2 class="module-title">Surface Finish</h2>
+            <span class="module-brand">AMB-FIN</span>
+          </div>
+          <div class="module-body">
+            <p class="section-desc">
+              Material finishes change how light reflects off surfaces. Choose matte for diffuse lighting,
+              shiny for specular highlights, or translucent for glass-like effects.
+            </p>
+            <div class="demo-panel ambient amb-groove-2">
+              <div class="demo-title">Available Finishes</div>
+              <div class="demo-row">
+                <div class="demo-item">
+                  <div class="sample-box ambient amb-fillet amb-matte amb-elevation-1"></div>
+                  <span class="demo-item-label">Matte</span>
+                </div>
+                <div class="demo-item">
+                  <div class="sample-box ambient amb-fillet amb-shiny amb-elevation-1"></div>
+                  <span class="demo-item-label">Shiny</span>
+                </div>
+                <div class="demo-item">
+                  <div class="sample-box ambient amb-fillet amb-translucent amb-elevation-1" style="background-color: rgba(100, 150, 200, 0.5);"></div>
+                  <span class="demo-item-label">Translucent</span>
+                </div>
+              </div>
+            </div>
+            <div class="code-display">
+              <code>&lt;div class="ambient amb-matte"&gt;</code> Default finish<br>
+              <code>&lt;div class="ambient amb-shiny"&gt;</code> Specular highlight<br>
+              <code>&lt;div class="ambient amb-translucent"&gt;</code> Glass-like
+            </div>
+          </div>
+        </div>
+
+        <!-- Components Module -->
+        <div class="module ambient amb-fillet-2 amb-elevation-1">
+          <div class="module-header">
+            <h2 class="module-title">Component Library</h2>
+            <span class="module-brand">AMB-CMP</span>
+          </div>
+          <div class="module-body">
+            <p class="section-desc">
+              Pre-styled interactive components that automatically respond to user interaction
+              with realistic pressed states and hover effects.
+            </p>
+
+            <!-- Buttons -->
+            <div class="demo-panel ambient amb-groove-2">
+              <div class="demo-title">Buttons</div>
+              <div class="demo-row">
+                <button class="amb-btn ambient">Default</button>
+                <button class="amb-btn ambient amb-accent-blue" style="color: white;">Primary</button>
+                <button class="amb-btn ambient amb-accent-green" style="color: white;">Success</button>
+                <button class="amb-btn ambient amb-accent-red" style="color: white;">Danger</button>
+              </div>
+              <div class="code-display">
+                <code>&lt;button class="amb-btn ambient"&gt;</code>Click me<code>&lt;/button&gt;</code>
+              </div>
+            </div>
+
+            <!-- Inputs -->
+            <div class="demo-panel ambient amb-groove-2">
+              <div class="demo-title">Inputs</div>
+              <div class="demo-row">
+                <input type="text" class="amb-input ambient" placeholder="Text input..." style="width: 180px; color: #bbb;">
+                <select class="amb-select ambient" style="color: #bbb;">
+                  <option>Select option</option>
+                  <option>Option 1</option>
+                  <option>Option 2</option>
+                </select>
+              </div>
+              <div class="code-display">
+                <code>&lt;input class="amb-input ambient" type="text"&gt;</code><br>
+                <code>&lt;select class="amb-select ambient"&gt;</code>
+              </div>
+            </div>
+
+            <!-- Synth Controls -->
+            <div class="demo-panel ambient amb-groove-2">
+              <div class="demo-title">Synth Controls</div>
+              <div class="demo-row">
+                <div class="control-group">
+                  <div class="amb-knob ambient"></div>
+                  <span class="control-label">Knob</span>
+                </div>
+                <div class="control-group">
+                  <div class="amb-led ambient amb-emit-green on"></div>
+                  <span class="control-label">LED On</span>
+                </div>
+                <div class="control-group">
+                  <div class="amb-led ambient amb-emit-red off"></div>
+                  <span class="control-label">LED Off</span>
+                </div>
+                <div class="control-group">
+                  <div class="amb-jack ambient"></div>
+                  <span class="control-label">Jack</span>
+                </div>
+                <div class="control-group">
+                  <div class="amb-screw ambient"></div>
+                  <span class="control-label">Screw</span>
+                </div>
+              </div>
+              <div class="code-display">
+                <code>&lt;div class="amb-knob ambient"&gt;</code> Rotary control<br>
+                <code>&lt;div class="amb-led ambient amb-emit-green on"&gt;</code> LED indicator<br>
+                <code>&lt;div class="amb-jack ambient"&gt;</code> Connector jack
+              </div>
+            </div>
+
+            <!-- Panels -->
+            <div class="demo-panel ambient amb-groove-2">
+              <div class="demo-title">Panels</div>
+              <div class="grid-2">
+                <div class="amb-panel ambient" style="text-align: center;">
+                  <span class="control-label">Raised Panel</span>
+                </div>
+                <div class="amb-panel-inset ambient" style="text-align: center;">
+                  <span class="control-label">Inset Panel</span>
+                </div>
+              </div>
+              <div class="code-display">
+                <code>&lt;div class="amb-panel ambient"&gt;</code> Raised panel<br>
+                <code>&lt;div class="amb-panel-inset ambient"&gt;</code> Inset panel
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CSS Variables Module -->
+        <div class="module ambient amb-fillet-2 amb-elevation-1">
+          <div class="module-header">
+            <h2 class="module-title">Variable Reference</h2>
+            <span class="module-brand">AMB-VAR</span>
+          </div>
+          <div class="module-body">
+            <p class="section-desc">
+              Customize the lighting environment using CSS custom properties.
+              All values can be animated for dynamic lighting transitions.
+            </p>
+            <div class="demo-panel ambient amb-groove-2">
+              <table class="doc-table">
+                <thead>
+                  <tr>
+                    <th>Variable</th>
+                    <th>Default</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>--amb-light-x</code></td>
+                    <td>1</td>
+                    <td>Light direction X (-1 to 1)</td>
+                  </tr>
+                  <tr>
+                    <td><code>--amb-light-y</code></td>
+                    <td>-1</td>
+                    <td>Light direction Y (-1 to 1)</td>
+                  </tr>
+                  <tr>
+                    <td><code>--amb-key-light-intensity</code></td>
+                    <td>0.3</td>
+                    <td>Main light strength (0 to 1)</td>
+                  </tr>
+                  <tr>
+                    <td><code>--amb-fill-light-intensity</code></td>
+                    <td>0</td>
+                    <td>Fill light strength (0 to 1)</td>
+                  </tr>
+                  <tr>
+                    <td><code>--amb-elevation</code></td>
+                    <td>0</td>
+                    <td>Element elevation (0 to 3)</td>
+                  </tr>
+                  <tr>
+                    <td><code>--amb-thickness</code></td>
+                    <td>0</td>
+                    <td>Element thickness (0 to 3)</td>
+                  </tr>
+                  <tr>
+                    <td><code>--amb-emit-color</code></td>
+                    <td>255, 200, 100</td>
+                    <td>RGB values for emitter glow</td>
+                  </tr>
+                  <tr>
+                    <td><code>--amb-emit-intensity</code></td>
+                    <td>0.5</td>
+                    <td>Emitter brightness (0 to 1)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Start Module -->
+        <div class="module ambient amb-fillet-2 amb-elevation-1">
+          <div class="module-header">
+            <h2 class="module-title">Quick Start</h2>
+            <span class="module-brand">AMB-QST</span>
+          </div>
+          <div class="module-body">
+            <p class="section-desc">
+              Get started with Ambient CSS in seconds. Include the stylesheet and
+              start adding classes to your elements.
+            </p>
+            <div class="demo-panel ambient amb-groove-2">
+              <div class="demo-title">1. Include the CSS</div>
+              <div class="code-display">
+                <code>&lt;link href="index.css" rel="stylesheet"&gt;</code>
+              </div>
+            </div>
+            <div class="demo-panel ambient amb-groove-2">
+              <div class="demo-title">2. Add Ambient Classes</div>
+              <div class="code-display">
+                <code>&lt;div class="ambient amb-fillet amb-elevation-2"&gt;</code><br>
+                &nbsp;&nbsp;Your content here<br>
+                <code>&lt;/div&gt;</code>
+              </div>
+            </div>
+            <div class="demo-panel ambient amb-groove-2">
+              <div class="demo-title">3. Customize Lighting (Optional)</div>
+              <div class="code-display">
+                :root {<br>
+                &nbsp;&nbsp;<code>--amb-light-x: -1;</code> /* Light from left */<br>
+                &nbsp;&nbsp;<code>--amb-key-light-intensity: 0.5;</code> /* Brighter */<br>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Class Reference Module -->
+        <div class="module ambient amb-fillet-2 amb-elevation-1">
+          <div class="module-header">
+            <h2 class="module-title">Class Reference</h2>
+            <span class="module-brand">AMB-REF</span>
+          </div>
+          <div class="module-body">
+            <div class="grid-2">
+              <div class="demo-panel ambient amb-groove-2">
+                <div class="demo-title">Edge Classes</div>
+                <table class="doc-table">
+                  <tbody>
+                    <tr><td><code>.amb-fillet</code></td><td>Rounded edge</td></tr>
+                    <tr><td><code>.amb-fillet-1/2/3</code></td><td>Fillet widths</td></tr>
+                    <tr><td><code>.amb-chamfer</code></td><td>Beveled edge</td></tr>
+                    <tr><td><code>.amb-chamfer-1/2/3</code></td><td>Chamfer widths</td></tr>
+                    <tr><td><code>.amb-groove</code></td><td>Inset edge</td></tr>
+                    <tr><td><code>.amb-groove-1/2/3</code></td><td>Groove widths</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="demo-panel ambient amb-groove-2">
+                <div class="demo-title">Property Classes</div>
+                <table class="doc-table">
+                  <tbody>
+                    <tr><td><code>.amb-elevation-0/1/2/3</code></td><td>Shadow depth</td></tr>
+                    <tr><td><code>.amb-thickness-0/1/2/3</code></td><td>Visual weight</td></tr>
+                    <tr><td><code>.amb-pressed</code></td><td>Pressed state</td></tr>
+                    <tr><td><code>.amb-emitter</code></td><td>Glowing element</td></tr>
+                    <tr><td><code>.amb-matte</code></td><td>Matte finish</td></tr>
+                    <tr><td><code>.amb-shiny</code></td><td>Specular finish</td></tr>
+                    <tr><td><code>.amb-translucent</code></td><td>Glass finish</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="demo-panel ambient amb-groove-2">
+                <div class="demo-title">Emitter Classes</div>
+                <table class="doc-table">
+                  <tbody>
+                    <tr><td><code>.amb-emit-warm</code></td><td>Warm white glow</td></tr>
+                    <tr><td><code>.amb-emit-cool</code></td><td>Cool blue glow</td></tr>
+                    <tr><td><code>.amb-emit-red/green/blue</code></td><td>Color glows</td></tr>
+                    <tr><td><code>.amb-emit-purple/amber</code></td><td>Accent glows</td></tr>
+                    <tr><td><code>.amb-emit-dim</code></td><td>Low intensity</td></tr>
+                    <tr><td><code>.amb-emit-bright</code></td><td>High intensity</td></tr>
+                    <tr><td><code>.amb-emit-intense</code></td><td>Maximum glow</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="demo-panel ambient amb-groove-2">
+                <div class="demo-title">Component Classes</div>
+                <table class="doc-table">
+                  <tbody>
+                    <tr><td><code>.amb-btn</code></td><td>Button styling</td></tr>
+                    <tr><td><code>.amb-input</code></td><td>Text input</td></tr>
+                    <tr><td><code>.amb-select</code></td><td>Dropdown select</td></tr>
+                    <tr><td><code>.amb-panel</code></td><td>Raised panel</td></tr>
+                    <tr><td><code>.amb-panel-inset</code></td><td>Inset panel</td></tr>
+                    <tr><td><code>.amb-knob</code></td><td>Rotary control</td></tr>
+                    <tr><td><code>.amb-led</code></td><td>LED indicator</td></tr>
+                    <tr><td><code>.amb-jack</code></td><td>Connector port</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="rack-footer">
+          <p>Ambient CSS v0.1 - Physically-based lighting for skeumorphic interfaces</p>
+          <p>Inspired by synthesizer interfaces and the original iPhone</p>
+        </footer>
+
       </div>
     </div>
     <script src="script.js"></script>

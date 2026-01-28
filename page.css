@@ -1,72 +1,558 @@
+/* ==========================================================================
+   Ambient CSS Documentation Page Styles
+   Synth Rack Theme
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Base Styles
+   -------------------------------------------------------------------------- */
+* {
+  box-sizing: border-box;
+}
+
 body {
+  margin: 0;
+  padding: 0;
   background-color: rgb(36, 43, 60);
-  background-image: linear-gradient(
-    45deg,
-    rgba(0, 0, 0, 0.1) 0%,
-    rgba(255, 255, 255, 0.1) 100%
-  );
-  font-family: "Josefin Sans", sans-serif;
+  background-image:
+    linear-gradient(45deg, rgba(0, 0, 0, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
+    );
+  font-family: "Josefin Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #bbb;
+  min-height: 100vh;
   transition: background-color 3s ease-in;
 }
 
-.container {
-  display: grid;
-  min-height: 90vh;
-  min-width: 100%;
-  column-gap: 30px;
-  gap: 30px;
+/* --------------------------------------------------------------------------
+   Synth Rack Container
+   -------------------------------------------------------------------------- */
+.rack {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
-.content {
-  justify-self: center;
-  align-self: center;
+.rack-rails {
+  position: relative;
+  padding: 10px 30px;
 }
 
-.box {
-  padding: 7rem;
-  border-radius: 7px;
-  margin: 30px;
+/* Rail holes decoration */
+.rack-rails::before,
+.rack-rails::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  background-image:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 15px,
+      rgb(60, 65, 75) 15px,
+      rgb(60, 65, 75) 20px,
+      transparent 20px,
+      transparent 35px
+    );
 }
 
-.logo {
-  text-align: center;
-  font-size: 49px;
-  color: #aaa;
+.rack-rails::before {
+  left: 0;
 }
 
-.circle {
-  width: 64px;
-  min-height: 64px;
-  content: " ";
-  margin: 30px;
-  border-radius: 50%;
+.rack-rails::after {
+  right: 0;
 }
 
-.custom {
-  cursor: pointer;
-  border: 1px solid rgb(0 0 0 / 0.4);
-  background-color: inherit;
-  padding: 0.5rem;
-  border-radius: 12px;
-  text-transform: uppercase;
-  width: 64px;
-  font-weight: 600;
-  color: #aaa;
-  text-shadow: 0 0 14px rgb(255 255 255 / 0.35);
+/* --------------------------------------------------------------------------
+   Module (Each "device" in the rack)
+   -------------------------------------------------------------------------- */
+.module {
+  background-color: rgb(55, 62, 78);
+  border-radius: 8px;
+  margin-bottom: 15px;
+  overflow: hidden;
 }
 
-.custom:focus {
-  /* border: 1px solid lightcoral; */
-  outline: 4px double pink;
-  outline-offset: 2px;
-}
-
-.custom:hover {
-  border-color: coral;
-}
-
-.row {
+.module-header {
+  background-color: rgb(45, 52, 68);
+  padding: 12px 20px;
   display: flex;
-  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.module-title {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #999;
+  margin: 0;
+}
+
+.module-brand {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #666;
+}
+
+.module-body {
+  padding: 20px;
+}
+
+/* --------------------------------------------------------------------------
+   Header Module (Hero/Logo)
+   -------------------------------------------------------------------------- */
+.module-hero {
+  text-align: center;
+  background: linear-gradient(180deg, rgb(50, 57, 73) 0%, rgb(45, 52, 68) 100%);
+}
+
+.hero-logo {
+  font-size: 48px;
+  letter-spacing: 8px;
+  color: #888;
+  margin-bottom: 10px;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.1),
+    0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.hero-subtitle {
+  font-size: 28px;
+  color: #777;
+  margin-bottom: 20px;
+}
+
+.hero-tagline {
+  font-size: 14px;
+  color: #666;
+  max-width: 500px;
+  margin: 0 auto 30px;
+  line-height: 1.6;
+}
+
+.hero-controls {
+  display: flex;
   justify-content: center;
+  gap: 15px;
+  padding: 20px 0;
+}
+
+/* --------------------------------------------------------------------------
+   Controls Row (Inside modules)
+   -------------------------------------------------------------------------- */
+.controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.control-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #777;
+}
+
+/* --------------------------------------------------------------------------
+   Demo Panels
+   -------------------------------------------------------------------------- */
+.demo-panel {
+  background-color: rgb(50, 57, 73);
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.demo-panel:last-child {
+  margin-bottom: 0;
+}
+
+.demo-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #888;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.demo-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.demo-row:last-child {
+  margin-bottom: 0;
+}
+
+.demo-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.demo-item-label {
+  font-size: 10px;
+  color: #666;
+  text-transform: uppercase;
+}
+
+/* --------------------------------------------------------------------------
+   Sample Shapes for Demos
+   -------------------------------------------------------------------------- */
+.sample-box {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  background-color: inherit;
+}
+
+.sample-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: inherit;
+}
+
+.sample-rect {
+  width: 80px;
+  height: 40px;
+  border-radius: 6px;
+  background-color: inherit;
+}
+
+.sample-pill {
+  width: 100px;
+  height: 30px;
+  border-radius: 15px;
+  background-color: inherit;
+}
+
+/* --------------------------------------------------------------------------
+   Code Display
+   -------------------------------------------------------------------------- */
+.code-display {
+  background-color: rgb(30, 35, 45);
+  border-radius: 4px;
+  padding: 12px 15px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 12px;
+  color: #aaa;
+  overflow-x: auto;
+  margin: 10px 0;
+}
+
+.code-display code {
+  color: #88c8ff;
+}
+
+.code-display .tag {
+  color: #ff8888;
+}
+
+.code-display .class {
+  color: #88ff88;
+}
+
+.code-display .attr {
+  color: #ffcc88;
+}
+
+/* --------------------------------------------------------------------------
+   Grid Layouts
+   -------------------------------------------------------------------------- */
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+
+@media (max-width: 768px) {
+  .grid-2,
+  .grid-3,
+  .grid-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Interactive Elements
+   -------------------------------------------------------------------------- */
+.btn-day,
+.btn-night {
+  cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  background-color: rgb(65, 72, 88);
+  padding: 10px 20px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: #999;
+  transition: all 0.2s ease;
+}
+
+.btn-day:hover,
+.btn-night:hover {
+  background-color: rgb(75, 82, 98);
+  color: #bbb;
+}
+
+.btn-day:active,
+.btn-night:active {
+  transform: translateY(1px);
+}
+
+/* --------------------------------------------------------------------------
+   LED Strip
+   -------------------------------------------------------------------------- */
+.led-strip {
+  display: flex;
+  gap: 6px;
+  padding: 8px;
+  background-color: rgb(30, 35, 45);
+  border-radius: 4px;
+}
+
+.led {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: rgb(40, 45, 55);
+}
+
+/* --------------------------------------------------------------------------
+   VU Meter
+   -------------------------------------------------------------------------- */
+.vu-meter {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px;
+  background-color: rgb(30, 35, 45);
+  border-radius: 4px;
+}
+
+.vu-segment {
+  width: 24px;
+  height: 5px;
+  border-radius: 2px;
+  background-color: rgb(40, 45, 55);
+}
+
+/* --------------------------------------------------------------------------
+   Display Screen
+   -------------------------------------------------------------------------- */
+.display-screen {
+  background-color: rgb(20, 35, 30);
+  border-radius: 4px;
+  padding: 10px 15px;
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 14px;
+  color: rgb(100, 255, 150);
+  text-shadow: 0 0 10px rgba(100, 255, 150, 0.5);
+  min-width: 120px;
+}
+
+/* --------------------------------------------------------------------------
+   Section Descriptions
+   -------------------------------------------------------------------------- */
+.section-desc {
+  font-size: 13px;
+  color: #888;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+/* --------------------------------------------------------------------------
+   Feature List
+   -------------------------------------------------------------------------- */
+.feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.feature-list li {
+  padding: 8px 0;
+  padding-left: 20px;
+  position: relative;
+  font-size: 13px;
+  color: #888;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.feature-list li:last-child {
+  border-bottom: none;
+}
+
+.feature-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: rgb(100, 180, 255);
+  box-shadow: 0 0 6px rgba(100, 180, 255, 0.5);
+}
+
+/* --------------------------------------------------------------------------
+   Documentation Table
+   -------------------------------------------------------------------------- */
+.doc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.doc-table th,
+.doc-table td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.doc-table th {
+  color: #999;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 10px;
+}
+
+.doc-table td {
+  color: #777;
+}
+
+.doc-table code {
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 11px;
+  color: #88c8ff;
+}
+
+/* --------------------------------------------------------------------------
+   Screw Decorations
+   -------------------------------------------------------------------------- */
+.module-screws {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 15px;
+  background-color: rgb(45, 52, 68);
+}
+
+.screw {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgb(80, 85, 95) 0%, rgb(50, 55, 65) 100%);
+  position: relative;
+}
+
+.screw::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+/* --------------------------------------------------------------------------
+   Footer
+   -------------------------------------------------------------------------- */
+.rack-footer {
+  text-align: center;
+  padding: 30px;
+  color: #555;
+  font-size: 12px;
+}
+
+.rack-footer a {
+  color: #777;
+  text-decoration: none;
+}
+
+.rack-footer a:hover {
+  color: #999;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive
+   -------------------------------------------------------------------------- */
+@media (max-width: 600px) {
+  .rack {
+    padding: 10px;
+  }
+
+  .rack-rails {
+    padding: 10px 15px;
+  }
+
+  .rack-rails::before,
+  .rack-rails::after {
+    display: none;
+  }
+
+  .module-body {
+    padding: 15px;
+  }
+
+  .hero-logo {
+    font-size: 32px;
+    letter-spacing: 4px;
+  }
+
+  .hero-subtitle {
+    font-size: 20px;
+  }
+
+  .controls-row {
+    justify-content: center;
+  }
 }

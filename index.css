@@ -1,18 +1,60 @@
+/* ==========================================================================
+   Ambient CSS Framework v0.1
+   A physically-based lighting and shadow system for skeumorphic interfaces
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Root Variables - Global lighting and material settings
+   -------------------------------------------------------------------------- */
 :root {
+  /* Lighting direction (-1 to 1 for each axis) */
   --amb-light-x: 1;
   --amb-light-y: -1;
+
+  /* Light intensities (0 to 1) */
   --amb-key-light-intensity: 0.3;
   --amb-fill-light-intensity: 0;
-  --amb-light-distance: 0px;
-  --amb-fillet: 0;
-  --amb-chamfer: 0;
+
+  /* Object properties */
   --amb-thickness: 0;
   --amb-elevation: 0;
+
+  /* Edge properties */
+  --amb-fillet: 0;
   --amb-fillet-width: 1;
+  --amb-chamfer: 0;
+  --amb-chamfer-width: 2;
+  --amb-groove: 0;
+  --amb-groove-width: 2;
+
+  /* Emitter properties */
+  --amb-emitter: 0;
+  --amb-emit-color: 255, 200, 100;
+  --amb-emit-intensity: 0.5;
+
+  /* Finish properties */
+  --amb-finish-shiny: 0;
+  --amb-finish-translucent: 0;
+
+  /* Pressed state */
+  --amb-pressed: 0;
+
+  /* Surface color (used for lighting calculations) */
+  --amb-surface-color: inherit;
 }
 
+/* --------------------------------------------------------------------------
+   Edge Styles - Fillet, Chamfer, Groove
+   -------------------------------------------------------------------------- */
+
+/* Fillet - Rounded edges that catch light */
 .amb-fillet {
   --amb-fillet: 1;
+}
+
+.amb-fillet-1 {
+  --amb-fillet: 1;
+  --amb-fillet-width: 1;
 }
 
 .amb-fillet-2 {
@@ -20,10 +62,54 @@
   --amb-fillet-width: 2;
 }
 
+.amb-fillet-3 {
+  --amb-fillet: 1;
+  --amb-fillet-width: 3;
+}
+
+/* Chamfer - Beveled edges */
 .amb-chamfer {
   --amb-chamfer: 1;
 }
 
+.amb-chamfer-1 {
+  --amb-chamfer: 1;
+  --amb-chamfer-width: 1;
+}
+
+.amb-chamfer-2 {
+  --amb-chamfer: 1;
+  --amb-chamfer-width: 2;
+}
+
+.amb-chamfer-3 {
+  --amb-chamfer: 1;
+  --amb-chamfer-width: 3;
+}
+
+/* Groove - Inset border effect (works best at elevation 0) */
+.amb-groove {
+  --amb-groove: 1;
+}
+
+.amb-groove-1 {
+  --amb-groove: 1;
+  --amb-groove-width: 1;
+}
+
+.amb-groove-2 {
+  --amb-groove: 1;
+  --amb-groove-width: 2;
+}
+
+.amb-groove-3 {
+  --amb-groove: 1;
+  --amb-groove-width: 3;
+}
+
+/* --------------------------------------------------------------------------
+   Elevation Levels - How high the element floats above the surface
+   -------------------------------------------------------------------------- */
 .amb-elevation-0 {
   --amb-elevation: 0;
 }
@@ -40,45 +126,516 @@
   --amb-elevation: 3;
 }
 
+/* --------------------------------------------------------------------------
+   Thickness - Visual depth of the element itself
+   -------------------------------------------------------------------------- */
+.amb-thickness-0 {
+  --amb-thickness: 0;
+}
+
+.amb-thickness-1 {
+  --amb-thickness: 1;
+}
+
+.amb-thickness-2 {
+  --amb-thickness: 2;
+}
+
+.amb-thickness-3 {
+  --amb-thickness: 3;
+}
+
+/* --------------------------------------------------------------------------
+   Finishes - Material appearance
+   -------------------------------------------------------------------------- */
+
+/* Matte finish (default) - No special styling needed */
+.amb-matte {
+  --amb-finish-shiny: 0;
+  --amb-finish-translucent: 0;
+}
+
+/* Shiny finish - Adds specular highlight */
+.amb-shiny {
+  --amb-finish-shiny: 1;
+}
+
+/* Translucent finish - Semi-transparent with glow */
+.amb-translucent {
+  --amb-finish-translucent: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Emitter - Glowing elements that emit light
+   -------------------------------------------------------------------------- */
+.amb-emitter {
+  --amb-emitter: 1;
+  --amb-elevation: 0;
+}
+
+/* Emitter color variants */
+.amb-emit-warm {
+  --amb-emit-color: 255, 180, 100;
+}
+
+.amb-emit-cool {
+  --amb-emit-color: 100, 180, 255;
+}
+
+.amb-emit-red {
+  --amb-emit-color: 255, 80, 80;
+}
+
+.amb-emit-green {
+  --amb-emit-color: 80, 255, 120;
+}
+
+.amb-emit-blue {
+  --amb-emit-color: 80, 140, 255;
+}
+
+.amb-emit-purple {
+  --amb-emit-color: 180, 100, 255;
+}
+
+.amb-emit-amber {
+  --amb-emit-color: 255, 150, 50;
+}
+
+/* Emitter intensity levels */
+.amb-emit-dim {
+  --amb-emit-intensity: 0.3;
+}
+
+.amb-emit-bright {
+  --amb-emit-intensity: 0.7;
+}
+
+.amb-emit-intense {
+  --amb-emit-intensity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Pressed State - For interactive elements
+   -------------------------------------------------------------------------- */
+.amb-pressed {
+  --amb-pressed: 1;
+  --amb-elevation: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Main Ambient Class - The core shadow and lighting calculations
+   -------------------------------------------------------------------------- */
 .ambient {
-  box-shadow: rgba(
-        0,
-        0,
-        0,
-        calc((var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)))
-      )
+  /* Transition for smooth state changes */
+  transition: box-shadow 0.15s ease-out, transform 0.15s ease-out;
+
+  box-shadow:
+    /* Drop shadow based on elevation and light direction */
+    rgba(0, 0, 0, calc((var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)) * (1 - var(--amb-emitter))))
       calc(var(--amb-light-x) * var(--amb-elevation) * -8px)
       calc(var(--amb-light-y) * var(--amb-elevation) * -8px)
-      calc(var(--amb-elevation) * 8px) calc(var(--amb-elevation) * -4px),
+      calc(var(--amb-elevation) * 8px)
+      calc(var(--amb-elevation) * -4px),
+
+    /* Thickness shadow - gives depth to the element */
+    rgba(0, 0, 0, calc(0.15 * var(--amb-thickness) * (1 - var(--amb-emitter))))
+      calc(var(--amb-light-x) * var(--amb-thickness) * -2px)
+      calc(var(--amb-light-y) * var(--amb-thickness) * -2px)
+      calc(var(--amb-thickness) * 1px)
+      0px,
+
+    /* Fillet highlight (top-left relative to light) */
     inset calc(var(--amb-light-x) * var(--amb-fillet-width) * -1px)
-      calc(var(--amb-light-y) * var(--amb-fillet-width) * -1px) 0px 0px
-      rgb(
-        255 255 255 / calc(var(--amb-fillet) * var(--amb-key-light-intensity))
-      ),
+      calc(var(--amb-light-y) * var(--amb-fillet-width) * -1px)
+      0px 0px
+      rgb(255 255 255 / calc(var(--amb-fillet) * var(--amb-key-light-intensity) * (1 - var(--amb-pressed)))),
+
+    /* Fillet shadow (bottom-right relative to light) */
     inset calc(var(--amb-light-x) * var(--amb-fillet-width) * 1px)
-      calc(var(--amb-light-y) * var(--amb-fillet-width) * 1px) 0px 0px
-      rgb(
-        0 0 0 /
-          calc(
-            var(--amb-fillet) *
-              calc(
-                var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
-              )
-          )
-      ),
-    inset calc(var(--amb-light-x) * -2px) calc(var(--amb-light-y) * -2px) 2px
-      0px
-      rgb(
-        255 255 255 / calc(var(--amb-chamfer) * var(--amb-key-light-intensity))
-      ),
-    inset calc(var(--amb-light-x) * 2px) calc(var(--amb-light-y) * 2px) 2px 0px
-      rgb(
-        0 0 0 /
-          calc(
-            var(--amb-chamfer) *
-              calc(
-                var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
-              )
-          )
-      );
+      calc(var(--amb-light-y) * var(--amb-fillet-width) * 1px)
+      0px 0px
+      rgb(0 0 0 / calc(var(--amb-fillet) * (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)) * (1 - var(--amb-pressed)))),
+
+    /* Chamfer highlight */
+    inset calc(var(--amb-light-x) * var(--amb-chamfer-width) * -1px)
+      calc(var(--amb-light-y) * var(--amb-chamfer-width) * -1px)
+      calc(var(--amb-chamfer-width) * 1px) 0px
+      rgb(255 255 255 / calc(var(--amb-chamfer) * var(--amb-key-light-intensity) * (1 - var(--amb-pressed)))),
+
+    /* Chamfer shadow */
+    inset calc(var(--amb-light-x) * var(--amb-chamfer-width) * 1px)
+      calc(var(--amb-light-y) * var(--amb-chamfer-width) * 1px)
+      calc(var(--amb-chamfer-width) * 1px) 0px
+      rgb(0 0 0 / calc(var(--amb-chamfer) * (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)) * (1 - var(--amb-pressed)))),
+
+    /* Groove outer shadow (creates inset appearance) */
+    inset calc(var(--amb-light-x) * var(--amb-groove-width) * -1px)
+      calc(var(--amb-light-y) * var(--amb-groove-width) * -1px)
+      calc(var(--amb-groove-width) * 0.5px) 0px
+      rgb(0 0 0 / calc(var(--amb-groove) * (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)))),
+
+    /* Groove inner highlight */
+    inset calc(var(--amb-light-x) * var(--amb-groove-width) * 1px)
+      calc(var(--amb-light-y) * var(--amb-groove-width) * 1px)
+      calc(var(--amb-groove-width) * 0.5px) 0px
+      rgb(255 255 255 / calc(var(--amb-groove) * var(--amb-key-light-intensity) * 0.5)),
+
+    /* Pressed state - inner shadow */
+    inset 0 0 calc(var(--amb-pressed) * 4px) calc(var(--amb-pressed) * 2px)
+      rgb(0 0 0 / calc(var(--amb-pressed) * 0.2)),
+
+    /* Shiny finish - specular highlight */
+    inset calc(var(--amb-light-x) * -4px)
+      calc(var(--amb-light-y) * -4px)
+      8px -4px
+      rgb(255 255 255 / calc(var(--amb-finish-shiny) * var(--amb-key-light-intensity) * 0.6)),
+
+    /* Emitter glow */
+    0 0 calc(var(--amb-emitter) * var(--amb-emit-intensity) * 20px)
+      calc(var(--amb-emitter) * var(--amb-emit-intensity) * 5px)
+      rgb(var(--amb-emit-color) / calc(var(--amb-emitter) * var(--amb-emit-intensity) * 0.8)),
+
+    /* Emitter inner glow */
+    inset 0 0 calc(var(--amb-emitter) * var(--amb-emit-intensity) * 15px)
+      calc(var(--amb-emitter) * var(--amb-emit-intensity) * -5px)
+      rgb(var(--amb-emit-color) / calc(var(--amb-emitter) * var(--amb-emit-intensity) * 0.4));
+}
+
+/* Translucent finish - adds transparency */
+.ambient.amb-translucent {
+  background-color: rgba(var(--amb-surface-color, 128, 128, 128), 0.7);
+  backdrop-filter: blur(4px);
+}
+
+/* --------------------------------------------------------------------------
+   Component Base Styles - Buttons, Inputs, Selects, etc.
+   -------------------------------------------------------------------------- */
+
+/* Button base */
+.amb-btn {
+  cursor: pointer;
+  border: none;
+  padding: 0.6em 1.2em;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 500;
+  background-color: inherit;
+  color: inherit;
+  --amb-fillet: 1;
+  --amb-fillet-width: 1;
+  --amb-elevation: 1;
+}
+
+.amb-btn:hover {
+  --amb-elevation: 2;
+}
+
+.amb-btn:active {
+  --amb-pressed: 1;
+  --amb-elevation: 0;
+  transform: translateY(1px);
+}
+
+.amb-btn:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Input base */
+.amb-input {
+  border: none;
+  padding: 0.6em 0.8em;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: inherit;
+  background-color: inherit;
+  color: inherit;
+  --amb-groove: 1;
+  --amb-groove-width: 1;
+}
+
+.amb-input:focus {
+  outline: none;
+  --amb-groove-width: 2;
+}
+
+/* Select base */
+.amb-select {
+  cursor: pointer;
+  border: none;
+  padding: 0.6em 2em 0.6em 0.8em;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: inherit;
+  background-color: inherit;
+  color: inherit;
+  appearance: none;
+  --amb-fillet: 1;
+  --amb-fillet-width: 1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5em center;
+}
+
+.amb-select:focus {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Slider/Range base */
+.amb-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background-color: inherit;
+  --amb-groove: 1;
+  --amb-groove-width: 1;
+}
+
+.amb-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: inherit;
+  cursor: pointer;
+  border: none;
+}
+
+.amb-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: inherit;
+  cursor: pointer;
+  border: none;
+}
+
+/* Toggle/Switch */
+.amb-toggle {
+  position: relative;
+  width: 48px;
+  height: 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  --amb-groove: 1;
+  --amb-groove-width: 1;
+}
+
+.amb-toggle-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  transition: left 0.2s ease-out;
+  --amb-fillet: 1;
+  --amb-elevation: 1;
+}
+
+.amb-toggle.active .amb-toggle-knob {
+  left: 26px;
+}
+
+/* Tab */
+.amb-tab {
+  cursor: pointer;
+  border: none;
+  padding: 0.6em 1.2em;
+  border-radius: 6px 6px 0 0;
+  font-family: inherit;
+  font-size: inherit;
+  background-color: inherit;
+  color: inherit;
+  --amb-fillet: 1;
+  --amb-fillet-width: 1;
+  --amb-elevation: 0;
+  opacity: 0.7;
+}
+
+.amb-tab:hover {
+  opacity: 0.9;
+}
+
+.amb-tab.active {
+  --amb-elevation: 1;
+  opacity: 1;
+}
+
+/* Label/Badge */
+.amb-label {
+  display: inline-block;
+  padding: 0.25em 0.6em;
+  border-radius: 4px;
+  font-size: 0.85em;
+  font-weight: 500;
+  --amb-fillet: 1;
+  --amb-fillet-width: 1;
+  --amb-elevation: 0;
+}
+
+/* Card/Panel */
+.amb-panel {
+  border-radius: 8px;
+  padding: 1rem;
+  --amb-fillet: 1;
+  --amb-fillet-width: 2;
+  --amb-elevation: 1;
+}
+
+.amb-panel-inset {
+  border-radius: 8px;
+  padding: 1rem;
+  --amb-groove: 1;
+  --amb-groove-width: 2;
+}
+
+/* Knob (rotary control) */
+.amb-knob {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+  --amb-chamfer: 1;
+  --amb-chamfer-width: 2;
+  --amb-elevation: 1;
+}
+
+.amb-knob::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 10px;
+  background: currentColor;
+  border-radius: 2px;
+  opacity: 0.6;
+}
+
+/* LED indicator */
+.amb-led {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  --amb-emitter: 1;
+  --amb-emit-intensity: 0.5;
+}
+
+.amb-led.on {
+  --amb-emit-intensity: 1;
+}
+
+.amb-led.off {
+  --amb-emitter: 0;
+}
+
+/* Display/Screen */
+.amb-display {
+  border-radius: 4px;
+  padding: 0.5rem;
+  font-family: monospace;
+  --amb-groove: 1;
+  --amb-groove-width: 2;
+  --amb-finish-translucent: 1;
+}
+
+/* Meter/VU meter segment */
+.amb-meter-segment {
+  width: 8px;
+  height: 4px;
+  border-radius: 1px;
+  --amb-emitter: 0;
+  --amb-emit-intensity: 0;
+}
+
+.amb-meter-segment.active {
+  --amb-emitter: 1;
+  --amb-emit-intensity: 0.8;
+}
+
+/* Jack/Port connector */
+.amb-jack {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  --amb-groove: 1;
+  --amb-groove-width: 3;
+}
+
+/* Screw detail */
+.amb-screw {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  position: relative;
+  --amb-chamfer: 1;
+  --amb-chamfer-width: 1;
+  --amb-elevation: 0;
+}
+
+.amb-screw::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.4;
+}
+
+/* --------------------------------------------------------------------------
+   Utility Classes
+   -------------------------------------------------------------------------- */
+
+/* Surface colors for themed elements */
+.amb-surface-dark {
+  --amb-surface-color: 40, 45, 55;
+  background-color: rgb(40, 45, 55);
+}
+
+.amb-surface-light {
+  --amb-surface-color: 220, 225, 230;
+  background-color: rgb(220, 225, 230);
+}
+
+.amb-surface-warm {
+  --amb-surface-color: 180, 160, 140;
+  background-color: rgb(180, 160, 140);
+}
+
+.amb-surface-cool {
+  --amb-surface-color: 140, 160, 180;
+  background-color: rgb(140, 160, 180);
+}
+
+/* Color accents */
+.amb-accent-red {
+  background-color: rgb(180, 60, 60);
+}
+
+.amb-accent-green {
+  background-color: rgb(60, 140, 80);
+}
+
+.amb-accent-blue {
+  background-color: rgb(60, 100, 180);
+}
+
+.amb-accent-yellow {
+  background-color: rgb(200, 180, 60);
+}
+
+.amb-accent-orange {
+  background-color: rgb(200, 120, 60);
 }
