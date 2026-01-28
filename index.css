@@ -202,3 +202,100 @@
   outline: none;
   background-color: rgba(0, 0, 0, 0.3);
 }
+
+/* --- Knob --- */
+.amb-knob {
+  position: relative;
+  width: var(--amb-knob-size, 40px);
+  height: var(--amb-knob-size, 40px);
+  border-radius: 50%;
+  background: var(--amb-surface-color, #e0e0e0);
+  /* Use the ambient shadow mixin logic manually here or ensure it inherits standard object props */
+  /* We assume knobs are raised */
+  --elevation: 2px;
+  --thickness: 1px;
+}
+
+/* Knob Indicator (The line or dot) */
+.amb-knob::after {
+  content: '';
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  width: 2px;
+  height: 30%;
+  background: var(--amb-ink-color, #333);
+  transform-origin: 50% 133%; /* Pivot around center of knob */
+  transform: translateX(-50%);
+}
+
+/* --- Fader --- */
+.amb-fader {
+  position: relative;
+  width: 30px;
+  height: 100px;
+  /* The track is usually recessed */
+}
+
+.amb-fader-track {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 4px;
+  transform: translateX(-50%);
+  background: #111;
+  border-radius: 2px;
+  box-shadow: inset 1px 1px 2px rgba(0,0,0,0.8), inset -1px -1px 2px rgba(255,255,255,0.1);
+}
+
+.amb-fader-handle {
+  position: absolute;
+  left: 50%;
+  width: 20px;
+  height: 30px;
+  transform: translate(-50%, -50%); /* Centered on the value point */
+  background: var(--amb-surface-color, #e0e0e0);
+  border-radius: 2px;
+  /* Appears raised */
+  box-shadow:
+    -1px -1px 1px rgba(255,255,255,0.5),
+    1px 1px 2px rgba(0,0,0,0.5),
+    2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.amb-fader-handle::after {
+   /* A little line on the fader cap */
+   content: '';
+   position: absolute;
+   top: 50%;
+   left: 10%;
+   right: 10%;
+   height: 1px;
+   background: #333;
+}
+
+/* --- Switch --- */
+.amb-switch {
+  position: relative;
+  width: 20px;
+  height: 40px;
+  background: #111; /* Recessed well */
+  border-radius: 2px;
+  box-shadow: inset 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+.amb-switch-handle {
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  height: 18px;
+  background: var(--amb-surface-color, #e0e0e0);
+  border-radius: 2px;
+  box-shadow:
+    -1px -1px 1px rgba(255,255,255,0.4),
+    1px 1px 2px rgba(0,0,0,0.6);
+}
+/* States usually handled by top/bottom positioning */
+.amb-switch[data-state="up"] .amb-switch-handle { top: 2px; }
+.amb-switch[data-state="down"] .amb-switch-handle { bottom: 2px; }

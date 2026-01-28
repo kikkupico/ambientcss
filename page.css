@@ -1,147 +1,117 @@
 body {
-    background-color: #2b2b2b;
-    color: #ddd;
-    font-family: 'Josefin Sans', sans-serif;
-    margin: 0;
-    padding: 20px;
-    min-height: 100vh;
-    box-sizing: border-box;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: background-color 3s ease-in;
+  margin: 0;
+  background-color: #2a2a2a; /* Dark charcoal background */
+  color: #e0e0e0;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow-x: auto;
 }
 
-.rack-container {
-    background-color: #1a1a1a;
-    border: 4px solid #444;
-    border-radius: 8px;
-    padding: 10px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    max-width: 1000px;
-    width: 100%;
+.synth-container {
+  background-color: #202020;
+  width: 1200px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  border-radius: 4px;
 }
 
-.rack-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    background-color: #222;
-    border-radius: 4px;
-    border-bottom: 2px solid #000;
+/* Header Section */
+.synth-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #333;
+  margin-bottom: 20px;
 }
 
-.brand {
-    font-weight: 300;
-    letter-spacing: 4px;
-    margin: 0;
-    font-size: 1.5rem;
-    color: #eee;
-    text-shadow: 0 0 5px rgba(255,255,255,0.2);
+.synth-logo {
+  font-size: 32px;
+  font-weight: 800;
+  color: #e0e0e0;
+  letter-spacing: -1px;
 }
 
-.version {
-    font-size: 0.8rem;
-    color: #666;
-    vertical-align: super;
+.synth-logo span {
+  font-weight: 300;
 }
 
-.power-section {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.rack-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    background-color: #000;
-    padding: 4px;
-    border-radius: 4px;
-    justify-content: center;
+/* Module Grid */
+.module-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
 .module {
-    background-color: #333;
-    padding: 20px;
-    min-width: 200px;
-    flex: 1;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    border-radius: 2px;
+  background: #252525;
+  border: 1px solid #1a1a1a;
+  display: flex;
+  flex-direction: column;
 }
 
-.module-title {
-    font-size: 0.9rem;
-    text-align: center;
-    letter-spacing: 2px;
-    margin: 0 0 10px 0;
-    color: #888;
-    border-bottom: 1px solid #444;
-    padding-bottom: 5px;
+.module-header {
+  background-color: #ff6600; /* Jupiter Orange */
+  color: #000;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 4px 0;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+.module-content {
+  padding: 10px;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  gap: 10px;
+  flex-grow: 1;
 }
 
 .control-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
 }
 
-.control-group label {
-    font-size: 0.7rem;
-    color: #aaa;
-    letter-spacing: 1px;
+.control-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: #aaa;
+  text-align: center;
+  margin-bottom: 4px;
 }
 
-.row {
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-    justify-content: center;
+.control-sublabel {
+    font-size: 9px;
+    color: #777;
+    margin-top: 4px;
 }
 
-.box {
-    width: 60px;
-    height: 60px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 0.7rem;
-    font-weight: bold;
-    color: #aaa;
-    border-radius: 4px;
-    background-color: #333;
-    /* Ensure text shadow works for clarity */
-    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+/* Override Ambient Defaults for this theme */
+.amb-knob {
+  --amb-knob-size: 36px;
+  background: #181818; /* Dark knob */
+  box-shadow:
+    -2px -2px 4px rgba(255,255,255,0.05),
+    2px 2px 5px rgba(0,0,0,0.8);
+}
+.amb-knob::after {
+  background: #fff; /* White indicator */
 }
 
-.screws {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    pointer-events: none;
+.amb-fader-handle {
+    background: #181818;
+    border: 1px solid #333;
 }
-.screw {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    background: linear-gradient(135deg, #444, #222);
-    border-radius: 50%;
-    color: #111;
-    font-size: 8px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-shadow: inset 1px 1px 2px rgba(0,0,0,0.5), 1px 1px 2px rgba(0,0,0,0.5);
+.amb-fader-handle::after {
+    background: #ff6600; /* Orange line on fader */
+    height: 2px;
 }
-.screw:nth-child(1) { top: 6px; left: 6px; }
-.screw:nth-child(2) { top: 6px; right: 6px; }
-.screw:nth-child(3) { bottom: 6px; left: 6px; }
-.screw:nth-child(4) { bottom: 6px; right: 6px; }

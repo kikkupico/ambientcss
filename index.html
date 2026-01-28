@@ -1,106 +1,288 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ambient CSS Synth Rack</title>
-    <link rel="stylesheet" href="index.css">
-    <link rel="stylesheet" href="page.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JP-80 Synth Spec</title>
+  <link rel="stylesheet" href="index.css" />
+  <link rel="stylesheet" href="page.css" />
 </head>
 <body>
-    <div class="rack-container">
-        <header class="rack-header">
-            <h1 class="brand">AMBIENT <span class="version">V1.0</span></h1>
-            <div class="power-section">
-                <span class="label">POWER</span>
-                <div class="button-group">
-                    <button id="button-day" class="amb-btn ambient amb-fillet" style="padding: 5px 10px; font-size: 0.7rem;">DAY</button>
-                    <button id="button-night" class="amb-btn ambient amb-fillet" style="padding: 5px 10px; font-size: 0.7rem;">NIGHT</button>
-                </div>
-            </div>
-        </header>
 
-        <div class="rack-row">
-            <!-- Module: Geometry -->
-            <div class="module">
-                <h2 class="module-title">GEOMETRY</h2>
-                <div class="module-content">
-                    <div class="control-group">
-                        <label>ELEVATION</label>
-                        <div class="row">
-                            <div class="box ambient amb-elevation-1 amb-fillet">1</div>
-                            <div class="box ambient amb-elevation-3 amb-fillet">3</div>
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label>THICKNESS</label>
-                        <div class="row">
-                            <div class="box ambient amb-thickness-1 amb-elevation-1 amb-fillet">1</div>
-                            <div class="box ambient amb-thickness-3 amb-elevation-1 amb-fillet">3</div>
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label>EDGES</label>
-                        <div class="row">
-                            <div class="box ambient amb-elevation-1 amb-fillet-2">FILLET</div>
-                            <div class="box ambient amb-elevation-1 amb-chamfer">CHAMFER</div>
-                            <div class="box ambient amb-groove" style="display:flex; justify-content:center; align-items:center;">GROOVE</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="screws">
-                    <div class="screw">+</div><div class="screw">+</div>
-                    <div class="screw">+</div><div class="screw">+</div>
-                </div>
-            </div>
+<div class="synth-container">
 
-            <!-- Module: Materials -->
-            <div class="module">
-                <h2 class="module-title">MATERIALS</h2>
-                <div class="module-content">
-                    <div class="control-group">
-                        <label>FINISH</label>
-                        <div class="row">
-                            <div class="box ambient amb-elevation-1 amb-fillet amb-matte">MATTE</div>
-                            <div class="box ambient amb-elevation-1 amb-fillet amb-shiny">SHINY</div>
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label>EMISSION</label>
-                        <div class="row">
-                            <div class="box amb-emitter amb-fillet">GLOW</div>
-                        </div>
-                    </div>
-                </div>
-                 <div class="screws">
-                    <div class="screw">+</div><div class="screw">+</div>
-                    <div class="screw">+</div><div class="screw">+</div>
-                </div>
-            </div>
+  <!-- Header / Master Section -->
+  <div class="synth-header">
+    <div class="synth-logo">JP-80</div>
+    <div style="display: flex; gap: 20px;">
+        <div class="control-group">
+            <div class="control-label">Volume</div>
+            <div class="amb-knob" style="transform: rotate(45deg);"></div>
+        </div>
+        <div class="control-group">
+            <div class="control-label">Tune</div>
+            <div class="amb-knob" style="transform: rotate(-10deg);"></div>
+        </div>
+    </div>
+  </div>
 
-            <!-- Module: Controls -->
-            <div class="module">
-                <h2 class="module-title">CONTROLS</h2>
-                <div class="module-content">
-                    <div class="control-group">
-                        <label>INPUT</label>
-                        <input type="text" class="amb-input" placeholder="WAVEFORM">
-                    </div>
-                    <div class="control-group">
-                        <label>TRIGGER</label>
-                        <button class="amb-btn ambient amb-fillet">PUSH ME</button>
-                    </div>
-                </div>
-                 <div class="screws">
-                    <div class="screw">+</div><div class="screw">+</div>
-                    <div class="screw">+</div><div class="screw">+</div>
-                </div>
+  <!-- Row 1: LFO, Mod, VCOs -->
+  <div class="module-row">
+
+    <!-- LFO-1 -->
+    <div class="module">
+      <div class="module-header">LFO-1</div>
+      <div class="module-content">
+        <div class="control-group">
+          <div class="control-label">Rate</div>
+          <div class="amb-fader"><div class="amb-fader-track"></div><div class="amb-fader-handle" style="bottom: 40%"></div></div>
+        </div>
+        <div class="control-group">
+          <div class="control-label">Delay</div>
+          <div class="amb-fader"><div class="amb-fader-track"></div><div class="amb-fader-handle" style="bottom: 20%"></div></div>
+        </div>
+        <div class="control-group">
+            <div class="control-label">Wave</div>
+            <div class="amb-knob" style="--amb-knob-size: 30px; transform: rotate(90deg);"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VCO MOD -->
+    <div class="module">
+      <div class="module-header">VCO MOD</div>
+      <div class="module-content">
+        <div class="control-group">
+          <div class="control-label">LFO</div>
+          <div class="amb-fader"><div class="amb-fader-track"></div><div class="amb-fader-handle" style="bottom: 10%"></div></div>
+        </div>
+        <div class="control-group">
+          <div class="control-label">ENV</div>
+          <div class="amb-fader"><div class="amb-fader-track"></div><div class="amb-fader-handle" style="bottom: 60%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PULSE WIDTH -->
+    <div class="module">
+        <div class="module-header">PULSE WIDTH</div>
+        <div class="module-content">
+          <div class="control-group">
+            <div class="control-label">PW</div>
+            <div class="amb-fader"><div class="amb-fader-track"></div><div class="amb-fader-handle" style="bottom: 50%"></div></div>
+          </div>
+          <div class="control-group">
+            <div class="control-label">PWM</div>
+            <div class="amb-fader"><div class="amb-fader-track"></div><div class="amb-fader-handle" style="bottom: 30%"></div></div>
+          </div>
+        </div>
+    </div>
+
+    <!-- CROSS MOD -->
+    <div class="module">
+        <div class="module-header">CROSS MOD</div>
+        <div class="module-content">
+            <div class="control-group">
+                <div class="control-label">Manual</div>
+                <div class="amb-fader"><div class="amb-fader-track"></div><div class="amb-fader-handle" style="bottom: 0%"></div></div>
+            </div>
+            <div class="control-group">
+                <div class="control-label">Env</div>
+                <div class="amb-fader"><div class="amb-fader-track"></div><div class="amb-fader-handle" style="bottom: 0%"></div></div>
             </div>
         </div>
     </div>
-    <script src="script.js"></script>
+
+    <!-- VCO-1 -->
+    <div class="module">
+        <div class="module-header">VCO-1</div>
+        <div class="module-content">
+            <div class="control-group">
+                <div class="control-label">Range</div>
+                <div class="amb-knob" style="transform: rotate(-45deg);"></div>
+            </div>
+            <div class="control-group">
+                <div class="control-label">Wave</div>
+                <div class="amb-switch" data-state="up"><div class="amb-switch-handle"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VCO-2 -->
+    <div class="module">
+        <div class="module-header">VCO-2</div>
+        <div class="module-content">
+            <div class="control-group">
+                <div class="control-label">Range</div>
+                <div class="amb-knob" style="transform: rotate(0deg);"></div>
+            </div>
+            <div class="control-group">
+                <div class="control-label">Tune</div>
+                <div class="amb-knob" style="transform: rotate(15deg);"></div>
+            </div>
+            <div class="control-group">
+                <div class="control-label">Wave</div>
+                <div class="amb-knob" style="--amb-knob-size: 30px; transform: rotate(135deg);"></div>
+            </div>
+        </div>
+    </div>
+
+  </div> <!-- End Row 1 -->
+
+  <!-- Row 2: Mixer, VCF, VCA, Envelopes -->
+  <div class="module-row">
+
+    <!-- Mixer -->
+    <div class="module">
+        <div class="module-header">MIXER</div>
+        <div class="module-content">
+            <div class="control-group">
+                <div class="control-label">Source</div>
+                <div class="amb-knob" style="transform: rotate(-90deg);"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VCF -->
+    <div class="module" style="flex-grow: 2">
+        <div class="module-header">VCF</div>
+        <div class="module-content">
+            <div class="control-group">
+                <div class="control-label">HPF</div>
+                <div class="amb-fader"><div class="amb-fader-track"></div><div class="amb-fader-handle" style="bottom: 10%"></div></div>
+            </div>
+            <div class="control-group">
+                <div class="control-label">LPF</div>
+                <div class="amb-fader"><div class="amb-fader-track"></div><div class="amb-fader-handle" style="bottom: 80%"></div></div>
+            </div>
+            <div class="control-group">
+                <div class="control-label">Res</div>
+                <div class="amb-fader"><div class="amb-fader-track"></div><div class="amb-fader-handle" style="bottom: 20%"></div></div>
+            </div>
+            <div class="control-group">
+                <div class="control-label">Env</div>
+                <div class="amb-fader"><div class="amb-fader-track"></div><div class="amb-fader-handle" style="bottom: 50%"></div></div>
+            </div>
+             <div class="control-group">
+                <div class="control-label">Kybd</div>
+                <div class="amb-fader"><div class="amb-fader-track"></div><div class="amb-fader-handle" style="bottom: 30%"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VCA -->
+    <div class="module">
+        <div class="module-header">VCA</div>
+        <div class="module-content">
+            <div class="control-group">
+                <div class="control-label">Level</div>
+                <div class="amb-fader"><div class="amb-fader-track"></div><div class="amb-fader-handle" style="bottom: 70%"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ENV-1 -->
+    <div class="module" style="flex-grow: 2">
+        <div class="module-header">ENV-1</div>
+        <div class="module-content">
+            <div class="control-group">
+                <div class="control-label">A</div>
+                <div class="amb-fader"><div class="amb-fader-track"></div><div class="amb-fader-handle" style="bottom: 10%"></div></div>
+            </div>
+            <div class="control-group">
+                <div class="control-label">D</div>
+                <div class="amb-fader"><div class="amb-fader-track"></div><div class="amb-fader-handle" style="bottom: 40%"></div></div>
+            </div>
+            <div class="control-group">
+                <div class="control-label">S</div>
+                <div class="amb-fader"><div class="amb-fader-track"></div><div class="amb-fader-handle" style="bottom: 80%"></div></div>
+            </div>
+            <div class="control-group">
+                <div class="control-label">R</div>
+                <div class="amb-fader"><div class="amb-fader-track"></div><div class="amb-fader-handle" style="bottom: 20%"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ENV-2 -->
+    <div class="module" style="flex-grow: 2">
+        <div class="module-header">ENV-2</div>
+        <div class="module-content">
+            <div class="control-group">
+                <div class="control-label">A</div>
+                <div class="amb-fader"><div class="amb-fader-track"></div><div class="amb-fader-handle" style="bottom: 5%"></div></div>
+            </div>
+            <div class="control-group">
+                <div class="control-label">D</div>
+                <div class="amb-fader"><div class="amb-fader-track"></div><div class="amb-fader-handle" style="bottom: 30%"></div></div>
+            </div>
+            <div class="control-group">
+                <div class="control-label">S</div>
+                <div class="amb-fader"><div class="amb-fader-track"></div><div class="amb-fader-handle" style="bottom: 60%"></div></div>
+            </div>
+            <div class="control-group">
+                <div class="control-label">R</div>
+                <div class="amb-fader"><div class="amb-fader-track"></div><div class="amb-fader-handle" style="bottom: 40%"></div></div>
+            </div>
+        </div>
+    </div>
+
+  </div> <!-- End Row 2 -->
+
+  <!-- Row 3: Bottom controls -->
+  <div class="module-row">
+
+      <!-- LFO-2 -->
+      <div class="module">
+          <div class="module-header">LFO-2</div>
+          <div class="module-content">
+              <div class="control-group">
+                <div class="control-label">Rate</div>
+                <div class="amb-fader"><div class="amb-fader-track"></div><div class="amb-fader-handle" style="bottom: 35%"></div></div>
+              </div>
+          </div>
+      </div>
+
+      <!-- GLIDE -->
+      <div class="module">
+        <div class="module-header">GLIDE</div>
+        <div class="module-content">
+            <div class="control-group">
+                <div class="control-label">Time</div>
+                <div class="amb-knob" style="transform: rotate(-120deg);"></div>
+            </div>
+        </div>
+      </div>
+
+      <!-- ASSIGN -->
+      <div class="module">
+        <div class="module-header">ASSIGN</div>
+        <div class="module-content">
+            <div class="control-group">
+                <div class="control-label">Mode</div>
+                <div class="amb-knob" style="transform: rotate(0deg);"></div>
+            </div>
+        </div>
+      </div>
+
+      <!-- ARPEGGIO -->
+      <div class="module">
+        <div class="module-header">ARPEGGIO</div>
+        <div class="module-content">
+            <div class="control-group">
+                <div class="control-label">Rate</div>
+                <div class="amb-knob" style="transform: rotate(50deg);"></div>
+            </div>
+            <div class="control-group">
+                <div class="control-label">Range</div>
+                <div class="amb-switch" data-state="down"><div class="amb-switch-handle"></div></div>
+            </div>
+        </div>
+      </div>
+
+  </div> <!-- End Row 3 -->
+
+</div>
+
 </body>
 </html>
