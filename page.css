@@ -1,72 +1,150 @@
 body {
-  background-color: rgb(36, 43, 60);
-  background-image: linear-gradient(
-    45deg,
-    rgba(0, 0, 0, 0.1) 0%,
-    rgba(255, 255, 255, 0.1) 100%
-  );
-  font-family: "Josefin Sans", sans-serif;
-  transition: background-color 3s ease-in;
+  margin: 0;
+  background-color: var(--amb-surface-color);
+  color: var(--amb-ink-color);
+  font-family: 'Inter', sans-serif;
+  transition: background-color 0.3s, color 0.3s;
+  padding-bottom: 50px;
 }
 
-.container {
+/* --- Typography --- */
+h1, h2, h3, h4 {
+  font-family: 'Michroma', sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+/* --- Header --- */
+.main-header {
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  margin-bottom: 40px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(0,0,0,0.05));
+}
+
+.brand-title {
+  margin: 0;
+  font-size: 1.5rem;
+  letter-spacing: 2px;
+}
+
+.global-controls {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.finish-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.finish-controls .label {
+  font-weight: 600;
+  opacity: 0.7;
+}
+
+/* --- Sections --- */
+.section-container {
+  max-width: 1200px;
+  margin: 0 auto 60px auto;
+  padding: 0 20px;
+}
+
+.section-container h2 {
+  font-size: 1.8rem;
+  border-bottom: 2px solid var(--amb-ink-color);
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+  opacity: 0.8;
+}
+
+.concept-text {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  max-width: 800px;
+  margin-bottom: 30px;
+  opacity: 0.9;
+}
+
+/* --- Concept Visuals --- */
+.concept-visuals {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.diagram-box, .test-box-container {
+  flex: 1;
+  min-width: 300px;
+  background: rgba(0,0,0,0.03);
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.test-stage {
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.05);
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.test-controls .control-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.test-controls label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* --- Component Library --- */
+.component-library {
   display: grid;
-  min-height: 90vh;
-  min-width: 100%;
-  column-gap: 30px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 30px;
 }
 
-.content {
-  justify-self: center;
-  align-self: center;
-}
-
-.box {
-  padding: 7rem;
-  border-radius: 7px;
-  margin: 30px;
-}
-
-.logo {
-  text-align: center;
-  font-size: 49px;
-  color: #aaa;
-}
-
-.circle {
-  width: 64px;
-  min-height: 64px;
-  content: " ";
-  margin: 30px;
-  border-radius: 50%;
-}
-
-.custom {
-  cursor: pointer;
-  border: 1px solid rgb(0 0 0 / 0.4);
-  background-color: inherit;
-  padding: 0.5rem;
-  border-radius: 12px;
-  text-transform: uppercase;
-  width: 64px;
-  font-weight: 600;
-  color: #aaa;
-  text-shadow: 0 0 14px rgb(255 255 255 / 0.35);
-}
-
-.custom:focus {
-  /* border: 1px solid lightcoral; */
-  outline: 4px double pink;
-  outline-offset: 2px;
-}
-
-.custom:hover {
-  border-color: coral;
-}
-
-.row {
+.comp-card {
+  background: var(--amb-surface-color);
+  padding: 20px;
+  border-radius: 8px;
+  /* "Panel" look */
+  box-shadow:
+    -2px -2px 6px rgb(var(--amb-shadow-light) / 0.5),
+    2px 2px 6px rgb(var(--amb-shadow-dark) / 0.2);
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  align-items: center;
+}
+
+.comp-card h4 {
+  margin-top: 0;
+  font-size: 0.9rem;
+  color: var(--amb-ink-color);
+  opacity: 0.6;
+  margin-bottom: 20px;
+  width: 100%;
+  text-align: left;
+}
+
+.comp-demo {
+  display: flex;
+  gap: 20px;
+  align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
+  width: 100%;
 }
