@@ -8,252 +8,322 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500&family=Michroma&display=swap"
       rel="stylesheet"
     />
     <title>Ambient CSS v0.1</title>
   </head>
-  <body class="theme-night">
-    <main class="rack">
-      <section class="top-bar ambient amb-fillet amb-elevation-2 amb-thickness-1">
-        <div class="brand">
-          jp-80
-          <span>ambient css rack</span>
+  <body class="theme-night finish-matte">
+    <main class="shell">
+      <section class="hero ambient amb-fillet amb-elevation-3 amb-thickness-2">
+        <div class="hero-title">
+          <p class="hero-tag">Ambient CSS v0.1</p>
+          <h1 class="hero-logo">ambient css</h1>
+          <p class="hero-subtitle">
+            Skeuomorphic lighting, depth, and materials for tactile web
+            interfaces.
+          </p>
         </div>
-        <div class="top-controls">
-          <div
-            class="display ambient amb-fillet amb-surface-screen amb-elevation-1"
-          >
-            032 · sound 31
+        <div class="hero-controls">
+          <div class="control-block">
+            <span class="control-label">Theme</span>
+            <div class="control-row">
+              <button
+                id="button-day"
+                class="amb-button ambient amb-fillet amb-elevation-1 amb-surface-bright"
+              >
+                Day
+              </button>
+              <button
+                id="button-night"
+                class="amb-button ambient amb-fillet amb-elevation-1 amb-surface-2"
+              >
+                Night
+              </button>
+            </div>
           </div>
-          <button
-            id="button-day"
-            class="amb-button ambient amb-fillet amb-elevation-1 amb-surface-bright"
-          >
-            day
-          </button>
-          <button
-            id="button-night"
-            class="amb-button ambient amb-fillet amb-elevation-1 amb-surface-2"
-          >
-            night
-          </button>
-          <div class="amb-led"></div>
+          <div class="control-block">
+            <span class="control-label">Finish</span>
+            <div class="control-row" data-finish-controls>
+              <button
+                class="amb-button ambient amb-fillet amb-elevation-1 amb-surface-3 is-active"
+                data-finish="finish-matte"
+              >
+                Matte
+              </button>
+              <button
+                class="amb-button ambient amb-fillet amb-elevation-1 amb-surface-3"
+                data-finish="finish-shiny"
+              >
+                Shiny
+              </button>
+              <button
+                class="amb-button ambient amb-fillet amb-elevation-1 amb-surface-3"
+                data-finish="finish-translucent"
+              >
+                Translucent
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 
-      <section class="module-row">
-        <div class="module-title">LFO-1</div>
-        <div class="panel-grid">
-          <article class="panel ambient amb-fillet amb-elevation-2 amb-surface-2">
-            <div class="panel-label">Rate / Delay</div>
-            <div class="fader-grid">
+      <section class="concept">
+        <header class="section-header">
+          <div>
+            <p class="section-kicker">Concept</p>
+            <h2>Physical lighting, orthographic view</h2>
+            <p class="section-text">
+              Ambient CSS imagines UI as a front-facing object lit by a key and
+              fill source. Elevation, thickness, and edge profiles sculpt the
+              shadows. Emitters glow instead of casting a shadow. Finishes shape
+              how surfaces react to light.
+            </p>
+          </div>
+          <div class="section-callout ambient amb-fillet amb-elevation-2">
+            <div class="amb-readout">Key variables</div>
+            <div class="amb-readout">--amb-light-x / --amb-light-y</div>
+            <div class="amb-readout">--amb-key-light-intensity</div>
+            <div class="amb-readout">--amb-fill-light-intensity</div>
+          </div>
+        </header>
+
+        <div class="concept-grid">
+          <article class="concept-card ambient amb-fillet amb-elevation-2">
+            <div class="panel-label">Orthographic view</div>
+            <svg viewBox="0 0 220 120" role="img" aria-label="Orthographic view">
+              <rect x="20" y="20" width="180" height="80" rx="10" />
+              <line x1="45" y1="30" x2="45" y2="90" />
+              <line x1="175" y1="30" x2="175" y2="90" />
+              <text x="110" y="67">front view</text>
+            </svg>
+            <p class="small-text">
+              Elements are shaded as if viewed straight-on, giving predictable
+              shadow direction and consistent depth.
+            </p>
+          </article>
+          <article class="concept-card ambient amb-fillet amb-elevation-2">
+            <div class="panel-label">Two light rig</div>
+            <svg viewBox="0 0 220 120" role="img" aria-label="Two light setup">
+              <circle cx="40" cy="30" r="10" />
+              <circle cx="180" cy="90" r="10" />
+              <line x1="40" y1="30" x2="110" y2="60" />
+              <line x1="180" y1="90" x2="110" y2="60" />
+              <rect x="90" y="50" width="40" height="20" rx="6" />
+              <text x="110" y="102">key + fill</text>
+            </svg>
+            <p class="small-text">
+              A key light drives shadow length while a softer fill lifts the
+              darkest areas.
+            </p>
+          </article>
+          <article class="concept-card ambient amb-fillet amb-elevation-2">
+            <div class="panel-label">Depth + edges</div>
+            <svg viewBox="0 0 220 120" role="img" aria-label="Elevation and edges">
+              <rect x="30" y="30" width="160" height="60" rx="8" />
+              <rect x="40" y="20" width="160" height="60" rx="8" />
+              <text x="110" y="96">elevation + thickness</text>
+            </svg>
+            <p class="small-text">
+              Stack elevation and thickness to create layered panels, fillets,
+              chamfers, and grooves.
+            </p>
+          </article>
+          <article class="concept-card ambient amb-fillet amb-elevation-2">
+            <div class="panel-label">Emitter + finish</div>
+            <svg viewBox="0 0 220 120" role="img" aria-label="Emitter and finishes">
+              <circle cx="110" cy="50" r="18" />
+              <circle cx="110" cy="50" r="32" class="glow" />
+              <text x="110" y="96">glow + sheen</text>
+            </svg>
+            <p class="small-text">
+              Emitters glow instead of casting shadows, while finishes tune
+              surface sheen.
+            </p>
+          </article>
+        </div>
+
+        <div class="test-bay">
+          <div class="test-panel ambient amb-fillet amb-elevation-2">
+            <div class="panel-label">Live rig</div>
+            <div
+              class="demo-box ambient amb-fillet amb-elevation-2 amb-thickness-1"
+              data-demo-box
+            >
+              Ambient
+            </div>
+            <div class="demo-controls">
+              <div
+                class="control-group"
+                data-control-group
+                data-classes="amb-elevation-0 amb-elevation-1 amb-elevation-2 amb-elevation-3"
+              >
+                <span class="control-label">Elevation</span>
+                <div class="control-row">
+                  <button class="amb-button ambient amb-fillet" data-value="amb-elevation-0">
+                    0
+                  </button>
+                  <button class="amb-button ambient amb-fillet" data-value="amb-elevation-1">
+                    1
+                  </button>
+                  <button class="amb-button ambient amb-fillet is-active" data-value="amb-elevation-2">
+                    2
+                  </button>
+                  <button class="amb-button ambient amb-fillet" data-value="amb-elevation-3">
+                    3
+                  </button>
+                </div>
+              </div>
+              <div
+                class="control-group"
+                data-control-group
+                data-classes="amb-fillet amb-chamfer amb-groove"
+              >
+                <span class="control-label">Edge</span>
+                <div class="control-row">
+                  <button class="amb-button ambient amb-fillet is-active" data-value="amb-fillet">
+                    Fillet
+                  </button>
+                  <button class="amb-button ambient amb-fillet" data-value="amb-chamfer">
+                    Chamfer
+                  </button>
+                  <button class="amb-button ambient amb-fillet" data-value="amb-groove">
+                    Groove
+                  </button>
+                </div>
+              </div>
+              <div
+                class="control-group"
+                data-control-group
+                data-classes="amb-thickness-0 amb-thickness-1 amb-thickness-2"
+              >
+                <span class="control-label">Thickness</span>
+                <div class="control-row">
+                  <button class="amb-button ambient amb-fillet" data-value="amb-thickness-0">
+                    0
+                  </button>
+                  <button class="amb-button ambient amb-fillet is-active" data-value="amb-thickness-1">
+                    1
+                  </button>
+                  <button class="amb-button ambient amb-fillet" data-value="amb-thickness-2">
+                    2
+                  </button>
+                </div>
+              </div>
+              <div
+                class="control-group"
+                data-control-group
+                data-classes="amb-emitter"
+              >
+                <span class="control-label">Emitter</span>
+                <div class="control-row">
+                  <button class="amb-button ambient amb-fillet is-active" data-value="">
+                    Off
+                  </button>
+                  <button class="amb-button ambient amb-fillet" data-value="amb-emitter">
+                    On
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="test-panel ambient amb-fillet amb-elevation-2">
+            <div class="panel-label">Quick notes</div>
+            <ul class="note-list">
+              <li>Grooves are best at zero elevation and thickness.</li>
+              <li>Use emitters for LEDs and display highlights.</li>
+              <li>Finishes apply globally or per component.</li>
+            </ul>
+            <div class="amb-display ambient amb-fillet amb-elevation-1">
+              orthographic · key+fill · tactile depth
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="components">
+        <header class="section-header">
+          <div>
+            <p class="section-kicker">Components</p>
+            <h2>Hardware-ready controls</h2>
+            <p class="section-text">
+              Combine primitives into panels and sections: buttons, knobs, faders,
+              multi-selector switches, LED indicators, and display readouts.
+            </p>
+          </div>
+        </header>
+        <div class="component-grid">
+          <article class="component-card ambient amb-fillet amb-elevation-2">
+            <div class="panel-label">Buttons</div>
+            <div class="component-row">
+              <button class="amb-button ambient amb-fillet amb-elevation-1 amb-surface-accent">
+                Trigger
+              </button>
+              <button class="amb-button ambient amb-fillet amb-elevation-1 amb-surface-3">
+                Shift
+              </button>
+            </div>
+          </article>
+          <article class="component-card ambient amb-fillet amb-elevation-2">
+            <div class="panel-label">Knobs</div>
+            <div class="component-row">
+              <div class="amb-knob ambient amb-fillet amb-elevation-1">Tune</div>
+              <div class="amb-knob ambient amb-fillet amb-elevation-1">Fine</div>
+            </div>
+          </article>
+          <article class="component-card ambient amb-fillet amb-elevation-2">
+            <div class="panel-label">Faders</div>
+            <div class="component-row">
               <div class="amb-fader">
                 <div class="amb-fader-track ambient amb-fillet"></div>
-                rate
+                level
               </div>
               <div class="amb-fader">
-                <div
-                  class="amb-fader-track ambient amb-fillet"
-                  style="--amb-fader-pos: 25%"
-                ></div>
-                delay
+                <div class="amb-fader-track ambient amb-fillet" style="--amb-fader-pos: 30%"></div>
+                depth
               </div>
             </div>
           </article>
-          <article class="panel ambient amb-fillet amb-elevation-2 amb-surface-2">
-            <div class="panel-label">Wave</div>
-            <div class="knob-grid">
-              <div class="amb-knob ambient amb-fillet amb-elevation-1">sine</div>
-              <div class="amb-knob ambient amb-fillet amb-elevation-1">tri</div>
-              <div class="amb-knob ambient amb-fillet amb-elevation-1">rnd</div>
+          <article class="component-card ambient amb-fillet amb-elevation-2">
+            <div class="panel-label">Slider</div>
+            <div class="component-row">
+              <input class="amb-slider ambient amb-fillet" type="range" value="60" />
+              <span class="amb-label">cutoff</span>
             </div>
           </article>
-          <article class="panel ambient amb-fillet amb-elevation-2 amb-surface-2">
-            <div class="panel-label">Sync</div>
-            <div class="switch-grid">
-              <div class="amb-switch ambient amb-fillet amb-elevation-1">off</div>
-              <div class="amb-switch ambient amb-fillet amb-elevation-1">on</div>
+          <article class="component-card ambient amb-fillet amb-elevation-2">
+            <div class="panel-label">Multi-selector</div>
+            <div class="amb-multi-switch ambient amb-fillet amb-elevation-1">
+              <button class="is-active">A</button>
+              <button>B</button>
+              <button>C</button>
+            </div>
+          </article>
+          <article class="component-card ambient amb-fillet amb-elevation-2">
+            <div class="panel-label">On / Off</div>
+            <div class="component-row">
               <div class="amb-toggle ambient amb-fillet amb-elevation-1 is-on"></div>
-            </div>
-            <p class="small-text">Grooves + fillets keep toggles tactile.</p>
-          </article>
-        </div>
-      </section>
-
-      <section class="module-row">
-        <div class="module-title">Oscillators</div>
-        <div class="panel-grid">
-          <article class="panel ambient amb-fillet amb-elevation-2 amb-surface-2">
-            <div class="panel-label">VCO-1</div>
-            <div class="knob-grid">
-              <div class="amb-knob ambient amb-fillet amb-elevation-1">tune</div>
-              <div class="amb-knob ambient amb-fillet amb-elevation-1">pulse</div>
-              <div class="amb-knob ambient amb-fillet amb-elevation-1">range</div>
-            </div>
-            <div class="switch-grid">
-              <span class="amb-label">keybd</span>
-              <div class="amb-toggle ambient amb-fillet amb-elevation-1"></div>
+              <span class="amb-label">power</span>
             </div>
           </article>
-          <article class="panel ambient amb-fillet amb-elevation-2 amb-surface-2">
-            <div class="panel-label">Cross Mod</div>
-            <div class="fader-grid">
-              <div class="amb-fader">
-                <div class="amb-fader-track ambient amb-fillet"></div>
-                mod
-              </div>
-              <div class="amb-fader">
-                <div
-                  class="amb-fader-track ambient amb-fillet"
-                  style="--amb-fader-pos: 40%"
-                ></div>
-                env
-              </div>
-              <div class="amb-fader">
-                <div
-                  class="amb-fader-track ambient amb-fillet"
-                  style="--amb-fader-pos: 70%"
-                ></div>
-                lfo
+          <article class="component-card ambient amb-fillet amb-elevation-2">
+            <div class="panel-label">LED + display</div>
+            <div class="component-row">
+              <div class="amb-led"></div>
+              <div class="amb-display ambient amb-fillet amb-elevation-1">
+                tempo 124
               </div>
             </div>
           </article>
-          <article class="panel ambient amb-fillet amb-elevation-2 amb-surface-2">
-            <div class="panel-label">VCO-2</div>
-            <div class="knob-grid">
-              <div class="amb-knob ambient amb-fillet amb-elevation-1">tune</div>
-              <div class="amb-knob ambient amb-fillet amb-elevation-1">range</div>
-              <div class="amb-knob ambient amb-fillet amb-elevation-1">wave</div>
+          <article class="component-card ambient amb-fillet amb-elevation-2">
+            <div class="panel-label">Sectioning</div>
+            <div class="amb-section ambient amb-fillet amb-elevation-1">
+              <div class="amb-subsection ambient amb-fillet">sub panel</div>
+              <div class="amb-subsection ambient amb-fillet">sub panel</div>
             </div>
           </article>
         </div>
       </section>
-
-      <section class="module-row">
-        <div class="module-title">Mixer + VCF</div>
-        <div class="panel-grid">
-          <article class="panel ambient amb-fillet amb-elevation-2 amb-surface-2">
-            <div class="panel-label">Mixer</div>
-            <div class="fader-grid">
-              <div class="amb-fader">
-                <div
-                  class="amb-fader-track ambient amb-fillet"
-                  style="--amb-fader-pos: 30%"
-                ></div>
-                vco1
-              </div>
-              <div class="amb-fader">
-                <div
-                  class="amb-fader-track ambient amb-fillet"
-                  style="--amb-fader-pos: 50%"
-                ></div>
-                vco2
-              </div>
-              <div class="amb-fader">
-                <div
-                  class="amb-fader-track ambient amb-fillet"
-                  style="--amb-fader-pos: 75%"
-                ></div>
-                noise
-              </div>
-            </div>
-          </article>
-          <article class="panel ambient amb-fillet amb-elevation-2 amb-surface-2">
-            <div class="panel-label">VCF</div>
-            <div class="knob-grid">
-              <div class="amb-knob ambient amb-fillet amb-elevation-1">freq</div>
-              <div class="amb-knob ambient amb-fillet amb-elevation-1">res</div>
-              <div class="amb-knob ambient amb-fillet amb-elevation-1">env</div>
-            </div>
-            <div class="switch-grid">
-              <span class="amb-label">mode</span>
-              <div class="amb-switch ambient amb-fillet amb-elevation-1">lp</div>
-              <div class="amb-switch ambient amb-fillet amb-elevation-1">bp</div>
-              <div class="amb-switch ambient amb-fillet amb-elevation-1">hp</div>
-            </div>
-          </article>
-          <article class="panel ambient amb-fillet amb-elevation-2 amb-surface-2">
-            <div class="panel-label">Envelope</div>
-            <div class="fader-grid">
-              <div class="amb-fader">
-                <div class="amb-fader-track ambient amb-fillet"></div>
-                atk
-              </div>
-              <div class="amb-fader">
-                <div class="amb-fader-track ambient amb-fillet"></div>
-                dec
-              </div>
-              <div class="amb-fader">
-                <div class="amb-fader-track ambient amb-fillet"></div>
-                sus
-              </div>
-              <div class="amb-fader">
-                <div class="amb-fader-track ambient amb-fillet"></div>
-                rel
-              </div>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section class="bottom-strip ambient amb-fillet amb-elevation-2 amb-surface-1">
-        <div class="panel ambient amb-fillet amb-elevation-1 amb-surface-2">
-          <div class="panel-label">Assign</div>
-          <div class="switch-grid">
-            <div class="amb-switch ambient amb-fillet amb-elevation-1">solo</div>
-            <div class="amb-switch ambient amb-fillet amb-elevation-1">poly</div>
-            <div class="amb-switch ambient amb-fillet amb-elevation-1">arp</div>
-          </div>
-        </div>
-        <div class="panel ambient amb-fillet amb-elevation-1 amb-surface-2">
-          <div class="panel-label">Delay</div>
-          <div class="knob-grid">
-            <div class="amb-knob ambient amb-fillet amb-elevation-1">time</div>
-            <div class="amb-knob ambient amb-fillet amb-elevation-1">mix</div>
-            <div class="amb-knob ambient amb-fillet amb-elevation-1">fb</div>
-          </div>
-        </div>
-        <div class="panel ambient amb-fillet amb-elevation-1 amb-surface-2">
-          <div class="panel-label">Arp</div>
-          <div class="fader-grid">
-            <div class="amb-fader">
-              <div class="amb-fader-track ambient amb-fillet"></div>
-              rate
-            </div>
-            <div class="amb-fader">
-              <div
-                class="amb-fader-track ambient amb-fillet"
-                style="--amb-fader-pos: 20%"
-              ></div>
-              gate
-            </div>
-            <div class="amb-fader">
-              <div
-                class="amb-fader-track ambient amb-fillet"
-                style="--amb-fader-pos: 80%"
-              ></div>
-              range
-            </div>
-          </div>
-        </div>
-        <div class="panel ambient amb-fillet amb-elevation-1 amb-surface-2">
-          <div class="panel-label">Components</div>
-          <div class="switch-grid">
-            <div class="amb-led"></div>
-            <div class="amb-toggle ambient amb-fillet amb-elevation-1 is-on"></div>
-            <input
-              class="amb-input ambient amb-fillet amb-thickness-1 amb-surface-3"
-              value="/v0.1/spec"
-            />
-          </div>
-        </div>
-      </section>
-
-      <p class="footer-note">
-        Ambient CSS: sculpt lighting, depth, and hardware-ready controls in pure
-        CSS.
-      </p>
     </main>
     <script src="script.js"></script>
   </body>
