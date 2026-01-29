@@ -1,101 +1,80 @@
 :root {
+  /* Lighting & Geometry Primitives */
   --amb-light-x: 1;
   --amb-light-y: -1;
-  --amb-key-light-intensity: 0.3;
-  --amb-fill-light-intensity: 0;
+  --amb-key-light-intensity: 0.8; /* Increased for better visibility in neutral */
+  --amb-fill-light-intensity: 0.2;
   --amb-light-distance: 0px;
   --amb-fillet: 0;
   --amb-chamfer: 0;
   --amb-thickness: 0;
   --amb-elevation: 0;
   --amb-fillet-width: 1;
+
+  /* Theme: Day (Default) */
+  --amb-surface-color: #e0e0e0;
+  --amb-ink-color: #333;
+  --amb-shadow-light: 255 255 255;
+  --amb-shadow-dark: 0 0 0;
+  --amb-accent-color: #4CAF50; /* Green LED default */
 }
 
-.amb-fillet {
-  --amb-fillet: 1;
+/* Theme: Night */
+body.night {
+  --amb-surface-color: #2a2a2a;
+  --amb-ink-color: #e0e0e0;
+  --amb-shadow-light: 60 60 60;
+  --amb-shadow-dark: 0 0 0;
 }
 
-.amb-fillet-2 {
-  --amb-fillet: 1;
-  --amb-fillet-width: 2;
-}
+/* --- Geometry Mixins --- */
 
-.amb-chamfer {
-  --amb-chamfer: 1;
-}
+.amb-fillet { --amb-fillet: 1; }
+.amb-fillet-2 { --amb-fillet: 1; --amb-fillet-width: 2; }
+.amb-chamfer { --amb-chamfer: 1; }
+.amb-elevation-0 { --amb-elevation: 0; }
+.amb-elevation-1 { --amb-elevation: 1; }
+.amb-elevation-2 { --amb-elevation: 2; }
+.amb-elevation-3 { --amb-elevation: 3; }
+.amb-thickness-1 { --amb-thickness: 1; }
+.amb-thickness-2 { --amb-thickness: 2; }
+.amb-thickness-3 { --amb-thickness: 3; }
 
-.amb-elevation-0 {
-  --amb-elevation: 0;
-}
-
-.amb-elevation-1 {
-  --amb-elevation: 1;
-}
-
-.amb-elevation-2 {
-  --amb-elevation: 2;
-}
-
-.amb-elevation-3 {
-  --amb-elevation: 3;
-}
-
-.amb-thickness-1 {
-  --amb-thickness: 1;
-}
-
-.amb-thickness-2 {
-  --amb-thickness: 2;
-}
-
-.amb-thickness-3 {
-  --amb-thickness: 3;
-}
-
+/* The Ambient Core Logic */
 .ambient {
-  box-shadow: inset calc(var(--amb-light-x) * var(--amb-fillet-width) * -1px)
-      calc(var(--amb-light-y) * var(--amb-fillet-width) * -1px) 0px 0px
-      rgb(
-        255 255 255 / calc(var(--amb-fillet) * var(--amb-key-light-intensity))
-      ),
+  background-color: var(--amb-surface-color);
+  color: var(--amb-ink-color);
+  transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
+
+  box-shadow:
+    /* Light Edge (Fillet) */
+    inset calc(var(--amb-light-x) * var(--amb-fillet-width) * -1px)
+          calc(var(--amb-light-y) * var(--amb-fillet-width) * -1px) 0px 0px
+          rgb(var(--amb-shadow-light) / calc(var(--amb-fillet) * var(--amb-key-light-intensity))),
+
+    /* Dark Edge (Fillet) */
     inset calc(var(--amb-light-x) * var(--amb-fillet-width) * 1px)
-      calc(var(--amb-light-y) * var(--amb-fillet-width) * 1px) 0px 0px
-      rgb(
-        0 0 0 /
-          calc(
-            var(--amb-fillet) *
-              calc(
-                var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
-              )
-          )
-      ),
-    inset calc(var(--amb-light-x) * -2px) calc(var(--amb-light-y) * -2px) 2px
-      0px
-      rgb(
-        255 255 255 / calc(var(--amb-chamfer) * var(--amb-key-light-intensity))
-      ),
+          calc(var(--amb-light-y) * var(--amb-fillet-width) * 1px) 0px 0px
+          rgb(var(--amb-shadow-dark) / calc(var(--amb-fillet) * var(--amb-key-light-intensity))),
+
+    /* Light Edge (Chamfer - sharper) */
+    inset calc(var(--amb-light-x) * -2px) calc(var(--amb-light-y) * -2px) 2px 0px
+          rgb(var(--amb-shadow-light) / calc(var(--amb-chamfer) * var(--amb-key-light-intensity))),
+
+    /* Dark Edge (Chamfer) */
     inset calc(var(--amb-light-x) * 2px) calc(var(--amb-light-y) * 2px) 2px 0px
-      rgb(
-        0 0 0 /
-          calc(
-            var(--amb-chamfer) *
-              calc(
-                var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
-              )
-          )
-      ),
+          rgb(var(--amb-shadow-dark) / calc(var(--amb-chamfer) * var(--amb-key-light-intensity))),
+
+    /* Thickness (Side extrusion) */
     calc(var(--amb-light-x) * var(--amb-thickness) * -1px)
-      calc(var(--amb-light-y) * var(--amb-thickness) * -1px) 0px 0px
-      rgba(0, 0, 0, 1),
-    calc(var(--amb-light-x) * var(--amb-elevation) * -8px)
-      calc(var(--amb-light-y) * var(--amb-elevation) * -8px)
-      calc(var(--amb-elevation) * 8px) calc(var(--amb-elevation) * -4px)
-      rgba(
-        0,
-        0,
-        0,
-        calc((var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)))
-      );
+    calc(var(--amb-light-y) * var(--amb-thickness) * -1px) 0px 0px
+    rgb(var(--amb-shadow-dark)),
+
+    /* Drop Shadow (Elevation) - Softer diffusion */
+    calc(var(--amb-light-x) * var(--amb-elevation) * -4px)
+    calc(var(--amb-light-y) * var(--amb-elevation) * -4px)
+    calc(var(--amb-elevation) * 6px) calc(var(--amb-elevation) * -2px)
+    rgba(0, 0, 0, calc(var(--amb-key-light-intensity) * 0.4));
 }
 
 .amb-groove {
@@ -103,38 +82,19 @@
   --amb-thickness: 0;
   --amb-fillet: 0;
   --amb-chamfer: 0;
-  box-shadow: inset calc(var(--amb-light-x) * 1px)
-      calc(var(--amb-light-y) * 1px) 0px 0px
-      rgb(
-        255 255 255 / calc(var(--amb-key-light-intensity))
-      ),
-    inset calc(var(--amb-light-x) * -1px)
-      calc(var(--amb-light-y) * -1px) 0px 0px
-      rgb(
-        0 0 0 /
-          calc(
-            calc(
-                var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
-              )
-          )
-      ) !important;
+  background-color: var(--amb-surface-color);
+  box-shadow:
+      inset calc(var(--amb-light-x) * 1px) calc(var(--amb-light-y) * 1px) 2px 0px rgb(var(--amb-shadow-dark) / 0.5),
+      inset calc(var(--amb-light-x) * -1px) calc(var(--amb-light-y) * -1px) 2px 0px rgb(var(--amb-shadow-light) / 0.8) !important;
 }
 
-.amb-emitter {
-  --amb-emitter-color: #4CAF50;
-  box-shadow: 0 0 10px var(--amb-emitter-color), 0 0 20px var(--amb-emitter-color) !important;
-  background-color: var(--amb-emitter-color);
-  color: rgba(255,255,255,0.9);
-  border: 1px solid rgba(255,255,255,0.2);
-  text-shadow: 0 0 2px rgba(0,0,0,0.5);
-}
-
+/* --- Finishes --- */
 .amb-shiny {
   background-image: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.3) 0%,
     rgba(255, 255, 255, 0.0) 50%,
-    rgba(0, 0, 0, 0.1) 100%
+    rgba(0, 0, 0, 0.05) 100%
   );
 }
 
@@ -142,99 +102,73 @@
   background-image: none;
 }
 
+/* --- Components --- */
+
+/* Button */
 .amb-btn {
   padding: 12px 24px;
   border: none;
-  background-color: inherit;
-  color: #bbb;
   font-family: inherit;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 6px;
   text-transform: uppercase;
   letter-spacing: 1px;
   --amb-elevation: 2;
   --amb-thickness: 1;
   --amb-fillet: 1;
-  transition: all 0.1s ease;
 }
 
 .amb-btn:active {
   --amb-elevation: 1;
-  transform: translate(1px, 1px); /* Optional: physical movement */
+  transform: translate(1px, 1px);
 }
 
-.amb-input {
-  border: none;
-  padding: 12px;
-  background-color: rgba(0, 0, 0, 0.2);
-  color: #ddd;
-  font-family: inherit;
-  border-radius: 4px;
-  width: 100%;
-  box-sizing: border-box;
-
-  /* Groove Logic */
-  --amb-elevation: 0;
-  --amb-thickness: 0;
-  --amb-fillet: 0;
-  --amb-chamfer: 0;
-
-  box-shadow: inset calc(var(--amb-light-x) * 1px)
-      calc(var(--amb-light-y) * 1px) 0px 0px
-      rgb(
-        255 255 255 / calc(var(--amb-key-light-intensity))
-      ),
-    inset calc(var(--amb-light-x) * -1px)
-      calc(var(--amb-light-y) * -1px) 0px 0px
-      rgb(
-        0 0 0 /
-          calc(
-            calc(
-                var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
-              )
-          )
-      ) !important;
-}
-
-.amb-input:focus {
-  outline: none;
-  background-color: rgba(0, 0, 0, 0.3);
-}
-
-/* --- Knob --- */
+/* Knob */
 .amb-knob {
   position: relative;
-  width: var(--amb-knob-size, 40px);
-  height: var(--amb-knob-size, 40px);
+  width: var(--amb-knob-size, 50px);
+  height: var(--amb-knob-size, 50px);
   border-radius: 50%;
-  background: var(--amb-surface-color, #e0e0e0);
-  /* Use the ambient shadow mixin logic manually here or ensure it inherits standard object props */
-  /* We assume knobs are raised */
-  --elevation: 2px;
-  --thickness: 1px;
+  background: var(--amb-surface-color);
+
+  /* Manual Shadow for soft round look */
+  box-shadow:
+    -2px -2px 6px rgb(var(--amb-shadow-light) / 0.6),
+    2px 2px 6px rgb(var(--amb-shadow-dark) / 0.4),
+    5px 5px 10px rgba(0,0,0,0.2);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* Knob Indicator (The line or dot) */
-.amb-knob::after {
+/* The rotating part */
+.amb-knob-dial {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  position: absolute;
+  /* Indicator Line */
+}
+.amb-knob-dial::after {
   content: '';
   position: absolute;
   top: 10%;
   left: 50%;
-  width: 2px;
-  height: 30%;
-  background: var(--amb-ink-color, #333);
-  transform-origin: 50% 133%; /* Pivot around center of knob */
+  width: 3px;
+  height: 35%;
+  background: var(--amb-ink-color);
   transform: translateX(-50%);
+  border-radius: 2px;
 }
 
-/* --- Fader --- */
+/* Fader */
 .amb-fader {
   position: relative;
-  width: 30px;
-  height: 100px;
-  /* The track is usually recessed */
+  width: 40px;
+  height: 120px;
 }
 
 .amb-fader-track {
@@ -242,60 +176,147 @@
   top: 0;
   bottom: 0;
   left: 50%;
-  width: 4px;
+  width: 6px;
   transform: translateX(-50%);
-  background: #111;
-  border-radius: 2px;
-  box-shadow: inset 1px 1px 2px rgba(0,0,0,0.8), inset -1px -1px 2px rgba(255,255,255,0.1);
+  border-radius: 3px;
+  background-color: var(--amb-surface-color);
+  box-shadow:
+      inset 1px 1px 3px rgb(var(--amb-shadow-dark) / 0.5),
+      inset -1px -1px 3px rgb(var(--amb-shadow-light) / 0.8);
 }
 
 .amb-fader-handle {
   position: absolute;
   left: 50%;
-  width: 20px;
-  height: 30px;
-  transform: translate(-50%, -50%); /* Centered on the value point */
-  background: var(--amb-surface-color, #e0e0e0);
-  border-radius: 2px;
-  /* Appears raised */
+  width: 24px;
+  height: 40px;
+  transform: translate(-50%, -50%);
+  background: var(--amb-surface-color);
+  border-radius: 4px;
   box-shadow:
-    -1px -1px 1px rgba(255,255,255,0.5),
-    1px 1px 2px rgba(0,0,0,0.5),
-    2px 2px 4px rgba(0,0,0,0.3);
+    -1px -1px 2px rgb(var(--amb-shadow-light) / 0.5),
+    1px 1px 3px rgb(var(--amb-shadow-dark) / 0.4),
+    2px 2px 6px rgba(0,0,0,0.2);
 }
-
 .amb-fader-handle::after {
-   /* A little line on the fader cap */
    content: '';
    position: absolute;
    top: 50%;
-   left: 10%;
-   right: 10%;
-   height: 1px;
-   background: #333;
+   left: 5px;
+   right: 5px;
+   height: 2px;
+   background: var(--amb-ink-color);
+   transform: translateY(-50%);
 }
 
-/* --- Switch --- */
+/* Switch (Toggle) */
 .amb-switch {
   position: relative;
-  width: 20px;
-  height: 40px;
-  background: #111; /* Recessed well */
-  border-radius: 2px;
-  box-shadow: inset 1px 1px 2px rgba(0,0,0,0.8);
+  width: 30px;
+  height: 50px;
+  border-radius: 4px;
+  background-color: var(--amb-surface-color);
+  box-shadow:
+      inset 1px 1px 3px rgb(var(--amb-shadow-dark) / 0.5),
+      inset -1px -1px 3px rgb(var(--amb-shadow-light) / 0.8);
 }
 
 .amb-switch-handle {
   position: absolute;
-  left: 2px;
-  right: 2px;
-  height: 18px;
-  background: var(--amb-surface-color, #e0e0e0);
-  border-radius: 2px;
+  left: 3px;
+  right: 3px;
+  height: 22px;
+  background: var(--amb-surface-color);
+  border-radius: 3px;
   box-shadow:
-    -1px -1px 1px rgba(255,255,255,0.4),
-    1px 1px 2px rgba(0,0,0,0.6);
+    -1px -1px 2px rgb(var(--amb-shadow-light) / 0.6),
+    1px 1px 3px rgb(var(--amb-shadow-dark) / 0.5);
+  transition: top 0.2s;
 }
-/* States usually handled by top/bottom positioning */
-.amb-switch[data-state="up"] .amb-switch-handle { top: 2px; }
-.amb-switch[data-state="down"] .amb-switch-handle { bottom: 2px; }
+.amb-switch[data-state="up"] .amb-switch-handle { top: 3px; }
+.amb-switch[data-state="down"] .amb-switch-handle { bottom: 3px; }
+
+/* Multi-Switch (Segmented) */
+.amb-multi-switch {
+  display: flex;
+  background-color: var(--amb-surface-color);
+  border-radius: 6px;
+  padding: 4px;
+  /* Groove style container */
+  box-shadow:
+      inset 1px 1px 3px rgb(var(--amb-shadow-dark) / 0.3),
+      inset -1px -1px 3px rgb(var(--amb-shadow-light) / 0.8);
+  gap: 4px;
+  display: inline-flex;
+}
+
+.amb-multi-switch-option {
+  padding: 8px 16px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 4px;
+  color: var(--amb-ink-color);
+  opacity: 0.6;
+}
+
+.amb-multi-switch-option.active {
+  opacity: 1;
+  background-color: var(--amb-surface-color);
+  box-shadow:
+    -1px -1px 2px rgb(var(--amb-shadow-light) / 0.6),
+    1px 1px 3px rgb(var(--amb-shadow-dark) / 0.4);
+}
+
+/* LED */
+.amb-led {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #333;
+  box-shadow: inset 1px 1px 2px rgba(0,0,0,0.8);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.amb-led.active {
+  background-color: var(--amb-accent-color);
+  box-shadow: 0 0 5px var(--amb-accent-color), inset -1px -1px 2px rgba(0,0,0,0.2);
+}
+
+/* LED Display */
+.amb-led-display {
+  font-family: 'Courier New', monospace;
+  background-color: #111;
+  color: var(--amb-accent-color);
+  padding: 8px 12px;
+  border-radius: 4px;
+  box-shadow: inset 1px 1px 3px rgba(0,0,0,0.8), inset -1px -1px 1px rgba(255,255,255,0.1);
+  text-shadow: 0 0 2px var(--amb-accent-color);
+  letter-spacing: 2px;
+  display: inline-block;
+}
+
+/* Screw */
+.amb-screw {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #bbb, #888);
+  box-shadow: inset 1px 1px 1px rgba(0,0,0,0.5), 1px 1px 1px rgba(0,0,0,0.3);
+  position: relative;
+}
+.amb-screw::before { /* Crosshead */
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 8px; height: 2px;
+  background: rgba(0,0,0,0.6);
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+.amb-screw::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 8px; height: 2px;
+  background: rgba(0,0,0,0.6);
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
