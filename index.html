@@ -3,796 +3,509 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ambient CSS - Physically-Based Lighting for Synth Interfaces</title>
+  <title>Ambient CSS - Physically-Based Lighting for Interfaces</title>
   <link href="index.css" rel="stylesheet">
   <link href="page.css" rel="stylesheet">
 </head>
 <body>
 
-<div class="synth">
-  <!-- Header -->
-  <div class="synth-header">
-    <div class="synth-title-area">
-      <div class="synth-logo">AMBIENT<span>CSS</span></div>
-      <div class="synth-display ambient" style="min-width: 100px;">v0.1</div>
-    </div>
-    <div class="synth-master-controls">
-      <div class="ctrl">
-        <div class="synth-led on ambient"></div>
-        <span class="ctrl-label">Power</span>
-      </div>
-      <div class="ctrl">
-        <div class="synth-knob-lg ambient"></div>
-        <span class="ctrl-label">Master</span>
-      </div>
-    </div>
-  </div>
+<div class="container">
+  <!-- ========================================================================
+       SECTION 1: HEADER / TITLE
+       ======================================================================== -->
+  <header class="header">
+    <h1 class="logo">AMBIENT CSS</h1>
+    <p class="tagline">Physically-based lighting for skeumorphic interfaces</p>
 
-  <!-- Row 1: LFO, VCO, Filter -->
-  <div class="synth-row">
-    <!-- LFO-1 -->
-    <div class="synth-module">
-      <div class="synth-module-header">LFO-1</div>
-      <div class="synth-module-body">
-        <div class="ctrl">
-          <div class="synth-fader">
-            <div class="synth-fader-track ambient">
-              <div class="synth-fader-cap ambient"></div>
-            </div>
-          </div>
-          <span class="ctrl-label">Rate</span>
+    <div class="global-controls">
+      <div class="control-group">
+        <span class="control-group-label">Lighting</span>
+        <div class="toggle-group">
+          <button class="toggle-btn active ambient" id="btn-night">Night</button>
+          <button class="toggle-btn ambient" id="btn-day">Day</button>
         </div>
-        <div class="ctrl">
-          <div class="synth-fader">
-            <div class="synth-fader-track ambient">
-              <div class="synth-fader-cap ambient" style="top: 50%"></div>
-            </div>
-          </div>
-          <span class="ctrl-label">Delay</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-waveform">
-            <div class="synth-waveform-btn ambient active">
-              <svg viewBox="0 0 16 10"><polyline points="1,9 8,1 8,9 15,1"/></svg>
-            </div>
-            <div class="synth-waveform-btn ambient">
-              <svg viewBox="0 0 16 10"><polyline points="1,9 4,1 12,1 15,9"/></svg>
-            </div>
-          </div>
-          <span class="ctrl-label">Wave</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-switch ambient">
-            <div class="synth-switch-handle ambient"></div>
-          </div>
-          <span class="ctrl-label">Sync</span>
+      </div>
+      <div class="control-group">
+        <span class="control-group-label">Finish</span>
+        <div class="toggle-group">
+          <button class="toggle-btn active ambient" id="btn-matte">Matte</button>
+          <button class="toggle-btn ambient" id="btn-satin">Satin</button>
+          <button class="toggle-btn ambient" id="btn-gloss">Gloss</button>
         </div>
       </div>
     </div>
+  </header>
 
-    <!-- VCO MOD -->
-    <div class="synth-module">
-      <div class="synth-module-header">VCO Mod</div>
-      <div class="synth-module-body">
-        <div class="ctrl">
-          <div class="synth-fader">
-            <div class="synth-fader-track ambient">
-              <div class="synth-fader-cap ambient" style="top: 20%"></div>
-            </div>
-          </div>
-          <span class="ctrl-label">LFO-1</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-fader">
-            <div class="synth-fader-track ambient">
-              <div class="synth-fader-cap ambient" style="top: 70%"></div>
-            </div>
-          </div>
-          <span class="ctrl-label">ENV-1</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-switch-3 ambient">
-            <div class="synth-switch-handle ambient"></div>
-          </div>
-          <span class="ctrl-label">Dest</span>
-        </div>
-      </div>
-    </div>
+  <!-- ========================================================================
+       SECTION 2: CONCEPT EXPLANATION
+       ======================================================================== -->
+  <section class="concept-section">
+    <h2 class="section-title">How It Works</h2>
 
-    <!-- PULSE WIDTH -->
-    <div class="synth-module w-sm">
-      <div class="synth-module-header">PWM</div>
-      <div class="synth-module-body">
-        <div class="ctrl">
-          <div class="synth-knob-md ambient"></div>
-          <span class="ctrl-label">PW</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-knob-md ambient"></div>
-          <span class="ctrl-label">PWM</span>
-        </div>
-      </div>
-    </div>
+    <!-- SVG Definitions -->
+    <svg style="position: absolute; width: 0; height: 0;">
+      <defs>
+        <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <polygon points="0 0, 6 3, 0 6" fill="rgb(120, 125, 135)"/>
+        </marker>
+      </defs>
+    </svg>
 
-    <!-- VCO-1 -->
-    <div class="synth-module w-lg">
-      <div class="synth-module-header">VCO-1</div>
-      <div class="synth-module-body">
-        <div class="ctrl">
-          <div class="synth-knob-sm ambient"></div>
-          <span class="ctrl-label">Range</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-waveform">
-            <div class="synth-waveform-btn ambient">
-              <svg viewBox="0 0 16 10"><polyline points="1,9 8,1 8,9 15,1"/></svg>
-            </div>
-            <div class="synth-waveform-btn ambient active">
-              <svg viewBox="0 0 16 10"><polyline points="1,9 1,1 8,1 8,9 15,9 15,1"/></svg>
-            </div>
-            <div class="synth-waveform-btn ambient">
-              <svg viewBox="0 0 16 10"><polyline points="1,5 4,1 8,9 12,1 15,5"/></svg>
-            </div>
-          </div>
-          <span class="ctrl-label">Wave</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-switch ambient down">
-            <div class="synth-switch-handle ambient"></div>
-          </div>
-          <span class="ctrl-label">Sync</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-switch ambient">
-            <div class="synth-switch-handle ambient"></div>
-          </div>
-          <span class="ctrl-label">Kybd</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- VCO-2 -->
-    <div class="synth-module w-xl">
-      <div class="synth-module-header">VCO-2</div>
-      <div class="synth-module-body">
-        <div class="ctrl">
-          <div class="synth-knob-sm ambient"></div>
-          <span class="ctrl-label">Range</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-knob-lg ambient"></div>
-          <span class="ctrl-label">Tune</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-waveform">
-            <div class="synth-waveform-btn ambient active">
-              <svg viewBox="0 0 16 10"><polyline points="1,9 8,1 8,9 15,1"/></svg>
-            </div>
-            <div class="synth-waveform-btn ambient">
-              <svg viewBox="0 0 16 10"><polyline points="1,9 1,1 8,1 8,9 15,9 15,1"/></svg>
-            </div>
-            <div class="synth-waveform-btn ambient">
-              <svg viewBox="0 0 16 10"><polyline points="1,5 4,1 8,9 12,1 15,5"/></svg>
-            </div>
-            <div class="synth-waveform-btn ambient">
-              <svg viewBox="0 0 16 10"><path d="M1,5 Q4,1 8,5 Q12,9 15,5" fill="none"/></svg>
-            </div>
-          </div>
-          <span class="ctrl-label">Wave</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-switch-3 ambient up">
-            <div class="synth-switch-handle ambient"></div>
-          </div>
-          <span class="ctrl-label">Low<br>Freq</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Row 2: Mixer, VCF, VCA, Envelopes -->
-  <div class="synth-row">
-    <!-- MIXER -->
-    <div class="synth-module">
-      <div class="synth-module-header">Mixer</div>
-      <div class="synth-module-body tall">
-        <div class="ctrl">
-          <div class="synth-fader">
-            <div class="synth-fader-track synth-fader-track-tall ambient">
-              <div class="synth-fader-cap ambient" style="top: 20%"></div>
-            </div>
-          </div>
-          <span class="ctrl-label">VCO-1</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-fader">
-            <div class="synth-fader-track synth-fader-track-tall ambient">
-              <div class="synth-fader-cap ambient" style="top: 35%"></div>
-            </div>
-          </div>
-          <span class="ctrl-label">VCO-2</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-fader">
-            <div class="synth-fader-track synth-fader-track-tall ambient">
-              <div class="synth-fader-cap ambient" style="top: 80%"></div>
-            </div>
-          </div>
-          <span class="ctrl-label">Noise</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- VCF -->
-    <div class="synth-module w-lg">
-      <div class="synth-module-header">VCF</div>
-      <div class="synth-module-body tall">
-        <div class="ctrl">
-          <div class="synth-knob-lg ambient"></div>
-          <span class="ctrl-label">Freq</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-knob-lg ambient"></div>
-          <span class="ctrl-label">Res</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-fader">
-            <div class="synth-fader-track synth-fader-track-tall ambient">
-              <div class="synth-fader-cap ambient" style="top: 40%"></div>
-            </div>
-          </div>
-          <span class="ctrl-label">Env</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-fader">
-            <div class="synth-fader-track synth-fader-track-tall ambient">
-              <div class="synth-fader-cap ambient" style="top: 60%"></div>
-            </div>
-          </div>
-          <span class="ctrl-label">Mod</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-fader">
-            <div class="synth-fader-track synth-fader-track-tall ambient">
-              <div class="synth-fader-cap ambient" style="top: 50%"></div>
-            </div>
-          </div>
-          <span class="ctrl-label">Kybd</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- VCA -->
-    <div class="synth-module w-sm">
-      <div class="synth-module-header">VCA</div>
-      <div class="synth-module-body tall">
-        <div class="ctrl">
-          <div class="synth-fader">
-            <div class="synth-fader-track synth-fader-track-tall ambient">
-              <div class="synth-fader-cap ambient" style="top: 15%"></div>
-            </div>
-          </div>
-          <span class="ctrl-label">Level</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-switch ambient">
-            <div class="synth-switch-handle ambient"></div>
-          </div>
-          <span class="ctrl-label">Env</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- ENV-1 -->
-    <div class="synth-module w-lg">
-      <div class="synth-module-header">ENV-1</div>
-      <div class="synth-module-body tall">
-        <div class="ctrl">
-          <div class="synth-env-display ambient">
-            <svg viewBox="0 0 80 40">
-              <polygon class="fill" points="5,35 15,5 30,15 60,15 75,35"/>
-              <polyline points="5,35 15,5 30,15 60,15 75,35"/>
-            </svg>
-          </div>
-        </div>
-        <div class="ctrl">
-          <div class="synth-fader">
-            <div class="synth-fader-track synth-fader-track-tall ambient">
-              <div class="synth-fader-cap ambient" style="top: 25%"></div>
-            </div>
-          </div>
-          <span class="ctrl-label">A</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-fader">
-            <div class="synth-fader-track synth-fader-track-tall ambient">
-              <div class="synth-fader-cap ambient" style="top: 40%"></div>
-            </div>
-          </div>
-          <span class="ctrl-label">D</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-fader">
-            <div class="synth-fader-track synth-fader-track-tall ambient">
-              <div class="synth-fader-cap ambient" style="top: 30%"></div>
-            </div>
-          </div>
-          <span class="ctrl-label">S</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-fader">
-            <div class="synth-fader-track synth-fader-track-tall ambient">
-              <div class="synth-fader-cap ambient" style="top: 50%"></div>
-            </div>
-          </div>
-          <span class="ctrl-label">R</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- ENV-2 -->
-    <div class="synth-module w-lg">
-      <div class="synth-module-header">ENV-2</div>
-      <div class="synth-module-body tall">
-        <div class="ctrl">
-          <div class="synth-env-display ambient">
-            <svg viewBox="0 0 80 40">
-              <polygon class="fill" points="5,35 20,5 35,20 55,20 75,35"/>
-              <polyline points="5,35 20,5 35,20 55,20 75,35"/>
-            </svg>
-          </div>
-        </div>
-        <div class="ctrl">
-          <div class="synth-fader">
-            <div class="synth-fader-track synth-fader-track-tall ambient">
-              <div class="synth-fader-cap ambient" style="top: 35%"></div>
-            </div>
-          </div>
-          <span class="ctrl-label">A</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-fader">
-            <div class="synth-fader-track synth-fader-track-tall ambient">
-              <div class="synth-fader-cap ambient" style="top: 45%"></div>
-            </div>
-          </div>
-          <span class="ctrl-label">D</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-fader">
-            <div class="synth-fader-track synth-fader-track-tall ambient">
-              <div class="synth-fader-cap ambient" style="top: 40%"></div>
-            </div>
-          </div>
-          <span class="ctrl-label">S</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-fader">
-            <div class="synth-fader-track synth-fader-track-tall ambient">
-              <div class="synth-fader-cap ambient" style="top: 55%"></div>
-            </div>
-          </div>
-          <span class="ctrl-label">R</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Row 3: Effects, Performance -->
-  <div class="synth-row">
-    <!-- LFO-2 -->
-    <div class="synth-module w-md">
-      <div class="synth-module-header">LFO-2</div>
-      <div class="synth-module-body">
-        <div class="ctrl">
-          <div class="synth-knob-md ambient"></div>
-          <span class="ctrl-label">Rate</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-switch ambient">
-            <div class="synth-switch-handle ambient"></div>
-          </div>
-          <span class="ctrl-label">VCO</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-switch ambient down">
-            <div class="synth-switch-handle ambient"></div>
-          </div>
-          <span class="ctrl-label">VCF</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- BENDER -->
-    <div class="synth-module w-sm">
-      <div class="synth-module-header">Bend</div>
-      <div class="synth-module-body">
-        <div class="ctrl">
-          <div class="synth-wheel ambient">
-            <div class="synth-wheel-surface"></div>
-          </div>
-          <span class="ctrl-label">Pitch</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- GLIDE -->
-    <div class="synth-module w-sm">
-      <div class="synth-module-header">Glide</div>
-      <div class="synth-module-body">
-        <div class="ctrl">
-          <div class="synth-knob-md ambient"></div>
-          <span class="ctrl-label">Time</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-switch ambient">
-            <div class="synth-switch-handle ambient"></div>
-          </div>
-          <span class="ctrl-label">On</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- UNISON -->
-    <div class="synth-module w-md">
-      <div class="synth-module-header">Unison</div>
-      <div class="synth-module-body">
-        <div class="ctrl">
-          <div class="synth-knob-md ambient"></div>
-          <span class="ctrl-label">Detune</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-knob-sm ambient"></div>
-          <span class="ctrl-label">Voices</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- CHORUS -->
-    <div class="synth-module w-md">
-      <div class="synth-module-header">Chorus</div>
-      <div class="synth-module-body">
-        <div class="ctrl">
-          <div class="synth-knob-md ambient"></div>
-          <span class="ctrl-label">Rate</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-knob-md ambient"></div>
-          <span class="ctrl-label">Depth</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-led green on ambient"></div>
-          <span class="ctrl-label">On</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- OUTPUT -->
-    <div class="synth-module">
-      <div class="synth-module-header">Output</div>
-      <div class="synth-module-body">
-        <div class="ctrl">
-          <div class="synth-vu">
-            <div class="synth-vu-segment red active"></div>
-            <div class="synth-vu-segment yellow active"></div>
-            <div class="synth-vu-segment yellow active"></div>
-            <div class="synth-vu-segment green active"></div>
-            <div class="synth-vu-segment green active"></div>
-            <div class="synth-vu-segment green active"></div>
-            <div class="synth-vu-segment green active"></div>
-            <div class="synth-vu-segment green"></div>
-          </div>
-        </div>
-        <div class="ctrl">
-          <div class="synth-jack ambient"></div>
-          <span class="ctrl-label">L</span>
-        </div>
-        <div class="ctrl">
-          <div class="synth-jack ambient"></div>
-          <span class="ctrl-label">R</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Footer -->
-  <div class="synth-footer">
-    <span>Ambient CSS v0.1 - Physically-based lighting for synth interfaces</span>
-    <span>Pure CSS, no JavaScript required</span>
-  </div>
-</div>
-
-<!-- Documentation -->
-<div class="synth" style="margin-top: 30px;">
-  <div class="docs-section">
-    <h2>Component Reference</h2>
-
-    <h3>Rotary Knobs</h3>
-    <div class="showcase-row">
-      <div class="showcase-item">
-        <div class="synth-knob-lg ambient"></div>
-        <span class="showcase-label">Large</span>
-      </div>
-      <div class="showcase-item">
-        <div class="synth-knob-md ambient"></div>
-        <span class="showcase-label">Medium</span>
-      </div>
-      <div class="showcase-item">
-        <div class="synth-knob-sm ambient"></div>
-        <span class="showcase-label">Small</span>
-      </div>
-    </div>
-    <div class="code-block">
-      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"synth-knob-lg ambient"</span><span class="tag">&gt;&lt;/div&gt;</span><br>
-      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"synth-knob-md ambient"</span><span class="tag">&gt;&lt;/div&gt;</span><br>
-      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"synth-knob-sm ambient"</span><span class="tag">&gt;&lt;/div&gt;</span>
-    </div>
-
-    <h3>Vertical Faders</h3>
-    <div class="showcase-row">
-      <div class="showcase-item">
-        <div class="synth-fader">
-          <div class="synth-fader-track ambient">
-            <div class="synth-fader-cap ambient" style="top: 20%"></div>
-          </div>
-        </div>
-        <span class="showcase-label">Standard</span>
-      </div>
-      <div class="showcase-item">
-        <div class="synth-fader">
-          <div class="synth-fader-track synth-fader-track-tall ambient">
-            <div class="synth-fader-cap ambient" style="top: 40%"></div>
-          </div>
-        </div>
-        <span class="showcase-label">Tall</span>
-      </div>
-    </div>
-    <div class="code-block">
-      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"synth-fader"</span><span class="tag">&gt;</span><br>
-      &nbsp;&nbsp;<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"synth-fader-track ambient"</span><span class="tag">&gt;</span><br>
-      &nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"synth-fader-cap ambient"</span><span class="tag">&gt;&lt;/div&gt;</span><br>
-      &nbsp;&nbsp;<span class="tag">&lt;/div&gt;</span><br>
-      <span class="tag">&lt;/div&gt;</span>
-    </div>
-
-    <h3>Toggle Switches</h3>
-    <div class="showcase-row">
-      <div class="showcase-item">
-        <div class="synth-switch ambient">
-          <div class="synth-switch-handle ambient"></div>
-        </div>
-        <span class="showcase-label">2-Way Up</span>
-      </div>
-      <div class="showcase-item">
-        <div class="synth-switch ambient down">
-          <div class="synth-switch-handle ambient"></div>
-        </div>
-        <span class="showcase-label">2-Way Down</span>
-      </div>
-      <div class="showcase-item">
-        <div class="synth-switch-3 ambient up">
-          <div class="synth-switch-handle ambient"></div>
-        </div>
-        <span class="showcase-label">3-Way Up</span>
-      </div>
-      <div class="showcase-item">
-        <div class="synth-switch-3 ambient">
-          <div class="synth-switch-handle ambient"></div>
-        </div>
-        <span class="showcase-label">3-Way Mid</span>
-      </div>
-      <div class="showcase-item">
-        <div class="synth-switch-3 ambient down">
-          <div class="synth-switch-handle ambient"></div>
-        </div>
-        <span class="showcase-label">3-Way Down</span>
-      </div>
-    </div>
-    <div class="code-block">
-      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"synth-switch ambient"</span><span class="tag">&gt;</span><br>
-      &nbsp;&nbsp;<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"synth-switch-handle ambient"</span><span class="tag">&gt;&lt;/div&gt;</span><br>
-      <span class="tag">&lt;/div&gt;</span><br><br>
-      <span class="comment">&lt;!-- Add "down" class for down position --&gt;</span><br>
-      <span class="comment">&lt;!-- Use synth-switch-3 for 3-position, with "up", "down", or neither --&gt;</span>
-    </div>
-
-    <h3>Waveform Selectors</h3>
-    <div class="showcase-row">
-      <div class="showcase-item">
-        <div class="synth-waveform">
-          <div class="synth-waveform-btn ambient active">
-            <svg viewBox="0 0 16 10"><polyline points="1,9 8,1 8,9 15,1"/></svg>
-          </div>
-          <div class="synth-waveform-btn ambient">
-            <svg viewBox="0 0 16 10"><polyline points="1,9 1,1 8,1 8,9 15,9 15,1"/></svg>
-          </div>
-          <div class="synth-waveform-btn ambient">
-            <svg viewBox="0 0 16 10"><polyline points="1,5 4,1 8,9 12,1 15,5"/></svg>
-          </div>
-          <div class="synth-waveform-btn ambient">
-            <svg viewBox="0 0 16 10"><path d="M1,5 Q4,1 8,5 Q12,9 15,5" fill="none"/></svg>
-          </div>
-        </div>
-        <span class="showcase-label">Saw / Square / Tri / Sine</span>
-      </div>
-    </div>
-
-    <h3>LEDs & Indicators</h3>
-    <div class="showcase-row">
-      <div class="showcase-item">
-        <div class="synth-led ambient"></div>
-        <span class="showcase-label">Off</span>
-      </div>
-      <div class="showcase-item">
-        <div class="synth-led on ambient"></div>
-        <span class="showcase-label">Red On</span>
-      </div>
-      <div class="showcase-item">
-        <div class="synth-led green on ambient"></div>
-        <span class="showcase-label">Green On</span>
-      </div>
-      <div class="showcase-item">
-        <div class="synth-led amber on ambient"></div>
-        <span class="showcase-label">Amber On</span>
-      </div>
-    </div>
-
-    <h3>Displays</h3>
-    <div class="showcase-row">
-      <div class="showcase-item">
-        <div class="synth-display ambient">127</div>
-        <span class="showcase-label">Green LCD</span>
-      </div>
-      <div class="showcase-item">
-        <div class="synth-display synth-display-orange ambient">440</div>
-        <span class="showcase-label">Orange LCD</span>
-      </div>
-    </div>
-
-    <h3>VU Meter</h3>
-    <div class="showcase-row">
-      <div class="showcase-item">
-        <div class="synth-vu">
-          <div class="synth-vu-segment red"></div>
-          <div class="synth-vu-segment red"></div>
-          <div class="synth-vu-segment yellow"></div>
-          <div class="synth-vu-segment yellow active"></div>
-          <div class="synth-vu-segment green active"></div>
-          <div class="synth-vu-segment green active"></div>
-          <div class="synth-vu-segment green active"></div>
-          <div class="synth-vu-segment green active"></div>
-        </div>
-        <span class="showcase-label">VU Meter</span>
-      </div>
-    </div>
-
-    <h3>Wheels & Special Controls</h3>
-    <div class="showcase-row">
-      <div class="showcase-item">
-        <div class="synth-wheel ambient">
-          <div class="synth-wheel-surface"></div>
-        </div>
-        <span class="showcase-label">Pitch/Mod Wheel</span>
-      </div>
-      <div class="showcase-item">
-        <div class="synth-jack ambient"></div>
-        <span class="showcase-label">Jack</span>
-      </div>
-      <div class="showcase-item">
-        <div class="synth-screw ambient"></div>
-        <span class="showcase-label">Screw</span>
-      </div>
-      <div class="showcase-item">
-        <div class="synth-encoder">
-          <div class="synth-encoder-inner ambient"></div>
-        </div>
-        <span class="showcase-label">Encoder</span>
-      </div>
-    </div>
-
-    <h3>Envelope Display</h3>
-    <div class="showcase-row">
-      <div class="showcase-item">
-        <div class="synth-env-display ambient">
-          <svg viewBox="0 0 80 40">
-            <polygon class="fill" points="5,35 15,5 30,15 60,15 75,35"/>
-            <polyline points="5,35 15,5 30,15 60,15 75,35"/>
+    <div class="concept-grid">
+      <!-- Orthographic View -->
+      <div class="concept-card ambient">
+        <h3 class="concept-card-title">Orthographic View</h3>
+        <p class="concept-card-desc">Elements are viewed straight-on with no perspective distortion. Lighting is calculated based on a virtual light source position.</p>
+        <div class="concept-diagram">
+          <svg viewBox="0 0 200 100" width="180">
+            <!-- Eye -->
+            <ellipse cx="100" cy="15" rx="12" ry="8" class="diagram-surface" stroke="rgb(120,125,135)" stroke-width="1"/>
+            <circle cx="100" cy="15" r="3" class="diagram-accent"/>
+            <!-- View lines -->
+            <line x1="90" y1="23" x2="60" y2="55" stroke="rgb(80,85,95)" stroke-width="1" stroke-dasharray="3,2"/>
+            <line x1="110" y1="23" x2="140" y2="55" stroke="rgb(80,85,95)" stroke-width="1" stroke-dasharray="3,2"/>
+            <line x1="100" y1="23" x2="100" y2="55" stroke="rgb(80,85,95)" stroke-width="1" stroke-dasharray="3,2"/>
+            <!-- Object -->
+            <rect x="50" y="55" width="100" height="35" rx="4" class="diagram-raised" stroke="rgb(100,105,115)" stroke-width="1"/>
+            <text x="100" y="77" text-anchor="middle" class="diagram-text">ELEMENT</text>
           </svg>
         </div>
-        <span class="showcase-label">ADSR Visualization</span>
+      </div>
+
+      <!-- Two-Light Setup -->
+      <div class="concept-card ambient">
+        <h3 class="concept-card-title">Two-Light Setup</h3>
+        <p class="concept-card-desc">A key light provides strong highlights and shadows. A fill light softens shadows for natural illumination.</p>
+        <div class="concept-diagram">
+          <svg viewBox="0 0 200 100" width="180">
+            <!-- Key light -->
+            <circle cx="30" cy="20" r="14" class="diagram-accent" opacity="0.9"/>
+            <text x="30" y="24" text-anchor="middle" class="diagram-text" fill="#000">KEY</text>
+            <!-- Light rays from key -->
+            <line x1="44" y1="28" x2="75" y2="50" class="diagram-arrow"/>
+            <line x1="46" y1="32" x2="85" y2="55" class="diagram-arrow"/>
+            <!-- Fill light -->
+            <circle cx="170" cy="30" r="10" class="diagram-surface" stroke="rgb(150,155,165)" stroke-width="1"/>
+            <text x="170" y="34" text-anchor="middle" class="diagram-text">FILL</text>
+            <!-- Light rays from fill -->
+            <line x1="160" y1="36" x2="140" y2="50" stroke="rgb(80,85,95)" stroke-width="1" stroke-dasharray="2,2"/>
+            <!-- Object with highlight/shadow -->
+            <rect x="60" y="50" width="80" height="40" rx="4" class="diagram-raised"/>
+            <rect x="60" y="50" width="80" height="4" rx="2" fill="rgba(255,255,255,0.3)"/>
+            <rect x="60" y="86" width="80" height="4" rx="2" fill="rgba(0,0,0,0.2)"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Elevation -->
+      <div class="concept-card ambient">
+        <h3 class="concept-card-title">Elevation</h3>
+        <p class="concept-card-desc">Controls how high an element appears above the surface, creating a drop shadow that responds to light direction.</p>
+        <div class="concept-diagram">
+          <svg viewBox="0 0 200 100" width="180">
+            <!-- E0 -->
+            <rect x="15" y="60" width="35" height="20" rx="2" class="diagram-raised"/>
+            <text x="32" y="90" text-anchor="middle" class="diagram-text">E0</text>
+            <!-- E1 -->
+            <rect x="67" y="58" width="35" height="20" rx="2" fill="rgba(0,0,0,0.15)" transform="translate(3,4)"/>
+            <rect x="67" y="58" width="35" height="20" rx="2" class="diagram-raised"/>
+            <text x="84" y="90" text-anchor="middle" class="diagram-text">E1</text>
+            <!-- E2 -->
+            <rect x="117" y="55" width="35" height="20" rx="2" fill="rgba(0,0,0,0.2)" transform="translate(5,7)"/>
+            <rect x="117" y="55" width="35" height="20" rx="2" class="diagram-raised"/>
+            <text x="134" y="90" text-anchor="middle" class="diagram-text">E2</text>
+            <!-- E3 -->
+            <rect x="167" y="52" width="35" height="20" rx="2" fill="rgba(0,0,0,0.25)" transform="translate(8,10)"/>
+            <rect x="167" y="52" width="35" height="20" rx="2" class="diagram-raised"/>
+            <text x="184" y="90" text-anchor="middle" class="diagram-text">E3</text>
+            <!-- Arrow showing direction -->
+            <line x1="20" y1="35" x2="185" y2="35" stroke="rgb(80,85,95)" stroke-width="1"/>
+            <polygon points="185,35 178,32 178,38" fill="rgb(80,85,95)"/>
+            <text x="100" y="30" text-anchor="middle" class="diagram-text">HIGHER</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Edge Shapes -->
+      <div class="concept-card ambient">
+        <h3 class="concept-card-title">Edge Shapes</h3>
+        <p class="concept-card-desc">Three edge styles create different light interactions: fillet (rounded), chamfer (beveled), and groove (inset).</p>
+        <div class="concept-diagram">
+          <svg viewBox="0 0 200 100" width="180">
+            <!-- Fillet -->
+            <rect x="15" y="35" width="50" height="35" rx="6" class="diagram-raised"/>
+            <path d="M15,45 Q15,35 25,35" stroke="rgba(255,255,255,0.4)" stroke-width="2" fill="none"/>
+            <text x="40" y="85" text-anchor="middle" class="diagram-text">FILLET</text>
+            <!-- Chamfer -->
+            <path d="M75,35 L120,35 L125,40 L125,65 L120,70 L75,70 L70,65 L70,40 Z" class="diagram-raised"/>
+            <path d="M70,40 L75,35" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
+            <text x="97" y="85" text-anchor="middle" class="diagram-text">CHAMFER</text>
+            <!-- Groove -->
+            <rect x="140" y="35" width="50" height="35" rx="3" class="diagram-inset"/>
+            <path d="M142,37 L188,37 L188,68 L142,68 Z" stroke="rgba(0,0,0,0.4)" stroke-width="1" fill="none"/>
+            <path d="M188,68 L188,37" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+            <text x="165" y="85" text-anchor="middle" class="diagram-text">GROOVE</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Thickness -->
+      <div class="concept-card ambient">
+        <h3 class="concept-card-title">Thickness</h3>
+        <p class="concept-card-desc">Simulates material depth by adding a shadow on the opposite side of the light source.</p>
+        <div class="concept-diagram">
+          <svg viewBox="0 0 200 100" width="180">
+            <!-- Side view label -->
+            <text x="100" y="15" text-anchor="middle" class="diagram-text">SIDE VIEW</text>
+            <!-- Surface line -->
+            <line x1="20" y1="70" x2="180" y2="70" stroke="rgb(80,85,95)" stroke-width="1"/>
+            <!-- Thin element -->
+            <rect x="30" y="62" width="35" height="8" rx="1" class="diagram-raised"/>
+            <text x="47" y="85" text-anchor="middle" class="diagram-text">T0</text>
+            <!-- Medium thickness -->
+            <rect x="82" y="57" width="35" height="13" rx="1" class="diagram-raised"/>
+            <rect x="85" y="68" width="35" height="3" fill="rgba(0,0,0,0.25)"/>
+            <text x="99" y="85" text-anchor="middle" class="diagram-text">T1</text>
+            <!-- Thick element -->
+            <rect x="134" y="50" width="35" height="20" rx="2" class="diagram-raised"/>
+            <rect x="139" y="68" width="35" height="5" fill="rgba(0,0,0,0.3)"/>
+            <text x="151" y="85" text-anchor="middle" class="diagram-text">T2</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Emitter -->
+      <div class="concept-card ambient">
+        <h3 class="concept-card-title">Emitter</h3>
+        <p class="concept-card-desc">Elements that emit light glow outward, with customizable color and intensity.</p>
+        <div class="concept-diagram">
+          <svg viewBox="0 0 200 100" width="180">
+            <!-- Off LED -->
+            <circle cx="35" cy="50" r="12" class="diagram-inset"/>
+            <text x="35" y="80" text-anchor="middle" class="diagram-text">OFF</text>
+            <!-- Red glow -->
+            <circle cx="85" cy="50" r="18" fill="rgba(255,80,60,0.3)"/>
+            <circle cx="85" cy="50" r="12" fill="rgb(255,80,60)"/>
+            <text x="85" y="80" text-anchor="middle" class="diagram-text">RED</text>
+            <!-- Green glow -->
+            <circle cx="135" cy="50" r="18" fill="rgba(80,255,120,0.3)"/>
+            <circle cx="135" cy="50" r="12" fill="rgb(80,255,120)"/>
+            <text x="135" y="80" text-anchor="middle" class="diagram-text">GREEN</text>
+            <!-- Amber glow -->
+            <circle cx="175" cy="50" r="14" fill="rgba(255,180,50,0.3)"/>
+            <circle cx="175" cy="50" r="10" fill="rgb(255,180,50)"/>
+            <text x="175" y="80" text-anchor="middle" class="diagram-text">AMBER</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Finishes -->
+      <div class="concept-card ambient">
+        <h3 class="concept-card-title">Finishes</h3>
+        <p class="concept-card-desc">Surface finish affects specular reflection: matte absorbs light, gloss reflects it sharply.</p>
+        <div class="concept-diagram">
+          <svg viewBox="0 0 200 100" width="180">
+            <!-- Matte -->
+            <rect x="15" y="35" width="50" height="35" rx="4" class="diagram-raised"/>
+            <text x="40" y="85" text-anchor="middle" class="diagram-text">MATTE</text>
+            <!-- Satin -->
+            <rect x="75" y="35" width="50" height="35" rx="4" class="diagram-raised"/>
+            <ellipse cx="90" cy="45" rx="15" ry="6" fill="rgba(255,255,255,0.15)"/>
+            <text x="100" y="85" text-anchor="middle" class="diagram-text">SATIN</text>
+            <!-- Gloss -->
+            <rect x="135" y="35" width="50" height="35" rx="4" class="diagram-raised"/>
+            <ellipse cx="150" cy="43" rx="18" ry="8" fill="rgba(255,255,255,0.35)"/>
+            <text x="160" y="85" text-anchor="middle" class="diagram-text">GLOSS</text>
+          </svg>
+        </div>
       </div>
     </div>
 
-    <h3>Section Headers</h3>
-    <div class="showcase-row">
-      <div class="synth-section-header ambient">VCO-1</div>
-      <div class="synth-section-header ambient">Filter</div>
-      <div class="synth-section-header ambient">Envelope</div>
-    </div>
-
-    <h3>Buttons</h3>
-    <div class="showcase-row">
-      <div class="showcase-item">
-        <button class="synth-btn ambient">Default</button>
+    <!-- Interactive Test Box -->
+    <div class="test-area ambient">
+      <h3 class="test-area-title">Interactive Sandbox</h3>
+      <div class="test-layout">
+        <div class="test-preview">
+          <div class="test-box ambient" id="test-box"></div>
+        </div>
+        <div class="test-controls">
+          <div class="test-control-row">
+            <span class="test-control-label">Elevation</span>
+            <div class="test-control-options">
+              <button class="test-opt active" data-var="elevation" data-val="0">0</button>
+              <button class="test-opt" data-var="elevation" data-val="1">1</button>
+              <button class="test-opt" data-var="elevation" data-val="2">2</button>
+              <button class="test-opt" data-var="elevation" data-val="3">3</button>
+            </div>
+          </div>
+          <div class="test-control-row">
+            <span class="test-control-label">Edge</span>
+            <div class="test-control-options">
+              <button class="test-opt active" data-var="edge" data-val="none">None</button>
+              <button class="test-opt" data-var="edge" data-val="fillet">Fillet</button>
+              <button class="test-opt" data-var="edge" data-val="chamfer">Chamfer</button>
+              <button class="test-opt" data-var="edge" data-val="groove">Groove</button>
+            </div>
+          </div>
+          <div class="test-control-row">
+            <span class="test-control-label">Thickness</span>
+            <div class="test-control-options">
+              <button class="test-opt active" data-var="thickness" data-val="0">0</button>
+              <button class="test-opt" data-var="thickness" data-val="1">1</button>
+              <button class="test-opt" data-var="thickness" data-val="2">2</button>
+              <button class="test-opt" data-var="thickness" data-val="3">3</button>
+            </div>
+          </div>
+          <div class="test-control-row">
+            <span class="test-control-label">Emitter</span>
+            <div class="test-control-options">
+              <button class="test-opt active" data-var="emitter" data-val="off">Off</button>
+              <button class="test-opt" data-var="emitter" data-val="red">Red</button>
+              <button class="test-opt" data-var="emitter" data-val="green">Green</button>
+              <button class="test-opt" data-var="emitter" data-val="amber">Amber</button>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="showcase-item">
-        <button class="synth-btn ambient active">Active</button>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       SECTION 3: COMPONENT LIBRARY
+       ======================================================================== -->
+  <section class="components-section">
+    <h2 class="section-title">Components</h2>
+
+    <div class="component-grid">
+      <!-- Button -->
+      <div class="component-card ambient">
+        <h4 class="component-card-title">Button</h4>
+        <div class="component-demo">
+          <div class="demo-row">
+            <button class="btn ambient">Default</button>
+            <button class="btn active ambient">Active</button>
+          </div>
+        </div>
+        <div class="component-code"><code>.btn.ambient</code></div>
+      </div>
+
+      <!-- Knob Large -->
+      <div class="component-card ambient">
+        <h4 class="component-card-title">Knob Large</h4>
+        <div class="component-demo">
+          <div class="knob-lg ambient"></div>
+        </div>
+        <div class="component-code"><code>.knob-lg.ambient</code></div>
+      </div>
+
+      <!-- Knob Medium -->
+      <div class="component-card ambient">
+        <h4 class="component-card-title">Knob Medium</h4>
+        <div class="component-demo">
+          <div class="knob-md ambient"></div>
+        </div>
+        <div class="component-code"><code>.knob-md.ambient</code></div>
+      </div>
+
+      <!-- Knob Small -->
+      <div class="component-card ambient">
+        <h4 class="component-card-title">Knob Small</h4>
+        <div class="component-demo">
+          <div class="knob-sm ambient"></div>
+        </div>
+        <div class="component-code"><code>.knob-sm.ambient</code></div>
+      </div>
+
+      <!-- Fader -->
+      <div class="component-card ambient">
+        <h4 class="component-card-title">Fader</h4>
+        <div class="component-demo">
+          <div class="fader">
+            <div class="fader-track ambient">
+              <div class="fader-cap ambient" style="top: 25%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="component-code"><code>.fader-track + .fader-cap</code></div>
+      </div>
+
+      <!-- Horizontal Slider -->
+      <div class="component-card ambient">
+        <h4 class="component-card-title">Slider</h4>
+        <div class="component-demo">
+          <div class="slider-track ambient">
+            <div class="slider-cap ambient" style="left: 40%"></div>
+          </div>
+        </div>
+        <div class="component-code"><code>.slider-track + .slider-cap</code></div>
+      </div>
+
+      <!-- Switch 2-Way -->
+      <div class="component-card ambient">
+        <h4 class="component-card-title">Switch 2-Way</h4>
+        <div class="component-demo">
+          <div class="demo-row">
+            <div class="demo-item">
+              <div class="switch ambient">
+                <div class="switch-handle ambient"></div>
+              </div>
+              <span class="demo-label">Up</span>
+            </div>
+            <div class="demo-item">
+              <div class="switch down ambient">
+                <div class="switch-handle ambient"></div>
+              </div>
+              <span class="demo-label">Down</span>
+            </div>
+          </div>
+        </div>
+        <div class="component-code"><code>.switch.ambient</code></div>
+      </div>
+
+      <!-- Switch 3-Way -->
+      <div class="component-card ambient">
+        <h4 class="component-card-title">Switch 3-Way</h4>
+        <div class="component-demo">
+          <div class="demo-row">
+            <div class="demo-item">
+              <div class="switch-3 up ambient">
+                <div class="switch-handle ambient"></div>
+              </div>
+              <span class="demo-label">Up</span>
+            </div>
+            <div class="demo-item">
+              <div class="switch-3 ambient">
+                <div class="switch-handle ambient"></div>
+              </div>
+              <span class="demo-label">Mid</span>
+            </div>
+            <div class="demo-item">
+              <div class="switch-3 down ambient">
+                <div class="switch-handle ambient"></div>
+              </div>
+              <span class="demo-label">Down</span>
+            </div>
+          </div>
+        </div>
+        <div class="component-code"><code>.switch-3.ambient</code></div>
+      </div>
+
+      <!-- Rotary Selector -->
+      <div class="component-card ambient">
+        <h4 class="component-card-title">Selector</h4>
+        <div class="component-demo">
+          <div class="selector ambient">
+            <div class="selector-pointer"></div>
+          </div>
+        </div>
+        <div class="component-code"><code>.selector.ambient</code></div>
+      </div>
+
+      <!-- LED -->
+      <div class="component-card ambient">
+        <h4 class="component-card-title">LED</h4>
+        <div class="component-demo">
+          <div class="demo-row">
+            <div class="demo-item">
+              <div class="led ambient"></div>
+              <span class="demo-label">Off</span>
+            </div>
+            <div class="demo-item">
+              <div class="led on amb-emit-red ambient"></div>
+              <span class="demo-label">Red</span>
+            </div>
+            <div class="demo-item">
+              <div class="led on amb-emit-green ambient"></div>
+              <span class="demo-label">Green</span>
+            </div>
+            <div class="demo-item">
+              <div class="led on amb-emit-amber ambient"></div>
+              <span class="demo-label">Amber</span>
+            </div>
+          </div>
+        </div>
+        <div class="component-code"><code>.led.on.amb-emit-*</code></div>
+      </div>
+
+      <!-- LED Display -->
+      <div class="component-card ambient">
+        <h4 class="component-card-title">LED Display</h4>
+        <div class="component-demo">
+          <div class="demo-row">
+            <div class="led-display amb-emit-green ambient">127</div>
+            <div class="led-display amb-emit-orange ambient">440</div>
+          </div>
+        </div>
+        <div class="component-code"><code>.led-display.ambient</code></div>
+      </div>
+
+      <!-- Section -->
+      <div class="component-card ambient">
+        <h4 class="component-card-title">Section</h4>
+        <div class="component-demo">
+          <div class="section ambient" style="width: 100%;">
+            <div class="section-header">Title</div>
+            <div class="section-body" style="padding: 8px;">Content</div>
+          </div>
+        </div>
+        <div class="component-code"><code>.section.ambient</code></div>
+      </div>
+
+      <!-- Panel -->
+      <div class="component-card ambient">
+        <h4 class="component-card-title">Panel</h4>
+        <div class="component-demo">
+          <div class="panel ambient" style="width: 80%;">
+            Raised panel
+          </div>
+        </div>
+        <div class="component-code"><code>.panel.ambient</code></div>
+      </div>
+
+      <!-- Subsection -->
+      <div class="component-card ambient">
+        <h4 class="component-card-title">Subsection</h4>
+        <div class="component-demo">
+          <div class="subsection ambient" style="width: 80%;">
+            Inset area
+          </div>
+        </div>
+        <div class="component-code"><code>.subsection.ambient</code></div>
+      </div>
+
+      <!-- Jack -->
+      <div class="component-card ambient">
+        <h4 class="component-card-title">Jack</h4>
+        <div class="component-demo">
+          <div class="demo-row">
+            <div class="jack ambient"></div>
+            <div class="jack ambient"></div>
+          </div>
+        </div>
+        <div class="component-code"><code>.jack.ambient</code></div>
+      </div>
+
+      <!-- Screw -->
+      <div class="component-card ambient">
+        <h4 class="component-card-title">Screw</h4>
+        <div class="component-demo">
+          <div class="demo-row">
+            <div class="screw ambient"></div>
+            <div class="screw ambient"></div>
+            <div class="screw ambient"></div>
+          </div>
+        </div>
+        <div class="component-code"><code>.screw.ambient</code></div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <div class="docs-section">
-    <h2>Core Framework Classes</h2>
-    <table class="docs-table">
-      <thead>
-        <tr>
-          <th>Class</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td><code>.ambient</code></td><td>Base class - enables lighting calculations</td></tr>
-        <tr><td><code>.amb-fillet</code></td><td>Rounded edge highlight/shadow</td></tr>
-        <tr><td><code>.amb-fillet-1/2/3</code></td><td>Fillet width variants</td></tr>
-        <tr><td><code>.amb-chamfer</code></td><td>Beveled edge highlight/shadow</td></tr>
-        <tr><td><code>.amb-chamfer-1/2/3</code></td><td>Chamfer width variants</td></tr>
-        <tr><td><code>.amb-groove</code></td><td>Inset/recessed appearance</td></tr>
-        <tr><td><code>.amb-groove-1/2/3</code></td><td>Groove depth variants</td></tr>
-        <tr><td><code>.amb-elevation-0/1/2/3</code></td><td>Drop shadow depth</td></tr>
-        <tr><td><code>.amb-thickness-0/1/2/3</code></td><td>Material thickness shadow</td></tr>
-        <tr><td><code>.amb-emitter</code></td><td>Glowing element</td></tr>
-        <tr><td><code>.amb-emit-red/green/amber</code></td><td>Emitter colors</td></tr>
-        <tr><td><code>.amb-shiny</code></td><td>Specular highlight finish</td></tr>
-        <tr><td><code>.amb-pressed</code></td><td>Pressed/active state</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="docs-section">
-    <h2>CSS Variables</h2>
-    <table class="docs-table">
-      <thead>
-        <tr>
-          <th>Variable</th>
-          <th>Default</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td><code>--amb-light-x</code></td><td>1</td><td>Light direction X (-1 to 1)</td></tr>
-        <tr><td><code>--amb-light-y</code></td><td>-1</td><td>Light direction Y (-1 to 1)</td></tr>
-        <tr><td><code>--amb-key-light-intensity</code></td><td>0.4</td><td>Main light strength</td></tr>
-        <tr><td><code>--amb-fill-light-intensity</code></td><td>0.1</td><td>Fill light strength</td></tr>
-        <tr><td><code>--synth-accent</code></td><td>#ff6600</td><td>Accent color (orange)</td></tr>
-        <tr><td><code>--synth-panel-bg</code></td><td>#2a2a2a</td><td>Panel background</td></tr>
-        <tr><td><code>--synth-text</code></td><td>#cccccc</td><td>Text color</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="docs-section">
-    <h2>Quick Start</h2>
-    <div class="code-block">
-      <span class="comment">&lt;!-- 1. Include the CSS --&gt;</span><br>
-      <span class="tag">&lt;link</span> <span class="attr">href</span>=<span class="string">"index.css"</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span><span class="tag">&gt;</span><br><br>
-      <span class="comment">&lt;!-- 2. Create a knob --&gt;</span><br>
-      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"synth-knob-md ambient"</span><span class="tag">&gt;&lt;/div&gt;</span><br><br>
-      <span class="comment">&lt;!-- 3. Create a fader --&gt;</span><br>
-      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"synth-fader"</span><span class="tag">&gt;</span><br>
-      &nbsp;&nbsp;<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"synth-fader-track ambient"</span><span class="tag">&gt;</span><br>
-      &nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"synth-fader-cap ambient"</span><span class="tag">&gt;&lt;/div&gt;</span><br>
-      &nbsp;&nbsp;<span class="tag">&lt;/div&gt;</span><br>
-      <span class="tag">&lt;/div&gt;</span><br><br>
-      <span class="comment">&lt;!-- 4. Create a glowing LED --&gt;</span><br>
-      <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"synth-led green on ambient"</span><span class="tag">&gt;&lt;/div&gt;</span>
-    </div>
-  </div>
-
-  <div class="synth-footer">
-    <span>Built with Ambient CSS</span>
-    <span>Inspired by classic synthesizer interfaces</span>
-  </div>
+  <!-- Footer -->
+  <footer class="footer">
+    Ambient CSS v0.1 - Pure CSS physically-based lighting
+  </footer>
 </div>
 
+<script src="script.js"></script>
 </body>
 </html>
