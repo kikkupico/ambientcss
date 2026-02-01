@@ -1,129 +1,197 @@
 // ==========================================================================
-// Ambient CSS - Interactive Controls
+// Ambient CSS - Modular Rack Interface (Knoblaunch Style)
 // ==========================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
   // --------------------------------------------------------------------------
-  // Day/Night Toggle
+  // Theme Toggle
   // --------------------------------------------------------------------------
-  const btnDay = document.getElementById('btn-day');
-  const btnNight = document.getElementById('btn-night');
+  const lightBtn = document.getElementById('lightBtn');
+  const darkBtn = document.getElementById('darkBtn');
 
-  btnDay.addEventListener('click', () => {
-    document.body.classList.add('day-mode');
-    btnDay.classList.add('active');
-    btnNight.classList.remove('active');
-  });
-
-  btnNight.addEventListener('click', () => {
-    document.body.classList.remove('day-mode');
-    btnNight.classList.add('active');
-    btnDay.classList.remove('active');
-  });
-
-  // --------------------------------------------------------------------------
-  // Finish Toggle
-  // --------------------------------------------------------------------------
-  const btnMatte = document.getElementById('btn-matte');
-  const btnSatin = document.getElementById('btn-satin');
-  const btnGloss = document.getElementById('btn-gloss');
-
-  function setFinish(finish) {
-    document.body.classList.remove('finish-matte', 'finish-satin', 'finish-gloss');
-    document.body.classList.add(`finish-${finish}`);
-    btnMatte.classList.remove('active');
-    btnSatin.classList.remove('active');
-    btnGloss.classList.remove('active');
-    if (finish === 'matte') btnMatte.classList.add('active');
-    if (finish === 'satin') btnSatin.classList.add('active');
-    if (finish === 'gloss') btnGloss.classList.add('active');
-  }
-
-  btnMatte.addEventListener('click', () => setFinish('matte'));
-  btnSatin.addEventListener('click', () => setFinish('satin'));
-  btnGloss.addEventListener('click', () => setFinish('gloss'));
-
-  // --------------------------------------------------------------------------
-  // Interactive Test Box
-  // --------------------------------------------------------------------------
-  const testBox = document.getElementById('test-box');
-  const testOpts = document.querySelectorAll('.test-opt');
-
-  // Current state
-  let state = {
-    elevation: 0,
-    edge: 'none',
-    thickness: 0,
-    emitter: 'off'
-  };
-
-  function updateTestBox() {
-    // Reset CSS variables
-    testBox.style.setProperty('--amb-elevation', state.elevation);
-    testBox.style.setProperty('--amb-thickness', state.thickness);
-
-    // Reset edge styles
-    testBox.style.setProperty('--amb-fillet', 0);
-    testBox.style.setProperty('--amb-chamfer', 0);
-    testBox.style.setProperty('--amb-groove', 0);
-
-    // Apply edge style
-    if (state.edge === 'fillet') {
-      testBox.style.setProperty('--amb-fillet', 1);
-      testBox.style.setProperty('--amb-fillet-w', 2);
-    } else if (state.edge === 'chamfer') {
-      testBox.style.setProperty('--amb-chamfer', 1);
-      testBox.style.setProperty('--amb-chamfer-w', 2);
-    } else if (state.edge === 'groove') {
-      testBox.style.setProperty('--amb-groove', 1);
-      testBox.style.setProperty('--amb-groove-w', 2);
-    }
-
-    // Reset emitter
-    testBox.style.setProperty('--amb-emitter', 0);
-
-    // Apply emitter
-    if (state.emitter !== 'off') {
-      testBox.style.setProperty('--amb-emitter', 1);
-      testBox.style.setProperty('--amb-emit-i', 0.8);
-
-      if (state.emitter === 'red') {
-        testBox.style.setProperty('--amb-emit-r', 255);
-        testBox.style.setProperty('--amb-emit-g', 70);
-        testBox.style.setProperty('--amb-emit-b', 50);
-      } else if (state.emitter === 'green') {
-        testBox.style.setProperty('--amb-emit-r', 80);
-        testBox.style.setProperty('--amb-emit-g', 255);
-        testBox.style.setProperty('--amb-emit-b', 120);
-      } else if (state.emitter === 'amber') {
-        testBox.style.setProperty('--amb-emit-r', 255);
-        testBox.style.setProperty('--amb-emit-g', 180);
-        testBox.style.setProperty('--amb-emit-b', 50);
-      }
+  function setTheme(theme) {
+    if (theme === 'light') {
+      document.body.setAttribute('data-theme', 'light');
+      lightBtn?.classList.add('active');
+      darkBtn?.classList.remove('active');
+    } else {
+      document.body.removeAttribute('data-theme');
+      darkBtn?.classList.add('active');
+      lightBtn?.classList.remove('active');
     }
   }
 
-  testOpts.forEach(opt => {
-    opt.addEventListener('click', () => {
-      const varName = opt.dataset.var;
-      const value = opt.dataset.val;
+  lightBtn?.addEventListener('click', () => setTheme('light'));
+  darkBtn?.addEventListener('click', () => setTheme('dark'));
 
-      // Update active state in UI
-      const siblings = opt.parentElement.querySelectorAll('.test-opt');
-      siblings.forEach(s => s.classList.remove('active'));
-      opt.classList.add('active');
-
-      // Update state
-      if (varName === 'elevation' || varName === 'thickness') {
-        state[varName] = parseInt(value);
-      } else {
-        state[varName] = value;
-      }
-
-      updateTestBox();
+  // --------------------------------------------------------------------------
+  // Toggle Buttons
+  // --------------------------------------------------------------------------
+  document.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      // For grouped buttons (S/M/B style), toggle individually
+      btn.classList.toggle('active');
     });
   });
 
-  // Initialize test box
-  updateTestBox();
+  // --------------------------------------------------------------------------
+  // Switches (data-state toggle)
+  // --------------------------------------------------------------------------
+  document.querySelectorAll('.switch').forEach(sw => {
+    sw.addEventListener('click', () => {
+      const currentState = sw.getAttribute('data-state');
+      if (currentState === 'on') {
+        sw.setAttribute('data-state', 'off');
+      } else {
+        sw.setAttribute('data-state', 'on');
+      }
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // Knob Rotation
+  // --------------------------------------------------------------------------
+  let activeKnob = null;
+  let startY = 0;
+  let startRotation = 0;
+
+  function getKnobRotation(knob) {
+    const transform = knob.style.transform || '';
+    const match = transform.match(/rotate\(([-\d.]+)deg\)/);
+    return match ? parseFloat(match[1]) : 0;
+  }
+
+  function setKnobRotation(knob, degrees) {
+    const clamped = Math.max(-135, Math.min(135, degrees));
+    knob.style.transform = `rotate(${clamped}deg)`;
+  }
+
+  // Initialize knob rotations based on data-value
+  document.querySelectorAll('.knob').forEach(knob => {
+    const value = parseInt(knob.getAttribute('data-value') || '50');
+    // Map 0-100 to -135 to 135 degrees
+    const rotation = ((value / 100) * 270) - 135;
+    setKnobRotation(knob, rotation);
+
+    knob.addEventListener('mousedown', (e) => {
+      activeKnob = knob;
+      startY = e.clientY;
+      startRotation = getKnobRotation(knob);
+      knob.style.cursor = 'grabbing';
+      e.preventDefault();
+    });
+
+    knob.addEventListener('touchstart', (e) => {
+      activeKnob = knob;
+      startY = e.touches[0].clientY;
+      startRotation = getKnobRotation(knob);
+      e.preventDefault();
+    });
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!activeKnob) return;
+    const deltaY = startY - e.clientY;
+    const newRotation = startRotation + deltaY * 0.8;
+    setKnobRotation(activeKnob, newRotation);
+  });
+
+  document.addEventListener('touchmove', (e) => {
+    if (!activeKnob) return;
+    const deltaY = startY - e.touches[0].clientY;
+    const newRotation = startRotation + deltaY * 0.8;
+    setKnobRotation(activeKnob, newRotation);
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (activeKnob) {
+      activeKnob.style.cursor = 'grab';
+      activeKnob = null;
+    }
+  });
+
+  document.addEventListener('touchend', () => {
+    activeKnob = null;
+  });
+
+  // --------------------------------------------------------------------------
+  // Slider Dragging
+  // --------------------------------------------------------------------------
+  let activeSlider = null;
+  let sliderTrack = null;
+
+  document.querySelectorAll('.slider-handle').forEach(handle => {
+    handle.addEventListener('mousedown', (e) => {
+      activeSlider = handle;
+      sliderTrack = handle.parentElement;
+      e.preventDefault();
+    });
+
+    handle.addEventListener('touchstart', (e) => {
+      activeSlider = handle;
+      sliderTrack = handle.parentElement;
+      e.preventDefault();
+    });
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!activeSlider) return;
+    updateSliderPosition(e.clientX);
+  });
+
+  document.addEventListener('touchmove', (e) => {
+    if (!activeSlider) return;
+    updateSliderPosition(e.touches[0].clientX);
+  });
+
+  function updateSliderPosition(clientX) {
+    const trackRect = sliderTrack.getBoundingClientRect();
+    let percent = ((clientX - trackRect.left) / trackRect.width) * 100;
+    percent = Math.max(0, Math.min(100, percent));
+    activeSlider.style.left = `${percent}%`;
+
+    // Update the fill as well
+    const fill = sliderTrack.querySelector('.slider-fill');
+    if (fill) {
+      fill.style.width = `${percent}%`;
+    }
+  }
+
+  document.addEventListener('mouseup', () => {
+    activeSlider = null;
+    sliderTrack = null;
+  });
+
+  document.addEventListener('touchend', () => {
+    activeSlider = null;
+    sliderTrack = null;
+  });
+
+  // --------------------------------------------------------------------------
+  // Jack Click (visual feedback)
+  // --------------------------------------------------------------------------
+  document.querySelectorAll('.jack').forEach(jack => {
+    jack.addEventListener('click', () => {
+      jack.classList.toggle('connected');
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // Empty Slot Click
+  // --------------------------------------------------------------------------
+  document.querySelectorAll('.slot.empty').forEach(slot => {
+    slot.addEventListener('click', () => {
+      console.log('Add module clicked');
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // Menu Button
+  // --------------------------------------------------------------------------
+  const menuBtn = document.getElementById('menuBtn');
+  if (menuBtn) {
+    menuBtn.addEventListener('click', () => {
+      console.log('Menu clicked');
+    });
+  }
 });

@@ -1,0 +1,191 @@
+/* ==========================================================================
+   Ambient CSS v0.1
+   A CSS framework for skeuomorphic interfaces
+
+   Physically-based lighting, shadows, textures and shading for creating
+   realistic UI elements - buttons, knobs, sliders, panels, indicators,
+   and any interface that benefits from depth and materiality.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   LIGHTING MODEL
+
+   Light Direction:
+   --amb-light-x : Horizontal component (-1 = left, 1 = right)
+   --amb-light-y : Vertical component (-1 = up, 1 = down)
+
+   Light Intensity:
+   --amb-key-light   : Main light (0-1), creates primary highlights/shadows
+   --amb-fill-light  : Secondary light (0-1), softens shadows
+
+   Light Hue (RGB 0-255):
+   --amb-light-r : Red component of light color
+   --amb-light-g : Green component of light color
+   --amb-light-b : Blue component of light color
+
+   The key light controls overall scene brightness.
+   The difference (key - fill) determines shadow contrast.
+   The light hue tints all highlights and surface illumination.
+
+   Accent Color (RGB 0-255):
+   --amb-accent-r : Red component of accent color
+   --amb-accent-g : Green component of accent color
+   --amb-accent-b : Blue component of accent color
+   -------------------------------------------------------------------------- */
+
+:root {
+  /* Light direction (normalized vector) */
+  --amb-light-x: 1;
+  --amb-light-y: -1;
+
+  /* Light intensity (0-1) */
+  --amb-key-light: 0.3;
+  --amb-fill-light: 0;
+
+  /* Light color/hue (RGB values 0-255) */
+  --amb-light-r: 255;
+  --amb-light-g: 255;
+  --amb-light-b: 255;
+
+  /* Edge treatments (0 = off, 1 = on) */
+  --amb-fillet: 0;
+  --amb-fillet-width: 1;
+  --amb-chamfer: 0;
+
+  /* Elevation (shadow distance multiplier) */
+  --amb-elevation: 0;
+
+  /* Base surface colors (before lighting) */
+  --amb-surface-base: 25, 25, 35;
+  --amb-surface-light-base: 180, 180, 180;
+
+  /* Text colors */
+  --amb-text: #e0e0e0;
+  --amb-text-muted: #888;
+
+  /* Accent color (RGB values) */
+  --amb-accent-r: 255;
+  --amb-accent-g: 140;
+  --amb-accent-b: 50;
+  --amb-accent: rgb(var(--amb-accent-r), var(--amb-accent-g), var(--amb-accent-b));
+}
+
+/* --------------------------------------------------------------------------
+   CORE AMBIENT CLASS
+
+   Applies physically-based lighting via box-shadow:
+   1. Drop shadow - offset by light direction, scaled by elevation
+   2. Fillet highlight - inner lit edge (white on light side)
+   3. Fillet shadow - inner dark edge (black on shadow side)
+   4. Chamfer highlight - softer inner bevel (light side)
+   5. Chamfer shadow - softer inner bevel (shadow side)
+   -------------------------------------------------------------------------- */
+
+.ambient {
+  box-shadow:
+    /* Drop shadow - direction based on light, size based on elevation */
+    rgba(0, 0, 0, calc(var(--amb-key-light) - var(--amb-fill-light)))
+      calc(var(--amb-light-x) * var(--amb-elevation) * -8px)
+      calc(var(--amb-light-y) * var(--amb-elevation) * -8px)
+      calc(var(--amb-elevation) * 8px)
+      calc(var(--amb-elevation) * -4px),
+
+    /* Fillet highlight - lit edge */
+    inset
+      calc(var(--amb-light-x) * var(--amb-fillet-width) * -1px)
+      calc(var(--amb-light-y) * var(--amb-fillet-width) * -1px)
+      0px 0px
+      rgb(255 255 255 / calc(var(--amb-fillet) * var(--amb-key-light))),
+
+    /* Fillet shadow - dark edge */
+    inset
+      calc(var(--amb-light-x) * var(--amb-fillet-width) * 1px)
+      calc(var(--amb-light-y) * var(--amb-fillet-width) * 1px)
+      0px 0px
+      rgb(0 0 0 / calc(var(--amb-fillet) * (var(--amb-key-light) - var(--amb-fill-light)))),
+
+    /* Chamfer highlight - soft lit bevel */
+    inset
+      calc(var(--amb-light-x) * -2px)
+      calc(var(--amb-light-y) * -2px)
+      2px 0px
+      rgb(255 255 255 / calc(var(--amb-chamfer) * var(--amb-key-light))),
+
+    /* Chamfer shadow - soft dark bevel */
+    inset
+      calc(var(--amb-light-x) * 2px)
+      calc(var(--amb-light-y) * 2px)
+      2px 0px
+      rgb(0 0 0 / calc(var(--amb-chamfer) * (var(--amb-key-light) - var(--amb-fill-light))));
+}
+
+/* --------------------------------------------------------------------------
+   EDGE TREATMENTS
+   -------------------------------------------------------------------------- */
+
+.amb-fillet {
+  --amb-fillet: 1;
+}
+
+.amb-fillet-2 {
+  --amb-fillet: 1;
+  --amb-fillet-width: 2;
+}
+
+.amb-fillet-3 {
+  --amb-fillet: 1;
+  --amb-fillet-width: 3;
+}
+
+.amb-chamfer {
+  --amb-chamfer: 1;
+}
+
+.amb-bevel {
+  --amb-fillet: 1;
+  --amb-chamfer: 1;
+}
+
+/* --------------------------------------------------------------------------
+   ELEVATION LEVELS
+   -------------------------------------------------------------------------- */
+
+.amb-elevation-0 { --amb-elevation: 0; }
+.amb-elevation-1 { --amb-elevation: 1; }
+.amb-elevation-2 { --amb-elevation: 2; }
+.amb-elevation-3 { --amb-elevation: 3; }
+.amb-elevation-4 { --amb-elevation: 4; }
+
+/* --------------------------------------------------------------------------
+   LIGHT POSITIONS
+   -------------------------------------------------------------------------- */
+
+.amb-light-tl { --amb-light-x: -1; --amb-light-y: -1; }
+.amb-light-tr { --amb-light-x: 1; --amb-light-y: -1; }
+.amb-light-bl { --amb-light-x: -1; --amb-light-y: 1; }
+.amb-light-br { --amb-light-x: 1; --amb-light-y: 1; }
+.amb-light-top { --amb-light-x: 0; --amb-light-y: -1; }
+.amb-light-bottom { --amb-light-x: 0; --amb-light-y: 1; }
+.amb-light-left { --amb-light-x: -1; --amb-light-y: 0; }
+.amb-light-right { --amb-light-x: 1; --amb-light-y: 0; }
+
+/* --------------------------------------------------------------------------
+   EMISSIVE (LEDs, Displays)
+   -------------------------------------------------------------------------- */
+
+.amb-emit-red { --amb-emit-color: #ef4444; }
+.amb-emit-green { --amb-emit-color: #4ade80; }
+.amb-emit-amber { --amb-emit-color: #f59e0b; }
+.amb-emit-cyan { --amb-emit-color: #22d3d3; }
+.amb-emit-blue { --amb-emit-color: #3b82f6; }
+.amb-emit-white { --amb-emit-color: #ffffff; }
+
+/* --------------------------------------------------------------------------
+   UTILITY CLASSES
+   -------------------------------------------------------------------------- */
+
+.amb-rounded { border-radius: 4px; }
+.amb-rounded-md { border-radius: 8px; }
+.amb-rounded-lg { border-radius: 12px; }
+.amb-rounded-xl { border-radius: 16px; }
+.amb-rounded-full { border-radius: 9999px; }
