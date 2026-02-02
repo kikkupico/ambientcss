@@ -125,6 +125,17 @@
         }
 
         /* CSS Classes Demo */
+        .subsection-title {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--amb-text-muted);
+            margin: 20px 0 12px 0;
+        }
+        .subsection-title:first-of-type {
+            margin-top: 0;
+        }
         .css-demo {
             display: flex;
             gap: 16px;
@@ -141,12 +152,12 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            color: var(--amb-text-muted);
+            color: #444;
         }
 
         /* Code example */
         .code-example {
-            background: #1a1a2e;
+            background: #2a2a3e;
             border-radius: 8px;
             padding: 16px;
             margin-top: 16px;
@@ -179,14 +190,52 @@
             </div>
         </header>
 
+        <!-- Lighting Controls -->
+        <section>
+            <h2>Lighting Variables</h2>
+
+            <amb-panel screws shade="light">
+                <div class="module-header">
+                    <div class="module-title" style="color: #333;">LIGHTING</div>
+                    <div class="module-subtitle" style="color: #666;">CSS Custom Properties</div>
+                </div>
+
+                <div class="controls">
+                    <amb-knob id="keyLight" value="30" label="KEY" shade="dark"></amb-knob>
+                    <amb-knob id="fillLight" value="0" label="FILL" shade="dark"></amb-knob>
+                    <amb-knob id="lightX" value="75" label="LIGHT X" shade="dark"></amb-knob>
+                    <amb-knob id="lightY" value="0" label="LIGHT Y" shade="dark"></amb-knob>
+                </div>
+            </amb-panel>
+
+            <div class="code-example ambient amb-fillet amb-inset">
+                :root {<br>
+                &nbsp;&nbsp;<span style="color:#666">/* Light direction */</span><br>
+                &nbsp;&nbsp;<span class="attr">--amb-light-x</span>: <span class="val">1</span>;  <span style="color:#666">/* -1 to 1 */</span><br>
+                &nbsp;&nbsp;<span class="attr">--amb-light-y</span>: <span class="val">-1</span>; <span style="color:#666">/* -1 to 1 */</span><br>
+                &nbsp;&nbsp;<span style="color:#666">/* Light intensity */</span><br>
+                &nbsp;&nbsp;<span class="attr">--amb-key-light</span>: <span class="val">0.3</span>;<br>
+                &nbsp;&nbsp;<span class="attr">--amb-fill-light</span>: <span class="val">0</span>;<br>
+                &nbsp;&nbsp;<span style="color:#666">/* Light hue (RGB) */</span><br>
+                &nbsp;&nbsp;<span class="attr">--amb-light-r</span>: <span class="val">200</span>;<br>
+                &nbsp;&nbsp;<span class="attr">--amb-light-g</span>: <span class="val">210</span>;<br>
+                &nbsp;&nbsp;<span class="attr">--amb-light-b</span>: <span class="val">240</span>;<br>
+                &nbsp;&nbsp;<span style="color:#666">/* Accent color (RGB) - Gold */</span><br>
+                &nbsp;&nbsp;<span class="attr">--amb-accent-r</span>: <span class="val">245</span>;<br>
+                &nbsp;&nbsp;<span class="attr">--amb-accent-g</span>: <span class="val">200</span>;<br>
+                &nbsp;&nbsp;<span class="attr">--amb-accent-b</span>: <span class="val">66</span>;<br>
+                }
+            </div>
+        </section>
+
         <!-- Web Components Demo -->
         <section>
             <h2>Ambient Components</h2>
 
-            <amb-panel screws>
+            <amb-panel screws shade="light">
                 <div class="module-header">
-                    <div class="module-title">CONTROLS</div>
-                    <div class="module-subtitle">Knobs, Faders & Switches</div>
+                    <div class="module-title" style="color: #333;">CONTROLS</div>
+                    <div class="module-subtitle" style="color: #666;">Knobs, Faders & Switches</div>
                 </div>
 
                 <div class="controls">
@@ -196,9 +245,9 @@
                         <amb-button label="B"></amb-button>
                     </div>
 
-                    <amb-knob value="70" size="large" label="MAIN"></amb-knob>
-                    <amb-knob value="45" label="TRIM"></amb-knob>
-                    <amb-knob value="80" label="BIAS"></amb-knob>
+                    <amb-knob value="70" size="large" label="MAIN" shade="light"></amb-knob>
+                    <amb-knob value="45" label="TRIM" shade="light"></amb-knob>
+                    <amb-knob value="80" label="BIAS" shade="light"></amb-knob>
 
                     <amb-switch on label="AUTO"></amb-switch>
 
@@ -230,7 +279,7 @@
                 </div>
             </amb-panel>
 
-            <div class="code-example">
+            <div class="code-example ambient amb-fillet amb-inset">
                 <span class="tag">&lt;amb-panel</span> <span class="attr">screws</span><span class="tag">&gt;</span><br>
                 &nbsp;&nbsp;<span class="tag">&lt;amb-knob</span> <span class="attr">value</span>=<span class="val">"70"</span> <span class="attr">label</span>=<span class="val">"VOLUME"</span><span class="tag">&gt;&lt;/amb-knob&gt;</span><br>
                 &nbsp;&nbsp;<span class="tag">&lt;amb-fader</span> <span class="attr">value</span>=<span class="val">"75"</span> <span class="attr">label</span>=<span class="val">"LEVEL"</span><span class="tag">&gt;&lt;/amb-fader&gt;</span><br>
@@ -244,93 +293,98 @@
         <section>
             <h2>Ambient CSS Classes</h2>
 
+            <h3 class="subsection-title">Raised Edge Treatments</h3>
             <div class="css-demo">
-                <div class="demo-box ambient amb-fillet amb-elevation-1 amb-rounded-md" style="background: #3a3d45;">
+                <div class="demo-box ambient amb-fillet amb-rounded-md" style="background: #9a9aa5;">
                     fillet
                 </div>
-                <div class="demo-box ambient amb-chamfer amb-elevation-1 amb-rounded-md" style="background: #3a3d45;">
-                    chamfer
-                </div>
-                <div class="demo-box ambient amb-bevel amb-elevation-2 amb-rounded-md" style="background: #3a3d45;">
-                    bevel
-                </div>
-                <div class="demo-box amb-inset amb-rounded-md" style="background: #2a2a3e;">
-                    inset
-                </div>
-            </div>
-
-            <div class="css-demo" style="margin-top: 16px;">
-                <div class="demo-box ambient amb-fillet amb-elevation-1 amb-rounded-md" style="background: #555;">
-                    elev-1
-                </div>
-                <div class="demo-box ambient amb-fillet amb-elevation-2 amb-rounded-md" style="background: #555;">
-                    elev-2
-                </div>
-                <div class="demo-box ambient amb-fillet amb-elevation-3 amb-rounded-md" style="background: #555;">
-                    elev-3
-                </div>
-                <div class="demo-box ambient amb-fillet-2 amb-elevation-2 amb-rounded-md" style="background: #555;">
+                <div class="demo-box ambient amb-fillet-2 amb-rounded-md" style="background: #9a9aa5;">
                     fillet-2
                 </div>
+                <div class="demo-box ambient amb-chamfer amb-rounded-md" style="background: #9a9aa5;">
+                    chamfer
+                </div>
+                <div class="demo-box ambient amb-chamfer-2 amb-rounded-md" style="background: #9a9aa5;">
+                    chamfer-2
+                </div>
             </div>
 
-            <div class="code-example">
+            <h3 class="subsection-title">Inset Edge Treatments</h3>
+            <div class="css-demo">
+                <div class="demo-box ambient amb-fillet amb-inset amb-rounded-md" style="background: #9a9aa5;">
+                    fillet
+                </div>
+                <div class="demo-box ambient amb-fillet-2 amb-inset amb-rounded-md" style="background: #9a9aa5;">
+                    fillet-2
+                </div>
+                <div class="demo-box ambient amb-chamfer amb-inset amb-rounded-md" style="background: #9a9aa5;">
+                    chamfer
+                </div>
+                <div class="demo-box ambient amb-chamfer-2 amb-inset amb-rounded-md" style="background: #9a9aa5;">
+                    chamfer-2
+                </div>
+            </div>
+
+            <h3 class="subsection-title">Elevations</h3>
+            <div class="css-demo">
+                <div class="demo-box ambient amb-fillet amb-elevation-0 amb-rounded-md" style="background: #9a9aa5;">
+                    elev-0
+                </div>
+                <div class="demo-box ambient amb-fillet amb-elevation-1 amb-rounded-md" style="background: #9a9aa5;">
+                    elev-1
+                </div>
+                <div class="demo-box ambient amb-fillet amb-elevation-2 amb-rounded-md" style="background: #9a9aa5;">
+                    elev-2
+                </div>
+                <div class="demo-box ambient amb-fillet amb-elevation-3 amb-rounded-md" style="background: #9a9aa5;">
+                    elev-3
+                </div>
+            </div>
+
+            <div class="code-example ambient amb-fillet amb-inset">
                 <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"ambient amb-fillet amb-elevation-1"</span><span class="tag">&gt;&lt;/div&gt;</span><br>
-                <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"ambient amb-chamfer amb-elevation-2"</span><span class="tag">&gt;&lt;/div&gt;</span><br>
-                <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"ambient amb-bevel amb-elevation-3"</span><span class="tag">&gt;&lt;/div&gt;</span>
+                <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"ambient amb-chamfer-2"</span><span class="tag">&gt;&lt;/div&gt;</span><br>
+                <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"ambient amb-fillet amb-inset"</span><span class="tag">&gt;&lt;/div&gt;</span>
             </div>
         </section>
 
-        <!-- Lighting Controls -->
-        <section>
-            <h2>Lighting Variables</h2>
-
-            <amb-panel screws>
-                <div class="module-header">
-                    <div class="module-title">LIGHTING</div>
-                    <div class="module-subtitle">CSS Custom Properties</div>
-                </div>
-
-                <div class="controls">
-                    <amb-knob id="keyLight" value="30" label="KEY"></amb-knob>
-                    <amb-knob id="fillLight" value="0" label="FILL"></amb-knob>
-                    <amb-knob id="lightX" value="75" label="LIGHT X"></amb-knob>
-                    <amb-knob id="lightY" value="25" label="LIGHT Y"></amb-knob>
-                </div>
-            </amb-panel>
-
-            <div class="code-example">
-                :root {<br>
-                &nbsp;&nbsp;<span style="color:#666">/* Light direction */</span><br>
-                &nbsp;&nbsp;<span class="attr">--amb-light-x</span>: <span class="val">1</span>;  <span style="color:#666">/* -1 to 1 */</span><br>
-                &nbsp;&nbsp;<span class="attr">--amb-light-y</span>: <span class="val">-1</span>; <span style="color:#666">/* -1 to 1 */</span><br>
-                &nbsp;&nbsp;<span style="color:#666">/* Light intensity */</span><br>
-                &nbsp;&nbsp;<span class="attr">--amb-key-light</span>: <span class="val">0.3</span>;<br>
-                &nbsp;&nbsp;<span class="attr">--amb-fill-light</span>: <span class="val">0</span>;<br>
-                &nbsp;&nbsp;<span style="color:#666">/* Light hue (RGB) */</span><br>
-                &nbsp;&nbsp;<span class="attr">--amb-light-r</span>: <span class="val">180</span>;<br>
-                &nbsp;&nbsp;<span class="attr">--amb-light-g</span>: <span class="val">160</span>;<br>
-                &nbsp;&nbsp;<span class="attr">--amb-light-b</span>: <span class="val">200</span>;<br>
-                &nbsp;&nbsp;<span style="color:#666">/* Accent color (RGB) */</span><br>
-                &nbsp;&nbsp;<span class="attr">--amb-accent-r</span>: <span class="val">255</span>;<br>
-                &nbsp;&nbsp;<span class="attr">--amb-accent-g</span>: <span class="val">140</span>;<br>
-                &nbsp;&nbsp;<span class="attr">--amb-accent-b</span>: <span class="val">50</span>;<br>
-                }
-            </div>
-        </section>
     </div>
 
     <script>
+        // Animation utilities
+        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+        const root = document.documentElement;
+        const style = getComputedStyle(root);
+
+        async function animateVar(variable, target, duration = 2000) {
+            const start = parseFloat(style.getPropertyValue(variable)) || 0;
+            const diff = target - start;
+            const steps = 60;
+            const stepTime = duration / steps;
+
+            for (let i = 1; i <= steps; i++) {
+                const progress = i / steps;
+                // Ease in-out
+                const eased = progress < 0.5
+                    ? 2 * progress * progress
+                    : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+                root.style.setProperty(variable, start + diff * eased);
+                await sleep(stepTime);
+            }
+        }
+
         // Day/Night mode presets
         const dayBtn = document.getElementById('dayBtn');
         const nightBtn = document.getElementById('nightBtn');
         const keyLightKnob = document.getElementById('keyLight');
         const fillLightKnob = document.getElementById('fillLight');
+        const lightXKnob = document.getElementById('lightX');
 
         const presets = {
             day: {
                 keyLight: 0.85,
                 fillLight: 0.4,
+                lightX: -1,
                 lightR: 255,
                 lightG: 255,
                 lightB: 255
@@ -338,27 +392,25 @@
             night: {
                 keyLight: 0.3,
                 fillLight: 0,
-                lightR: 180,
-                lightG: 160,
-                lightB: 200
+                lightX: 1,
+                lightR: 200,
+                lightG: 210,
+                lightB: 240
             }
         };
 
-        function setMode(mode) {
+        // Keep light Y at top for better shadow perception
+        document.documentElement.style.setProperty('--amb-light-y', -1);
+
+        let isAnimating = false;
+
+        async function setMode(mode) {
+            if (isAnimating) return;
+            isAnimating = true;
+
             const p = presets[mode];
-            const root = document.documentElement;
 
-            root.style.setProperty('--amb-key-light', p.keyLight);
-            root.style.setProperty('--amb-fill-light', p.fillLight);
-            root.style.setProperty('--amb-light-r', p.lightR);
-            root.style.setProperty('--amb-light-g', p.lightG);
-            root.style.setProperty('--amb-light-b', p.lightB);
-
-            // Update knob positions
-            keyLightKnob.value = p.keyLight * 100;
-            fillLightKnob.value = p.fillLight * 100;
-
-            // Toggle active states
+            // Toggle active states immediately
             if (mode === 'day') {
                 dayBtn.classList.add('active');
                 nightBtn.classList.remove('active');
@@ -366,6 +418,23 @@
                 nightBtn.classList.add('active');
                 dayBtn.classList.remove('active');
             }
+
+            // Animate all variables in parallel
+            await Promise.all([
+                animateVar('--amb-key-light', p.keyLight, 2500),
+                animateVar('--amb-fill-light', p.fillLight, 2500),
+                animateVar('--amb-light-x', p.lightX, 3000),
+                animateVar('--amb-light-r', p.lightR, 2500),
+                animateVar('--amb-light-g', p.lightG, 2500),
+                animateVar('--amb-light-b', p.lightB, 2500)
+            ]);
+
+            // Update knob positions after animation
+            keyLightKnob.value = p.keyLight * 100;
+            fillLightKnob.value = p.fillLight * 100;
+            lightXKnob.value = (p.lightX + 1) * 50;
+
+            isAnimating = false;
         }
 
         dayBtn.addEventListener('click', () => setMode('day'));

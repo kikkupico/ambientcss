@@ -55,7 +55,7 @@ class AmbientElement extends HTMLElement {
 // --------------------------------------------------------------------------
 class AmbKnob extends AmbientElement {
   static get observedAttributes() {
-    return ['value', 'min', 'max', 'size', 'label'];
+    return ['value', 'min', 'max', 'size', 'label', 'shade'];
   }
 
   constructor() {
@@ -133,8 +133,19 @@ class AmbKnob extends AmbientElement {
   render() {
     const size = this.getAttribute('size') || 'medium';
     const label = this.getAttribute('label') || '';
+    const shade = this.getAttribute('shade') || 'dark';
     const sizeMap = { small: 40, medium: 52, large: 64 };
     const sz = sizeMap[size] || 52;
+
+    const isLight = shade === 'light';
+    // Light shade responds to global lighting like background (base ~background, high brightness mult)
+    const knobBg = isLight ? 'rgb(30, 30, 40)' : 'rgb(35, 35, 45)';
+    const knobInnerBg = isLight ? 'rgb(28, 28, 38)' : 'rgb(30, 30, 40)';
+    const highlightMult = isLight ? 0.5 : 0.3;
+    const brightnessMult = isLight ? 0.95 : 0.15;
+    const innerBrightness = isLight ? 0.85 : 0.1;
+    const indicatorColor = isLight ? '#333' : '#fff';
+    const indicatorGlow = isLight ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.5)';
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -151,7 +162,7 @@ class AmbKnob extends AmbientElement {
           border-radius: 50%;
           cursor: grab;
           position: relative;
-          background: rgb(35, 35, 45);
+          background: ${knobBg};
           box-shadow:
             /* Drop shadow based on light direction */
             rgba(0, 0, 0, calc(var(--_key) - var(--_fill) + 0.2))
@@ -164,7 +175,7 @@ class AmbKnob extends AmbientElement {
               calc(var(--_lx) * -1px)
               calc(var(--_ly) * -1px)
               2px 0px
-              rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * 0.3)),
+              rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * ${highlightMult})),
             /* Shadow edge */
             inset
               calc(var(--_lx) * 1px)
@@ -172,7 +183,7 @@ class AmbKnob extends AmbientElement {
               2px 0px
               rgba(0, 0, 0, calc(var(--_key) * 0.5)),
             /* Brightness from key light */
-            inset 0 0 0 100px rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * 0.15));
+            inset 0 0 0 100px rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * ${brightnessMult}));
         }
         .knob.grabbing { cursor: grabbing; }
         .knob-inner {
@@ -182,10 +193,10 @@ class AmbKnob extends AmbientElement {
           right: 3px;
           bottom: 3px;
           border-radius: 50%;
-          background: rgb(30, 30, 40);
+          background: ${knobInnerBg};
           box-shadow:
-            inset 0 2px 6px rgba(0, 0, 0, 0.5),
-            inset 0 0 0 100px rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * 0.1));
+            inset 0 2px 6px rgba(0, 0, 0, ${isLight ? '0.3' : '0.5'}),
+            inset 0 0 0 100px rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * ${innerBrightness}));
         }
         .knob-rotation {
           position: absolute;
@@ -200,10 +211,10 @@ class AmbKnob extends AmbientElement {
           left: 50%;
           width: 3px;
           height: 8px;
-          background: #fff;
+          background: ${indicatorColor};
           border-radius: 2px;
           transform: translateX(-50%);
-          box-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
+          box-shadow: 0 0 4px ${indicatorGlow};
         }
         .label {
           font-family: system-ui, sans-serif;
@@ -211,7 +222,7 @@ class AmbKnob extends AmbientElement {
           font-weight: 600;
           letter-spacing: 1px;
           text-transform: uppercase;
-          color: var(--amb-text-muted, #888);
+          color: var(--amb-label-color, var(--amb-text-muted, #888));
         }
       </style>
       <div class="knob" part="knob">
@@ -892,7 +903,7 @@ class AmbButton extends AmbientElement {
 // --------------------------------------------------------------------------
 class AmbPanel extends AmbientElement {
   static get observedAttributes() {
-    return ['screws'];
+    return ['screws', 'shade'];
   }
 
   connectedCallback() {
@@ -905,6 +916,14 @@ class AmbPanel extends AmbientElement {
 
   render() {
     const showScrews = this.hasAttribute('screws');
+    const shade = this.getAttribute('shade') || 'dark';
+    const isLight = shade === 'light';
+
+    // Light shade responds to global lighting like background (base ~background, high brightness mult)
+    const panelBg = isLight ? 'rgb(30, 30, 40)' : 'rgb(35, 35, 45)';
+    const screwBg = isLight ? 'rgb(50, 50, 60)' : 'rgb(100, 100, 110)';
+    const highlightMult = isLight ? 0.25 : 0.12;
+    const brightnessMult = isLight ? 0.95 : 0.12;
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -913,7 +932,7 @@ class AmbPanel extends AmbientElement {
           display: block;
         }
         .panel {
-          background: rgb(35, 35, 45);
+          background: ${panelBg};
           border-radius: 12px;
           padding: 20px;
           position: relative;
@@ -926,20 +945,20 @@ class AmbPanel extends AmbientElement {
               calc(var(--_lx) * -1px)
               calc(var(--_ly) * -1px)
               0px 0px
-              rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * 0.12)),
+              rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * ${highlightMult})),
             inset
               calc(var(--_lx) * 1px)
               calc(var(--_ly) * 1px)
               0px 0px
               rgba(0, 0, 0, calc(var(--_key) * 0.2)),
-            inset 0 0 0 1000px rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * 0.12));
+            inset 0 0 0 1000px rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * ${brightnessMult}));
         }
         .screw {
           position: absolute;
           width: 10px;
           height: 10px;
           border-radius: 50%;
-          background: rgb(100, 100, 110);
+          background: ${screwBg};
           box-shadow:
             inset
               calc(var(--_lx) * -1px)
@@ -970,6 +989,7 @@ class AmbPanel extends AmbientElement {
         .screw.br { bottom: 8px; right: 8px; }
         .content {
           position: relative;
+          --amb-label-color: #777;
         }
       </style>
       <div class="panel" part="panel">

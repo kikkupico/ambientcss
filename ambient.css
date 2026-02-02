@@ -42,15 +42,16 @@
   --amb-key-light: 0.3;
   --amb-fill-light: 0;
 
-  /* Light color/hue (RGB values 0-255) */
-  --amb-light-r: 255;
-  --amb-light-g: 255;
-  --amb-light-b: 255;
+  /* Light color/hue (RGB values 0-255) - Bluish for night */
+  --amb-light-r: 200;
+  --amb-light-g: 210;
+  --amb-light-b: 240;
 
   /* Edge treatments (0 = off, 1 = on) */
   --amb-fillet: 0;
   --amb-fillet-width: 1;
   --amb-chamfer: 0;
+  --amb-chamfer-width: 2;
 
   /* Elevation (shadow distance multiplier) */
   --amb-elevation: 0;
@@ -63,10 +64,10 @@
   --amb-text: #e0e0e0;
   --amb-text-muted: #888;
 
-  /* Accent color (RGB values) */
-  --amb-accent-r: 255;
-  --amb-accent-g: 140;
-  --amb-accent-b: 50;
+  /* Accent color (RGB values) - Gold */
+  --amb-accent-r: 245;
+  --amb-accent-g: 200;
+  --amb-accent-b: 66;
   --amb-accent: rgb(var(--amb-accent-r), var(--amb-accent-g), var(--amb-accent-b));
 }
 
@@ -77,8 +78,10 @@
    1. Drop shadow - offset by light direction, scaled by elevation
    2. Fillet highlight - inner lit edge (white on light side)
    3. Fillet shadow - inner dark edge (black on shadow side)
-   4. Chamfer highlight - softer inner bevel (light side)
-   5. Chamfer shadow - softer inner bevel (shadow side)
+   4. Chamfer highlight - softer inner edge (light side)
+   5. Chamfer shadow - softer inner edge (shadow side)
+
+   Add .amb-inset to create depressed/recessed surfaces (reverses edges)
    -------------------------------------------------------------------------- */
 
 .ambient {
@@ -104,19 +107,56 @@
       0px 0px
       rgb(0 0 0 / calc(var(--amb-fillet) * (var(--amb-key-light) - var(--amb-fill-light)))),
 
-    /* Chamfer highlight - soft lit bevel */
+    /* Chamfer highlight - soft lit edge */
     inset
-      calc(var(--amb-light-x) * -2px)
-      calc(var(--amb-light-y) * -2px)
+      calc(var(--amb-light-x) * var(--amb-chamfer-width) * -1px)
+      calc(var(--amb-light-y) * var(--amb-chamfer-width) * -1px)
       2px 0px
       rgb(255 255 255 / calc(var(--amb-chamfer) * var(--amb-key-light))),
 
-    /* Chamfer shadow - soft dark bevel */
+    /* Chamfer shadow - soft dark edge */
     inset
-      calc(var(--amb-light-x) * 2px)
-      calc(var(--amb-light-y) * 2px)
+      calc(var(--amb-light-x) * var(--amb-chamfer-width) * 1px)
+      calc(var(--amb-light-y) * var(--amb-chamfer-width) * 1px)
       2px 0px
       rgb(0 0 0 / calc(var(--amb-chamfer) * (var(--amb-key-light) - var(--amb-fill-light))));
+}
+
+/* Inset surfaces - edges are reversed */
+.ambient.amb-inset {
+  box-shadow:
+    /* Inner shadow instead of drop shadow */
+    inset
+      calc(var(--amb-light-x) * -3px)
+      calc(var(--amb-light-y) * -3px)
+      6px 0px
+      rgba(0, 0, 0, calc(var(--amb-key-light) * 0.4)),
+
+    /* Fillet - reversed: shadow on light side, highlight on dark side */
+    inset
+      calc(var(--amb-light-x) * var(--amb-fillet-width) * -1px)
+      calc(var(--amb-light-y) * var(--amb-fillet-width) * -1px)
+      0px 0px
+      rgb(0 0 0 / calc(var(--amb-fillet) * (var(--amb-key-light) - var(--amb-fill-light)))),
+
+    inset
+      calc(var(--amb-light-x) * var(--amb-fillet-width) * 1px)
+      calc(var(--amb-light-y) * var(--amb-fillet-width) * 1px)
+      0px 0px
+      rgb(255 255 255 / calc(var(--amb-fillet) * var(--amb-key-light))),
+
+    /* Chamfer - reversed */
+    inset
+      calc(var(--amb-light-x) * var(--amb-chamfer-width) * -1px)
+      calc(var(--amb-light-y) * var(--amb-chamfer-width) * -1px)
+      2px 0px
+      rgb(0 0 0 / calc(var(--amb-chamfer) * (var(--amb-key-light) - var(--amb-fill-light)))),
+
+    inset
+      calc(var(--amb-light-x) * var(--amb-chamfer-width) * 1px)
+      calc(var(--amb-light-y) * var(--amb-chamfer-width) * 1px)
+      2px 0px
+      rgb(255 255 255 / calc(var(--amb-chamfer) * var(--amb-key-light)));
 }
 
 /* --------------------------------------------------------------------------
@@ -141,9 +181,14 @@
   --amb-chamfer: 1;
 }
 
-.amb-bevel {
-  --amb-fillet: 1;
+.amb-chamfer-2 {
   --amb-chamfer: 1;
+  --amb-chamfer-width: 3;
+}
+
+/* Inset modifier - use with .ambient to create depressed surfaces */
+.amb-inset {
+  /* Marker class - actual styles defined in .ambient.amb-inset */
 }
 
 /* --------------------------------------------------------------------------
