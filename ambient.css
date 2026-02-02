@@ -40,7 +40,7 @@
 
   /* Light intensity (0-1) */
   --amb-key-light: 0.3;
-  --amb-fill-light: 0;
+  --amb-fill-light: 0.15;
 
   /* Light color/hue (RGB values 0-255) - Bluish for night */
   --amb-light-r: 200;

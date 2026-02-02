@@ -142,8 +142,10 @@
             flex-wrap: wrap;
         }
         .demo-box {
-            width: 80px;
-            height: 80px;
+            width: calc(50% - 8px);
+            min-width: 120px;
+            max-width: 150px;
+            height: 100px;
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -152,7 +154,53 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            color: #444;
+            color: #666;
+            /* Lighting-responsive background using inset shadow overlay */
+            background: rgb(45, 45, 55);
+            --demo-light: inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.75));
+        }
+        /* Override ambient box-shadow to include lighting */
+        .demo-box.ambient {
+            box-shadow:
+                /* Ambient shadows from edge treatments */
+                rgba(0, 0, 0, calc(var(--amb-key-light) - var(--amb-fill-light)))
+                    calc(var(--amb-light-x) * var(--amb-elevation) * -8px)
+                    calc(var(--amb-light-y) * var(--amb-elevation) * -8px)
+                    calc(var(--amb-elevation) * 8px)
+                    calc(var(--amb-elevation) * -4px),
+                inset calc(var(--amb-light-x) * var(--amb-fillet-width) * -1px)
+                    calc(var(--amb-light-y) * var(--amb-fillet-width) * -1px) 0px 0px
+                    rgb(255 255 255 / calc(var(--amb-fillet) * var(--amb-key-light))),
+                inset calc(var(--amb-light-x) * var(--amb-fillet-width) * 1px)
+                    calc(var(--amb-light-y) * var(--amb-fillet-width) * 1px) 0px 0px
+                    rgb(0 0 0 / calc(var(--amb-fillet) * (var(--amb-key-light) - var(--amb-fill-light)))),
+                inset calc(var(--amb-light-x) * var(--amb-chamfer-width, 2) * -1px)
+                    calc(var(--amb-light-y) * var(--amb-chamfer-width, 2) * -1px) 2px 0px
+                    rgb(255 255 255 / calc(var(--amb-chamfer) * var(--amb-key-light))),
+                inset calc(var(--amb-light-x) * var(--amb-chamfer-width, 2) * 1px)
+                    calc(var(--amb-light-y) * var(--amb-chamfer-width, 2) * 1px) 2px 0px
+                    rgb(0 0 0 / calc(var(--amb-chamfer) * (var(--amb-key-light) - var(--amb-fill-light)))),
+                /* Lighting overlay */
+                inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.75));
+        }
+        .demo-box.ambient.amb-inset {
+            box-shadow:
+                inset calc(var(--amb-light-x) * -3px) calc(var(--amb-light-y) * -3px) 6px 0px
+                    rgba(0, 0, 0, calc(var(--amb-key-light) * 0.4)),
+                inset calc(var(--amb-light-x) * var(--amb-fillet-width) * -1px)
+                    calc(var(--amb-light-y) * var(--amb-fillet-width) * -1px) 0px 0px
+                    rgb(0 0 0 / calc(var(--amb-fillet) * (var(--amb-key-light) - var(--amb-fill-light)))),
+                inset calc(var(--amb-light-x) * var(--amb-fillet-width) * 1px)
+                    calc(var(--amb-light-y) * var(--amb-fillet-width) * 1px) 0px 0px
+                    rgb(255 255 255 / calc(var(--amb-fillet) * var(--amb-key-light))),
+                inset calc(var(--amb-light-x) * var(--amb-chamfer-width, 2) * -1px)
+                    calc(var(--amb-light-y) * var(--amb-chamfer-width, 2) * -1px) 2px 0px
+                    rgb(0 0 0 / calc(var(--amb-chamfer) * (var(--amb-key-light) - var(--amb-fill-light)))),
+                inset calc(var(--amb-light-x) * var(--amb-chamfer-width, 2) * 1px)
+                    calc(var(--amb-light-y) * var(--amb-chamfer-width, 2) * 1px) 2px 0px
+                    rgb(255 255 255 / calc(var(--amb-chamfer) * var(--amb-key-light))),
+                /* Lighting overlay */
+                inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.75));
         }
 
         /* Code example */
@@ -202,7 +250,7 @@
 
                 <div class="controls">
                     <amb-knob id="keyLight" value="30" label="KEY" shade="dark"></amb-knob>
-                    <amb-knob id="fillLight" value="0" label="FILL" shade="dark"></amb-knob>
+                    <amb-knob id="fillLight" value="15" label="FILL" shade="dark"></amb-knob>
                     <amb-knob id="lightX" value="75" label="LIGHT X" shade="dark"></amb-knob>
                     <amb-knob id="lightY" value="0" label="LIGHT Y" shade="dark"></amb-knob>
                 </div>
@@ -295,48 +343,48 @@
 
             <h3 class="subsection-title">Raised Edge Treatments</h3>
             <div class="css-demo">
-                <div class="demo-box ambient amb-fillet amb-rounded-md" style="background: #9a9aa5;">
+                <div class="demo-box ambient amb-fillet amb-rounded-md">
                     fillet
                 </div>
-                <div class="demo-box ambient amb-fillet-2 amb-rounded-md" style="background: #9a9aa5;">
+                <div class="demo-box ambient amb-fillet-2 amb-rounded-md">
                     fillet-2
                 </div>
-                <div class="demo-box ambient amb-chamfer amb-rounded-md" style="background: #9a9aa5;">
+                <div class="demo-box ambient amb-chamfer amb-rounded-md">
                     chamfer
                 </div>
-                <div class="demo-box ambient amb-chamfer-2 amb-rounded-md" style="background: #9a9aa5;">
+                <div class="demo-box ambient amb-chamfer-2 amb-rounded-md">
                     chamfer-2
                 </div>
             </div>
 
             <h3 class="subsection-title">Inset Edge Treatments</h3>
             <div class="css-demo">
-                <div class="demo-box ambient amb-fillet amb-inset amb-rounded-md" style="background: #9a9aa5;">
+                <div class="demo-box ambient amb-fillet amb-inset amb-rounded-md">
                     fillet
                 </div>
-                <div class="demo-box ambient amb-fillet-2 amb-inset amb-rounded-md" style="background: #9a9aa5;">
+                <div class="demo-box ambient amb-fillet-2 amb-inset amb-rounded-md">
                     fillet-2
                 </div>
-                <div class="demo-box ambient amb-chamfer amb-inset amb-rounded-md" style="background: #9a9aa5;">
+                <div class="demo-box ambient amb-chamfer amb-inset amb-rounded-md">
                     chamfer
                 </div>
-                <div class="demo-box ambient amb-chamfer-2 amb-inset amb-rounded-md" style="background: #9a9aa5;">
+                <div class="demo-box ambient amb-chamfer-2 amb-inset amb-rounded-md">
                     chamfer-2
                 </div>
             </div>
 
             <h3 class="subsection-title">Elevations</h3>
             <div class="css-demo">
-                <div class="demo-box ambient amb-fillet amb-elevation-0 amb-rounded-md" style="background: #9a9aa5;">
+                <div class="demo-box ambient amb-fillet amb-elevation-0 amb-rounded-md">
                     elev-0
                 </div>
-                <div class="demo-box ambient amb-fillet amb-elevation-1 amb-rounded-md" style="background: #9a9aa5;">
+                <div class="demo-box ambient amb-fillet amb-elevation-1 amb-rounded-md">
                     elev-1
                 </div>
-                <div class="demo-box ambient amb-fillet amb-elevation-2 amb-rounded-md" style="background: #9a9aa5;">
+                <div class="demo-box ambient amb-fillet amb-elevation-2 amb-rounded-md">
                     elev-2
                 </div>
-                <div class="demo-box ambient amb-fillet amb-elevation-3 amb-rounded-md" style="background: #9a9aa5;">
+                <div class="demo-box ambient amb-fillet amb-elevation-3 amb-rounded-md">
                     elev-3
                 </div>
             </div>
@@ -383,7 +431,7 @@
         const presets = {
             day: {
                 keyLight: 0.85,
-                fillLight: 0.4,
+                fillLight: 0.55,
                 lightX: -1,
                 lightR: 255,
                 lightG: 255,
@@ -391,7 +439,7 @@
             },
             night: {
                 keyLight: 0.3,
-                fillLight: 0,
+                fillLight: 0.15,
                 lightX: 1,
                 lightR: 200,
                 lightG: 210,
