@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ambient CSS - Materials Demo</title>
+    <link rel="stylesheet" href="ambient.css">
+    <script src="ambient-components.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: rgb(25, 25, 35);
+            color: var(--amb-text);
+            min-height: 100vh;
+            padding: 40px 20px;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgb(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b));
+            opacity: calc(var(--amb-key-light) * 0.9);
+            pointer-events: none;
+            z-index: -1;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        header {
+            margin-bottom: 40px;
+        }
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+        h1 span {
+            color: rgb(var(--amb-accent-r), var(--amb-accent-g), var(--amb-accent-b));
+        }
+        .subtitle {
+            font-size: 12px;
+            color: var(--amb-text-muted);
+            margin-top: 8px;
+            letter-spacing: 1px;
+        }
+
+        .panels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .panel-demo {
+            --amb-elevation: 2;
+        }
+
+        .section-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--amb-text-muted);
+            margin-bottom: 16px;
+            margin-top: 40px;
+        }
+        .section-label:first-of-type {
+            margin-top: 0;
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+        .panel-subtitle {
+            font-size: 10px;
+            color: var(--amb-text-muted);
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+        .panel-content {
+            font-size: 13px;
+            color: var(--amb-text-muted);
+            line-height: 1.5;
+        }
+
+        /* ================================================================
+           MATERIAL: SOLID (Default)
+           Full 3D lighting with shadows and highlights
+           ================================================================ */
+        /* Default - handled by amb-panel */
+
+        /* ================================================================
+           MATERIAL: FLAT
+           No 3D lighting response - matte finish
+           ================================================================ */
+        .material-flat {
+            background: rgb(45, 45, 55);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: none;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .material-flat.flat-light {
+            background: rgb(200, 200, 200);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        /* Controls section */
+        .controls-section {
+            margin-top: 40px;
+            padding: 24px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+        }
+        .controls-section h2 {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--amb-text-muted);
+            margin-bottom: 20px;
+        }
+        .controls-row {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AMBIENT <span>CSS</span></h1>
+            <div class="subtitle">MATERIALS</div>
+        </header>
+
+        <!-- MATERIALS -->
+        <div class="section-label">Materials</div>
+        <div class="panels-grid">
+            <!-- SOLID -->
+            <div>
+                <amb-panel screws class="panel-demo">
+                    <div class="panel-title">SOLID</div>
+                    <div class="panel-subtitle">Default Material</div>
+                    <div class="panel-content">
+                        Full 3D lighting with shadows and highlights.
+                        Responds to light direction and intensity.
+                    </div>
+                </amb-panel>
+            </div>
+
+            <!-- FLAT -->
+            <div>
+                <div class="material-flat panel-demo">
+                    <div class="panel-title" style="color: #ccc;">FLAT</div>
+                    <div class="panel-subtitle">Matte Finish</div>
+                    <div class="panel-content">
+                        No 3D shading or lighting response.
+                        Clean, flat appearance.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Light variants -->
+        <div class="section-label">Light Shades</div>
+        <div class="panels-grid">
+            <div>
+                <amb-panel screws shade="light" class="panel-demo">
+                    <div class="panel-title" style="color: #333;">SOLID</div>
+                    <div class="panel-subtitle" style="color: #666;">Light Shade</div>
+                    <div class="panel-content" style="color: #555;">
+                        Light variant responds strongly to ambient lighting.
+                    </div>
+                </amb-panel>
+            </div>
+
+            <div>
+                <div class="material-flat flat-light panel-demo">
+                    <div class="panel-title" style="color: #333;">FLAT</div>
+                    <div class="panel-subtitle" style="color: #666;">Light Shade</div>
+                    <div class="panel-content" style="color: #555;">
+                        Light flat surface - like matte paint.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lighting Controls -->
+        <div class="controls-section">
+            <h2>Adjust Lighting</h2>
+            <div class="controls-row">
+                <amb-knob id="keyLight" value="30" label="KEY" shade="dark"></amb-knob>
+                <amb-knob id="fillLight" value="15" label="FILL" shade="dark"></amb-knob>
+                <amb-knob id="lightX" value="75" label="LIGHT X" shade="dark"></amb-knob>
+                <amb-knob id="lightY" value="0" label="LIGHT Y" shade="dark"></amb-knob>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Lighting controls
+        document.getElementById('keyLight').addEventListener('change', (e) => {
+            document.documentElement.style.setProperty('--amb-key-light', e.detail.value / 100);
+        });
+        document.getElementById('fillLight').addEventListener('change', (e) => {
+            document.documentElement.style.setProperty('--amb-fill-light', e.detail.value / 100);
+        });
+        document.getElementById('lightX').addEventListener('change', (e) => {
+            const x = (e.detail.value / 50) - 1;
+            document.documentElement.style.setProperty('--amb-light-x', x);
+        });
+        document.getElementById('lightY').addEventListener('change', (e) => {
+            const y = (e.detail.value / 50) - 1;
+            document.documentElement.style.setProperty('--amb-light-y', y);
+        });
+
+        // Set initial light Y for better shadow visibility
+        document.documentElement.style.setProperty('--amb-light-y', -1);
+    </script>
+</body>
+</html>

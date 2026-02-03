@@ -49,29 +49,84 @@
             font-weight: 700;
             letter-spacing: 2px;
         }
-        h1 span {
+        h1.amb-lume span {
             color: rgb(var(--amb-accent-r), var(--amb-accent-g), var(--amb-accent-b));
         }
-        .mode-toggle {
+
+        /* Header toggles */
+        .header-toggles {
             display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+        .toggle-group {
+            display: flex;
+            align-items: center;
             gap: 8px;
         }
-        .mode-toggle button {
-            width: 36px;
-            height: 36px;
-            border: none;
-            background: rgba(255, 255, 255, 0.1);
-            cursor: pointer;
-            border-radius: 8px;
-            color: var(--amb-text-muted);
-            transition: all 0.2s;
+        .toggle-label {
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
-        .mode-toggle button:hover {
-            background: rgba(255, 255, 255, 0.15);
-            color: var(--amb-text);
+
+        /* Global flat material mode - keeps lighting, removes edges/shadows */
+        body.material-flat amb-panel::part(panel) {
+            box-shadow:
+                inset 0 0 0 1000px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.12)) !important;
         }
-        .mode-toggle button.active {
-            color: rgb(var(--amb-accent-r), var(--amb-accent-g), var(--amb-accent-b));
+        body.material-flat amb-panel[shade="light"]::part(panel) {
+            box-shadow:
+                inset 0 0 0 1000px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.95)) !important;
+        }
+        body.material-flat amb-knob::part(knob) {
+            box-shadow:
+                inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.15)) !important;
+        }
+        body.material-flat amb-knob::part(inner) {
+            box-shadow:
+                inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.1)) !important;
+        }
+        body.material-flat amb-knob[shade="light"]::part(knob) {
+            box-shadow:
+                inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.95)) !important;
+        }
+        body.material-flat amb-knob[shade="light"]::part(inner) {
+            box-shadow:
+                inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.85)) !important;
+        }
+        body.material-flat amb-button::part(button) {
+            box-shadow:
+                inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.3)) !important;
+        }
+        body.material-flat amb-switch::part(track) {
+            box-shadow:
+                inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.05)) !important;
+        }
+        body.material-flat amb-switch::part(handle) {
+            box-shadow:
+                inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.3)) !important;
+        }
+        body.material-flat amb-fader::part(handle) {
+            box-shadow:
+                inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.3)) !important;
+        }
+        body.material-flat amb-jack::part(jack) {
+            box-shadow:
+                inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.15)) !important;
+        }
+        body.material-flat .demo-box.ambient {
+            box-shadow:
+                inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.95)) !important;
+        }
+        body.material-flat .demo-box.ambient.amb-inset {
+            box-shadow:
+                inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.8)) !important;
+        }
+        body.material-flat .code-example {
+            box-shadow:
+                inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.8)) !important;
         }
 
         section {
@@ -82,10 +137,9 @@
             font-weight: 600;
             letter-spacing: 1px;
             text-transform: uppercase;
-            color: var(--amb-text-muted);
             margin-bottom: 20px;
             padding-bottom: 8px;
-            border-bottom: 1px solid var(--amb-bg-raised);
+            border-bottom: 1px solid rgba(128, 128, 128, 0.2);
         }
 
         /* Module layout */
@@ -103,7 +157,6 @@
         }
         .module-subtitle {
             font-size: 10px;
-            color: var(--amb-text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -130,7 +183,6 @@
             font-weight: 600;
             letter-spacing: 0.5px;
             text-transform: uppercase;
-            color: var(--amb-text-muted);
             margin: 20px 0 12px 0;
         }
         .subsection-title:first-of-type {
@@ -154,98 +206,143 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            color: #666;
-            /* Lighting-responsive background using inset shadow overlay */
-            background: rgb(45, 45, 55);
-            --demo-light: inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.75));
+            /* Raised: same as panel light shade */
+            background: rgb(30, 30, 40);
+        }
+        .demo-box.amb-inset {
+            /* Inset: subtly darker than page background (25, 25, 35) */
+            background: rgb(22, 22, 31);
         }
         /* Override ambient box-shadow to include lighting */
         .demo-box.ambient {
             box-shadow:
-                /* Ambient shadows from edge treatments */
+                /* Drop shadow */
                 rgba(0, 0, 0, calc(var(--amb-key-light) - var(--amb-fill-light)))
                     calc(var(--amb-light-x) * var(--amb-elevation) * -8px)
                     calc(var(--amb-light-y) * var(--amb-elevation) * -8px)
                     calc(var(--amb-elevation) * 8px)
                     calc(var(--amb-elevation) * -4px),
+                /* Fillet highlight */
                 inset calc(var(--amb-light-x) * var(--amb-fillet-width) * -1px)
                     calc(var(--amb-light-y) * var(--amb-fillet-width) * -1px) 0px 0px
                     rgb(255 255 255 / calc(var(--amb-fillet) * var(--amb-key-light))),
+                /* Fillet shadow */
                 inset calc(var(--amb-light-x) * var(--amb-fillet-width) * 1px)
                     calc(var(--amb-light-y) * var(--amb-fillet-width) * 1px) 0px 0px
                     rgb(0 0 0 / calc(var(--amb-fillet) * (var(--amb-key-light) - var(--amb-fill-light)))),
+                /* Chamfer highlight */
                 inset calc(var(--amb-light-x) * var(--amb-chamfer-width, 2) * -1px)
                     calc(var(--amb-light-y) * var(--amb-chamfer-width, 2) * -1px) 2px 0px
                     rgb(255 255 255 / calc(var(--amb-chamfer) * var(--amb-key-light))),
+                /* Chamfer shadow */
                 inset calc(var(--amb-light-x) * var(--amb-chamfer-width, 2) * 1px)
                     calc(var(--amb-light-y) * var(--amb-chamfer-width, 2) * 1px) 2px 0px
                     rgb(0 0 0 / calc(var(--amb-chamfer) * (var(--amb-key-light) - var(--amb-fill-light)))),
-                /* Lighting overlay */
-                inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.75));
+                /* Lighting overlay - same as panel light shade (0.95) */
+                inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.95));
         }
         .demo-box.ambient.amb-inset {
             box-shadow:
+                /* Inset shadow */
                 inset calc(var(--amb-light-x) * -3px) calc(var(--amb-light-y) * -3px) 6px 0px
-                    rgba(0, 0, 0, calc(var(--amb-key-light) * 0.4)),
+                    rgba(0, 0, 0, calc(var(--amb-key-light) * 0.5)),
+                /* Fillet shadow (reversed for inset) */
                 inset calc(var(--amb-light-x) * var(--amb-fillet-width) * -1px)
                     calc(var(--amb-light-y) * var(--amb-fillet-width) * -1px) 0px 0px
                     rgb(0 0 0 / calc(var(--amb-fillet) * (var(--amb-key-light) - var(--amb-fill-light)))),
+                /* Fillet highlight (reversed for inset) */
                 inset calc(var(--amb-light-x) * var(--amb-fillet-width) * 1px)
                     calc(var(--amb-light-y) * var(--amb-fillet-width) * 1px) 0px 0px
                     rgb(255 255 255 / calc(var(--amb-fillet) * var(--amb-key-light))),
+                /* Chamfer shadow (reversed for inset) */
                 inset calc(var(--amb-light-x) * var(--amb-chamfer-width, 2) * -1px)
                     calc(var(--amb-light-y) * var(--amb-chamfer-width, 2) * -1px) 2px 0px
                     rgb(0 0 0 / calc(var(--amb-chamfer) * (var(--amb-key-light) - var(--amb-fill-light)))),
+                /* Chamfer highlight (reversed for inset) */
                 inset calc(var(--amb-light-x) * var(--amb-chamfer-width, 2) * 1px)
                     calc(var(--amb-light-y) * var(--amb-chamfer-width, 2) * 1px) 2px 0px
                     rgb(255 255 255 / calc(var(--amb-chamfer) * var(--amb-key-light))),
-                /* Lighting overlay */
-                inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.75));
+                /* Lighting overlay - slightly lower for inset to appear subtly darker */
+                inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.8));
         }
 
-        /* Code example */
+        /* Code example - inset panel style */
         .code-example {
-            background: #2a2a3e;
+            background: rgb(22, 22, 31);
             border-radius: 8px;
             padding: 16px;
             margin-top: 16px;
             font-family: 'SF Mono', Monaco, monospace;
             font-size: 13px;
-            color: #e0e0e0;
             overflow-x: auto;
+            --amb-fillet: 1;
+            --amb-fillet-width: 1;
+            box-shadow:
+                /* Inset shadow */
+                inset calc(var(--amb-light-x) * -3px) calc(var(--amb-light-y) * -3px) 6px 0px
+                    rgba(0, 0, 0, calc(var(--amb-key-light) * 0.5)),
+                /* Fillet shadow (reversed for inset) */
+                inset calc(var(--amb-light-x) * var(--amb-fillet-width) * -1px)
+                    calc(var(--amb-light-y) * var(--amb-fillet-width) * -1px) 0px 0px
+                    rgb(0 0 0 / calc(var(--amb-fillet) * (var(--amb-key-light) - var(--amb-fill-light)))),
+                /* Fillet highlight (reversed for inset) */
+                inset calc(var(--amb-light-x) * var(--amb-fillet-width) * 1px)
+                    calc(var(--amb-light-y) * var(--amb-fillet-width) * 1px) 0px 0px
+                    rgb(255 255 255 / calc(var(--amb-fillet) * var(--amb-key-light))),
+                /* Lighting overlay */
+                inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.8));
         }
-        .code-example .tag { color: #f59e0b; }
-        .code-example .attr { color: #4ade80; }
-        .code-example .val { color: #38bdf8; }
+        .code-example .tag { color: #d4a056; }
+        .code-example .attr { color: #7ec87e; }
+        .code-example .val { color: #6cb6d9; }
+
+        /* Ambient luminance text - dark in bright light, light in dark */
+        .amb-lume {
+            --lume: calc(1 - var(--amb-key-light, 0.5));
+            color: rgb(
+                calc(var(--lume) * 220 + 30),
+                calc(var(--lume) * 220 + 30),
+                calc(var(--lume) * 220 + 40)
+            );
+            transition: color 0.3s ease;
+        }
+        .amb-lume-muted {
+            --lume: calc(1 - var(--amb-key-light, 0.5));
+            color: rgb(
+                calc(var(--lume) * 120 + 60),
+                calc(var(--lume) * 120 + 60),
+                calc(var(--lume) * 120 + 70)
+            );
+            transition: color 0.3s ease;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>AMBIENT <span>CSS</span></h1>
-            <div class="mode-toggle">
-                <button id="dayBtn" title="Day mode">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
-                        <circle cx="12" cy="12" r="5"/>
-                        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-                    </svg>
-                </button>
-                <button id="nightBtn" class="active" title="Night mode">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
-                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-                    </svg>
-                </button>
+            <h1 class="amb-lume">AMBIENT <span>CSS</span></h1>
+            <div class="header-toggles">
+                <div class="toggle-group">
+                    <span class="toggle-label amb-lume-muted">Flat</span>
+                    <amb-switch id="materialToggle"></amb-switch>
+                    <span class="toggle-label amb-lume-muted">Solid</span>
+                </div>
+                <div class="toggle-group">
+                    <span class="toggle-label amb-lume-muted">Night</span>
+                    <amb-switch id="modeToggle"></amb-switch>
+                    <span class="toggle-label amb-lume-muted">Day</span>
+                </div>
             </div>
         </header>
 
         <!-- Lighting Controls -->
         <section>
-            <h2>Lighting Variables</h2>
+            <h2 class="amb-lume-muted">Lighting Variables</h2>
 
             <amb-panel screws shade="light">
                 <div class="module-header">
-                    <div class="module-title" style="color: #333;">LIGHTING</div>
-                    <div class="module-subtitle" style="color: #666;">CSS Custom Properties</div>
+                    <div class="module-title amb-lume">LIGHTING</div>
+                    <div class="module-subtitle amb-lume-muted">CSS Custom Properties</div>
                 </div>
 
                 <div class="controls">
@@ -256,7 +353,7 @@
                 </div>
             </amb-panel>
 
-            <div class="code-example ambient amb-fillet amb-inset">
+            <div class="code-example amb-lume-muted">
                 :root {<br>
                 &nbsp;&nbsp;<span style="color:#666">/* Light direction */</span><br>
                 &nbsp;&nbsp;<span class="attr">--amb-light-x</span>: <span class="val">1</span>;  <span style="color:#666">/* -1 to 1 */</span><br>
@@ -278,12 +375,12 @@
 
         <!-- Web Components Demo -->
         <section>
-            <h2>Ambient Components</h2>
+            <h2 class="amb-lume-muted">Ambient Components</h2>
 
             <amb-panel screws shade="light">
                 <div class="module-header">
-                    <div class="module-title" style="color: #333;">CONTROLS</div>
-                    <div class="module-subtitle" style="color: #666;">Knobs, Faders & Switches</div>
+                    <div class="module-title amb-lume">CONTROLS</div>
+                    <div class="module-subtitle amb-lume-muted">Knobs, Faders & Switches</div>
                 </div>
 
                 <div class="controls">
@@ -305,8 +402,8 @@
 
             <amb-panel screws>
                 <div class="module-header">
-                    <div class="module-title">STATUS</div>
-                    <div class="module-subtitle">Indicators & Buttons</div>
+                    <div class="module-title amb-lume">STATUS</div>
+                    <div class="module-subtitle amb-lume-muted">Indicators & Buttons</div>
                 </div>
 
                 <div class="controls">
@@ -322,12 +419,12 @@
                             <amb-led color="amber"></amb-led>
                             <amb-led color="red"></amb-led>
                         </div>
-                        <span style="font-size: 9px; color: var(--amb-text-muted); letter-spacing: 1px;">STATUS</span>
+                        <span class="amb-lume-muted" style="font-size: 9px; letter-spacing: 1px;">STATUS</span>
                     </div>
                 </div>
             </amb-panel>
 
-            <div class="code-example ambient amb-fillet amb-inset">
+            <div class="code-example amb-lume-muted">
                 <span class="tag">&lt;amb-panel</span> <span class="attr">screws</span><span class="tag">&gt;</span><br>
                 &nbsp;&nbsp;<span class="tag">&lt;amb-knob</span> <span class="attr">value</span>=<span class="val">"70"</span> <span class="attr">label</span>=<span class="val">"VOLUME"</span><span class="tag">&gt;&lt;/amb-knob&gt;</span><br>
                 &nbsp;&nbsp;<span class="tag">&lt;amb-fader</span> <span class="attr">value</span>=<span class="val">"75"</span> <span class="attr">label</span>=<span class="val">"LEVEL"</span><span class="tag">&gt;&lt;/amb-fader&gt;</span><br>
@@ -339,57 +436,57 @@
 
         <!-- CSS Classes Demo -->
         <section>
-            <h2>Ambient CSS Classes</h2>
+            <h2 class="amb-lume-muted">Ambient CSS Classes</h2>
 
-            <h3 class="subsection-title">Raised Edge Treatments</h3>
+            <h3 class="subsection-title amb-lume-muted">Raised Edge Treatments</h3>
             <div class="css-demo">
-                <div class="demo-box ambient amb-fillet amb-rounded-md">
+                <div class="demo-box ambient amb-lume-muted amb-fillet amb-rounded-md">
                     fillet
                 </div>
-                <div class="demo-box ambient amb-fillet-2 amb-rounded-md">
+                <div class="demo-box ambient amb-lume-muted amb-fillet-2 amb-rounded-md">
                     fillet-2
                 </div>
-                <div class="demo-box ambient amb-chamfer amb-rounded-md">
+                <div class="demo-box ambient amb-lume-muted amb-chamfer amb-rounded-md">
                     chamfer
                 </div>
-                <div class="demo-box ambient amb-chamfer-2 amb-rounded-md">
+                <div class="demo-box ambient amb-lume-muted amb-chamfer-2 amb-rounded-md">
                     chamfer-2
                 </div>
             </div>
 
-            <h3 class="subsection-title">Inset Edge Treatments</h3>
+            <h3 class="subsection-title amb-lume-muted">Inset Edge Treatments</h3>
             <div class="css-demo">
-                <div class="demo-box ambient amb-fillet amb-inset amb-rounded-md">
+                <div class="demo-box ambient amb-lume-muted amb-fillet amb-inset amb-rounded-md">
                     fillet
                 </div>
-                <div class="demo-box ambient amb-fillet-2 amb-inset amb-rounded-md">
+                <div class="demo-box ambient amb-lume-muted amb-fillet-2 amb-inset amb-rounded-md">
                     fillet-2
                 </div>
-                <div class="demo-box ambient amb-chamfer amb-inset amb-rounded-md">
+                <div class="demo-box ambient amb-lume-muted amb-chamfer amb-inset amb-rounded-md">
                     chamfer
                 </div>
-                <div class="demo-box ambient amb-chamfer-2 amb-inset amb-rounded-md">
+                <div class="demo-box ambient amb-lume-muted amb-chamfer-2 amb-inset amb-rounded-md">
                     chamfer-2
                 </div>
             </div>
 
-            <h3 class="subsection-title">Elevations</h3>
+            <h3 class="subsection-title amb-lume-muted">Elevations</h3>
             <div class="css-demo">
-                <div class="demo-box ambient amb-fillet amb-elevation-0 amb-rounded-md">
+                <div class="demo-box ambient amb-lume-muted amb-fillet amb-elevation-0 amb-rounded-md">
                     elev-0
                 </div>
-                <div class="demo-box ambient amb-fillet amb-elevation-1 amb-rounded-md">
+                <div class="demo-box ambient amb-lume-muted amb-fillet amb-elevation-1 amb-rounded-md">
                     elev-1
                 </div>
-                <div class="demo-box ambient amb-fillet amb-elevation-2 amb-rounded-md">
+                <div class="demo-box ambient amb-lume-muted amb-fillet amb-elevation-2 amb-rounded-md">
                     elev-2
                 </div>
-                <div class="demo-box ambient amb-fillet amb-elevation-3 amb-rounded-md">
+                <div class="demo-box ambient amb-lume-muted amb-fillet amb-elevation-3 amb-rounded-md">
                     elev-3
                 </div>
             </div>
 
-            <div class="code-example ambient amb-fillet amb-inset">
+            <div class="code-example amb-lume-muted">
                 <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"ambient amb-fillet amb-elevation-1"</span><span class="tag">&gt;&lt;/div&gt;</span><br>
                 <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"ambient amb-chamfer-2"</span><span class="tag">&gt;&lt;/div&gt;</span><br>
                 <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"ambient amb-fillet amb-inset"</span><span class="tag">&gt;&lt;/div&gt;</span>
@@ -422,33 +519,53 @@
         }
 
         // Day/Night mode presets
-        const dayBtn = document.getElementById('dayBtn');
-        const nightBtn = document.getElementById('nightBtn');
+        const modeToggle = document.getElementById('modeToggle');
         const keyLightKnob = document.getElementById('keyLight');
         const fillLightKnob = document.getElementById('fillLight');
         const lightXKnob = document.getElementById('lightX');
 
         const presets = {
             day: {
-                keyLight: 0.85,
-                fillLight: 0.55,
+                keyLight: 0.95,
+                fillLight: 0.65,
                 lightX: -1,
                 lightR: 255,
                 lightG: 255,
                 lightB: 255
             },
             night: {
-                keyLight: 0.3,
-                fillLight: 0.15,
+                keyLight: 0.05,
+                fillLight: 0.02,
                 lightX: 1,
-                lightR: 200,
-                lightG: 210,
-                lightB: 240
+                lightR: 150,
+                lightG: 160,
+                lightB: 200
             }
         };
 
         // Keep light Y at top for better shadow perception
         document.documentElement.style.setProperty('--amb-light-y', -1);
+
+        // Detect OS color scheme and set initial mode
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const initialMode = prefersDark ? 'night' : 'day';
+        const initialPreset = presets[initialMode];
+
+        // Apply initial values immediately (no animation)
+        document.documentElement.style.setProperty('--amb-key-light', initialPreset.keyLight);
+        document.documentElement.style.setProperty('--amb-fill-light', initialPreset.fillLight);
+        document.documentElement.style.setProperty('--amb-light-x', initialPreset.lightX);
+        document.documentElement.style.setProperty('--amb-light-r', initialPreset.lightR);
+        document.documentElement.style.setProperty('--amb-light-g', initialPreset.lightG);
+        document.documentElement.style.setProperty('--amb-light-b', initialPreset.lightB);
+
+        // Set initial switch state (on = day)
+        modeToggle.on = !prefersDark;
+
+        // Update knobs to match initial state
+        keyLightKnob.value = initialPreset.keyLight * 100;
+        fillLightKnob.value = initialPreset.fillLight * 100;
+        lightXKnob.value = (initialPreset.lightX + 1) * 50;
 
         let isAnimating = false;
 
@@ -457,15 +574,6 @@
             isAnimating = true;
 
             const p = presets[mode];
-
-            // Toggle active states immediately
-            if (mode === 'day') {
-                dayBtn.classList.add('active');
-                nightBtn.classList.remove('active');
-            } else {
-                nightBtn.classList.add('active');
-                dayBtn.classList.remove('active');
-            }
 
             // Animate all variables in parallel
             await Promise.all([
@@ -485,8 +593,23 @@
             isAnimating = false;
         }
 
-        dayBtn.addEventListener('click', () => setMode('day'));
-        nightBtn.addEventListener('click', () => setMode('night'));
+        modeToggle.addEventListener('change', (e) => {
+            setMode(e.detail.on ? 'day' : 'night');
+        });
+
+        // Material toggle
+        const materialToggle = document.getElementById('materialToggle');
+
+        // Set initial state (solid = on)
+        materialToggle.on = true;
+
+        materialToggle.addEventListener('change', (e) => {
+            if (e.detail.on) {
+                document.body.classList.remove('material-flat');
+            } else {
+                document.body.classList.add('material-flat');
+            }
+        });
 
         // Lighting controls - update CSS variables
         document.getElementById('keyLight').addEventListener('change', (e) => {
