@@ -1008,6 +1008,259 @@ class AmbPanel extends AmbientElement {
 }
 
 // --------------------------------------------------------------------------
+// amb-subpanel - Section within a panel with grooved heading line
+// --------------------------------------------------------------------------
+class AmbSubpanel extends AmbientElement {
+  static get observedAttributes() {
+    return ['label'];
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  render() {
+    const label = this.getAttribute('label') || '';
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        ${AmbientElement.baseStyles}
+        :host {
+          display: block;
+          margin: 24px 0;
+        }
+        :host(:first-child) {
+          margin-top: 8px;
+        }
+        :host(:last-child) {
+          margin-bottom: 8px;
+        }
+        .label {
+          font-family: system-ui, sans-serif;
+          font-size: 12px;
+          font-weight: 600;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          margin-bottom: 8px;
+          /* Adaptive text color */
+          --lume: calc(1 - var(--_key));
+          color: rgb(
+            calc(var(--lume) * 120 + 60),
+            calc(var(--lume) * 120 + 60),
+            calc(var(--lume) * 120 + 70)
+          );
+        }
+        .groove {
+          width: 100%;
+          height: 2px;
+          background: rgb(22, 22, 31);
+          border-radius: 1px;
+          margin-bottom: 12px;
+          box-shadow:
+            /* Inset shadow - based on light direction */
+            inset calc(var(--_lx) * -1px) calc(var(--_ly) * -1px) 1px 0px
+                rgba(0, 0, 0, calc(var(--_key) * 0.5)),
+            /* Highlight on opposite side */
+            inset calc(var(--_lx) * 1px) calc(var(--_ly) * 1px) 0 0
+                rgba(255, 255, 255, calc(var(--_key) * 0.15)),
+            /* Lighting overlay */
+            inset 0 0 0 100px rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * 0.8));
+        }
+        .content {
+          position: relative;
+        }
+      </style>
+      ${label ? `<div class="label" part="label">${label}</div>` : ''}
+      <div class="groove" part="groove"></div>
+      <div class="content" part="content">
+        <slot></slot>
+      </div>
+    `;
+  }
+}
+
+// --------------------------------------------------------------------------
+// amb-slider - Horizontal slider control
+// --------------------------------------------------------------------------
+class AmbSlider extends AmbientElement {
+  static get observedAttributes() {
+    return ['value', 'min', 'max', 'label', 'shade'];
+  }
+
+  constructor() {
+    super();
+    this._value = 50;
+    this._min = 0;
+    this._max = 100;
+    this._dragging = false;
+  }
+
+  connectedCallback() {
+    this.render();
+    this.setupEvents();
+  }
+
+  attributeChangedCallback(name, oldVal, newVal) {
+    if (oldVal === newVal) return;
+    switch (name) {
+      case 'value': this._value = parseFloat(newVal) || 0; break;
+      case 'min': this._min = parseFloat(newVal) || 0; break;
+      case 'max': this._max = parseFloat(newVal) || 100; break;
+    }
+    if (name === 'shade') {
+      this.render();
+    } else {
+      this.updatePosition();
+    }
+  }
+
+  get value() { return this._value; }
+  set value(v) {
+    this._value = Math.max(this._min, Math.min(this._max, v));
+    this.setAttribute('value', this._value);
+    this.updatePosition();
+    this.dispatchEvent(new CustomEvent('change', { detail: { value: this._value } }));
+  }
+
+  updatePosition() {
+    const thumb = this.shadowRoot?.querySelector('.thumb');
+    const fill = this.shadowRoot?.querySelector('.fill');
+    if (!thumb || !fill) return;
+
+    const percent = ((this._value - this._min) / (this._max - this._min)) * 100;
+    thumb.style.left = `${percent}%`;
+    fill.style.width = `${percent}%`;
+  }
+
+  setupEvents() {
+    const track = this.shadowRoot.querySelector('.track');
+
+    const updateFromPosition = (clientX) => {
+      const rect = track.getBoundingClientRect();
+      let percent = (clientX - rect.left) / rect.width;
+      percent = Math.max(0, Math.min(1, percent));
+      this.value = this._min + (percent * (this._max - this._min));
+    };
+
+    const onStart = (x) => {
+      this._dragging = true;
+      updateFromPosition(x);
+    };
+
+    const onMove = (x) => {
+      if (!this._dragging) return;
+      updateFromPosition(x);
+    };
+
+    const onEnd = () => {
+      this._dragging = false;
+    };
+
+    track.addEventListener('mousedown', (e) => { onStart(e.clientX); e.preventDefault(); });
+    track.addEventListener('touchstart', (e) => { onStart(e.touches[0].clientX); e.preventDefault(); });
+    document.addEventListener('mousemove', (e) => onMove(e.clientX));
+    document.addEventListener('touchmove', (e) => onMove(e.touches[0].clientX));
+    document.addEventListener('mouseup', onEnd);
+    document.addEventListener('touchend', onEnd);
+  }
+
+  render() {
+    const label = this.getAttribute('label') || '';
+    const shade = this.getAttribute('shade') || 'dark';
+    const isLight = shade === 'light';
+
+    const thumbBg = isLight ? 'rgb(30, 30, 40)' : 'rgb(30, 30, 40)';
+    const thumbBrightness = isLight ? 0.95 : 0.95;
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        ${AmbientElement.baseStyles}
+        :host {
+          display: inline-flex;
+          flex-direction: column;
+          gap: 8px;
+          min-width: 120px;
+        }
+        .track {
+          position: relative;
+          height: 6px;
+          background: #222;
+          border-radius: 3px;
+          cursor: pointer;
+          box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+        .fill {
+          position: absolute;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          width: 50%;
+          background: var(--_accent);
+          border-radius: 3px;
+          pointer-events: none;
+        }
+        .thumb {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 16px;
+          height: 16px;
+          background: ${thumbBg};
+          border-radius: 50%;
+          transform: translate(-50%, -50%);
+          cursor: grab;
+          box-shadow:
+            /* Drop shadow */
+            rgba(0, 0, 0, calc(var(--_key, 0.3) - var(--_fill, 0) + 0.1))
+              calc(var(--_lx, 1) * -2px)
+              calc(var(--_ly, -1) * -2px)
+              4px 0px,
+            /* Edge highlight */
+            inset
+              calc(var(--_lx, 1) * -1px)
+              calc(var(--_ly, -1) * -1px)
+              0px 0px
+              rgba(var(--_light-r, 255), var(--_light-g, 255), var(--_light-b, 255), calc(var(--_key, 0.3) * 0.6)),
+            /* Edge shadow */
+            inset
+              calc(var(--_lx, 1) * 1px)
+              calc(var(--_ly, -1) * 1px)
+              0px 0px
+              rgba(0, 0, 0, calc(var(--_key, 0.3) * 0.2)),
+            /* Lighting overlay */
+            inset 0 0 0 100px rgba(var(--_light-r, 255), var(--_light-g, 255), var(--_light-b, 255), calc(var(--_key, 0.3) * ${thumbBrightness}));
+        }
+        .thumb:active { cursor: grabbing; }
+        .label {
+          font-family: system-ui, sans-serif;
+          font-size: 9px;
+          font-weight: 600;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          /* Adaptive text color */
+          --lume: calc(1 - var(--_key));
+          color: rgb(
+            calc(var(--lume) * 120 + 60),
+            calc(var(--lume) * 120 + 60),
+            calc(var(--lume) * 120 + 70)
+          );
+        }
+      </style>
+      ${label ? `<span class="label" part="label">${label}</span>` : ''}
+      <div class="track" part="track">
+        <div class="fill" part="fill"></div>
+        <div class="thumb" part="thumb"></div>
+      </div>
+    `;
+    this.updatePosition();
+  }
+}
+
+// --------------------------------------------------------------------------
 // Register all components
 // --------------------------------------------------------------------------
 customElements.define('amb-knob', AmbKnob);
@@ -1017,8 +1270,10 @@ customElements.define('amb-jack', AmbJack);
 customElements.define('amb-led', AmbLed);
 customElements.define('amb-button', AmbButton);
 customElements.define('amb-panel', AmbPanel);
+customElements.define('amb-subpanel', AmbSubpanel);
+customElements.define('amb-slider', AmbSlider);
 
 // Export for module usage
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { AmbKnob, AmbFader, AmbSwitch, AmbJack, AmbLed, AmbButton, AmbPanel };
+  module.exports = { AmbKnob, AmbFader, AmbSwitch, AmbJack, AmbLed, AmbButton, AmbPanel, AmbSubpanel, AmbSlider };
 }

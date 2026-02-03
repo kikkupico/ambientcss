@@ -116,6 +116,18 @@
             box-shadow:
                 inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.15)) !important;
         }
+        body.material-flat amb-slider::part(track) {
+            box-shadow:
+                inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.8)) !important;
+        }
+        body.material-flat amb-slider::part(thumb) {
+            box-shadow:
+                inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.95)) !important;
+        }
+        body.material-flat amb-subpanel::part(groove) {
+            box-shadow:
+                inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.8)) !important;
+        }
         body.material-flat .demo-box.ambient {
             box-shadow:
                 inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.95)) !important;
@@ -430,6 +442,38 @@
                 &nbsp;&nbsp;<span class="tag">&lt;amb-fader</span> <span class="attr">value</span>=<span class="val">"75"</span> <span class="attr">label</span>=<span class="val">"LEVEL"</span><span class="tag">&gt;&lt;/amb-fader&gt;</span><br>
                 &nbsp;&nbsp;<span class="tag">&lt;amb-switch</span> <span class="attr">on</span> <span class="attr">label</span>=<span class="val">"AUTO"</span><span class="tag">&gt;&lt;/amb-switch&gt;</span><br>
                 &nbsp;&nbsp;<span class="tag">&lt;amb-led</span> <span class="attr">color</span>=<span class="val">"green"</span> <span class="attr">on</span><span class="tag">&gt;&lt;/amb-led&gt;</span><br>
+                <span class="tag">&lt;/amb-panel&gt;</span>
+            </div>
+
+            <!-- Subpanel and Slider demo -->
+            <amb-panel screws shade="light">
+                <div class="module-header">
+                    <div class="module-title amb-lume">MIXER</div>
+                    <div class="module-subtitle amb-lume-muted">Subpanels & Sliders</div>
+                </div>
+
+                <amb-subpanel label="EQ">
+                    <div class="controls">
+                        <amb-slider value="60" label="LOW" shade="light"></amb-slider>
+                        <amb-slider value="50" label="MID" shade="light"></amb-slider>
+                        <amb-slider value="70" label="HIGH" shade="light"></amb-slider>
+                    </div>
+                </amb-subpanel>
+
+                <amb-subpanel label="DYNAMICS">
+                    <div class="controls">
+                        <amb-slider value="40" label="THRESHOLD" shade="light"></amb-slider>
+                        <amb-slider value="65" label="RATIO" shade="light"></amb-slider>
+                    </div>
+                </amb-subpanel>
+            </amb-panel>
+
+            <div class="code-example amb-lume-muted">
+                <span class="tag">&lt;amb-panel</span> <span class="attr">screws</span><span class="tag">&gt;</span><br>
+                &nbsp;&nbsp;<span class="tag">&lt;amb-subpanel</span> <span class="attr">label</span>=<span class="val">"EQ"</span><span class="tag">&gt;</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;amb-slider</span> <span class="attr">value</span>=<span class="val">"60"</span> <span class="attr">label</span>=<span class="val">"LOW"</span><span class="tag">&gt;&lt;/amb-slider&gt;</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;amb-slider</span> <span class="attr">value</span>=<span class="val">"50"</span> <span class="attr">label</span>=<span class="val">"MID"</span><span class="tag">&gt;&lt;/amb-slider&gt;</span><br>
+                &nbsp;&nbsp;<span class="tag">&lt;/amb-subpanel&gt;</span><br>
                 <span class="tag">&lt;/amb-panel&gt;</span>
             </div>
         </section>
