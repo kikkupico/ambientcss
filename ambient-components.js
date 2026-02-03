@@ -1,5 +1,5 @@
 // ==========================================================================
-// Ambient Components v0.1
+// Ambient Components v0.2
 // Skeuomorphic Web Components
 //
 // Realistic UI controls - knobs, faders, switches, buttons, indicators.
@@ -16,7 +16,6 @@ class AmbientElement extends HTMLElement {
   }
 
   // Shared styles that all components inherit
-  // Uses the same lighting model as ambient.css
   static get baseStyles() {
     return `
       :host {
@@ -45,8 +44,163 @@ class AmbientElement extends HTMLElement {
 
         /* Accent color */
         --_accent: var(--amb-accent, rgb(255, 140, 50));
+
+        /* Surface colors */
+        --_surface-dark: var(--amb-surface-dark, 35, 35, 45);
+        --_surface-light: var(--amb-surface-light, 40, 40, 52);
+        --_surface-inset: var(--amb-surface-inset, 20, 20, 28);
+        --_handle: var(--amb-handle, 160, 160, 160);
       }
     `;
+  }
+
+  // Shared label styles
+  static get labelStyles() {
+    return `
+      .label {
+        font-family: system-ui, sans-serif;
+        font-size: 9px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--amb-label-color, var(--amb-text-muted, #888));
+      }
+    `;
+  }
+
+  // Lume text styles (adaptive to lighting) - dark in bright light, light in dark
+  static get lumeStyles() {
+    return `
+      .lume {
+        color: #777;
+        color: color-mix(
+          in srgb,
+          #404048 calc(var(--_key) * 100%),
+          #a8a8b0
+        );
+      }
+    `;
+  }
+
+  // Box-shadow generator for consistent shadows across components
+  static shadow({ drop, highlight, shadowEdge, overlay, inset = false } = {}) {
+    const parts = [];
+
+    if (drop && !inset) {
+      parts.push(`
+        rgba(0, 0, 0, calc(var(--_key) - var(--_fill) + ${drop.opacity || 0.1}))
+          calc(var(--_lx) * ${drop.x || -2}px)
+          calc(var(--_ly) * ${drop.y || -2}px)
+          ${drop.blur || 4}px
+          ${drop.spread || 0}px
+      `);
+    }
+
+    if (inset && drop) {
+      parts.push(`
+        inset
+          calc(var(--_lx) * ${drop.x || -3}px)
+          calc(var(--_ly) * ${drop.y || -3}px)
+          ${drop.blur || 6}px
+          ${drop.spread || 0}px
+          rgba(0, 0, 0, calc(var(--_key) * ${drop.opacity || 0.4}))
+      `);
+    }
+
+    if (highlight) {
+      parts.push(`
+        inset
+          calc(var(--_lx) * -${highlight.width || 1}px)
+          calc(var(--_ly) * -${highlight.width || 1}px)
+          ${highlight.blur || 0}px 0px
+          rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * ${highlight.opacity || 0.5}))
+      `);
+    }
+
+    if (shadowEdge) {
+      parts.push(`
+        inset
+          calc(var(--_lx) * ${shadowEdge.width || 1}px)
+          calc(var(--_ly) * ${shadowEdge.width || 1}px)
+          ${shadowEdge.blur || 0}px 0px
+          rgba(0, 0, 0, calc(var(--_key) * ${shadowEdge.opacity || 0.3}))
+      `);
+    }
+
+    if (overlay) {
+      parts.push(`
+        inset 0 0 0 ${overlay.spread || 100}px
+          rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * ${overlay.opacity || 0.15}))
+      `);
+    }
+
+    return parts.join(',');
+  }
+
+  // Shade configuration for light/dark variants
+  static shadeConfig(shade) {
+    const isLight = shade === 'light';
+    return {
+      isLight,
+      bg: isLight ? 'rgb(var(--_surface-light))' : 'rgb(var(--_surface-dark))',
+      bgRaw: isLight ? 'var(--_surface-light)' : 'var(--_surface-dark)',
+      innerBg: isLight ? 'rgb(28, 28, 38)' : 'rgb(var(--_surface-light))',
+      highlightMult: isLight ? 0.5 : 0.3,
+      brightnessMult: isLight ? 0.95 : 0.15,
+      innerBrightness: isLight ? 0.85 : 0.1,
+      indicatorColor: isLight ? '#333' : '#fff',
+      indicatorGlow: isLight ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.5)',
+    };
+  }
+
+  // Setup drag behavior for knobs/faders/sliders
+  setupDrag(element, { onStart, onMove, onEnd, getCoord = (e) => e.clientY }) {
+    const start = (e) => {
+      const coord = e.touches ? getCoord(e.touches[0]) : getCoord(e);
+      onStart?.(coord, e);
+      e.preventDefault();
+    };
+
+    const move = (e) => {
+      const coord = e.touches ? getCoord(e.touches[0]) : getCoord(e);
+      onMove?.(coord, e);
+    };
+
+    const end = () => {
+      onEnd?.();
+    };
+
+    element.addEventListener('mousedown', start);
+    element.addEventListener('touchstart', start);
+    document.addEventListener('mousemove', move);
+    document.addEventListener('touchmove', move);
+    document.addEventListener('mouseup', end);
+    document.addEventListener('touchend', end);
+  }
+
+  // Initialize value properties (min, max, value)
+  initValue(min = 0, max = 100, initial = 50) {
+    this._value = initial;
+    this._min = min;
+    this._max = max;
+  }
+
+  // Initialize toggle property
+  initToggle(propName, initial = false) {
+    this[`_${propName}`] = initial;
+  }
+
+  // Check if component is in flat material mode
+  get isFlat() {
+    return this.hasAttribute('material') && this.getAttribute('material') === 'flat';
+  }
+
+  // Get flat-aware box-shadow
+  getFlatShadow(normalShadow, flatOverlayOpacity = 0.15) {
+    if (this.isFlat) {
+      return `inset 0 0 0 100px rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * ${flatOverlayOpacity}))`;
+    }
+    return normalShadow;
   }
 }
 
@@ -55,14 +209,12 @@ class AmbientElement extends HTMLElement {
 // --------------------------------------------------------------------------
 class AmbKnob extends AmbientElement {
   static get observedAttributes() {
-    return ['value', 'min', 'max', 'size', 'label', 'shade'];
+    return ['value', 'min', 'max', 'size', 'label', 'shade', 'material'];
   }
 
   constructor() {
     super();
-    this._value = 50;
-    this._min = 0;
-    this._max = 100;
+    this.initValue(0, 100, 50);
     this._dragging = false;
     this._startY = 0;
     this._startValue = 0;
@@ -79,6 +231,11 @@ class AmbKnob extends AmbientElement {
       case 'value': this._value = parseFloat(newVal) || 0; break;
       case 'min': this._min = parseFloat(newVal) || 0; break;
       case 'max': this._max = parseFloat(newVal) || 100; break;
+      case 'shade':
+      case 'material':
+        this.render();
+        this.setupEvents();
+        return;
     }
     this.updateRotation();
   }
@@ -101,55 +258,57 @@ class AmbKnob extends AmbientElement {
 
   setupEvents() {
     const knob = this.shadowRoot.querySelector('.knob');
+    if (!knob) return;
 
-    const onStart = (y) => {
-      this._dragging = true;
-      this._startY = y;
-      this._startValue = this._value;
-      knob.classList.add('grabbing');
-    };
-
-    const onMove = (y) => {
-      if (!this._dragging) return;
-      const delta = this._startY - y;
-      const range = this._max - this._min;
-      const sensitivity = range / 150;
-      this.value = this._startValue + (delta * sensitivity);
-    };
-
-    const onEnd = () => {
-      this._dragging = false;
-      knob.classList.remove('grabbing');
-    };
-
-    knob.addEventListener('mousedown', (e) => { onStart(e.clientY); e.preventDefault(); });
-    knob.addEventListener('touchstart', (e) => { onStart(e.touches[0].clientY); e.preventDefault(); });
-    document.addEventListener('mousemove', (e) => onMove(e.clientY));
-    document.addEventListener('touchmove', (e) => onMove(e.touches[0].clientY));
-    document.addEventListener('mouseup', onEnd);
-    document.addEventListener('touchend', onEnd);
+    this.setupDrag(knob, {
+      onStart: (y) => {
+        this._dragging = true;
+        this._startY = y;
+        this._startValue = this._value;
+        knob.classList.add('grabbing');
+      },
+      onMove: (y) => {
+        if (!this._dragging) return;
+        const delta = this._startY - y;
+        const range = this._max - this._min;
+        const sensitivity = range / 150;
+        this.value = this._startValue + (delta * sensitivity);
+      },
+      onEnd: () => {
+        this._dragging = false;
+        knob.classList.remove('grabbing');
+      },
+      getCoord: (e) => e.clientY
+    });
   }
 
   render() {
     const size = this.getAttribute('size') || 'medium';
     const label = this.getAttribute('label') || '';
-    const shade = this.getAttribute('shade') || 'dark';
+    const s = AmbientElement.shadeConfig(this.getAttribute('shade'));
     const sizeMap = { small: 40, medium: 52, large: 64 };
     const sz = sizeMap[size] || 52;
 
-    const isLight = shade === 'light';
-    // Light shade responds to global lighting like background (base ~background, high brightness mult)
-    const knobBg = isLight ? 'rgb(30, 30, 40)' : 'rgb(35, 35, 45)';
-    const knobInnerBg = isLight ? 'rgb(28, 28, 38)' : 'rgb(30, 30, 40)';
-    const highlightMult = isLight ? 0.5 : 0.3;
-    const brightnessMult = isLight ? 0.95 : 0.15;
-    const innerBrightness = isLight ? 0.85 : 0.1;
-    const indicatorColor = isLight ? '#333' : '#fff';
-    const indicatorGlow = isLight ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.5)';
+    const knobShadow = this.getFlatShadow(
+      AmbientElement.shadow({
+        drop: { opacity: 0.2, x: -4, y: -4, blur: 8 },
+        highlight: { width: 1, blur: 2, opacity: s.highlightMult },
+        shadowEdge: { width: 1, blur: 2, opacity: 0.5 },
+        overlay: { spread: 100, opacity: s.brightnessMult }
+      }),
+      s.brightnessMult
+    );
+
+    const innerShadow = this.getFlatShadow(
+      `inset 0 2px 6px rgba(0, 0, 0, ${s.isLight ? '0.3' : '0.5'}),
+       inset 0 0 0 100px rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * ${s.innerBrightness}))`,
+      s.innerBrightness
+    );
 
     this.shadowRoot.innerHTML = `
       <style>
         ${AmbientElement.baseStyles}
+        ${AmbientElement.labelStyles}
         :host {
           display: inline-flex;
           flex-direction: column;
@@ -162,28 +321,8 @@ class AmbKnob extends AmbientElement {
           border-radius: 50%;
           cursor: grab;
           position: relative;
-          background: ${knobBg};
-          box-shadow:
-            /* Drop shadow based on light direction */
-            rgba(0, 0, 0, calc(var(--_key) - var(--_fill) + 0.2))
-              calc(var(--_lx) * var(--_elevation) * -4px)
-              calc(var(--_ly) * var(--_elevation) * -4px)
-              calc(var(--_elevation) * 8px)
-              0px,
-            /* Highlight edge */
-            inset
-              calc(var(--_lx) * -1px)
-              calc(var(--_ly) * -1px)
-              2px 0px
-              rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * ${highlightMult})),
-            /* Shadow edge */
-            inset
-              calc(var(--_lx) * 1px)
-              calc(var(--_ly) * 1px)
-              2px 0px
-              rgba(0, 0, 0, calc(var(--_key) * 0.5)),
-            /* Brightness from key light */
-            inset 0 0 0 100px rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * ${brightnessMult}));
+          background: ${s.bg};
+          box-shadow: ${knobShadow};
         }
         .knob.grabbing { cursor: grabbing; }
         .knob-inner {
@@ -193,10 +332,8 @@ class AmbKnob extends AmbientElement {
           right: 3px;
           bottom: 3px;
           border-radius: 50%;
-          background: ${knobInnerBg};
-          box-shadow:
-            inset 0 2px 6px rgba(0, 0, 0, ${isLight ? '0.3' : '0.5'}),
-            inset 0 0 0 100px rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * ${innerBrightness}));
+          background: ${s.innerBg};
+          box-shadow: ${innerShadow};
         }
         .knob-rotation {
           position: absolute;
@@ -211,18 +348,10 @@ class AmbKnob extends AmbientElement {
           left: 50%;
           width: 3px;
           height: 8px;
-          background: ${indicatorColor};
+          background: ${s.indicatorColor};
           border-radius: 2px;
           transform: translateX(-50%);
-          box-shadow: 0 0 4px ${indicatorGlow};
-        }
-        .label {
-          font-family: system-ui, sans-serif;
-          font-size: 9px;
-          font-weight: 600;
-          letter-spacing: 1px;
-          text-transform: uppercase;
-          color: var(--amb-label-color, var(--amb-text-muted, #888));
+          box-shadow: 0 0 4px ${s.indicatorGlow};
         }
       </style>
       <div class="knob" part="knob">
@@ -238,18 +367,16 @@ class AmbKnob extends AmbientElement {
 }
 
 // --------------------------------------------------------------------------
-// amb-fader - Linear slider control
+// amb-range - Base class for linear range controls (fader, slider)
 // --------------------------------------------------------------------------
-class AmbFader extends AmbientElement {
+class AmbRangeControl extends AmbientElement {
   static get observedAttributes() {
-    return ['value', 'min', 'max', 'orientation', 'label'];
+    return ['value', 'min', 'max', 'label', 'shade', 'material'];
   }
 
   constructor() {
     super();
-    this._value = 50;
-    this._min = 0;
-    this._max = 100;
+    this.initValue(0, 100, 50);
     this._dragging = false;
   }
 
@@ -264,6 +391,11 @@ class AmbFader extends AmbientElement {
       case 'value': this._value = parseFloat(newVal) || 0; break;
       case 'min': this._min = parseFloat(newVal) || 0; break;
       case 'max': this._max = parseFloat(newVal) || 100; break;
+      case 'shade':
+      case 'material':
+        this.render();
+        this.setupEvents();
+        return;
     }
     this.updatePosition();
   }
@@ -274,6 +406,71 @@ class AmbFader extends AmbientElement {
     this.setAttribute('value', this._value);
     this.updatePosition();
     this.dispatchEvent(new CustomEvent('change', { detail: { value: this._value } }));
+  }
+
+  // To be implemented by subclasses
+  get isVertical() { return false; }
+  updatePosition() {}
+  render() {}
+
+  setupEvents() {
+    const track = this.shadowRoot?.querySelector('.track');
+    if (!track) return;
+
+    const updateFromPosition = (clientX, clientY) => {
+      const rect = track.getBoundingClientRect();
+      let percent;
+
+      if (this.isVertical) {
+        percent = 1 - ((clientY - rect.top) / rect.height);
+      } else {
+        percent = (clientX - rect.left) / rect.width;
+      }
+
+      percent = Math.max(0, Math.min(1, percent));
+      this.value = this._min + (percent * (this._max - this._min));
+    };
+
+    this.setupDrag(track, {
+      onStart: (_, e) => {
+        this._dragging = true;
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        updateFromPosition(clientX, clientY);
+      },
+      onMove: (_, e) => {
+        if (!this._dragging) return;
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        updateFromPosition(clientX, clientY);
+      },
+      onEnd: () => {
+        this._dragging = false;
+      },
+      getCoord: () => 0 // We handle coords in the callbacks
+    });
+  }
+
+  // Shared handle shadow
+  getHandleShadow() {
+    return this.getFlatShadow(
+      AmbientElement.shadow({
+        drop: { opacity: 0.1, x: -2, y: -2, blur: 4 },
+        highlight: { width: 1, opacity: 0.8 },
+        shadowEdge: { width: 1, opacity: 0.2 },
+        overlay: { spread: 100, opacity: 0.3 }
+      }),
+      0.3
+    );
+  }
+}
+
+// --------------------------------------------------------------------------
+// amb-fader - Vertical linear slider control
+// --------------------------------------------------------------------------
+class AmbFader extends AmbRangeControl {
+  static get observedAttributes() {
+    return ['value', 'min', 'max', 'orientation', 'label', 'material'];
   }
 
   get isVertical() {
@@ -297,45 +494,6 @@ class AmbFader extends AmbientElement {
     }
   }
 
-  setupEvents() {
-    const track = this.shadowRoot.querySelector('.track');
-
-    const updateFromPosition = (clientX, clientY) => {
-      const rect = track.getBoundingClientRect();
-      let percent;
-
-      if (this.isVertical) {
-        percent = 1 - ((clientY - rect.top) / rect.height);
-      } else {
-        percent = (clientX - rect.left) / rect.width;
-      }
-
-      percent = Math.max(0, Math.min(1, percent));
-      this.value = this._min + (percent * (this._max - this._min));
-    };
-
-    const onStart = (x, y) => {
-      this._dragging = true;
-      updateFromPosition(x, y);
-    };
-
-    const onMove = (x, y) => {
-      if (!this._dragging) return;
-      updateFromPosition(x, y);
-    };
-
-    const onEnd = () => {
-      this._dragging = false;
-    };
-
-    track.addEventListener('mousedown', (e) => { onStart(e.clientX, e.clientY); e.preventDefault(); });
-    track.addEventListener('touchstart', (e) => { onStart(e.touches[0].clientX, e.touches[0].clientY); e.preventDefault(); });
-    document.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY));
-    document.addEventListener('touchmove', (e) => onMove(e.touches[0].clientX, e.touches[0].clientY));
-    document.addEventListener('mouseup', onEnd);
-    document.addEventListener('touchend', onEnd);
-  }
-
   render() {
     const label = this.getAttribute('label') || '';
     const isVert = this.isVertical;
@@ -343,6 +501,7 @@ class AmbFader extends AmbientElement {
     this.shadowRoot.innerHTML = `
       <style>
         ${AmbientElement.baseStyles}
+        ${AmbientElement.labelStyles}
         :host {
           display: inline-flex;
           flex-direction: column;
@@ -351,7 +510,7 @@ class AmbFader extends AmbientElement {
         }
         .track {
           position: relative;
-          background: #222;
+          background: rgb(var(--_surface-inset));
           border-radius: 4px;
           box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
           cursor: pointer;
@@ -367,37 +526,14 @@ class AmbFader extends AmbientElement {
           position: absolute;
           width: ${isVert ? '16px' : '16px'};
           height: ${isVert ? '24px' : '16px'};
-          background: rgb(160, 160, 160);
+          background: rgb(var(--_handle));
           border-radius: 3px;
           transform: translate(-50%, -50%);
           cursor: grab;
-          box-shadow:
-            rgba(0, 0, 0, calc(var(--_key) - var(--_fill) + 0.1))
-              calc(var(--_lx) * -2px)
-              calc(var(--_ly) * -2px)
-              4px 0px,
-            inset
-              calc(var(--_lx) * -1px)
-              calc(var(--_ly) * -1px)
-              0px 0px
-              rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * 0.8)),
-            inset
-              calc(var(--_lx) * 1px)
-              calc(var(--_ly) * 1px)
-              0px 0px
-              rgba(0, 0, 0, calc(var(--_key) * 0.2)),
-            inset 0 0 0 100px rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * 0.3));
+          box-shadow: ${this.getHandleShadow()};
           ${isVert ? 'left: 50%; top: 50%;' : 'top: 50%; left: 50%;'}
         }
         .handle:active { cursor: grabbing; }
-        .label {
-          font-family: system-ui, sans-serif;
-          font-size: 9px;
-          font-weight: 600;
-          letter-spacing: 1px;
-          text-transform: uppercase;
-          color: var(--amb-text-muted, #888);
-        }
       </style>
       <div class="track" part="track">
         <div class="fill" part="fill"></div>
@@ -410,16 +546,111 @@ class AmbFader extends AmbientElement {
 }
 
 // --------------------------------------------------------------------------
+// amb-slider - Horizontal slider control
+// --------------------------------------------------------------------------
+class AmbSlider extends AmbRangeControl {
+  get isVertical() { return false; }
+
+  updatePosition() {
+    const thumb = this.shadowRoot?.querySelector('.thumb');
+    const fill = this.shadowRoot?.querySelector('.fill');
+    if (!thumb || !fill) return;
+
+    const percent = ((this._value - this._min) / (this._max - this._min)) * 100;
+    thumb.style.left = `${percent}%`;
+    fill.style.width = `${percent}%`;
+  }
+
+  render() {
+    const label = this.getAttribute('label') || '';
+    const s = AmbientElement.shadeConfig(this.getAttribute('shade'));
+
+    const thumbShadow = this.getFlatShadow(
+      AmbientElement.shadow({
+        drop: { opacity: 0.1, x: -2, y: -2, blur: 4 },
+        highlight: { width: 1, opacity: 0.6 },
+        shadowEdge: { width: 1, opacity: 0.2 },
+        overlay: { spread: 100, opacity: s.brightnessMult }
+      }),
+      s.brightnessMult
+    );
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        ${AmbientElement.baseStyles}
+        ${AmbientElement.lumeStyles}
+        :host {
+          display: inline-flex;
+          flex-direction: column;
+          gap: 8px;
+          min-width: 120px;
+        }
+        .track {
+          position: relative;
+          height: 6px;
+          background: rgb(var(--_surface-inset));
+          border-radius: 3px;
+          cursor: pointer;
+          box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+        .fill {
+          position: absolute;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          width: 50%;
+          background: var(--_accent);
+          border-radius: 3px;
+          pointer-events: none;
+        }
+        .thumb {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 16px;
+          height: 16px;
+          background: ${s.bg};
+          border-radius: 50%;
+          transform: translate(-50%, -50%);
+          cursor: grab;
+          box-shadow: ${thumbShadow};
+        }
+        .thumb:active { cursor: grabbing; }
+        .label {
+          font-family: system-ui, sans-serif;
+          font-size: 9px;
+          font-weight: 600;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          color: #777;
+          color: color-mix(
+            in srgb,
+            #404048 calc(var(--_key) * 100%),
+            #a8a8b0
+          );
+        }
+      </style>
+      ${label ? `<span class="label" part="label">${label}</span>` : ''}
+      <div class="track" part="track">
+        <div class="fill" part="fill"></div>
+        <div class="thumb" part="thumb"></div>
+      </div>
+    `;
+    this.updatePosition();
+  }
+}
+
+// --------------------------------------------------------------------------
 // amb-switch - Toggle switch
 // --------------------------------------------------------------------------
 class AmbSwitch extends AmbientElement {
   static get observedAttributes() {
-    return ['on', 'label'];
+    return ['on', 'label', 'material'];
   }
 
   constructor() {
     super();
-    this._on = false;
+    this.initToggle('on', false);
   }
 
   connectedCallback() {
@@ -431,6 +662,9 @@ class AmbSwitch extends AmbientElement {
     if (name === 'on') {
       this._on = newVal !== null;
       this.updateState();
+    } else if (name === 'material') {
+      this.render();
+      this.setupEvents();
     }
   }
 
@@ -465,15 +699,34 @@ class AmbSwitch extends AmbientElement {
   }
 
   setupEvents() {
-    this.shadowRoot.querySelector('.track').addEventListener('click', () => this.toggle());
+    const track = this.shadowRoot?.querySelector('.track');
+    if (track) {
+      track.addEventListener('click', () => this.toggle());
+    }
   }
 
   render() {
     const label = this.getAttribute('label') || '';
 
+    const trackShadow = this.getFlatShadow(
+      `inset 0 2px 4px rgba(0, 0, 0, 0.5),
+       inset 0 0 0 100px rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * 0.05))`,
+      0.05
+    );
+
+    const handleShadow = this.getFlatShadow(
+      AmbientElement.shadow({
+        drop: { opacity: 0.1, x: -1, y: -1, blur: 3 },
+        highlight: { width: 1, opacity: 0.8 },
+        overlay: { spread: 100, opacity: 0.3 }
+      }),
+      0.3
+    );
+
     this.shadowRoot.innerHTML = `
       <style>
         ${AmbientElement.baseStyles}
+        ${AmbientElement.labelStyles}
         :host {
           display: inline-flex;
           flex-direction: column;
@@ -483,19 +736,19 @@ class AmbSwitch extends AmbientElement {
         .track {
           width: 36px;
           height: 20px;
-          background: rgb(25, 25, 35);
+          background: rgb(var(--_surface-inset));
           border-radius: 4px;
           position: relative;
           cursor: pointer;
-          box-shadow:
-            inset 0 2px 4px rgba(0, 0, 0, 0.5),
-            inset 0 0 0 100px rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * 0.05));
+          box-shadow: ${trackShadow};
           transition: box-shadow 0.15s ease;
         }
         .track.on {
-          box-shadow:
-            inset 0 2px 4px rgba(0, 0, 0, 0.5),
-            inset 0 0 0 100px rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * 0.1));
+          box-shadow: ${this.getFlatShadow(
+            `inset 0 2px 4px rgba(0, 0, 0, 0.5),
+             inset 0 0 0 100px rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * 0.1))`,
+            0.1
+          )};
         }
         .handle {
           position: absolute;
@@ -503,28 +756,10 @@ class AmbSwitch extends AmbientElement {
           left: 3px;
           width: 14px;
           height: 14px;
-          background: rgb(160, 160, 160);
+          background: rgb(var(--_handle));
           border-radius: 3px;
           transition: left 0.15s ease;
-          box-shadow:
-            rgba(0, 0, 0, calc(var(--_key) + 0.1))
-              calc(var(--_lx) * -1px)
-              calc(var(--_ly) * -1px)
-              3px 0px,
-            inset
-              calc(var(--_lx) * -1px)
-              calc(var(--_ly) * -1px)
-              0px 0px
-              rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * 0.8)),
-            inset 0 0 0 100px rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * 0.3));
-        }
-        .label {
-          font-family: system-ui, sans-serif;
-          font-size: 9px;
-          font-weight: 600;
-          letter-spacing: 1px;
-          text-transform: uppercase;
-          color: var(--amb-text-muted, #888);
+          box-shadow: ${handleShadow};
         }
       </style>
       <div class="track" part="track">
@@ -541,12 +776,12 @@ class AmbSwitch extends AmbientElement {
 // --------------------------------------------------------------------------
 class AmbJack extends AmbientElement {
   static get observedAttributes() {
-    return ['connected', 'label'];
+    return ['connected', 'label', 'material'];
   }
 
   constructor() {
     super();
-    this._connected = false;
+    this.initToggle('connected', false);
   }
 
   connectedCallback() {
@@ -558,6 +793,9 @@ class AmbJack extends AmbientElement {
     if (name === 'connected') {
       this._connected = newVal !== null;
       this.updateState();
+    } else if (name === 'material') {
+      this.render();
+      this.setupEvents();
     }
   }
 
@@ -580,17 +818,30 @@ class AmbJack extends AmbientElement {
   }
 
   setupEvents() {
-    this.shadowRoot.querySelector('.jack').addEventListener('click', () => {
-      this.connected = !this._connected;
-    });
+    const jack = this.shadowRoot?.querySelector('.jack');
+    if (jack) {
+      jack.addEventListener('click', () => {
+        this.connected = !this._connected;
+      });
+    }
   }
 
   render() {
     const label = this.getAttribute('label') || '';
 
+    const jackShadow = this.getFlatShadow(
+      AmbientElement.shadow({
+        drop: { opacity: 0.1, x: -2, y: -2, blur: 4 },
+        highlight: { width: 1, opacity: 0.4 },
+        overlay: { spread: 100, opacity: 0.15 }
+      }),
+      0.15
+    );
+
     this.shadowRoot.innerHTML = `
       <style>
         ${AmbientElement.baseStyles}
+        ${AmbientElement.labelStyles}
         :host {
           display: inline-flex;
           flex-direction: column;
@@ -602,17 +853,7 @@ class AmbJack extends AmbientElement {
           height: 28px;
           border-radius: 50%;
           background: rgb(90, 90, 100);
-          box-shadow:
-            rgba(0, 0, 0, calc(var(--_key) - var(--_fill) + 0.1))
-              calc(var(--_lx) * var(--_elevation) * -2px)
-              calc(var(--_ly) * var(--_elevation) * -2px)
-              calc(var(--_elevation) * 4px) 0px,
-            inset
-              calc(var(--_lx) * -1px)
-              calc(var(--_ly) * -1px)
-              1px 0px
-              rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * 0.4)),
-            inset 0 0 0 100px rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * 0.15));
+          box-shadow: ${jackShadow};
           cursor: pointer;
           position: relative;
           transition: transform 0.15s ease;
@@ -627,7 +868,7 @@ class AmbJack extends AmbientElement {
           right: 6px;
           bottom: 6px;
           border-radius: 50%;
-          background: #222;
+          background: rgb(var(--_surface-inset));
           box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
         }
         .jack.connected .jack-inner::after {
@@ -641,13 +882,6 @@ class AmbJack extends AmbientElement {
           border-radius: 50%;
           transform: translate(-50%, -50%);
           box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
-        }
-        .label {
-          font-family: system-ui, sans-serif;
-          font-size: 9px;
-          font-weight: 600;
-          letter-spacing: 0.5px;
-          color: var(--amb-text-muted, #888);
         }
       </style>
       <div class="jack" part="jack">
@@ -669,7 +903,7 @@ class AmbLed extends AmbientElement {
 
   constructor() {
     super();
-    this._on = false;
+    this.initToggle('on', false);
   }
 
   connectedCallback() {
@@ -709,7 +943,10 @@ class AmbLed extends AmbientElement {
   }
 
   setupEvents() {
-    this.shadowRoot.querySelector('.led').addEventListener('click', () => this.toggle());
+    const led = this.shadowRoot?.querySelector('.led');
+    if (led) {
+      led.addEventListener('click', () => this.toggle());
+    }
   }
 
   render() {
@@ -727,6 +964,7 @@ class AmbLed extends AmbientElement {
     this.shadowRoot.innerHTML = `
       <style>
         ${AmbientElement.baseStyles}
+        ${AmbientElement.labelStyles}
         :host {
           display: inline-flex;
           flex-direction: column;
@@ -738,21 +976,13 @@ class AmbLed extends AmbientElement {
           width: 6px;
           height: 6px;
           border-radius: 50%;
-          background: #2a2a3a;
+          background: rgb(var(--_surface-dark));
           cursor: pointer;
           transition: all 0.15s ease;
         }
         .led.on {
           background: var(--led-color);
           box-shadow: 0 0 8px var(--led-color);
-        }
-        .label {
-          font-family: system-ui, sans-serif;
-          font-size: 9px;
-          font-weight: 600;
-          letter-spacing: 1px;
-          text-transform: uppercase;
-          color: var(--amb-text-muted, #888);
         }
       </style>
       <div class="led" part="led"></div>
@@ -767,12 +997,12 @@ class AmbLed extends AmbientElement {
 // --------------------------------------------------------------------------
 class AmbButton extends AmbientElement {
   static get observedAttributes() {
-    return ['active', 'label', 'momentary'];
+    return ['active', 'label', 'momentary', 'material'];
   }
 
   constructor() {
     super();
-    this._active = false;
+    this.initToggle('active', false);
   }
 
   connectedCallback() {
@@ -784,6 +1014,9 @@ class AmbButton extends AmbientElement {
     if (name === 'active') {
       this._active = newVal !== null;
       this.updateState();
+    } else if (name === 'material') {
+      this.render();
+      this.setupEvents();
     }
   }
 
@@ -810,7 +1043,8 @@ class AmbButton extends AmbientElement {
   }
 
   setupEvents() {
-    const btn = this.shadowRoot.querySelector('.button');
+    const btn = this.shadowRoot?.querySelector('.button');
+    if (!btn) return;
 
     if (this.isMomentary) {
       btn.addEventListener('mousedown', () => { this.active = true; });
@@ -825,6 +1059,26 @@ class AmbButton extends AmbientElement {
 
   render() {
     const label = this.getAttribute('label') || '';
+
+    const buttonShadow = this.getFlatShadow(
+      AmbientElement.shadow({
+        drop: { opacity: 0.05, x: -2, y: -2, blur: 4 },
+        highlight: { width: 1, opacity: 0.8 },
+        shadowEdge: { width: 1, opacity: 0.15 },
+        overlay: { spread: 100, opacity: 0.3 }
+      }),
+      0.3
+    );
+
+    const activeShadow = this.getFlatShadow(
+      AmbientElement.shadow({
+        drop: { opacity: 0.05, x: -2, y: -2, blur: 4 },
+        highlight: { width: 1, opacity: 0.2 },
+        shadowEdge: { width: 1, opacity: 0.3 },
+        overlay: { spread: 100, opacity: 0.1 }
+      }),
+      0.1
+    );
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -843,23 +1097,8 @@ class AmbButton extends AmbientElement {
           font-weight: 700;
           cursor: pointer;
           transition: all 0.15s ease;
-          background: rgb(160, 160, 160);
-          box-shadow:
-            rgba(0, 0, 0, calc(var(--_key) - var(--_fill) + 0.05))
-              calc(var(--_lx) * -2px)
-              calc(var(--_ly) * -2px)
-              4px 0px,
-            inset
-              calc(var(--_lx) * -1px)
-              calc(var(--_ly) * -1px)
-              0px 0px
-              rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * 0.8)),
-            inset
-              calc(var(--_lx) * 1px)
-              calc(var(--_ly) * 1px)
-              0px 0px
-              rgba(0, 0, 0, calc(var(--_key) * 0.15)),
-            inset 0 0 0 100px rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * 0.3));
+          background: rgb(var(--_handle));
+          box-shadow: ${buttonShadow};
           color: #222;
         }
         .button:hover {
@@ -867,28 +1106,12 @@ class AmbButton extends AmbientElement {
         }
         .button:active {
           transform: translateY(1px);
-          box-shadow:
-            0 1px 2px rgba(0, 0, 0, 0.4),
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4),
             inset 0 1px 0 rgba(var(--_light-r), var(--_light-g), var(--_light-b), 0.5);
         }
         .button.active {
-          background: rgb(35, 35, 45);
-          box-shadow:
-            rgba(0, 0, 0, calc(var(--_key) - var(--_fill) + 0.05))
-              calc(var(--_lx) * -2px)
-              calc(var(--_ly) * -2px)
-              4px 0px,
-            inset
-              calc(var(--_lx) * -1px)
-              calc(var(--_ly) * -1px)
-              0px 0px
-              rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * 0.2)),
-            inset
-              calc(var(--_lx) * 1px)
-              calc(var(--_ly) * 1px)
-              0px 0px
-              rgba(0, 0, 0, calc(var(--_key) * 0.3)),
-            inset 0 0 0 100px rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * 0.1));
+          background: rgb(var(--_surface-dark));
+          box-shadow: ${activeShadow};
           color: var(--_accent);
         }
       </style>
@@ -903,7 +1126,7 @@ class AmbButton extends AmbientElement {
 // --------------------------------------------------------------------------
 class AmbPanel extends AmbientElement {
   static get observedAttributes() {
-    return ['screws', 'shade'];
+    return ['screws', 'shade', 'material'];
   }
 
   connectedCallback() {
@@ -916,14 +1139,28 @@ class AmbPanel extends AmbientElement {
 
   render() {
     const showScrews = this.hasAttribute('screws');
-    const shade = this.getAttribute('shade') || 'dark';
-    const isLight = shade === 'light';
+    const s = AmbientElement.shadeConfig(this.getAttribute('shade'));
 
-    // Light shade responds to global lighting like background (base ~background, high brightness mult)
-    const panelBg = isLight ? 'rgb(30, 30, 40)' : 'rgb(35, 35, 45)';
-    const screwBg = isLight ? 'rgb(50, 50, 60)' : 'rgb(100, 100, 110)';
-    const highlightMult = isLight ? 0.25 : 0.12;
-    const brightnessMult = isLight ? 0.95 : 0.12;
+    const screwBg = s.isLight ? 'rgb(50, 50, 60)' : 'rgb(100, 100, 110)';
+
+    const panelShadow = this.getFlatShadow(
+      AmbientElement.shadow({
+        drop: { opacity: 0.15, x: -6, y: -6, blur: 12 },
+        highlight: { width: 1, opacity: s.highlightMult },
+        shadowEdge: { width: 1, opacity: 0.2 },
+        overlay: { spread: 1000, opacity: s.brightnessMult }
+      }),
+      s.brightnessMult
+    );
+
+    const screwShadow = this.getFlatShadow(
+      AmbientElement.shadow({
+        highlight: { width: 1, opacity: 0.4 },
+        shadowEdge: { width: 1, opacity: 0.4 },
+        overlay: { spread: 100, opacity: 0.15 }
+      }) + ', 0 1px 2px rgba(0, 0, 0, 0.2)',
+      0.15
+    );
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -932,26 +1169,11 @@ class AmbPanel extends AmbientElement {
           display: block;
         }
         .panel {
-          background: ${panelBg};
+          background: ${s.bg};
           border-radius: 12px;
           padding: 20px;
           position: relative;
-          box-shadow:
-            rgba(0, 0, 0, calc(var(--_key) - var(--_fill) + 0.15))
-              calc(var(--_lx) * var(--_elevation) * -6px)
-              calc(var(--_ly) * var(--_elevation) * -6px)
-              calc(var(--_elevation) * 12px) 0px,
-            inset
-              calc(var(--_lx) * -1px)
-              calc(var(--_ly) * -1px)
-              0px 0px
-              rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * ${highlightMult})),
-            inset
-              calc(var(--_lx) * 1px)
-              calc(var(--_ly) * 1px)
-              0px 0px
-              rgba(0, 0, 0, calc(var(--_key) * 0.2)),
-            inset 0 0 0 1000px rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * ${brightnessMult}));
+          box-shadow: ${panelShadow};
         }
         .screw {
           position: absolute;
@@ -959,19 +1181,7 @@ class AmbPanel extends AmbientElement {
           height: 10px;
           border-radius: 50%;
           background: ${screwBg};
-          box-shadow:
-            inset
-              calc(var(--_lx) * -1px)
-              calc(var(--_ly) * -1px)
-              1px 0px
-              rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * 0.4)),
-            inset
-              calc(var(--_lx) * 1px)
-              calc(var(--_ly) * 1px)
-              1px 0px
-              rgba(0, 0, 0, 0.4),
-            0 1px 2px rgba(0, 0, 0, 0.2),
-            inset 0 0 0 100px rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * 0.15));
+          box-shadow: ${screwShadow};
         }
         .screw::after {
           content: '';
@@ -1012,7 +1222,7 @@ class AmbPanel extends AmbientElement {
 // --------------------------------------------------------------------------
 class AmbSubpanel extends AmbientElement {
   static get observedAttributes() {
-    return ['label'];
+    return ['label', 'material'];
   }
 
   connectedCallback() {
@@ -1025,6 +1235,13 @@ class AmbSubpanel extends AmbientElement {
 
   render() {
     const label = this.getAttribute('label') || '';
+
+    const grooveShadow = this.getFlatShadow(
+      `inset calc(var(--_lx) * -1px) calc(var(--_ly) * -1px) 1px 0px rgba(0, 0, 0, calc(var(--_key) * 0.5)),
+       inset calc(var(--_lx) * 1px) calc(var(--_ly) * 1px) 0 0 rgba(255, 255, 255, calc(var(--_key) * 0.15)),
+       inset 0 0 0 100px rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * 0.8))`,
+      0.8
+    );
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -1039,224 +1256,49 @@ class AmbSubpanel extends AmbientElement {
         :host(:last-child) {
           margin-bottom: 8px;
         }
+        .header {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 12px;
+        }
+        .groove {
+          flex: 1;
+          height: 2px;
+          background: rgb(var(--_surface-inset));
+          border-radius: 1px;
+          box-shadow: ${grooveShadow};
+        }
+        .groove-left {
+          flex: 0 0 24px;
+        }
         .label {
           font-family: system-ui, sans-serif;
-          font-size: 12px;
+          font-size: 10px;
           font-weight: 600;
           letter-spacing: 1px;
           text-transform: uppercase;
-          margin-bottom: 8px;
-          /* Adaptive text color */
-          --lume: calc(1 - var(--_key));
-          color: rgb(
-            calc(var(--lume) * 120 + 60),
-            calc(var(--lume) * 120 + 60),
-            calc(var(--lume) * 120 + 70)
+          white-space: nowrap;
+          color: #777;
+          color: color-mix(
+            in srgb,
+            #404048 calc(var(--_key) * 100%),
+            #a8a8b0
           );
-        }
-        .groove {
-          width: 100%;
-          height: 2px;
-          background: rgb(22, 22, 31);
-          border-radius: 1px;
-          margin-bottom: 12px;
-          box-shadow:
-            /* Inset shadow - based on light direction */
-            inset calc(var(--_lx) * -1px) calc(var(--_ly) * -1px) 1px 0px
-                rgba(0, 0, 0, calc(var(--_key) * 0.5)),
-            /* Highlight on opposite side */
-            inset calc(var(--_lx) * 1px) calc(var(--_ly) * 1px) 0 0
-                rgba(255, 255, 255, calc(var(--_key) * 0.15)),
-            /* Lighting overlay */
-            inset 0 0 0 100px rgba(var(--_light-r), var(--_light-g), var(--_light-b), calc(var(--_key) * 0.8));
         }
         .content {
           position: relative;
         }
       </style>
-      ${label ? `<div class="label" part="label">${label}</div>` : ''}
-      <div class="groove" part="groove"></div>
+      <div class="header" part="header">
+        <div class="groove groove-left" part="groove"></div>
+        ${label ? `<span class="label" part="label">${label}</span>` : ''}
+        <div class="groove" part="groove"></div>
+      </div>
       <div class="content" part="content">
         <slot></slot>
       </div>
     `;
-  }
-}
-
-// --------------------------------------------------------------------------
-// amb-slider - Horizontal slider control
-// --------------------------------------------------------------------------
-class AmbSlider extends AmbientElement {
-  static get observedAttributes() {
-    return ['value', 'min', 'max', 'label', 'shade'];
-  }
-
-  constructor() {
-    super();
-    this._value = 50;
-    this._min = 0;
-    this._max = 100;
-    this._dragging = false;
-  }
-
-  connectedCallback() {
-    this.render();
-    this.setupEvents();
-  }
-
-  attributeChangedCallback(name, oldVal, newVal) {
-    if (oldVal === newVal) return;
-    switch (name) {
-      case 'value': this._value = parseFloat(newVal) || 0; break;
-      case 'min': this._min = parseFloat(newVal) || 0; break;
-      case 'max': this._max = parseFloat(newVal) || 100; break;
-    }
-    if (name === 'shade') {
-      this.render();
-    } else {
-      this.updatePosition();
-    }
-  }
-
-  get value() { return this._value; }
-  set value(v) {
-    this._value = Math.max(this._min, Math.min(this._max, v));
-    this.setAttribute('value', this._value);
-    this.updatePosition();
-    this.dispatchEvent(new CustomEvent('change', { detail: { value: this._value } }));
-  }
-
-  updatePosition() {
-    const thumb = this.shadowRoot?.querySelector('.thumb');
-    const fill = this.shadowRoot?.querySelector('.fill');
-    if (!thumb || !fill) return;
-
-    const percent = ((this._value - this._min) / (this._max - this._min)) * 100;
-    thumb.style.left = `${percent}%`;
-    fill.style.width = `${percent}%`;
-  }
-
-  setupEvents() {
-    const track = this.shadowRoot.querySelector('.track');
-
-    const updateFromPosition = (clientX) => {
-      const rect = track.getBoundingClientRect();
-      let percent = (clientX - rect.left) / rect.width;
-      percent = Math.max(0, Math.min(1, percent));
-      this.value = this._min + (percent * (this._max - this._min));
-    };
-
-    const onStart = (x) => {
-      this._dragging = true;
-      updateFromPosition(x);
-    };
-
-    const onMove = (x) => {
-      if (!this._dragging) return;
-      updateFromPosition(x);
-    };
-
-    const onEnd = () => {
-      this._dragging = false;
-    };
-
-    track.addEventListener('mousedown', (e) => { onStart(e.clientX); e.preventDefault(); });
-    track.addEventListener('touchstart', (e) => { onStart(e.touches[0].clientX); e.preventDefault(); });
-    document.addEventListener('mousemove', (e) => onMove(e.clientX));
-    document.addEventListener('touchmove', (e) => onMove(e.touches[0].clientX));
-    document.addEventListener('mouseup', onEnd);
-    document.addEventListener('touchend', onEnd);
-  }
-
-  render() {
-    const label = this.getAttribute('label') || '';
-    const shade = this.getAttribute('shade') || 'dark';
-    const isLight = shade === 'light';
-
-    const thumbBg = isLight ? 'rgb(30, 30, 40)' : 'rgb(30, 30, 40)';
-    const thumbBrightness = isLight ? 0.95 : 0.95;
-
-    this.shadowRoot.innerHTML = `
-      <style>
-        ${AmbientElement.baseStyles}
-        :host {
-          display: inline-flex;
-          flex-direction: column;
-          gap: 8px;
-          min-width: 120px;
-        }
-        .track {
-          position: relative;
-          height: 6px;
-          background: #222;
-          border-radius: 3px;
-          cursor: pointer;
-          box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
-        }
-        .fill {
-          position: absolute;
-          top: 0;
-          left: 0;
-          bottom: 0;
-          width: 50%;
-          background: var(--_accent);
-          border-radius: 3px;
-          pointer-events: none;
-        }
-        .thumb {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          width: 16px;
-          height: 16px;
-          background: ${thumbBg};
-          border-radius: 50%;
-          transform: translate(-50%, -50%);
-          cursor: grab;
-          box-shadow:
-            /* Drop shadow */
-            rgba(0, 0, 0, calc(var(--_key, 0.3) - var(--_fill, 0) + 0.1))
-              calc(var(--_lx, 1) * -2px)
-              calc(var(--_ly, -1) * -2px)
-              4px 0px,
-            /* Edge highlight */
-            inset
-              calc(var(--_lx, 1) * -1px)
-              calc(var(--_ly, -1) * -1px)
-              0px 0px
-              rgba(var(--_light-r, 255), var(--_light-g, 255), var(--_light-b, 255), calc(var(--_key, 0.3) * 0.6)),
-            /* Edge shadow */
-            inset
-              calc(var(--_lx, 1) * 1px)
-              calc(var(--_ly, -1) * 1px)
-              0px 0px
-              rgba(0, 0, 0, calc(var(--_key, 0.3) * 0.2)),
-            /* Lighting overlay */
-            inset 0 0 0 100px rgba(var(--_light-r, 255), var(--_light-g, 255), var(--_light-b, 255), calc(var(--_key, 0.3) * ${thumbBrightness}));
-        }
-        .thumb:active { cursor: grabbing; }
-        .label {
-          font-family: system-ui, sans-serif;
-          font-size: 9px;
-          font-weight: 600;
-          letter-spacing: 1px;
-          text-transform: uppercase;
-          /* Adaptive text color */
-          --lume: calc(1 - var(--_key));
-          color: rgb(
-            calc(var(--lume) * 120 + 60),
-            calc(var(--lume) * 120 + 60),
-            calc(var(--lume) * 120 + 70)
-          );
-        }
-      </style>
-      ${label ? `<span class="label" part="label">${label}</span>` : ''}
-      <div class="track" part="track">
-        <div class="fill" part="fill"></div>
-        <div class="thumb" part="thumb"></div>
-      </div>
-    `;
-    this.updatePosition();
   }
 }
 
@@ -1275,5 +1317,17 @@ customElements.define('amb-slider', AmbSlider);
 
 // Export for module usage
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { AmbKnob, AmbFader, AmbSwitch, AmbJack, AmbLed, AmbButton, AmbPanel, AmbSubpanel, AmbSlider };
+  module.exports = {
+    AmbientElement,
+    AmbRangeControl,
+    AmbKnob,
+    AmbFader,
+    AmbSwitch,
+    AmbJack,
+    AmbLed,
+    AmbButton,
+    AmbPanel,
+    AmbSubpanel,
+    AmbSlider
+  };
 }

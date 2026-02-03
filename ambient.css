@@ -56,9 +56,11 @@
   /* Elevation (shadow distance multiplier) */
   --amb-elevation: 0;
 
-  /* Base surface colors (before lighting) */
-  --amb-surface-base: 25, 25, 35;
-  --amb-surface-light-base: 180, 180, 180;
+  /* Surface colors (RGB values for use in rgba()) */
+  --amb-surface-dark: 35, 35, 45;
+  --amb-surface-light: 40, 40, 52;
+  --amb-surface-inset: 20, 20, 28;
+  --amb-handle: 160, 160, 160;
 
   /* Text colors */
   --amb-text: #e0e0e0;
@@ -234,3 +236,53 @@
 .amb-rounded-lg { border-radius: 12px; }
 .amb-rounded-xl { border-radius: 16px; }
 .amb-rounded-full { border-radius: 9999px; }
+
+/* --------------------------------------------------------------------------
+   AMBIENT LUMINANCE TEXT
+
+   Text that adapts to lighting - dark in bright light, light in dark.
+   Use .amb-lume for primary text, .amb-lume-muted for secondary text.
+   -------------------------------------------------------------------------- */
+
+.amb-lume {
+  /* Fallback for browsers without color-mix */
+  color: #888;
+  /* Dark text in bright light, light text in dark - key light controls darkness */
+  color: color-mix(
+    in srgb,
+    #222230 calc(var(--amb-key-light, 0.5) * 100%),
+    #e8e8f0
+  );
+  transition: color 0.3s ease;
+}
+
+.amb-lume-muted {
+  /* Fallback */
+  color: #666;
+  /* Same logic for muted text */
+  color: color-mix(
+    in srgb,
+    #404048 calc(var(--amb-key-light, 0.5) * 100%),
+    #a8a8b0
+  );
+  transition: color 0.3s ease;
+}
+
+/* --------------------------------------------------------------------------
+   FLAT MATERIAL MODE
+
+   Removes 3D edge effects while preserving lighting response.
+   Apply .amb-flat class to body to affect all ambient elements.
+   -------------------------------------------------------------------------- */
+
+.amb-flat .ambient,
+.ambient.amb-flat {
+  box-shadow:
+    inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.95));
+}
+
+.amb-flat .ambient.amb-inset,
+.ambient.amb-inset.amb-flat {
+  box-shadow:
+    inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.7));
+}

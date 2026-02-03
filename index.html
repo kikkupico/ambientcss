@@ -72,73 +72,57 @@
         }
 
         /* Global flat material mode - keeps lighting, removes edges/shadows */
-        body.material-flat amb-panel::part(panel) {
+        body.amb-flat amb-panel::part(panel) {
             box-shadow:
                 inset 0 0 0 1000px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.12)) !important;
         }
-        body.material-flat amb-panel[shade="light"]::part(panel) {
+        body.amb-flat amb-panel[shade="light"]::part(panel) {
             box-shadow:
                 inset 0 0 0 1000px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.95)) !important;
         }
-        body.material-flat amb-knob::part(knob) {
+        body.amb-flat amb-knob::part(knob) {
             box-shadow:
                 inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.15)) !important;
         }
-        body.material-flat amb-knob::part(inner) {
+        body.amb-flat amb-knob::part(inner) {
             box-shadow:
                 inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.1)) !important;
         }
-        body.material-flat amb-knob[shade="light"]::part(knob) {
+        body.amb-flat amb-knob[shade="light"]::part(knob) {
             box-shadow:
                 inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.95)) !important;
         }
-        body.material-flat amb-knob[shade="light"]::part(inner) {
+        body.amb-flat amb-knob[shade="light"]::part(inner) {
             box-shadow:
                 inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.85)) !important;
         }
-        body.material-flat amb-button::part(button) {
+        body.amb-flat amb-button::part(button) {
             box-shadow:
                 inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.3)) !important;
         }
-        body.material-flat amb-switch::part(track) {
+        body.amb-flat amb-switch::part(track) {
             box-shadow:
                 inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.05)) !important;
         }
-        body.material-flat amb-switch::part(handle) {
+        body.amb-flat amb-switch::part(handle) {
             box-shadow:
                 inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.3)) !important;
         }
-        body.material-flat amb-fader::part(handle) {
+        body.amb-flat amb-fader::part(handle) {
             box-shadow:
                 inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.3)) !important;
         }
-        body.material-flat amb-jack::part(jack) {
+        body.amb-flat amb-jack::part(jack) {
             box-shadow:
                 inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.15)) !important;
         }
-        body.material-flat amb-slider::part(track) {
-            box-shadow:
-                inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.8)) !important;
-        }
-        body.material-flat amb-slider::part(thumb) {
+        body.amb-flat amb-slider::part(thumb) {
             box-shadow:
                 inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.95)) !important;
         }
-        body.material-flat amb-subpanel::part(groove) {
+        body.amb-flat amb-subpanel::part(groove) {
             box-shadow:
                 inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.8)) !important;
-        }
-        body.material-flat .demo-box.ambient {
-            box-shadow:
-                inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.95)) !important;
-        }
-        body.material-flat .demo-box.ambient.amb-inset {
-            box-shadow:
-                inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.8)) !important;
-        }
-        body.material-flat .code-example {
-            box-shadow:
-                inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.8)) !important;
         }
 
         section {
@@ -218,12 +202,12 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            /* Raised: same as panel light shade */
-            background: rgb(30, 30, 40);
+            /* Raised: lighter surface */
+            background: rgb(var(--amb-surface-light));
         }
         .demo-box.amb-inset {
-            /* Inset: subtly darker than page background (25, 25, 35) */
-            background: rgb(22, 22, 31);
+            /* Inset: darker than background */
+            background: rgb(var(--amb-surface-inset));
         }
         /* Override ambient box-shadow to include lighting */
         .demo-box.ambient {
@@ -250,7 +234,7 @@
                 inset calc(var(--amb-light-x) * var(--amb-chamfer-width, 2) * 1px)
                     calc(var(--amb-light-y) * var(--amb-chamfer-width, 2) * 1px) 2px 0px
                     rgb(0 0 0 / calc(var(--amb-chamfer) * (var(--amb-key-light) - var(--amb-fill-light)))),
-                /* Lighting overlay - same as panel light shade (0.95) */
+                /* Lighting overlay */
                 inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.95));
         }
         .demo-box.ambient.amb-inset {
@@ -274,13 +258,13 @@
                 inset calc(var(--amb-light-x) * var(--amb-chamfer-width, 2) * 1px)
                     calc(var(--amb-light-y) * var(--amb-chamfer-width, 2) * 1px) 2px 0px
                     rgb(255 255 255 / calc(var(--amb-chamfer) * var(--amb-key-light))),
-                /* Lighting overlay - slightly lower for inset to appear subtly darker */
-                inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.8));
+                /* Lighting overlay - lower opacity for inset to appear darker */
+                inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.7));
         }
 
         /* Code example - inset panel style */
         .code-example {
-            background: rgb(22, 22, 31);
+            background: rgb(var(--amb-surface-inset));
             border-radius: 8px;
             padding: 16px;
             margin-top: 16px;
@@ -302,30 +286,24 @@
                     calc(var(--amb-light-y) * var(--amb-fillet-width) * 1px) 0px 0px
                     rgb(255 255 255 / calc(var(--amb-fillet) * var(--amb-key-light))),
                 /* Lighting overlay */
-                inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.8));
+                inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.7));
         }
         .code-example .tag { color: #d4a056; }
         .code-example .attr { color: #7ec87e; }
         .code-example .val { color: #6cb6d9; }
 
-        /* Ambient luminance text - dark in bright light, light in dark */
-        .amb-lume {
-            --lume: calc(1 - var(--amb-key-light, 0.5));
-            color: rgb(
-                calc(var(--lume) * 220 + 30),
-                calc(var(--lume) * 220 + 30),
-                calc(var(--lume) * 220 + 40)
-            );
-            transition: color 0.3s ease;
+        /* Flat mode for demo boxes */
+        body.amb-flat .demo-box.ambient {
+            box-shadow:
+                inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.95)) !important;
         }
-        .amb-lume-muted {
-            --lume: calc(1 - var(--amb-key-light, 0.5));
-            color: rgb(
-                calc(var(--lume) * 120 + 60),
-                calc(var(--lume) * 120 + 60),
-                calc(var(--lume) * 120 + 70)
-            );
-            transition: color 0.3s ease;
+        body.amb-flat .demo-box.ambient.amb-inset {
+            box-shadow:
+                inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.7)) !important;
+        }
+        body.amb-flat .code-example {
+            box-shadow:
+                inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.7)) !important;
         }
     </style>
 </head>
@@ -641,7 +619,7 @@
             setMode(e.detail.on ? 'day' : 'night');
         });
 
-        // Material toggle
+        // Material toggle - uses body class for ::part() CSS
         const materialToggle = document.getElementById('materialToggle');
 
         // Set initial state (solid = on)
@@ -649,9 +627,9 @@
 
         materialToggle.addEventListener('change', (e) => {
             if (e.detail.on) {
-                document.body.classList.remove('material-flat');
+                document.body.classList.remove('amb-flat');
             } else {
-                document.body.classList.add('material-flat');
+                document.body.classList.add('amb-flat');
             }
         });
 
