@@ -3,12 +3,9 @@
   <head>
     <link href="page.css" rel="stylesheet" />
     <link href="index.css" rel="stylesheet" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Michroma&display=swap" rel="stylesheet">
   </head>
   <body>
     <div class="amb-surface container">
@@ -18,16 +15,19 @@
           <div style="font-size: 35px">CSS</div>
           <button
             id="button-day"
-            class="custom ambient amb-fillet-1 amb-elevation-0"
+            class="amb-button ambient amb-fillet-1 amb-elevation-1"
           >
-            <span style="mix-blend-mode: exclusion">day</span>
+            <span>day</span>
           </button>
           <button
             id="button-night"
-            class="custom ambient amb-fillet-1 amb-elevation-0"
+            class="amb-button ambient amb-fillet-1 amb-elevation-1"
           >
-            <span style="mix-blend-mode: exclusion">night</span>
+            <span>night</span>
           </button>
+        <div class="amb-knob ambient amb-fillet amb-elevation-2 amb-surface">
+          <div style="position:relative"><div class="amb-knob-indicator amb-glow"></div></div>
+        </div>
         </div>
         <div class="row">
           <div class="circle ambient amb-fillet amb-elevation-0"></div>
@@ -35,7 +35,6 @@
           <div class="circle ambient amb-fillet amb-elevation-2"></div>
           <div class="circle ambient amb-fillet amb-elevation-3"></div>
         </div>
-        <div class="amb-knob ambient amb-fillet amb-elevation-2 amb-surface"></div>
       </div>
     </div>
     <script src="script.js"></script>

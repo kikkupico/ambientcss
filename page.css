@@ -1,11 +1,13 @@
 body {
-  font-family: "Josefin Sans", sans-serif;
+  font-family: "Michroma", sans-serif;
   transition: background-color 3s ease-in;
+  padding: 0;
+  margin: 0;
 }
 
 .container {
   display: grid;
-  min-height: 90vh;
+  min-height: 100vh;
   min-width: 100%;
   column-gap: 30px;
   gap: 30px;

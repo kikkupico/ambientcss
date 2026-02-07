@@ -12,6 +12,7 @@
   --amb-elevation: 0;
   --amb-fillet-width: 1;
   --amb-chamfer-width: 1;
+  --amb-highlight-color: coral;
   --amb-lume: hsl(
   var(--amb-light-hue)
   var(--amb-light-saturation)
@@ -52,49 +53,6 @@
 
 .amb-elevation-3 {
   --amb-elevation: 3;
-}
-
-.ambient-rgb {
-  box-shadow: rgba(
-        0,
-        0,
-        0,
-        calc((var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)))
-      )
-      calc(var(--amb-light-x) * var(--amb-elevation) * -8px)
-      calc(var(--amb-light-y) * var(--amb-elevation) * -8px)
-      calc(var(--amb-elevation) * 8px) calc(var(--amb-elevation) * -4px),
-    inset calc(var(--amb-light-x) * var(--amb-fillet-width) * -1px)
-      calc(var(--amb-light-y) * var(--amb-fillet-width) * -1px) 0px 0px
-      rgb(
-        255 255 255 / calc(var(--amb-fillet) * var(--amb-key-light-intensity))
-      ),
-    inset calc(var(--amb-light-x) * var(--amb-fillet-width) * 1px)
-      calc(var(--amb-light-y) * var(--amb-fillet-width) * 1px) 0px 0px
-      rgb(
-        0 0 0 /
-          calc(
-            var(--amb-fillet) *
-              calc(
-                var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
-              )
-          )
-      ),
-    inset calc(var(--amb-light-x) * -2px) calc(var(--amb-light-y) * -2px) 2px
-      0px
-      rgb(
-        255 255 255 / calc(var(--amb-chamfer) * var(--amb-key-light-intensity))
-      ),
-    inset calc(var(--amb-light-x) * 2px) calc(var(--amb-light-y) * 2px) 2px 0px
-      rgb(
-        0 0 0 /
-          calc(
-            var(--amb-chamfer) *
-              calc(
-                var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
-              )
-          )
-      );
 }
 
 .ambient {
@@ -163,4 +121,39 @@
     var(--amb-light-saturation)
     calc(var(--amb-key-light-intensity) * 100%)
   );
+}
+
+.amb-button {
+  cursor: pointer;
+  border: medium solid var(--amb-lume);
+  background-color: inherit;
+  padding: 0.5rem;
+  border-radius: 12px;
+  text-transform: uppercase;
+  width: 64px;
+  font-weight: 600;
+  color: var(--amb-lume);
+}
+
+.amb-button:focus {
+  outline-offset: 2px;
+}
+
+.amb-button:hover {
+  border-color: var(--amb-highlight-color);
+}
+
+.amb-knob-indicator {
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    width: 3px;
+    height: 8px;
+    background: var(--amb-lume);
+    border-radius: 2px;
+    transform: translateX(-50%);
+}
+
+.amb-glow {
+   box-shadow: 0 0 4px var(--amb-lume);
 }
