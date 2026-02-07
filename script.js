@@ -21,6 +21,11 @@ document
     animateVar("--amb-fill-light-intensity", (val) => val < 0.7, 0.6 / 60);
   });
 document
+  .getElementById("demo-switch")
+  .addEventListener("click", function () {
+    this.classList.toggle("amb-switch-on");
+  });
+document
   .getElementById("button-night")
   .addEventListener("click", async function setNight() {
     animateVar("--amb-light-x", (val) => val < 1, 1 / 60);

@@ -157,3 +157,59 @@
 .amb-glow {
    box-shadow: 0 0 4px var(--amb-lume);
 }
+
+.amb-fader {
+  position: relative;
+  width: 8px;
+  height: 120px;
+  border-radius: 4px;
+  border: thin solid var(--amb-lume);
+}
+
+.amb-fader-thumb {
+  position: absolute;
+  width: 28px;
+  height: 14px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 3px;
+  border: thin solid var(--amb-lume);
+}
+
+.amb-fader-thumb-line {
+  position: absolute;
+  top: 50%;
+  left: 25%;
+  width: 50%;
+  height: 1px;
+  background: var(--amb-lume);
+  opacity: 0.6;
+}
+
+.amb-switch {
+  position: relative;
+  width: 40px;
+  height: 20px;
+  border-radius: 10px;
+  border: thin solid var(--amb-lume);
+  cursor: pointer;
+}
+
+.amb-switch-thumb {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  top: 50%;
+  left: 3px;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  border: thin solid var(--amb-lume);
+  transition: left 0.15s ease;
+}
+
+.amb-switch.amb-switch-on .amb-switch-thumb {
+  left: 21px;
+  background: var(--amb-highlight-color);
+  border-color: var(--amb-highlight-color);
+}
