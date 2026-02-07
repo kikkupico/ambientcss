@@ -1,10 +1,4 @@
 body {
-  background-color: rgb(36, 43, 60);
-  background-image: linear-gradient(
-    45deg,
-    rgba(0, 0, 0, 0.1) 0%,
-    rgba(255, 255, 255, 0.1) 100%
-  );
   font-family: "Josefin Sans", sans-serif;
   transition: background-color 3s ease-in;
 }

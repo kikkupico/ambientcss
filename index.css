@@ -2,14 +2,22 @@
   --amb-light-x: 1;
   --amb-light-y: -1;
   --amb-key-light-intensity: 0.3;
-  --amb-fill-light-intensity: 0;
+  --amb-fill-light-intensity: 0.1;
+  --amb-light-hue: 0;
+  --amb-light-saturation: 0%;
   --amb-light-distance: 0px;
   --amb-fillet: 0;
   --amb-chamfer: 0;
   --amb-thickness: 0;
   --amb-elevation: 0;
   --amb-fillet-width: 1;
-}
+  --amb-chamfer-width: 1;
+  --amb-lume: hsl(
+  var(--amb-light-hue)
+  var(--amb-light-saturation)
+  calc((1 - sign(var(--amb-key-light-intensity) - 0.5)) * 50% + 25%)
+);
+  }
 
 .amb-fillet {
   --amb-fillet: 1;
@@ -23,6 +31,12 @@
 .amb-chamfer {
   --amb-chamfer: 1;
 }
+
+.amb-chamfer-2 {
+  --amb-chamfer: 1;
+  --amb-chamfer-width: 2;
+}
+
 
 .amb-elevation-0 {
   --amb-elevation: 0;
@@ -40,7 +54,7 @@
   --amb-elevation: 3;
 }
 
-.ambient {
+.ambient-rgb {
   box-shadow: rgba(
         0,
         0,
@@ -81,4 +95,72 @@
               )
           )
       );
+}
+
+.ambient {
+  box-shadow: hsl(
+        var(--amb-light-hue)
+        var(--amb-light-saturation)
+        0%
+        / calc((var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)))
+      )
+      calc(var(--amb-light-x) * var(--amb-elevation) * -8px)
+      calc(var(--amb-light-y) * var(--amb-elevation) * -8px)
+      calc(var(--amb-elevation) * 8px) calc(var(--amb-elevation) * -4px),
+    inset calc(var(--amb-light-x) * var(--amb-fillet-width) * -1px)
+      calc(var(--amb-light-y) * var(--amb-fillet-width) * -1px) 0px 0px
+      hsl(
+        var(--amb-light-hue)
+        var(--amb-light-saturation)
+        100%
+        / calc(var(--amb-fillet) * var(--amb-key-light-intensity))
+      ),
+    inset calc(var(--amb-light-x) * var(--amb-fillet-width) * 1px)
+      calc(var(--amb-light-y) * var(--amb-fillet-width) * 1px) 0px 0px
+      hsl(
+        var(--amb-light-hue)
+        var(--amb-light-saturation)
+        0%
+        / calc(
+            var(--amb-fillet) *
+              calc(
+                var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
+              )
+          )
+      ),
+    inset calc(var(--amb-light-x) * -2px) calc(var(--amb-light-y) * -2px) 2px
+      0px
+      hsl(
+        var(--amb-light-hue)
+        var(--amb-light-saturation)
+        100%
+        / calc(var(--amb-chamfer) * var(--amb-key-light-intensity))
+      ),
+    inset calc(var(--amb-light-x) * 2px) calc(var(--amb-light-y) * 2px) 2px 0px
+      hsl(
+        var(--amb-light-hue)
+        var(--amb-light-saturation)
+        0%
+        / calc(
+            var(--amb-chamfer) *
+              calc(
+                var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
+              )
+          )
+      );
+}
+
+.amb-knob {
+  border-radius: 50%;
+  height: 64px;
+  width: 64px;
+  border: medium solid var(--amb-lume);
+}
+
+.amb-surface {
+  background-color: hsl(
+    var(--amb-light-hue)
+    var(--amb-light-saturation)
+    calc(var(--amb-key-light-intensity) * 100%)
+  );
 }
