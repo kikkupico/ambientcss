@@ -3,8 +3,8 @@
   --amb-light-y: -1;
   --amb-key-light-intensity: 0.3;
   --amb-fill-light-intensity: 0.1;
-  --amb-light-hue: 0;
-  --amb-light-saturation: 0%;
+  --amb-light-hue: 234;
+  --amb-light-saturation: 15%;
   --amb-light-distance: 0px;
   --amb-fillet: 0;
   --amb-chamfer: 0;
@@ -13,11 +13,16 @@
   --amb-fillet-width: 1;
   --amb-chamfer-width: 1;
   --amb-highlight-color: coral;
-  --amb-lume: hsl(
-  var(--amb-light-hue)
-  var(--amb-light-saturation)
-  calc((1 - sign(var(--amb-key-light-intensity) - 0.5)) * 50% + 25%)
-);
+  --amb-lume-color: #ffa07a;
+  --amb-lume: color-mix(
+    in oklab,
+    var(--amb-lume-color) calc(clamp(0, (0.5 - var(--amb-key-light-intensity)) / 0.2, 1) * 100%),
+    hsl(
+      var(--amb-light-hue)
+      var(--amb-light-saturation)
+      calc((1 - sign(var(--amb-key-light-intensity) - 0.5)) * 50% + 25%)
+    )
+  );
   }
 
 .amb-fillet {
@@ -131,6 +136,15 @@
   );
 }
 
+.amb-surface-concave {
+  --_concave-dark-stop: calc(50% + var(--amb-light-y) * 50%);
+  --_concave-light-stop: calc(50% - var(--amb-light-y) * 50%);
+  background: linear-gradient(
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 80%)) var(--_concave-dark-stop),
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 100%)) 50%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 120%)) var(--_concave-light-stop)
+  );
+}
 
 .amb-button {
   cursor: pointer;
