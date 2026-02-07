@@ -123,6 +123,15 @@
   );
 }
 
+.amb-surface-darker {
+  background-color: hsl(
+    var(--amb-light-hue)
+    var(--amb-light-saturation)
+    calc(var(--amb-key-light-intensity) * 30%)
+  );
+}
+
+
 .amb-button {
   cursor: pointer;
   border: medium solid var(--amb-lume);
@@ -139,7 +148,7 @@
   outline-offset: 2px;
 }
 
-.amb-button:hover {
+.amb-button:hover, .amb-fader-thumb:hover, .amb-knob:hover {
   border-color: var(--amb-highlight-color);
 }
 
@@ -163,36 +172,24 @@
   width: 8px;
   height: 120px;
   border-radius: 4px;
-  border: thin solid var(--amb-lume);
 }
 
 .amb-fader-thumb {
   position: absolute;
-  width: 28px;
-  height: 14px;
+  width: 20px;
+  height: 30px;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  border-radius: 3px;
-  border: thin solid var(--amb-lume);
-}
-
-.amb-fader-thumb-line {
-  position: absolute;
-  top: 50%;
-  left: 25%;
-  width: 50%;
-  height: 1px;
-  background: var(--amb-lume);
-  opacity: 0.6;
+  border-radius: 12px;
+  border: medium solid var(--amb-lume);
 }
 
 .amb-switch {
   position: relative;
-  width: 40px;
+  width: 36px;
   height: 20px;
-  border-radius: 10px;
-  border: thin solid var(--amb-lume);
+  border-radius: 4px;
   cursor: pointer;
 }
 
@@ -203,13 +200,10 @@
   top: 50%;
   left: 3px;
   transform: translateY(-50%);
-  border-radius: 50%;
-  border: thin solid var(--amb-lume);
+  border-radius: 4px;
   transition: left 0.15s ease;
 }
 
 .amb-switch.amb-switch-on .amb-switch-thumb {
-  left: 21px;
-  background: var(--amb-highlight-color);
-  border-color: var(--amb-highlight-color);
+  left: 19px;
 }
