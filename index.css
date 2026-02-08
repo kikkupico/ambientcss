@@ -162,7 +162,7 @@
   outline-offset: 2px;
 }
 
-.amb-button:hover, .amb-fader-thumb:hover, .amb-knob:hover {
+.amb-button:hover, .amb-knob:hover {
   border-color: var(--amb-highlight-color);
 }
 
@@ -196,7 +196,6 @@
   top: 50%;
   transform: translate(-50%, -50%);
   border-radius: 12px;
-  border: medium solid var(--amb-lume);
 }
 
 .amb-switch {
