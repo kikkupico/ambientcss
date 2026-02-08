@@ -1,8 +1,8 @@
 :root {
-  --amb-light-x: 1;
+  --amb-light-x: -1;
   --amb-light-y: -1;
-  --amb-key-light-intensity: 0.3;
-  --amb-fill-light-intensity: 0.1;
+  --amb-key-light-intensity: 0.9;
+  --amb-fill-light-intensity: 0.7;
   --amb-light-hue: 234;
   --amb-light-saturation: 15%;
   --amb-light-distance: 0px;
@@ -13,10 +13,10 @@
   --amb-fillet-width: 1;
   --amb-chamfer-width: 1;
   --amb-highlight-color: coral;
-  --amb-lume-color: #ffa07a;
+  --amb-lume-hue: 17;
   --amb-lume: color-mix(
     in oklab,
-    var(--amb-lume-color) calc(clamp(0, (0.5 - var(--amb-key-light-intensity)) / 0.2, 1) * 100%),
+    hsl(var(--amb-lume-hue) 100% 74%) calc(clamp(0, (0.5 - var(--amb-key-light-intensity)) / 0.2, 1) * 100%),
     hsl(
       var(--amb-light-hue)
       var(--amb-light-saturation)
@@ -140,9 +140,9 @@
   --_concave-dark-stop: calc(50% + var(--amb-light-y) * 50%);
   --_concave-light-stop: calc(50% - var(--amb-light-y) * 50%);
   background: linear-gradient(
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 80%)) var(--_concave-dark-stop),
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 90%)) var(--_concave-dark-stop),
     hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 100%)) 50%,
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 120%)) var(--_concave-light-stop)
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 110%)) var(--_concave-light-stop)
   );
 }
 
@@ -183,9 +183,10 @@
 
 .amb-fader {
   position: relative;
-  width: 8px;
+  width: 4px;
   height: 120px;
   border-radius: 4px;
+  background-color: var(--amb-lume);
 }
 
 .amb-fader-thumb {
@@ -200,23 +201,10 @@
 
 .amb-switch {
   position: relative;
-  width: 36px;
-  height: 20px;
-  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
   cursor: pointer;
-}
-
-.amb-switch-thumb {
-  position: absolute;
-  width: 14px;
-  height: 14px;
-  top: 50%;
-  left: 3px;
-  transform: translateY(-50%);
-  border-radius: 4px;
-  transition: left 0.15s ease;
-}
-
-.amb-switch.amb-switch-on .amb-switch-thumb {
-  left: 19px;
+  border: medium solid var(--amb-lume);
+  margin: 1em;
 }
