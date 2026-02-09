@@ -4,6 +4,7 @@ import {
   AmbientPanel,
   AmbientKnob,
   AmbientFader,
+  AmbientSlider,
   AmbientSwitch,
 } from "@ambientcss/components";
 import { DayNightWatchSwitch } from "./components/DayNightWatchSwitch";
@@ -27,6 +28,7 @@ export function App() {
   const [nightMode, setNightMode] = useState(false);
   const [knobValue, setKnobValue] = useState(50);
   const [faderValue, setFaderValue] = useState(50);
+  const [sliderValue, setSliderValue] = useState(50);
   const [switchOn, setSwitchOn] = useState(false);
   const animRef = useRef<number | null>(null);
   const lightRef = useRef(light);
@@ -88,7 +90,11 @@ export function App() {
           <div className="row" style={{ marginTop: "2rem", gap: "2rem", alignItems: "center" }}>
             <AmbientKnob value={knobValue} onChange={setKnobValue} label="Knob" />
             <AmbientFader value={faderValue} min={0} max={100} onChange={setFaderValue} label="Fader" />
-            <AmbientSwitch checked={switchOn} onCheckedChange={setSwitchOn} />
+            <AmbientSwitch checked={switchOn} onCheckedChange={setSwitchOn} led />
+          </div>
+
+          <div className="row" style={{ marginTop: "1.5rem" }}>
+            <AmbientSlider value={sliderValue} min={0} max={100} onChange={setSliderValue} label="Slider" />
           </div>
 
           <div className="row" style={{ marginTop: "2rem" }}>

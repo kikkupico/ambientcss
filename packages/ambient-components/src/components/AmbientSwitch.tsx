@@ -9,6 +9,8 @@ export type AmbientSwitchProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "
   defaultChecked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
   size?: AmbientSwitchSize;
+  /** Show a small LED indicator that lights up when the switch is on. Pass `true` for default green or a CSS color string. */
+  led?: boolean | string;
 };
 
 export function AmbientSwitch({
@@ -18,6 +20,8 @@ export function AmbientSwitch({
   onCheckedChange,
   onClick,
   size = "md",
+  led,
+  children,
   ...props
 }: AmbientSwitchProps) {
   const isControlled = checked !== undefined;
@@ -43,6 +47,14 @@ export function AmbientSwitch({
         onClick?.(event);
       }}
       {...props}
-    />
+    >
+      {led ? (
+        <span
+          className={cn("amb-led", !active && "amb-led-off")}
+          style={typeof led === "string" ? { "--amb-led-color": led } as React.CSSProperties : undefined}
+        />
+      ) : null}
+      {children}
+    </button>
   );
 }

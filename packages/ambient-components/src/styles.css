@@ -77,3 +77,14 @@
 .ambx-fader-thumb {
   transform: translate(-50%, -50%);
 }
+
+.ambx-slider {
+  height: 8px;
+  border-radius: 999px;
+  touch-action: none;
+  user-select: none;
+}
+
+.ambx-slider-thumb {
+  transform: translate(-50%, -50%);
+}

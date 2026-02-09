@@ -15,3 +15,6 @@ export type { AmbientKnobProps } from "./components/AmbientKnob";
 
 export { AmbientFader } from "./components/AmbientFader";
 export type { AmbientFaderProps } from "./components/AmbientFader";
+
+export { AmbientSlider } from "./components/AmbientSlider";
+export type { AmbientSliderProps } from "./components/AmbientSlider";
