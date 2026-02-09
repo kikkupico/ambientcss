@@ -42,3 +42,58 @@ body {
   flex-direction: row;
   justify-content: center;
 }
+
+.day-night-watch {
+  --dn-progress: 0;
+  cursor: pointer;
+  width: var(--ambx-switch-size);
+  height: var(--ambx-switch-size);
+  color: var(--amb-lume);
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  margin: 0;
+}
+
+.day-night-watch:hover {
+  color: var(--amb-highlight-color);
+}
+
+.day-night-watch:active {
+  transform: translateY(1px);
+}
+
+.day-night-watch:focus-visible {
+  outline: 2px solid rgb(255 255 255 / 0.35);
+  outline-offset: 3px;
+}
+
+.day-night-watch__icon-wrap {
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+
+.day-night-watch__icon {
+  position: absolute;
+  inset: 0;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transform-origin: 50% 50%;
+  transition: transform 280ms ease, opacity 200ms ease;
+}
+
+.day-night-watch__icon--sun {
+  opacity: calc(1 - var(--dn-progress));
+  transform: rotate(calc(var(--dn-progress) * -90deg));
+}
+
+.day-night-watch__icon--moon {
+  opacity: var(--dn-progress);
+  transform: rotate(calc((1 - var(--dn-progress)) * 90deg));
+}

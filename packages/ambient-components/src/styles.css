@@ -9,11 +9,29 @@
 }
 
 .ambx-switch {
+  --ambx-switch-size: 24px;
+  width: var(--ambx-switch-size);
+  height: var(--ambx-switch-size);
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
   transition: transform 120ms ease;
 }
 
 .ambx-switch:active {
   transform: translateY(1px);
+}
+
+.ambx-switch-sm {
+  --ambx-switch-size: 20px;
+}
+
+.ambx-switch-md {
+  --ambx-switch-size: 24px;
+}
+
+.ambx-switch-lg {
+  --ambx-switch-size: 32px;
 }
 
 .amb-switch-on {

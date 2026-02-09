@@ -8,7 +8,7 @@ export { AmbientButton } from "./components/AmbientButton";
 export type { AmbientButtonProps } from "./components/AmbientButton";
 
 export { AmbientSwitch } from "./components/AmbientSwitch";
-export type { AmbientSwitchProps } from "./components/AmbientSwitch";
+export type { AmbientSwitchProps, AmbientSwitchSize } from "./components/AmbientSwitch";
 
 export { AmbientKnob } from "./components/AmbientKnob";
 export type { AmbientKnobProps } from "./components/AmbientKnob";

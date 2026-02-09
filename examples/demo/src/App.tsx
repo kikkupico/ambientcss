@@ -2,11 +2,11 @@ import { useCallback, useRef, useState } from "react";
 import {
   AmbientProvider,
   AmbientPanel,
-  AmbientButton,
   AmbientKnob,
   AmbientFader,
   AmbientSwitch,
 } from "@ambientcss/components";
+import { DayNightWatchSwitch } from "./components/DayNightWatchSwitch";
 
 type LightState = {
   lightX: number;
@@ -24,6 +24,7 @@ function lerp(a: number, b: number, t: number): number {
 
 export function App() {
   const [light, setLight] = useState<LightState>(DAY);
+  const [nightMode, setNightMode] = useState(false);
   const [knobValue, setKnobValue] = useState(50);
   const [faderValue, setFaderValue] = useState(50);
   const [switchOn, setSwitchOn] = useState(false);
@@ -74,9 +75,14 @@ export function App() {
           a m b i e n t <br />
           <div style={{ fontSize: 35 }}>CSS</div>
 
-          <div className="row" style={{ marginTop: "1rem", gap: "1rem" }}>
-            <AmbientButton onClick={() => animateTo(DAY)}>day</AmbientButton>
-            <AmbientButton onClick={() => animateTo(NIGHT)}>night</AmbientButton>
+          <div className="row" style={{ marginTop: "1rem" }}>
+            <DayNightWatchSwitch
+              night={nightMode}
+              onToggle={(nextNight) => {
+                setNightMode(nextNight);
+                animateTo(nextNight ? NIGHT : DAY);
+              }}
+            />
           </div>
 
           <div className="row" style={{ marginTop: "2rem", gap: "2rem", alignItems: "center" }}>

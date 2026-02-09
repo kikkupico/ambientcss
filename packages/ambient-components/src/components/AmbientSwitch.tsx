@@ -2,10 +2,13 @@ import { useState } from "react";
 import type { ButtonHTMLAttributes } from "react";
 import { cn } from "../lib/cn";
 
+export type AmbientSwitchSize = "sm" | "md" | "lg";
+
 export type AmbientSwitchProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onChange"> & {
   checked?: boolean;
   defaultChecked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
+  size?: AmbientSwitchSize;
 };
 
 export function AmbientSwitch({
@@ -14,6 +17,7 @@ export function AmbientSwitch({
   defaultChecked,
   onCheckedChange,
   onClick,
+  size = "md",
   ...props
 }: AmbientSwitchProps) {
   const isControlled = checked !== undefined;
@@ -29,6 +33,7 @@ export function AmbientSwitch({
         "ambient amb-switch amb-chamfer amb-elevation-1",
         active ? "amb-surface-convex amb-switch-on" : "amb-surface-concave",
         "ambx-switch",
+        `ambx-switch-${size}`,
         className
       )}
       onClick={(event) => {
