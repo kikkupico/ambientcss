@@ -71,7 +71,7 @@ body {
 
 .title {
   text-align: center;
-  color: #aaa;
+  color: var(--amb-label);
   font-size: clamp(24px, 3vw, 42px);
   letter-spacing: 0.25em;
   line-height: 1.4;
@@ -109,7 +109,7 @@ body {
   font-size: 0.625rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #aaa;
+  color: var(--amb-label);
   text-align: center;
 }
 
@@ -125,7 +125,7 @@ body {
   font-size: 0.625rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #aaa;
+  color: var(--amb-label);
   margin-bottom: 0.5rem;
 }
 
@@ -181,7 +181,7 @@ body {
   font-size: 0.625rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #aaa;
+  color: var(--amb-label);
   text-align: center;
   margin-top: 0.75rem;
   line-height: 1.3;
