@@ -7,8 +7,14 @@
     "*.css"
   ],
   "exports": {
-    ".": "./dist/ambient.css",
-    "./ambient.css": "./dist/ambient.css"
+    ".": {
+      "development": "./src/ambient.css",
+      "default": "./dist/ambient.css"
+    },
+    "./ambient.css": {
+      "development": "./src/ambient.css",
+      "default": "./dist/ambient.css"
+    }
   },
   "files": [
     "dist"

@@ -28,10 +28,12 @@ export function App() {
   const [faderValue, setFaderValue] = useState(50);
   const [switchOn, setSwitchOn] = useState(false);
   const animRef = useRef<number | null>(null);
+  const lightRef = useRef(light);
+  lightRef.current = light;
 
   const animateTo = useCallback((target: LightState) => {
     if (animRef.current !== null) cancelAnimationFrame(animRef.current);
-    const start = { ...light };
+    const start = { ...lightRef.current };
     const duration = 3000;
     let startTime: number | null = null;
 
@@ -72,7 +74,7 @@ export function App() {
           a m b i e n t <br />
           <div style={{ fontSize: 35 }}>CSS</div>
 
-          <div className="row" style={{ marginTop: "1rem" }}>
+          <div className="row" style={{ marginTop: "1rem", gap: "1rem" }}>
             <AmbientButton onClick={() => animateTo(DAY)}>day</AmbientButton>
             <AmbientButton onClick={() => animateTo(NIGHT)}>night</AmbientButton>
           </div>

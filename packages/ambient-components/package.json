@@ -12,11 +12,15 @@
   ],
   "exports": {
     ".": {
+      "development": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
-    "./styles.css": "./dist/styles.css"
+    "./styles.css": {
+      "development": "./src/styles.css",
+      "default": "./dist/styles.css"
+    }
   },
   "files": [
     "dist"

@@ -1,4 +1,4 @@
-import type { CSSProperties, PropsWithChildren } from "react";
+import { useEffect, type CSSProperties, type PropsWithChildren } from "react";
 
 export type AmbientTheme = {
   lightX?: number;
@@ -16,19 +16,36 @@ export type AmbientProviderProps = PropsWithChildren<{
   theme?: AmbientTheme;
 }>;
 
+const VAR_MAP: Record<string, keyof AmbientTheme> = {
+  "--amb-light-x": "lightX",
+  "--amb-light-y": "lightY",
+  "--amb-key-light-intensity": "keyLight",
+  "--amb-fill-light-intensity": "fillLight",
+  "--amb-light-hue": "lightHue",
+  "--amb-light-saturation": "lightSaturation",
+  "--amb-highlight-color": "highlightColor",
+};
+
 export function AmbientProvider({ children, className, style, theme }: AmbientProviderProps) {
-  const cssVars: CSSProperties = {
-    "--amb-light-x": theme?.lightX,
-    "--amb-light-y": theme?.lightY,
-    "--amb-key-light-intensity": theme?.keyLight,
-    "--amb-fill-light-intensity": theme?.fillLight,
-    "--amb-light-hue": theme?.lightHue,
-    "--amb-light-saturation": theme?.lightSaturation !== undefined ? `${theme.lightSaturation}%` : undefined,
-    "--amb-highlight-color": theme?.highlightColor,
-  } as CSSProperties;
+  useEffect(() => {
+    const el = document.documentElement;
+    const entries = Object.entries(VAR_MAP);
+    for (const [varName, key] of entries) {
+      const value = theme?.[key];
+      if (value !== undefined) {
+        const str = key === "lightSaturation" ? `${value}%` : String(value);
+        el.style.setProperty(varName, str);
+      }
+    }
+    return () => {
+      for (const [varName] of entries) {
+        el.style.removeProperty(varName);
+      }
+    };
+  }, [theme]);
 
   return (
-    <div className={className} style={{ ...cssVars, ...style }}>
+    <div className={className} style={style}>
       {children}
     </div>
   );
