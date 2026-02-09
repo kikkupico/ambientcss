@@ -1,0 +1,17 @@
+{
+  "name": "ambientcss-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Ambient CSS + React components monorepo",
+  "packageManager": "pnpm@10.2.1",
+  "scripts": {
+    "build": "node scripts/run-workspace-task.mjs build",
+    "clean": "node scripts/run-workspace-task.mjs clean",
+    "typecheck": "node scripts/run-workspace-task.mjs typecheck"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

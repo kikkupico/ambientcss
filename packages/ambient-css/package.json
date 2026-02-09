@@ -1,0 +1,24 @@
+{
+  "name": "@ambientcss/css",
+  "version": "0.1.0",
+  "description": "Pure CSS ambient lighting and skeuomorphic utility classes",
+  "license": "MIT",
+  "sideEffects": [
+    "*.css"
+  ],
+  "exports": {
+    ".": "./dist/ambient.css",
+    "./ambient.css": "./dist/ambient.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "node ../../scripts/build-css.mjs src/ambient.css dist/ambient.css",
+    "clean": "rm -rf dist",
+    "typecheck": "echo \"No typecheck for CSS package\""
+  },
+  "devDependencies": {
+    "lightningcss": "^1.30.1"
+  }
+}

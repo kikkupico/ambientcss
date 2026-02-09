@@ -19,7 +19,7 @@ body {
 }
 
 .box {
-  padding: 7rem;
+  padding: 4rem;
   border-radius: 7px;
   margin: 30px;
 }
@@ -33,32 +33,8 @@ body {
 .circle {
   width: 64px;
   min-height: 64px;
-  content: " ";
   margin: 30px;
   border-radius: 50%;
-}
-
-.custom {
-  cursor: pointer;
-  border: 1px solid rgb(0 0 0 / 0.4);
-  background-color: inherit;
-  padding: 0.5rem;
-  border-radius: 12px;
-  text-transform: uppercase;
-  width: 64px;
-  font-weight: 600;
-  color: #aaa;
-  text-shadow: 0 0 14px rgb(255 255 255 / 0.35);
-}
-
-.custom:focus {
-  /* border: 1px solid lightcoral; */
-  outline: 4px double pink;
-  outline-offset: 2px;
-}
-
-.custom:hover {
-  border-color: coral;
 }
 
 .row {
