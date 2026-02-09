@@ -34,6 +34,11 @@
   --amb-fillet-width: 2;
 }
 
+.amb-fillet-minus-1 {
+  --amb-fillet: 1;
+  --amb-fillet-width: -1;
+}
+
 .amb-chamfer {
   --amb-chamfer: 1;
 }
@@ -177,14 +182,16 @@
 }
 
 .amb-knob-indicator {
-    position: absolute;
-    top: 5px;
-    left: 50%;
-    width: 3px;
-    height: 8px;
-    background: var(--amb-lume);
-    border-radius: 2px;
-    transform: translateX(-50%);
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.amb-knob-grip {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .amb-glow {
