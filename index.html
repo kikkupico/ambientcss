@@ -1,520 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ambient CSS - Skeuomorphic Interface Framework</title>
-    <link rel="stylesheet" href="ambient.css">
-    <script src="ambient-components.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            background: rgb(25, 25, 35);
-            color: var(--amb-text);
-            min-height: 100vh;
-            padding: 40px 20px;
-            transition: background 0.3s, color 0.3s;
-            position: relative;
-        }
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgb(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b));
-            opacity: calc(var(--amb-key-light) * 0.9);
-            pointer-events: none;
-            z-index: -1;
-            transition: opacity 0.3s, background 0.3s;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-        }
-        h1 {
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: 2px;
-        }
-        h1.amb-lume span {
-            color: rgb(var(--amb-accent-r), var(--amb-accent-g), var(--amb-accent-b));
-        }
-
-        /* Header toggles */
-        .header-toggles {
-            display: flex;
-            gap: 24px;
-            align-items: center;
-        }
-        .toggle-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .toggle-label {
-            font-size: 9px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        /* Global flat material mode - keeps lighting, removes edges/shadows */
-        body.amb-flat amb-panel::part(panel) {
-            box-shadow:
-                inset 0 0 0 1000px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.12)) !important;
-        }
-        body.amb-flat amb-panel[shade="light"]::part(panel) {
-            box-shadow:
-                inset 0 0 0 1000px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.95)) !important;
-        }
-        body.amb-flat amb-knob::part(knob) {
-            box-shadow:
-                inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.15)) !important;
-        }
-        body.amb-flat amb-knob::part(inner) {
-            box-shadow:
-                inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.1)) !important;
-        }
-        body.amb-flat amb-knob[shade="light"]::part(knob) {
-            box-shadow:
-                inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.95)) !important;
-        }
-        body.amb-flat amb-knob[shade="light"]::part(inner) {
-            box-shadow:
-                inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.85)) !important;
-        }
-        body.amb-flat amb-button::part(button) {
-            box-shadow:
-                inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.3)) !important;
-        }
-        body.amb-flat amb-switch::part(track) {
-            box-shadow:
-                inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.05)) !important;
-        }
-        body.amb-flat amb-switch::part(handle) {
-            box-shadow:
-                inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.3)) !important;
-        }
-        body.amb-flat amb-fader::part(handle) {
-            box-shadow:
-                inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.3)) !important;
-        }
-        body.amb-flat amb-jack::part(jack) {
-            box-shadow:
-                inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.15)) !important;
-        }
-        body.amb-flat amb-slider::part(thumb) {
-            box-shadow:
-                inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.95)) !important;
-        }
-        body.amb-flat amb-subpanel::part(groove) {
-            box-shadow:
-                inset 0 0 0 100px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.8)) !important;
-        }
-
-        section {
-            margin-bottom: 48px;
-        }
-        h2 {
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid rgba(128, 128, 128, 0.2);
-        }
-
-        /* Module layout */
-        amb-panel {
-            margin-bottom: 16px;
-            --amb-elevation: 2;
-        }
-        .module-header {
-            margin-bottom: 20px;
-        }
-        .module-title {
-            font-size: 20px;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-        .module-subtitle {
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .controls {
-            display: flex;
-            align-items: flex-end;
-            gap: 24px;
-            flex-wrap: wrap;
-        }
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-        }
-        .control-row {
-            display: flex;
-            gap: 8px;
-        }
-
-        /* CSS Classes Demo */
-        .subsection-title {
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            margin: 20px 0 12px 0;
-        }
-        .subsection-title:first-of-type {
-            margin-top: 0;
-        }
-        .css-demo {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-        .demo-box {
-            width: calc(50% - 8px);
-            min-width: 120px;
-            max-width: 150px;
-            height: 100px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            /* Raised: lighter surface */
-            background: rgb(var(--amb-surface-light));
-        }
-        .demo-box.amb-inset {
-            /* Inset: darker than background */
-            background: rgb(var(--amb-surface-inset));
-        }
-        /* Override ambient box-shadow to include lighting */
-        .demo-box.ambient {
-            box-shadow:
-                /* Drop shadow */
-                rgba(0, 0, 0, calc(var(--amb-key-light) - var(--amb-fill-light)))
-                    calc(var(--amb-light-x) * var(--amb-elevation) * -8px)
-                    calc(var(--amb-light-y) * var(--amb-elevation) * -8px)
-                    calc(var(--amb-elevation) * 8px)
-                    calc(var(--amb-elevation) * -4px),
-                /* Fillet highlight */
-                inset calc(var(--amb-light-x) * var(--amb-fillet-width) * -1px)
-                    calc(var(--amb-light-y) * var(--amb-fillet-width) * -1px) 0px 0px
-                    rgb(255 255 255 / calc(var(--amb-fillet) * var(--amb-key-light))),
-                /* Fillet shadow */
-                inset calc(var(--amb-light-x) * var(--amb-fillet-width) * 1px)
-                    calc(var(--amb-light-y) * var(--amb-fillet-width) * 1px) 0px 0px
-                    rgb(0 0 0 / calc(var(--amb-fillet) * (var(--amb-key-light) - var(--amb-fill-light)))),
-                /* Chamfer highlight */
-                inset calc(var(--amb-light-x) * var(--amb-chamfer-width, 2) * -1px)
-                    calc(var(--amb-light-y) * var(--amb-chamfer-width, 2) * -1px) 2px 0px
-                    rgb(255 255 255 / calc(var(--amb-chamfer) * var(--amb-key-light))),
-                /* Chamfer shadow */
-                inset calc(var(--amb-light-x) * var(--amb-chamfer-width, 2) * 1px)
-                    calc(var(--amb-light-y) * var(--amb-chamfer-width, 2) * 1px) 2px 0px
-                    rgb(0 0 0 / calc(var(--amb-chamfer) * (var(--amb-key-light) - var(--amb-fill-light)))),
-                /* Lighting overlay */
-                inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.95));
-        }
-        .demo-box.ambient.amb-inset {
-            box-shadow:
-                /* Inset shadow */
-                inset calc(var(--amb-light-x) * -3px) calc(var(--amb-light-y) * -3px) 6px 0px
-                    rgba(0, 0, 0, calc(var(--amb-key-light) * 0.5)),
-                /* Fillet shadow (reversed for inset) */
-                inset calc(var(--amb-light-x) * var(--amb-fillet-width) * -1px)
-                    calc(var(--amb-light-y) * var(--amb-fillet-width) * -1px) 0px 0px
-                    rgb(0 0 0 / calc(var(--amb-fillet) * (var(--amb-key-light) - var(--amb-fill-light)))),
-                /* Fillet highlight (reversed for inset) */
-                inset calc(var(--amb-light-x) * var(--amb-fillet-width) * 1px)
-                    calc(var(--amb-light-y) * var(--amb-fillet-width) * 1px) 0px 0px
-                    rgb(255 255 255 / calc(var(--amb-fillet) * var(--amb-key-light))),
-                /* Chamfer shadow (reversed for inset) */
-                inset calc(var(--amb-light-x) * var(--amb-chamfer-width, 2) * -1px)
-                    calc(var(--amb-light-y) * var(--amb-chamfer-width, 2) * -1px) 2px 0px
-                    rgb(0 0 0 / calc(var(--amb-chamfer) * (var(--amb-key-light) - var(--amb-fill-light)))),
-                /* Chamfer highlight (reversed for inset) */
-                inset calc(var(--amb-light-x) * var(--amb-chamfer-width, 2) * 1px)
-                    calc(var(--amb-light-y) * var(--amb-chamfer-width, 2) * 1px) 2px 0px
-                    rgb(255 255 255 / calc(var(--amb-chamfer) * var(--amb-key-light))),
-                /* Lighting overlay - lower opacity for inset to appear darker */
-                inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.7));
-        }
-
-        /* Code example - inset panel style */
-        .code-example {
-            background: rgb(var(--amb-surface-inset));
-            border-radius: 8px;
-            padding: 16px;
-            margin-top: 16px;
-            font-family: 'SF Mono', Monaco, monospace;
-            font-size: 13px;
-            overflow-x: auto;
-            --amb-fillet: 1;
-            --amb-fillet-width: 1;
-            box-shadow:
-                /* Inset shadow */
-                inset calc(var(--amb-light-x) * -3px) calc(var(--amb-light-y) * -3px) 6px 0px
-                    rgba(0, 0, 0, calc(var(--amb-key-light) * 0.5)),
-                /* Fillet shadow (reversed for inset) */
-                inset calc(var(--amb-light-x) * var(--amb-fillet-width) * -1px)
-                    calc(var(--amb-light-y) * var(--amb-fillet-width) * -1px) 0px 0px
-                    rgb(0 0 0 / calc(var(--amb-fillet) * (var(--amb-key-light) - var(--amb-fill-light)))),
-                /* Fillet highlight (reversed for inset) */
-                inset calc(var(--amb-light-x) * var(--amb-fillet-width) * 1px)
-                    calc(var(--amb-light-y) * var(--amb-fillet-width) * 1px) 0px 0px
-                    rgb(255 255 255 / calc(var(--amb-fillet) * var(--amb-key-light))),
-                /* Lighting overlay */
-                inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.7));
-        }
-        .code-example .tag { color: #d4a056; }
-        .code-example .attr { color: #7ec87e; }
-        .code-example .val { color: #6cb6d9; }
-
-        /* Flat mode for demo boxes */
-        body.amb-flat .demo-box.ambient {
-            box-shadow:
-                inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.95)) !important;
-        }
-        body.amb-flat .demo-box.ambient.amb-inset {
-            box-shadow:
-                inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.7)) !important;
-        }
-        body.amb-flat .code-example {
-            box-shadow:
-                inset 0 0 0 200px rgba(var(--amb-light-r), var(--amb-light-g), var(--amb-light-b), calc(var(--amb-key-light) * 0.7)) !important;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <header>
-            <h1 class="amb-lume">AMBIENT <span>CSS</span></h1>
-            <div class="header-toggles">
-                <div class="toggle-group">
-                    <span class="toggle-label amb-lume-muted">Flat</span>
-                    <amb-switch id="materialToggle"></amb-switch>
-                    <span class="toggle-label amb-lume-muted">Solid</span>
-                </div>
-                <div class="toggle-group">
-                    <span class="toggle-label amb-lume-muted">Night</span>
-                    <amb-switch id="modeToggle"></amb-switch>
-                    <span class="toggle-label amb-lume-muted">Day</span>
-                </div>
+<html>
+  <head>
+    <link href="page.css" rel="stylesheet" />
+    <link href="index.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Michroma&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div class="amb-surface container">
+      <div class="content">
+        <div class="box logo ambient amb-fillet amb-elevation-3">
+          a m b i e n t <br />
+          <div style="font-size: 35px">CSS</div>
+          <button
+            id="button-day"
+            class="amb-button ambient amb-fillet-1 amb-elevation-1"
+          >
+            <span>day</span>
+          </button>
+          <button
+            id="button-night"
+            class="amb-button ambient amb-fillet-1 amb-elevation-1"
+          >
+            <span>night</span>
+          </button>
+        <div class="amb-knob ambient amb-fillet amb-elevation-2 amb-surface">
+          <div style="position:relative">
+            <div class="amb-knob-indicator">
+              <div class="amb-knob-grip">
+                <span class="amb-fader-dot"></span>
+                <span class="amb-fader-dot"></span>
+                <span class="amb-fader-dot"></span>
+              </div>
             </div>
-        </header>
-
-        <!-- Lighting Controls -->
-        <section>
-            <h2 class="amb-lume-muted">Lighting Variables</h2>
-
-            <amb-panel screws shade="light">
-                <div class="module-header">
-                    <div class="module-title amb-lume">LIGHTING</div>
-                    <div class="module-subtitle amb-lume-muted">CSS Custom Properties</div>
-                </div>
-
-                <div class="controls">
-                    <amb-knob id="keyLight" value="30" label="KEY" shade="dark"></amb-knob>
-                    <amb-knob id="fillLight" value="15" label="FILL" shade="dark"></amb-knob>
-                    <amb-knob id="lightX" value="75" label="LIGHT X" shade="dark"></amb-knob>
-                    <amb-knob id="lightY" value="0" label="LIGHT Y" shade="dark"></amb-knob>
-                </div>
-            </amb-panel>
-
-            <div class="code-example amb-lume-muted">
-                :root {<br>
-                &nbsp;&nbsp;<span style="color:#666">/* Light direction */</span><br>
-                &nbsp;&nbsp;<span class="attr">--amb-light-x</span>: <span class="val">1</span>;  <span style="color:#666">/* -1 to 1 */</span><br>
-                &nbsp;&nbsp;<span class="attr">--amb-light-y</span>: <span class="val">-1</span>; <span style="color:#666">/* -1 to 1 */</span><br>
-                &nbsp;&nbsp;<span style="color:#666">/* Light intensity */</span><br>
-                &nbsp;&nbsp;<span class="attr">--amb-key-light</span>: <span class="val">0.3</span>;<br>
-                &nbsp;&nbsp;<span class="attr">--amb-fill-light</span>: <span class="val">0</span>;<br>
-                &nbsp;&nbsp;<span style="color:#666">/* Light hue (RGB) */</span><br>
-                &nbsp;&nbsp;<span class="attr">--amb-light-r</span>: <span class="val">200</span>;<br>
-                &nbsp;&nbsp;<span class="attr">--amb-light-g</span>: <span class="val">210</span>;<br>
-                &nbsp;&nbsp;<span class="attr">--amb-light-b</span>: <span class="val">240</span>;<br>
-                &nbsp;&nbsp;<span style="color:#666">/* Accent color (RGB) - Gold */</span><br>
-                &nbsp;&nbsp;<span class="attr">--amb-accent-r</span>: <span class="val">245</span>;<br>
-                &nbsp;&nbsp;<span class="attr">--amb-accent-g</span>: <span class="val">200</span>;<br>
-                &nbsp;&nbsp;<span class="attr">--amb-accent-b</span>: <span class="val">66</span>;<br>
-                }
+          </div>
+        </div>
+        <div class="amb-fader">
+          <div class="amb-fader-thumb ambient amb-fillet amb-elevation-1 amb-surface-concave">
+            <div class="amb-fader-grip">
+              <span class="amb-fader-dot"></span>
+              <span class="amb-fader-dot"></span>
+              <span class="amb-fader-dot"></span>
             </div>
-        </section>
-
-        <!-- Web Components Demo -->
-        <section>
-            <h2 class="amb-lume-muted">Ambient Components</h2>
-
-            <amb-panel screws shade="light">
-                <div class="module-header">
-                    <div class="module-title amb-lume">CONTROLS</div>
-                    <div class="module-subtitle amb-lume-muted">Knobs, Faders & Switches</div>
-                </div>
-
-                <div class="controls">
-                    <div class="control-row">
-                        <amb-button label="S"></amb-button>
-                        <amb-button label="M" active></amb-button>
-                        <amb-button label="B"></amb-button>
-                    </div>
-
-                    <amb-knob value="70" size="large" label="MAIN" shade="light"></amb-knob>
-                    <amb-knob value="45" label="TRIM" shade="light"></amb-knob>
-                    <amb-knob value="80" label="BIAS" shade="light"></amb-knob>
-
-                    <amb-switch on label="AUTO"></amb-switch>
-
-                    <amb-fader value="75" label="LEVEL"></amb-fader>
-                </div>
-            </amb-panel>
-
-            <amb-panel screws>
-                <div class="module-header">
-                    <div class="module-title amb-lume">STATUS</div>
-                    <div class="module-subtitle amb-lume-muted">Indicators & Buttons</div>
-                </div>
-
-                <div class="controls">
-                    <amb-knob value="60" size="large" label="SPEED"></amb-knob>
-                    <amb-knob value="30" label="SENS"></amb-knob>
-                    <amb-knob value="50" label="RANGE"></amb-knob>
-
-                    <amb-switch label="MODE"></amb-switch>
-
-                    <div class="control-group">
-                        <div class="control-row">
-                            <amb-led color="green" on></amb-led>
-                            <amb-led color="amber"></amb-led>
-                            <amb-led color="red"></amb-led>
-                        </div>
-                        <span class="amb-lume-muted" style="font-size: 9px; letter-spacing: 1px;">STATUS</span>
-                    </div>
-                </div>
-            </amb-panel>
-
-            <div class="code-example amb-lume-muted">
-                <span class="tag">&lt;amb-panel</span> <span class="attr">screws</span><span class="tag">&gt;</span><br>
-                &nbsp;&nbsp;<span class="tag">&lt;amb-knob</span> <span class="attr">value</span>=<span class="val">"70"</span> <span class="attr">label</span>=<span class="val">"VOLUME"</span><span class="tag">&gt;&lt;/amb-knob&gt;</span><br>
-                &nbsp;&nbsp;<span class="tag">&lt;amb-fader</span> <span class="attr">value</span>=<span class="val">"75"</span> <span class="attr">label</span>=<span class="val">"LEVEL"</span><span class="tag">&gt;&lt;/amb-fader&gt;</span><br>
-                &nbsp;&nbsp;<span class="tag">&lt;amb-switch</span> <span class="attr">on</span> <span class="attr">label</span>=<span class="val">"AUTO"</span><span class="tag">&gt;&lt;/amb-switch&gt;</span><br>
-                &nbsp;&nbsp;<span class="tag">&lt;amb-led</span> <span class="attr">color</span>=<span class="val">"green"</span> <span class="attr">on</span><span class="tag">&gt;&lt;/amb-led&gt;</span><br>
-                <span class="tag">&lt;/amb-panel&gt;</span>
-            </div>
-
-            <!-- Subpanel and Slider demo -->
-            <amb-panel screws shade="light">
-                <div class="module-header">
-                    <div class="module-title amb-lume">MIXER</div>
-                    <div class="module-subtitle amb-lume-muted">Subpanels & Sliders</div>
-                </div>
-
-                <amb-subpanel label="EQ">
-                    <div class="controls">
-                        <amb-slider value="60" label="LOW" shade="light"></amb-slider>
-                        <amb-slider value="50" label="MID" shade="light"></amb-slider>
-                        <amb-slider value="70" label="HIGH" shade="light"></amb-slider>
-                    </div>
-                </amb-subpanel>
-
-                <amb-subpanel label="DYNAMICS">
-                    <div class="controls">
-                        <amb-slider value="40" label="THRESHOLD" shade="light"></amb-slider>
-                        <amb-slider value="65" label="RATIO" shade="light"></amb-slider>
-                    </div>
-                </amb-subpanel>
-            </amb-panel>
-
-            <div class="code-example amb-lume-muted">
-                <span class="tag">&lt;amb-panel</span> <span class="attr">screws</span><span class="tag">&gt;</span><br>
-                &nbsp;&nbsp;<span class="tag">&lt;amb-subpanel</span> <span class="attr">label</span>=<span class="val">"EQ"</span><span class="tag">&gt;</span><br>
-                &nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;amb-slider</span> <span class="attr">value</span>=<span class="val">"60"</span> <span class="attr">label</span>=<span class="val">"LOW"</span><span class="tag">&gt;&lt;/amb-slider&gt;</span><br>
-                &nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;amb-slider</span> <span class="attr">value</span>=<span class="val">"50"</span> <span class="attr">label</span>=<span class="val">"MID"</span><span class="tag">&gt;&lt;/amb-slider&gt;</span><br>
-                &nbsp;&nbsp;<span class="tag">&lt;/amb-subpanel&gt;</span><br>
-                <span class="tag">&lt;/amb-panel&gt;</span>
-            </div>
-        </section>
-
-        <!-- CSS Classes Demo -->
-        <section>
-            <h2 class="amb-lume-muted">Ambient CSS Classes</h2>
-
-            <h3 class="subsection-title amb-lume-muted">Raised Edge Treatments</h3>
-            <div class="css-demo">
-                <div class="demo-box ambient amb-lume-muted amb-fillet amb-rounded-md">
-                    fillet
-                </div>
-                <div class="demo-box ambient amb-lume-muted amb-fillet-2 amb-rounded-md">
-                    fillet-2
-                </div>
-                <div class="demo-box ambient amb-lume-muted amb-chamfer amb-rounded-md">
-                    chamfer
-                </div>
-                <div class="demo-box ambient amb-lume-muted amb-chamfer-2 amb-rounded-md">
-                    chamfer-2
-                </div>
-            </div>
-
-            <h3 class="subsection-title amb-lume-muted">Inset Edge Treatments</h3>
-            <div class="css-demo">
-                <div class="demo-box ambient amb-lume-muted amb-fillet amb-inset amb-rounded-md">
-                    fillet
-                </div>
-                <div class="demo-box ambient amb-lume-muted amb-fillet-2 amb-inset amb-rounded-md">
-                    fillet-2
-                </div>
-                <div class="demo-box ambient amb-lume-muted amb-chamfer amb-inset amb-rounded-md">
-                    chamfer
-                </div>
-                <div class="demo-box ambient amb-lume-muted amb-chamfer-2 amb-inset amb-rounded-md">
-                    chamfer-2
-                </div>
-            </div>
-
-            <h3 class="subsection-title amb-lume-muted">Elevations</h3>
-            <div class="css-demo">
-                <div class="demo-box ambient amb-lume-muted amb-fillet amb-elevation-0 amb-rounded-md">
-                    elev-0
-                </div>
-                <div class="demo-box ambient amb-lume-muted amb-fillet amb-elevation-1 amb-rounded-md">
-                    elev-1
-                </div>
-                <div class="demo-box ambient amb-lume-muted amb-fillet amb-elevation-2 amb-rounded-md">
-                    elev-2
-                </div>
-                <div class="demo-box ambient amb-lume-muted amb-fillet amb-elevation-3 amb-rounded-md">
-                    elev-3
-                </div>
-            </div>
-
-            <div class="code-example amb-lume-muted">
-                <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"ambient amb-fillet amb-elevation-1"</span><span class="tag">&gt;&lt;/div&gt;</span><br>
-                <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"ambient amb-chamfer-2"</span><span class="tag">&gt;&lt;/div&gt;</span><br>
-                <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"ambient amb-fillet amb-inset"</span><span class="tag">&gt;&lt;/div&gt;</span>
-            </div>
-        </section>
-
+          </div>
+          <div class="amb-fader-indicator amb-glow"></div>
+        </div>
+        <div class="ambient amb-switch amb-surface-concave amb-chamfer amb-elevation-1" id="demo-switch"></div>
+        <div class="ambient amb-switch amb-surface-convex amb-chamfer amb-elevation-1"></div>
+        <div class="row">
+          <div class="circle ambient amb-fillet amb-elevation-0"></div>
+          <div class="circle ambient amb-fillet amb-elevation-1"></div>
+          <div class="circle ambient amb-fillet amb-elevation-2"></div>
+          <div class="circle ambient amb-fillet amb-elevation-3"></div>
+        </div>
+      </div>
     </div>
 
     <script>

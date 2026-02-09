@@ -1,165 +1,38 @@
-// ==========================================================================
-// Ambient CSS - Modular Rack Interface (Knoblaunch Style)
-// ==========================================================================
+async function sleep(x) {
+  return new Promise((resolve) => setTimeout(resolve, x));
+}
 
-document.addEventListener('DOMContentLoaded', () => {
-  // --------------------------------------------------------------------------
-  // Theme Toggle
-  // --------------------------------------------------------------------------
-  const lightBtn = document.getElementById('lightBtn');
-  const darkBtn = document.getElementById('darkBtn');
+let style = getComputedStyle(document.body);
+let wait = Math.round(3000 / 180);
 
-  function setTheme(theme) {
-    if (theme === 'light') {
-      document.body.setAttribute('data-theme', 'light');
-      lightBtn?.classList.add('active');
-      darkBtn?.classList.remove('active');
-    } else {
-      document.body.removeAttribute('data-theme');
-      darkBtn?.classList.add('active');
-      lightBtn?.classList.remove('active');
-    }
+async function animateVar(variable, cond, step, unit = "") {
+  while (cond(parseFloat(style.getPropertyValue(variable)))) {
+    let curr = parseFloat(style.getPropertyValue(variable));
+    document.documentElement.style.setProperty(variable, (curr + step) + unit);
+    await sleep(wait);
   }
+}
 
-  lightBtn?.addEventListener('click', () => setTheme('light'));
-  darkBtn?.addEventListener('click', () => setTheme('dark'));
-
-  // --------------------------------------------------------------------------
-  // Toggle Buttons
-  // --------------------------------------------------------------------------
-  document.querySelectorAll('.toggle-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      // For grouped buttons (S/M/B style), toggle individually
-      btn.classList.toggle('active');
-    });
+document
+  .getElementById("button-day")
+  .addEventListener("click", async function setDay() {
+    animateVar("--amb-light-x", (val) => val > -1, -1 / 60);
+    animateVar("--amb-key-light-intensity", (val) => val < 0.9, 0.6 / 60);
+    animateVar("--amb-fill-light-intensity", (val) => val < 0.7, 0.6 / 60);
+    animateVar("--amb-light-saturation", (val) => val > 0, -15 / 60, "%");
   });
-
-  // --------------------------------------------------------------------------
-  // Switches (data-state toggle)
-  // --------------------------------------------------------------------------
-  document.querySelectorAll('.switch').forEach(sw => {
-    sw.addEventListener('click', () => {
-      const currentState = sw.getAttribute('data-state');
-      if (currentState === 'on') {
-        sw.setAttribute('data-state', 'off');
-      } else {
-        sw.setAttribute('data-state', 'on');
-      }
-    });
+document
+  .getElementById("demo-switch")
+  .addEventListener("click", function () {
+    this.classList.toggle("amb-switch-on");
   });
-
-  // --------------------------------------------------------------------------
-  // Knob Rotation
-  // --------------------------------------------------------------------------
-  let activeKnob = null;
-  let startY = 0;
-  let startRotation = 0;
-
-  function getKnobRotation(knob) {
-    const transform = knob.style.transform || '';
-    const match = transform.match(/rotate\(([-\d.]+)deg\)/);
-    return match ? parseFloat(match[1]) : 0;
-  }
-
-  function setKnobRotation(knob, degrees) {
-    const clamped = Math.max(-135, Math.min(135, degrees));
-    knob.style.transform = `rotate(${clamped}deg)`;
-  }
-
-  // Initialize knob rotations based on data-value
-  document.querySelectorAll('.knob').forEach(knob => {
-    const value = parseInt(knob.getAttribute('data-value') || '50');
-    // Map 0-100 to -135 to 135 degrees
-    const rotation = ((value / 100) * 270) - 135;
-    setKnobRotation(knob, rotation);
-
-    knob.addEventListener('mousedown', (e) => {
-      activeKnob = knob;
-      startY = e.clientY;
-      startRotation = getKnobRotation(knob);
-      knob.style.cursor = 'grabbing';
-      e.preventDefault();
-    });
-
-    knob.addEventListener('touchstart', (e) => {
-      activeKnob = knob;
-      startY = e.touches[0].clientY;
-      startRotation = getKnobRotation(knob);
-      e.preventDefault();
-    });
-  });
-
-  document.addEventListener('mousemove', (e) => {
-    if (!activeKnob) return;
-    const deltaY = startY - e.clientY;
-    const newRotation = startRotation + deltaY * 0.8;
-    setKnobRotation(activeKnob, newRotation);
-  });
-
-  document.addEventListener('touchmove', (e) => {
-    if (!activeKnob) return;
-    const deltaY = startY - e.touches[0].clientY;
-    const newRotation = startRotation + deltaY * 0.8;
-    setKnobRotation(activeKnob, newRotation);
-  });
-
-  document.addEventListener('mouseup', () => {
-    if (activeKnob) {
-      activeKnob.style.cursor = 'grab';
-      activeKnob = null;
-    }
-  });
-
-  document.addEventListener('touchend', () => {
-    activeKnob = null;
-  });
-
-  // --------------------------------------------------------------------------
-  // Slider Dragging
-  // --------------------------------------------------------------------------
-  let activeSlider = null;
-  let sliderTrack = null;
-
-  document.querySelectorAll('.slider-handle').forEach(handle => {
-    handle.addEventListener('mousedown', (e) => {
-      activeSlider = handle;
-      sliderTrack = handle.parentElement;
-      e.preventDefault();
-    });
-
-    handle.addEventListener('touchstart', (e) => {
-      activeSlider = handle;
-      sliderTrack = handle.parentElement;
-      e.preventDefault();
-    });
-  });
-
-  document.addEventListener('mousemove', (e) => {
-    if (!activeSlider) return;
-    updateSliderPosition(e.clientX);
-  });
-
-  document.addEventListener('touchmove', (e) => {
-    if (!activeSlider) return;
-    updateSliderPosition(e.touches[0].clientX);
-  });
-
-  function updateSliderPosition(clientX) {
-    const trackRect = sliderTrack.getBoundingClientRect();
-    let percent = ((clientX - trackRect.left) / trackRect.width) * 100;
-    percent = Math.max(0, Math.min(100, percent));
-    activeSlider.style.left = `${percent}%`;
-
-    // Update the fill as well
-    const fill = sliderTrack.querySelector('.slider-fill');
-    if (fill) {
-      fill.style.width = `${percent}%`;
-    }
-  }
-
-  document.addEventListener('mouseup', () => {
-    activeSlider = null;
-    sliderTrack = null;
+document
+  .getElementById("button-night")
+  .addEventListener("click", async function setNight() {
+    animateVar("--amb-light-x", (val) => val < 1, 1 / 60);
+    animateVar("--amb-key-light-intensity", (val) => val > 0.3, -0.6 / 60);
+    animateVar("--amb-fill-light-intensity", (val) => val > 0.1, -0.6 / 60);
+    animateVar("--amb-light-saturation", (val) => val < 15, 15 / 60, "%");
   });
 
   document.addEventListener('touchend', () => {

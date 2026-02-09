@@ -7,336 +7,32 @@
    Root Variables - Global lighting and theme
    -------------------------------------------------------------------------- */
 :root {
-  /* Lighting direction (-1 to 1) */
-  --amb-light-x: 1;
+  --amb-light-x: -1;
   --amb-light-y: -1;
-
-  /* Light intensities */
-  --amb-key-light: 0.35;
-  --amb-fill-light: 0.1;
-
-  /* Object properties */
-  --amb-elevation: 0;
-  --amb-thickness: 0;
-
-  /* Edge properties */
+  --amb-key-light-intensity: 0.9;
+  --amb-fill-light-intensity: 0.7;
+  --amb-light-hue: 234;
+  --amb-light-saturation: 15%;
+  --amb-light-distance: 0px;
   --amb-fillet: 0;
   --amb-fillet-w: 1;
   --amb-chamfer: 0;
-  --amb-chamfer-w: 2;
-  --amb-groove: 0;
-  --amb-groove-w: 2;
-
-  /* Emitter */
-  --amb-emitter: 0;
-  --amb-emit-r: 255;
-  --amb-emit-g: 200;
-  --amb-emit-b: 100;
-  --amb-emit-i: 0.5;
-
-  /* Finish */
-  --amb-shiny: 0;
-
-  /* Pressed state */
-  --amb-pressed: 0;
-
-  /* ===================
-     NEUTRAL THEME COLORS
-     =================== */
-
-  /* Background (changes with day/night) */
-  --bg-base: 45, 48, 55;
-  --bg-surface: 55, 58, 65;
-  --bg-raised: 65, 68, 75;
-  --bg-inset: 35, 38, 45;
-
-  /* Text */
-  --text-primary: 180, 185, 195;
-  --text-secondary: 120, 125, 135;
-  --text-muted: 80, 85, 95;
-
-  /* Accent */
-  --accent-h: 25;
-  --accent-s: 90%;
-  --accent-l: 55%;
-
-  /* Transition for day/night */
-  --theme-transition: 0.8s ease;
-}
-
-/* Day mode overrides */
-.day-mode {
-  --amb-light-x: -1;
-  --amb-key-light: 0.5;
-  --amb-fill-light: 0.25;
-
-  --bg-base: 200, 205, 215;
-  --bg-surface: 210, 215, 225;
-  --bg-raised: 225, 230, 240;
-  --bg-inset: 180, 185, 195;
-
-  --text-primary: 50, 55, 65;
-  --text-secondary: 90, 95, 105;
-  --text-muted: 130, 135, 145;
-}
-
-/* Finish variations */
-.finish-matte {
-  --amb-shiny: 0;
-}
-
-.finish-satin {
-  --amb-shiny: 0.3;
-}
-
-.finish-gloss {
-  --amb-shiny: 0.6;
-}
-
-/* --------------------------------------------------------------------------
-   Edge Styles
-   -------------------------------------------------------------------------- */
-.amb-fillet { --amb-fillet: 1; }
-.amb-fillet-1 { --amb-fillet: 1; --amb-fillet-w: 1; }
-.amb-fillet-2 { --amb-fillet: 1; --amb-fillet-w: 2; }
-.amb-fillet-3 { --amb-fillet: 1; --amb-fillet-w: 3; }
-
-.amb-chamfer { --amb-chamfer: 1; }
-.amb-chamfer-1 { --amb-chamfer: 1; --amb-chamfer-w: 1; }
-.amb-chamfer-2 { --amb-chamfer: 1; --amb-chamfer-w: 2; }
-.amb-chamfer-3 { --amb-chamfer: 1; --amb-chamfer-w: 3; }
-
-.amb-groove { --amb-groove: 1; }
-.amb-groove-1 { --amb-groove: 1; --amb-groove-w: 1; }
-.amb-groove-2 { --amb-groove: 1; --amb-groove-w: 2; }
-.amb-groove-3 { --amb-groove: 1; --amb-groove-w: 3; }
-
-/* --------------------------------------------------------------------------
-   Elevation & Thickness
-   -------------------------------------------------------------------------- */
-.amb-e0 { --amb-elevation: 0; }
-.amb-e1 { --amb-elevation: 1; }
-.amb-e2 { --amb-elevation: 2; }
-.amb-e3 { --amb-elevation: 3; }
-
-.amb-t0 { --amb-thickness: 0; }
-.amb-t1 { --amb-thickness: 1; }
-.amb-t2 { --amb-thickness: 2; }
-.amb-t3 { --amb-thickness: 3; }
-
-/* --------------------------------------------------------------------------
-   Emitter
-   -------------------------------------------------------------------------- */
-.amb-emitter { --amb-emitter: 1; }
-.amb-emit-red { --amb-emit-r: 255; --amb-emit-g: 70; --amb-emit-b: 50; }
-.amb-emit-orange { --amb-emit-r: 255; --amb-emit-g: 140; --amb-emit-b: 50; }
-.amb-emit-amber { --amb-emit-r: 255; --amb-emit-g: 180; --amb-emit-b: 50; }
-.amb-emit-green { --amb-emit-r: 80; --amb-emit-g: 255; --amb-emit-b: 120; }
-.amb-emit-cyan { --amb-emit-r: 80; --amb-emit-g: 220; --amb-emit-b: 255; }
-.amb-emit-blue { --amb-emit-r: 80; --amb-emit-g: 140; --amb-emit-b: 255; }
-
-.amb-emit-dim { --amb-emit-i: 0.3; }
-.amb-emit-mid { --amb-emit-i: 0.6; }
-.amb-emit-bright { --amb-emit-i: 1; }
-
-/* --------------------------------------------------------------------------
-   States
-   -------------------------------------------------------------------------- */
-.amb-pressed { --amb-pressed: 1; --amb-elevation: 0; }
-
-/* --------------------------------------------------------------------------
-   Main Ambient Class
-   -------------------------------------------------------------------------- */
-.ambient {
-  transition:
-    box-shadow var(--theme-transition),
-    background-color var(--theme-transition);
-
-  box-shadow:
-    /* Drop shadow */
-    rgba(0, 0, 0, calc(var(--amb-key-light) * (1 - var(--amb-emitter)) * 0.6))
-      calc(var(--amb-light-x) * var(--amb-elevation) * -5px)
-      calc(var(--amb-light-y) * var(--amb-elevation) * -5px)
-      calc(var(--amb-elevation) * 6px)
-      calc(var(--amb-elevation) * -2px),
-
-    /* Thickness */
-    rgba(0, 0, 0, calc(var(--amb-thickness) * 0.15 * (1 - var(--amb-emitter))))
-      calc(var(--amb-light-x) * var(--amb-thickness) * -2px)
-      calc(var(--amb-light-y) * var(--amb-thickness) * -2px)
-      calc(var(--amb-thickness) * 1px) 0,
-
-    /* Fillet highlight */
-    inset calc(var(--amb-light-x) * var(--amb-fillet-w) * -1px)
-          calc(var(--amb-light-y) * var(--amb-fillet-w) * -1px) 0 0
-      rgba(255, 255, 255, calc(var(--amb-fillet) * var(--amb-key-light) * 0.7 * (1 - var(--amb-pressed)))),
-
-    /* Fillet shadow */
-    inset calc(var(--amb-light-x) * var(--amb-fillet-w) * 1px)
-          calc(var(--amb-light-y) * var(--amb-fillet-w) * 1px) 0 0
-      rgba(0, 0, 0, calc(var(--amb-fillet) * 0.35 * (1 - var(--amb-pressed)))),
-
-    /* Chamfer highlight */
-    inset calc(var(--amb-light-x) * var(--amb-chamfer-w) * -1px)
-          calc(var(--amb-light-y) * var(--amb-chamfer-w) * -1px)
-          calc(var(--amb-chamfer-w) * 1px) 0
-      rgba(255, 255, 255, calc(var(--amb-chamfer) * var(--amb-key-light) * 0.5 * (1 - var(--amb-pressed)))),
-
-    /* Chamfer shadow */
-    inset calc(var(--amb-light-x) * var(--amb-chamfer-w) * 1px)
-          calc(var(--amb-light-y) * var(--amb-chamfer-w) * 1px)
-          calc(var(--amb-chamfer-w) * 1px) 0
-      rgba(0, 0, 0, calc(var(--amb-chamfer) * 0.4 * (1 - var(--amb-pressed)))),
-
-    /* Groove shadow */
-    inset calc(var(--amb-light-x) * var(--amb-groove-w) * -1px)
-          calc(var(--amb-light-y) * var(--amb-groove-w) * -1px)
-          calc(var(--amb-groove-w) * 0.5px) 0
-      rgba(0, 0, 0, calc(var(--amb-groove) * 0.5)),
-
-    /* Groove highlight */
-    inset calc(var(--amb-light-x) * var(--amb-groove-w) * 1px)
-          calc(var(--amb-light-y) * var(--amb-groove-w) * 1px)
-          calc(var(--amb-groove-w) * 0.5px) 0
-      rgba(255, 255, 255, calc(var(--amb-groove) * var(--amb-key-light) * 0.25)),
-
-    /* Pressed */
-    inset 0 0 calc(var(--amb-pressed) * 4px) calc(var(--amb-pressed) * 1px)
-      rgba(0, 0, 0, calc(var(--amb-pressed) * 0.25)),
-
-    /* Shiny */
-    inset calc(var(--amb-light-x) * -2px) calc(var(--amb-light-y) * -2px) 4px -2px
-      rgba(255, 255, 255, calc(var(--amb-shiny) * var(--amb-key-light) * 0.4)),
-
-    /* Emitter glow */
-    0 0 calc(var(--amb-emitter) * var(--amb-emit-i) * 12px)
-        calc(var(--amb-emitter) * var(--amb-emit-i) * 3px)
-      rgba(var(--amb-emit-r), var(--amb-emit-g), var(--amb-emit-b),
-           calc(var(--amb-emitter) * var(--amb-emit-i) * 0.8)),
-
-    /* Emitter inner */
-    inset 0 0 calc(var(--amb-emitter) * var(--amb-emit-i) * 8px)
-              calc(var(--amb-emitter) * var(--amb-emit-i) * -2px)
-      rgba(var(--amb-emit-r), var(--amb-emit-g), var(--amb-emit-b),
-           calc(var(--amb-emitter) * var(--amb-emit-i) * 0.4));
-}
-
-/* ==========================================================================
-   SYNTH COMPONENTS
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   Knob - Large
-   -------------------------------------------------------------------------- */
-.knob-lg {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: rgb(var(--bg-raised));
-  position: relative;
-  cursor: pointer;
-  transition: background-color var(--theme-transition);
-  --amb-chamfer: 1;
-  --amb-chamfer-w: 3;
-  --amb-elevation: 2;
-}
-
-.knob-lg::before {
-  content: '';
-  position: absolute;
-  inset: 4px;
-  border-radius: 50%;
-  background: linear-gradient(
-    calc(135deg + var(--amb-light-x) * 45deg),
-    rgba(255,255,255,0.08) 0%,
-    transparent 50%,
-    rgba(0,0,0,0.15) 100%
+  --amb-thickness: 0;
+  --amb-elevation: 0;
+  --amb-fillet-width: 1;
+  --amb-chamfer-width: 1;
+  --amb-highlight-color: coral;
+  --amb-lume-hue: 17;
+  --amb-lume: color-mix(
+    in oklab,
+    hsl(var(--amb-lume-hue) 100% 74%) calc(clamp(0, (0.5 - var(--amb-key-light-intensity)) / 0.2, 1) * 100%),
+    hsl(
+      var(--amb-light-hue)
+      var(--amb-light-saturation)
+      calc((1 - sign(var(--amb-key-light-intensity) - 0.5)) * 50% + 25%)
+    )
   );
-}
-
-.knob-lg::after {
-  content: '';
-  position: absolute;
-  top: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 3px;
-  height: 12px;
-  background: rgb(var(--text-primary));
-  border-radius: 2px;
-  opacity: 0.8;
-}
-
-/* --------------------------------------------------------------------------
-   Knob - Medium
-   -------------------------------------------------------------------------- */
-.knob-md {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgb(var(--bg-raised));
-  position: relative;
-  cursor: pointer;
-  transition: background-color var(--theme-transition);
-  --amb-chamfer: 1;
-  --amb-chamfer-w: 2;
-  --amb-elevation: 1;
-}
-
-.knob-md::before {
-  content: '';
-  position: absolute;
-  inset: 3px;
-  border-radius: 50%;
-  background: linear-gradient(
-    calc(135deg + var(--amb-light-x) * 45deg),
-    rgba(255,255,255,0.06) 0%,
-    transparent 50%,
-    rgba(0,0,0,0.12) 100%
-  );
-}
-
-.knob-md::after {
-  content: '';
-  position: absolute;
-  top: 6px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 2px;
-  height: 9px;
-  background: rgb(var(--text-primary));
-  border-radius: 1px;
-  opacity: 0.7;
-}
-
-/* --------------------------------------------------------------------------
-   Knob - Small
-   -------------------------------------------------------------------------- */
-.knob-sm {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: rgb(var(--bg-raised));
-  position: relative;
-  cursor: pointer;
-  transition: background-color var(--theme-transition);
-  --amb-chamfer: 1;
-  --amb-chamfer-w: 1;
-  --amb-elevation: 1;
-}
-
-.knob-sm::after {
-  content: '';
-  position: absolute;
-  top: 4px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 2px;
-  height: 6px;
-  background: rgb(var(--text-primary));
-  border-radius: 1px;
-  opacity: 0.6;
-}
+  }
 
 /* --------------------------------------------------------------------------
    Fader / Slider
@@ -416,152 +112,22 @@
   --amb-elevation: 1;
 }
 
-/* --------------------------------------------------------------------------
-   Switch - 2 Position
-   -------------------------------------------------------------------------- */
-.switch {
-  width: 12px;
-  height: 24px;
-  background: rgb(var(--bg-inset));
-  border-radius: 3px;
-  position: relative;
-  cursor: pointer;
-  transition: background-color var(--theme-transition);
-  --amb-groove: 1;
-  --amb-groove-w: 1;
-}
-
-.switch-handle {
-  width: 10px;
-  height: 8px;
-  background: rgb(var(--bg-raised));
-  border-radius: 2px;
-  position: absolute;
-  left: 1px;
-  top: 2px;
-  transition: top 0.15s ease, background-color var(--theme-transition);
+.amb-fillet-minus-1 {
   --amb-fillet: 1;
-  --amb-elevation: 1;
+  --amb-fillet-width: -1;
 }
 
-.switch.down .switch-handle {
-  top: 14px;
+.amb-chamfer {
+  --amb-chamfer: 1;
 }
 
-/* --------------------------------------------------------------------------
-   Switch - 3 Position
-   -------------------------------------------------------------------------- */
-.switch-3 {
-  width: 12px;
-  height: 32px;
-  background: rgb(var(--bg-inset));
-  border-radius: 3px;
-  position: relative;
-  cursor: pointer;
-  transition: background-color var(--theme-transition);
-  --amb-groove: 1;
-  --amb-groove-w: 1;
+.amb-chamfer-2 {
+  --amb-chamfer: 1;
+  --amb-chamfer-width: 2;
 }
 
-.switch-3 .switch-handle {
-  top: 12px;
-}
 
-.switch-3.up .switch-handle {
-  top: 2px;
-}
-
-.switch-3.down .switch-handle {
-  top: 22px;
-}
-
-/* --------------------------------------------------------------------------
-   Multi-Selector (Rotary)
-   -------------------------------------------------------------------------- */
-.selector {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: rgb(var(--bg-inset));
-  position: relative;
-  cursor: pointer;
-  transition: background-color var(--theme-transition);
-  --amb-groove: 1;
-  --amb-groove-w: 2;
-}
-
-.selector-pointer {
-  position: absolute;
-  top: 5px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 4px;
-  height: 8px;
-  background: rgb(var(--text-primary));
-  border-radius: 2px;
-  transform-origin: center 13px;
-}
-
-/* --------------------------------------------------------------------------
-   LED Indicator
-   -------------------------------------------------------------------------- */
-.led {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: rgb(var(--bg-inset));
-  transition: background-color var(--theme-transition);
-  --amb-emitter: 0;
-}
-
-.led.on {
-  background: rgb(var(--amb-emit-r), var(--amb-emit-g), var(--amb-emit-b));
-  --amb-emitter: 1;
-  --amb-emit-i: 0.8;
-}
-
-/* --------------------------------------------------------------------------
-   LED Display
-   -------------------------------------------------------------------------- */
-.led-display {
-  background: rgb(var(--bg-inset));
-  border-radius: 3px;
-  padding: 6px 10px;
-  font-family: 'Courier New', monospace;
-  font-size: 14px;
-  font-weight: bold;
-  color: rgb(var(--amb-emit-r), var(--amb-emit-g), var(--amb-emit-b));
-  text-shadow: 0 0 8px rgba(var(--amb-emit-r), var(--amb-emit-g), var(--amb-emit-b), 0.6);
-  min-width: 50px;
-  text-align: right;
-  transition: background-color var(--theme-transition);
-  --amb-groove: 1;
-  --amb-groove-w: 2;
-}
-
-/* --------------------------------------------------------------------------
-   Button
-   -------------------------------------------------------------------------- */
-.btn {
-  padding: 8px 16px;
-  background: rgb(var(--bg-raised));
-  border: none;
-  border-radius: 4px;
-  color: rgb(var(--text-primary));
-  font-family: inherit;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  transition: background-color var(--theme-transition);
-  --amb-fillet: 1;
-  --amb-fillet-w: 1;
-  --amb-elevation: 1;
-}
-
-.btn:active {
-  --amb-pressed: 1;
+.amb-elevation-0 {
   --amb-elevation: 0;
 }
 
@@ -597,125 +163,185 @@
   padding: 16px;
 }
 
-/* --------------------------------------------------------------------------
-   Sub-Section
-   -------------------------------------------------------------------------- */
-.subsection {
-  background: rgb(var(--bg-inset));
-  border-radius: 4px;
-  padding: 12px;
-  transition: background-color var(--theme-transition);
-  --amb-groove: 1;
-  --amb-groove-w: 2;
+.ambient {
+  box-shadow: hsl(
+        var(--amb-light-hue)
+        var(--amb-light-saturation)
+        0%
+        / calc((var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)))
+      )
+      calc(var(--amb-light-x) * var(--amb-elevation) * -8px)
+      calc(var(--amb-light-y) * var(--amb-elevation) * -8px)
+      calc(var(--amb-elevation) * 8px) calc(var(--amb-elevation) * -4px),
+    inset calc(var(--amb-light-x) * var(--amb-fillet-width) * -1px)
+      calc(var(--amb-light-y) * var(--amb-fillet-width) * -1px) 0px 0px
+      hsl(
+        var(--amb-light-hue)
+        var(--amb-light-saturation)
+        100%
+        / calc(var(--amb-fillet) * var(--amb-key-light-intensity))
+      ),
+    inset calc(var(--amb-light-x) * var(--amb-fillet-width) * 1px)
+      calc(var(--amb-light-y) * var(--amb-fillet-width) * 1px) 0px 0px
+      hsl(
+        var(--amb-light-hue)
+        var(--amb-light-saturation)
+        0%
+        / calc(
+            var(--amb-fillet) *
+              calc(
+                var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
+              )
+          )
+      ),
+    inset calc(var(--amb-light-x) * -2px) calc(var(--amb-light-y) * -2px) 2px
+      0px
+      hsl(
+        var(--amb-light-hue)
+        var(--amb-light-saturation)
+        100%
+        / calc(var(--amb-chamfer) * var(--amb-key-light-intensity))
+      ),
+    inset calc(var(--amb-light-x) * 2px) calc(var(--amb-light-y) * 2px) 2px 0px
+      hsl(
+        var(--amb-light-hue)
+        var(--amb-light-saturation)
+        0%
+        / calc(
+            var(--amb-chamfer) *
+              calc(
+                var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
+              )
+          )
+      );
 }
 
-/* --------------------------------------------------------------------------
-   Panel (Raised)
-   -------------------------------------------------------------------------- */
-.panel {
-  background: rgb(var(--bg-raised));
-  border-radius: 4px;
-  padding: 12px;
-  transition: background-color var(--theme-transition);
-  --amb-fillet: 1;
-  --amb-fillet-w: 1;
-  --amb-elevation: 1;
-}
-
-/* --------------------------------------------------------------------------
-   Jack
-   -------------------------------------------------------------------------- */
-.jack {
-  width: 16px;
-  height: 16px;
+.amb-knob {
   border-radius: 50%;
-  background: rgb(var(--bg-inset));
-  position: relative;
-  transition: background-color var(--theme-transition);
-  --amb-groove: 1;
-  --amb-groove-w: 2;
+  height: 64px;
+  width: 64px;
+  border: medium solid var(--amb-lume);
 }
 
-.jack::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: rgb(var(--bg-base));
+.amb-surface {
+  background-color: hsl(
+    var(--amb-light-hue)
+    var(--amb-light-saturation)
+    calc(var(--amb-key-light-intensity) * 100%)
+  );
 }
 
-/* --------------------------------------------------------------------------
-   Screw
-   -------------------------------------------------------------------------- */
-.screw {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: rgb(var(--bg-raised));
-  position: relative;
-  transition: background-color var(--theme-transition);
-  --amb-chamfer: 1;
-  --amb-chamfer-w: 1;
+.amb-surface-darker {
+  background-color: hsl(
+    var(--amb-light-hue)
+    var(--amb-light-saturation)
+    calc(var(--amb-key-light-intensity) * 30%)
+  );
 }
 
-.screw::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 2px;
-  right: 2px;
-  height: 1px;
-  background: rgba(0,0,0,0.3);
-  transform: translateY(-50%);
+.amb-surface-concave {
+  --_concave-dark-stop: calc(50% + var(--amb-light-y) * 50%);
+  --_concave-light-stop: calc(50% - var(--amb-light-y) * 50%);
+  background: linear-gradient(
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 90%)) var(--_concave-dark-stop),
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 100%)) 50%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 110%)) var(--_concave-light-stop)
+  );
 }
 
-/* --------------------------------------------------------------------------
-   Utility
-   -------------------------------------------------------------------------- */
-.ctrl {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
+.amb-surface-convex {
+  --_convex-light-stop: calc(50% + var(--amb-light-y) * 50%);
+  --_convex-dark-stop: calc(50% - var(--amb-light-y) * 50%);
+  background: linear-gradient(
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 110%)) var(--_convex-light-stop),
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 100%)) 50%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 90%)) var(--_convex-dark-stop)
+  );
 }
 
-.label {
-  font-size: 9px;
-  color: rgb(var(--text-secondary));
+.amb-button {
+  cursor: pointer;
+  border: medium solid var(--amb-lume);
+  background-color: inherit;
+  padding: 0.5rem;
+  border-radius: 12px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  text-align: center;
-  transition: color var(--theme-transition);
+  width: 64px;
+  font-weight: 600;
+  color: var(--amb-lume);
 }
 
-.value {
-  font-size: 10px;
-  color: rgb(var(--text-primary));
-  text-align: center;
-  transition: color var(--theme-transition);
+.amb-button:focus {
+  outline-offset: 2px;
 }
 
-.row {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+.amb-button:hover, .amb-knob:hover {
+  border-color: var(--amb-highlight-color);
 }
 
-.col {
+.amb-knob-indicator {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.amb-knob-grip {
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 
-.gap-xs { gap: 4px; }
-.gap-sm { gap: 8px; }
-.gap-md { gap: 16px; }
-.gap-lg { gap: 24px; }
-.gap-xl { gap: 32px; }
+.amb-glow {
+   box-shadow: 0 0 4px var(--amb-lume);
+}
 
-.center { justify-content: center; align-items: center; }
-.between { justify-content: space-between; }
-.wrap { flex-wrap: wrap; }
+.amb-fader {
+  position: relative;
+  width: 4px;
+  height: 120px;
+  border-radius: 4px;
+  background-color: var(--amb-lume);
+}
+
+.amb-fader-thumb {
+  position: absolute;
+  width: 24px;
+  height: 36px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+}
+
+.amb-fader-grip {
+  display: flex;
+  gap: 2px;
+}
+
+.amb-fader-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 30% 30%,
+    color-mix(in oklab, var(--amb-lume), white 30%) 0%,
+    var(--amb-lume) 55%,
+    color-mix(in oklab, var(--amb-lume), black 35%) 100%
+  );
+  box-shadow:
+    inset 0 1px 1px rgb(255 255 255 / 0.28),
+    inset 0 -1px 1px rgb(0 0 0 / 0.22);
+}
+
+.amb-switch {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: medium solid var(--amb-lume);
+  margin: 1em;
+}
