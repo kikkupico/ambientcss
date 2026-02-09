@@ -106,8 +106,8 @@ body {
 }
 
 .control-label {
-  font-size: 0.5rem;
-  letter-spacing: 0.12em;
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #aaa;
   text-align: center;
@@ -122,8 +122,8 @@ body {
 }
 
 .section-heading {
-  font-size: 0.55rem;
-  letter-spacing: 0.15em;
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #999;
   margin-bottom: 0.5rem;
@@ -178,7 +178,7 @@ body {
 }
 
 .grid-circle-label {
-  font-size: 0.4rem;
+  font-size: 0.625rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #999;

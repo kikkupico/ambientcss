@@ -45,7 +45,7 @@
     hsl(
       var(--amb-light-hue)
       var(--amb-light-saturation)
-      calc((1 - sign(var(--amb-key-light-intensity) - 0.5)) * 50% + 25%)
+      calc((1 - clamp(0, (var(--amb-key-light-intensity) - 0.3) / 0.4, 1)) * 75% + 25%)
     )
   );
 }
