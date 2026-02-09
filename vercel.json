@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "buildCommand": "pnpm --filter @ambientcss/css build && pnpm --filter @ambientcss/components build && pnpm --filter demo build",
+  "outputDirectory": "examples/demo/dist"
+}
