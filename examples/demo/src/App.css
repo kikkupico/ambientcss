@@ -1,47 +1,201 @@
+/* ==========================================================================
+   Appliance Demo – Dieter Rams inspired layout
+   Three-section appliance: Left (components), Centre (title + controls),
+   Right (treatment grid).
+   ========================================================================== */
+
 body {
   font-family: "Michroma", sans-serif;
   transition: background-color 3s ease-in;
   padding: 0;
   margin: 0;
+  overflow: hidden;
 }
+
+/* --------------------------------------------------------------------------
+   Outer container – fills viewport, provides thick margin on desktop
+   -------------------------------------------------------------------------- */
 
 .container {
   display: grid;
   min-height: 100vh;
   min-width: 100%;
-  column-gap: 30px;
-  gap: 30px;
+  place-items: center;
 }
 
-.content {
-  justify-self: center;
-  align-self: center;
+/* --------------------------------------------------------------------------
+   Appliance shell – the main device
+   -------------------------------------------------------------------------- */
+
+.appliance {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  border-radius: 20px;
+  overflow: hidden;
+  width: calc(100vw - 80px);
+  height: calc(100vh - 80px);
+  max-width: 1400px;
+  max-height: 900px;
 }
 
-.box {
-  padding: 4rem;
-  border-radius: 7px;
-  margin: 30px;
+/* --------------------------------------------------------------------------
+   Section shared styles
+   -------------------------------------------------------------------------- */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  gap: 1.5rem;
+  position: relative;
 }
 
-.logo {
+/* Subtle divider lines between sections */
+.section-left {
+  border-right: 1px solid hsl(0 0% 50% / 0.12);
+}
+
+.section-right {
+  border-left: 1px solid hsl(0 0% 50% / 0.12);
+}
+
+/* --------------------------------------------------------------------------
+   Centre section – title, day/night, lighting knobs
+   -------------------------------------------------------------------------- */
+
+.section-centre {
+  gap: 2rem;
+}
+
+.title {
   text-align: center;
-  font-size: 49px;
   color: #aaa;
+  font-size: clamp(24px, 3vw, 42px);
+  letter-spacing: 0.25em;
+  line-height: 1.4;
+  user-select: none;
 }
 
-.circle {
-  width: 64px;
-  min-height: 64px;
-  margin: 30px;
+.title-sub {
+  font-size: clamp(20px, 2.2vw, 35px);
+  letter-spacing: 0.12em;
+}
+
+.centre-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.control-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.control-label {
+  font-size: 0.5rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #aaa;
+  text-align: center;
+}
+
+/* --------------------------------------------------------------------------
+   Left section – sample interactive components
+   -------------------------------------------------------------------------- */
+
+.section-left {
+  gap: 2rem;
+}
+
+.section-heading {
+  font-size: 0.55rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #999;
+  margin-bottom: 0.5rem;
+}
+
+.component-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+.component-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.component-item-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2rem;
+}
+
+.button-row {
+  display: flex;
+  gap: 1rem;
+}
+
+/* --------------------------------------------------------------------------
+   Right section – treatment circle grid
+   -------------------------------------------------------------------------- */
+
+.section-right {
+  gap: 1.5rem;
+}
+
+.circle-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.2rem;
+  justify-items: center;
+  align-items: center;
+}
+
+.grid-circle {
+  width: clamp(48px, 5vw, 64px);
+  height: clamp(48px, 5vw, 64px);
   border-radius: 50%;
 }
 
-.row {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
+.grid-circle-label {
+  font-size: 0.4rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #999;
+  text-align: center;
+  margin-top: 0.25rem;
+  line-height: 1.3;
 }
+
+.circle-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* --------------------------------------------------------------------------
+   Day-night switch styling (unchanged from original)
+   -------------------------------------------------------------------------- */
 
 .day-night-watch {
   --dn-progress: 0;
@@ -96,4 +250,64 @@ body {
 .day-night-watch__icon--moon {
   opacity: var(--dn-progress);
   transform: rotate(calc((1 - var(--dn-progress)) * 90deg));
+}
+
+/* --------------------------------------------------------------------------
+   LED strip decorations
+   -------------------------------------------------------------------------- */
+
+.led-strip {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* --------------------------------------------------------------------------
+   MOBILE LAYOUT
+   On narrow screens the appliance becomes a vertical scroll of sections.
+   The centre section fills the viewport initially.
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 768px) {
+  body {
+    overflow: auto;
+  }
+
+  .container {
+    min-height: auto;
+    place-items: stretch;
+  }
+
+  .appliance {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    width: 100vw;
+    height: auto;
+    max-width: none;
+    max-height: none;
+    border-radius: 0;
+  }
+
+  /* Centre section first in visual order, fills viewport */
+  .section-centre {
+    order: -1;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .section-left,
+  .section-right {
+    border: none;
+    border-top: 1px solid hsl(0 0% 50% / 0.12);
+    min-height: 60vh;
+  }
+
+  .section {
+    padding: 3rem 2rem;
+  }
+
+  .grid-circle {
+    width: 56px;
+    height: 56px;
+  }
 }

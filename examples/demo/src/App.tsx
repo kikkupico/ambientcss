@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from "react";
 import {
   AmbientProvider,
   AmbientPanel,
+  AmbientButton,
   AmbientKnob,
   AmbientFader,
   AmbientSlider,
@@ -23,13 +24,34 @@ function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
 }
 
+/* ── Treatment circles for the right-hand grid ─────────────────────────── */
+
+const TREATMENTS = [
+  { classes: "amb-fillet amb-elevation-0", label: "Fillet" },
+  { classes: "amb-fillet-2 amb-elevation-0", label: "Fillet 2" },
+  { classes: "amb-chamfer amb-elevation-0", label: "Chamfer" },
+  { classes: "amb-chamfer-2 amb-elevation-0", label: "Chamfer 2" },
+  { classes: "amb-fillet amb-elevation-1", label: "Elev 1" },
+  { classes: "amb-fillet amb-elevation-2", label: "Elev 2" },
+  { classes: "amb-fillet amb-elevation-3", label: "Elev 3" },
+  { classes: "amb-fillet-minus-1 amb-elevation-0", label: "Fillet -1" },
+  { classes: "amb-chamfer amb-elevation-1", label: "Chamfer\u00a0+\u00a0Elev" },
+];
+
 export function App() {
   const [light, setLight] = useState<LightState>(DAY);
   const [nightMode, setNightMode] = useState(false);
+
+  /* Left-section interactive controls */
   const [knobValue, setKnobValue] = useState(50);
   const [faderValue, setFaderValue] = useState(50);
   const [sliderValue, setSliderValue] = useState(50);
   const [switchOn, setSwitchOn] = useState(false);
+
+  /* Centre-section lighting controls */
+  const [keyLightKnob, setKeyLightKnob] = useState(90);
+  const [fillLightKnob, setFillLightKnob] = useState(70);
+
   const animRef = useRef<number | null>(null);
   const lightRef = useRef(light);
   lightRef.current = light;
@@ -43,16 +65,20 @@ export function App() {
     function step(time: number) {
       if (startTime === null) startTime = time;
       const t = Math.min((time - startTime) / duration, 1);
-      setLight({
+      const next: LightState = {
         lightX: lerp(start.lightX, target.lightX, t),
         keyLight: lerp(start.keyLight, target.keyLight, t),
         fillLight: lerp(start.fillLight, target.fillLight, t),
         lightSaturation: lerp(start.lightSaturation, target.lightSaturation, t),
-      });
-      if (t < 1) {
-        animRef.current = requestAnimationFrame(step);
-      } else {
+      };
+      setLight(next);
+      if (t >= 1) {
         animRef.current = null;
+        /* Sync knobs with final state */
+        setKeyLightKnob(Math.round(target.keyLight * 100));
+        setFillLightKnob(Math.round(target.fillLight * 100));
+      } else {
+        animRef.current = requestAnimationFrame(step);
       }
     }
 
@@ -72,39 +98,109 @@ export function App() {
         lightSaturation: light.lightSaturation,
       }}
     >
-      <div className="content">
-        <AmbientPanel className="box logo">
-          a m b i e n t <br />
-          <div style={{ fontSize: 35 }}>CSS</div>
+      {/* ── Appliance shell ───────────────────────────────────────────── */}
+      <AmbientPanel className="appliance">
 
-          <div className="row" style={{ marginTop: "1rem" }}>
-            <DayNightWatchSwitch
-              night={nightMode}
-              onToggle={(nextNight) => {
-                setNightMode(nextNight);
-                animateTo(nextNight ? NIGHT : DAY);
-              }}
-            />
+        {/* ── LEFT SECTION: Sample components ─────────────────────────── */}
+        <div className="section section-left">
+          <div className="section-heading">Components</div>
+
+          <div className="component-grid">
+            <div className="component-item">
+              <AmbientKnob value={knobValue} onChange={setKnobValue} label="Knob" />
+            </div>
+
+            <div className="component-item-row">
+              <AmbientFader value={faderValue} min={0} max={100} onChange={setFaderValue} label="Fader" />
+              <div className="component-item">
+                <AmbientSwitch checked={switchOn} onCheckedChange={setSwitchOn} led />
+                <span className="control-label">Switch</span>
+              </div>
+            </div>
+
+            <div className="component-item">
+              <AmbientSlider value={sliderValue} min={0} max={100} onChange={setSliderValue} label="Slider" />
+            </div>
+
+            <div className="button-row">
+              <AmbientButton>Play</AmbientButton>
+              <AmbientButton>Stop</AmbientButton>
+            </div>
+
+            {/* LED indicator strip */}
+            <div className="led-strip">
+              <div className="amb-led amb-emit-green" style={{ "--amb-led-color": "#4ade80" } as React.CSSProperties} />
+              <div className="amb-led amb-emit-amber" style={{ "--amb-led-color": "#f59e0b" } as React.CSSProperties} />
+              <div className="amb-led amb-emit-red" style={{ "--amb-led-color": "#ef4444" } as React.CSSProperties} />
+              <div className="amb-led amb-emit-cyan" style={{ "--amb-led-color": "#22d3d3" } as React.CSSProperties} />
+              <div className="amb-led amb-emit-blue" style={{ "--amb-led-color": "#3b82f6" } as React.CSSProperties} />
+            </div>
+          </div>
+        </div>
+
+        {/* ── CENTRE SECTION: Title + Day/Night + Global lighting ──── */}
+        <div className="section section-centre">
+          <div className="title">
+            a m b i e n t
+            <div className="title-sub">CSS</div>
           </div>
 
-          <div className="row" style={{ marginTop: "2rem", gap: "2rem", alignItems: "center" }}>
-            <AmbientKnob value={knobValue} onChange={setKnobValue} label="Knob" />
-            <AmbientFader value={faderValue} min={0} max={100} onChange={setFaderValue} label="Fader" />
-            <AmbientSwitch checked={switchOn} onCheckedChange={setSwitchOn} led />
-          </div>
+          <DayNightWatchSwitch
+            night={nightMode}
+            onToggle={(nextNight) => {
+              setNightMode(nextNight);
+              animateTo(nextNight ? NIGHT : DAY);
+            }}
+          />
 
-          <div className="row" style={{ marginTop: "1.5rem" }}>
-            <AmbientSlider value={sliderValue} min={0} max={100} onChange={setSliderValue} label="Slider" />
-          </div>
+          <div className="centre-controls">
+            <div className="section-heading">Lighting</div>
 
-          <div className="row" style={{ marginTop: "2rem" }}>
-            <div className="circle ambient amb-fillet amb-elevation-0" />
-            <div className="circle ambient amb-fillet amb-elevation-1" />
-            <div className="circle ambient amb-fillet amb-elevation-2" />
-            <div className="circle ambient amb-fillet amb-elevation-3" />
+            <div className="control-row">
+              <div className="control-group">
+                <AmbientKnob
+                  value={keyLightKnob}
+                  min={0}
+                  max={100}
+                  onChange={(v) => {
+                    setKeyLightKnob(v);
+                    setLight((prev) => ({ ...prev, keyLight: v / 100 }));
+                  }}
+                />
+                <span className="control-label">Key Light</span>
+              </div>
+
+              <div className="control-group">
+                <AmbientKnob
+                  value={fillLightKnob}
+                  min={0}
+                  max={100}
+                  onChange={(v) => {
+                    setFillLightKnob(v);
+                    setLight((prev) => ({ ...prev, fillLight: v / 100 }));
+                  }}
+                />
+                <span className="control-label">Fill Light</span>
+              </div>
+            </div>
           </div>
-        </AmbientPanel>
-      </div>
+        </div>
+
+        {/* ── RIGHT SECTION: Treatment circle grid ────────────────────── */}
+        <div className="section section-right">
+          <div className="section-heading">Treatments</div>
+
+          <div className="circle-grid">
+            {TREATMENTS.map(({ classes, label }) => (
+              <div className="circle-cell" key={label}>
+                <div className={`grid-circle ambient amb-surface ${classes}`} />
+                <span className="grid-circle-label">{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </AmbientPanel>
     </AmbientProvider>
   );
 }
