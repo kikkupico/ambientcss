@@ -62,7 +62,7 @@ export function App() {
 
   return (
     <AmbientProvider
-      className="amb-surface container"
+      className="amb-surface app-shell"
       theme={{
         lightX: light.lightX,
         lightY: -1,
@@ -72,12 +72,40 @@ export function App() {
         lightSaturation: light.lightSaturation,
       }}
     >
-      <div className="content">
-        <AmbientPanel className="box logo">
-          a m b i e n t <br />
-          <div style={{ fontSize: 35 }}>CSS</div>
+      <div className="appliance">
+        <AmbientPanel className="panel panel--left">
+          <div className="panel-title">Sample components</div>
+          <div className="sample-stack">
+            <div className="sample-card amb-surface">
+              <div className="sample-dot amb-fillet amb-elevation-2" />
+              <div>
+                <div className="sample-label">Edge tile</div>
+                <div className="sample-meta">Inset &amp; raised</div>
+              </div>
+            </div>
+            <div className="sample-card amb-surface">
+              <div className="sample-pill amb-fillet amb-elevation-1" />
+              <div>
+                <div className="sample-label">Toggle track</div>
+                <div className="sample-meta">Soft radius</div>
+              </div>
+            </div>
+            <div className="sample-card amb-surface">
+              <div className="sample-square amb-fillet amb-elevation-3" />
+              <div>
+                <div className="sample-label">Depth badge</div>
+                <div className="sample-meta">Elevated</div>
+              </div>
+            </div>
+          </div>
+        </AmbientPanel>
 
-          <div className="row" style={{ marginTop: "1rem" }}>
+        <AmbientPanel className="panel panel--center">
+          <div className="logo">a m b i e n t</div>
+          <div className="subtitle">Lighting Appliance Console</div>
+
+          <div className="row day-night-row">
+            <span className="section-label">Day / Night</span>
             <DayNightWatchSwitch
               night={nightMode}
               onToggle={(nextNight) => {
@@ -87,21 +115,46 @@ export function App() {
             />
           </div>
 
-          <div className="row" style={{ marginTop: "2rem", gap: "2rem", alignItems: "center" }}>
-            <AmbientKnob value={knobValue} onChange={setKnobValue} label="Knob" />
-            <AmbientFader value={faderValue} min={0} max={100} onChange={setFaderValue} label="Fader" />
-            <AmbientSwitch checked={switchOn} onCheckedChange={setSwitchOn} led />
+          <div className="controls">
+            <div className="section-label">Global lighting</div>
+            <div className="row" style={{ gap: "2.5rem", alignItems: "center" }}>
+              <AmbientKnob value={knobValue} onChange={setKnobValue} label="Glow" />
+              <AmbientFader value={faderValue} min={0} max={100} onChange={setFaderValue} label="Fill" />
+              <AmbientSwitch checked={switchOn} onCheckedChange={setSwitchOn} led />
+            </div>
+            <div className="row" style={{ marginTop: "1.5rem" }}>
+              <AmbientSlider value={sliderValue} min={0} max={100} onChange={setSliderValue} label="Beam" />
+            </div>
           </div>
+        </AmbientPanel>
 
-          <div className="row" style={{ marginTop: "1.5rem" }}>
-            <AmbientSlider value={sliderValue} min={0} max={100} onChange={setSliderValue} label="Slider" />
-          </div>
-
-          <div className="row" style={{ marginTop: "2rem" }}>
-            <div className="circle ambient amb-fillet amb-elevation-0" />
-            <div className="circle ambient amb-fillet amb-elevation-1" />
-            <div className="circle ambient amb-fillet amb-elevation-2" />
-            <div className="circle ambient amb-fillet amb-elevation-3" />
+        <AmbientPanel className="panel panel--right">
+          <div className="panel-title">Surface treatments</div>
+          <div className="treatment-grid">
+            <div className="treatment-item">
+              <div className="treatment-circle amb-fillet amb-elevation-0" />
+              <span>Edge</span>
+            </div>
+            <div className="treatment-item">
+              <div className="treatment-circle amb-fillet amb-elevation-1" />
+              <span>Lift</span>
+            </div>
+            <div className="treatment-item">
+              <div className="treatment-circle amb-fillet amb-elevation-2" />
+              <span>Depth</span>
+            </div>
+            <div className="treatment-item">
+              <div className="treatment-circle amb-fillet amb-elevation-3" />
+              <span>Glow</span>
+            </div>
+            <div className="treatment-item">
+              <div className="treatment-circle amb-fillet amb-elevation-4" />
+              <span>Peak</span>
+            </div>
+            <div className="treatment-item">
+              <div className="treatment-circle amb-fillet amb-elevation-5" />
+              <span>Rim</span>
+            </div>
           </div>
         </AmbientPanel>
       </div>

@@ -3,37 +3,140 @@ body {
   transition: background-color 3s ease-in;
   padding: 0;
   margin: 0;
+  background: #0d1016;
 }
 
-.container {
-  display: grid;
+.app-shell {
   min-height: 100vh;
   min-width: 100%;
-  column-gap: 30px;
-  gap: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+  box-sizing: border-box;
 }
 
-.content {
-  justify-self: center;
-  align-self: center;
+.appliance {
+  width: min(1200px, calc(100vw - 120px));
+  height: calc(100vh - 120px);
+  display: grid;
+  grid-template-columns: 1fr 1.35fr 1fr;
+  gap: 28px;
 }
 
-.box {
-  padding: 4rem;
-  border-radius: 7px;
-  margin: 30px;
+.panel {
+  padding: 2.5rem;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.panel-title {
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: #a9b4c5;
 }
 
 .logo {
   text-align: center;
-  font-size: 49px;
-  color: #aaa;
+  font-size: 42px;
+  color: #d6dbe4;
+  letter-spacing: 0.35em;
 }
 
-.circle {
-  width: 64px;
-  min-height: 64px;
-  margin: 30px;
+.subtitle {
+  text-align: center;
+  font-size: 14px;
+  color: #8f98a8;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+}
+
+.day-night-row {
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.section-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: #a4afc0;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sample-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.sample-card {
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: #ccd3df;
+}
+
+.sample-dot {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+}
+
+.sample-pill {
+  width: 54px;
+  height: 20px;
+  border-radius: 999px;
+}
+
+.sample-square {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+}
+
+.sample-label {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+
+.sample-meta {
+  font-size: 11px;
+  color: #8d98a8;
+  margin-top: 4px;
+}
+
+.treatment-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.treatment-item {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  color: #9aa6b8;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+
+.treatment-circle {
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
 }
 
@@ -96,4 +199,33 @@ body {
 .day-night-watch__icon--moon {
   opacity: var(--dn-progress);
   transform: rotate(calc((1 - var(--dn-progress)) * 90deg));
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    padding: 24px;
+  }
+
+  .appliance {
+    width: 100%;
+    height: auto;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "center"
+      "left"
+      "right";
+  }
+
+  .panel--center {
+    grid-area: center;
+    min-height: 100vh;
+  }
+
+  .panel--left {
+    grid-area: left;
+  }
+
+  .panel--right {
+    grid-area: right;
+  }
 }
