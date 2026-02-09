@@ -1,11 +1,3 @@
-/* ==========================================================================
-   Ambient CSS Framework v0.1
-   Physically-based lighting and shadows for skeumorphic interfaces
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   Root Variables - Global lighting and theme
-   -------------------------------------------------------------------------- */
 :root {
   --amb-light-x: -1;
   --amb-light-y: -1;
@@ -15,7 +7,6 @@
   --amb-light-saturation: 15%;
   --amb-light-distance: 0px;
   --amb-fillet: 0;
-  --amb-fillet-w: 1;
   --amb-chamfer: 0;
   --amb-thickness: 0;
   --amb-elevation: 0;
@@ -34,82 +25,13 @@
   );
   }
 
-/* --------------------------------------------------------------------------
-   Fader / Slider
-   -------------------------------------------------------------------------- */
-.fader {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.fader-track {
-  width: 6px;
-  height: 80px;
-  background: rgb(var(--bg-inset));
-  border-radius: 3px;
-  position: relative;
-  transition: background-color var(--theme-transition);
-  --amb-groove: 1;
-  --amb-groove-w: 1;
-}
-
-.fader-track-lg {
-  height: 100px;
-}
-
-.fader-cap {
-  width: 18px;
-  height: 10px;
-  background: rgb(var(--bg-raised));
-  border-radius: 2px;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  top: 30%;
-  cursor: ns-resize;
-  transition: background-color var(--theme-transition);
+.amb-fillet {
   --amb-fillet: 1;
-  --amb-fillet-w: 1;
-  --amb-elevation: 1;
 }
 
-.fader-cap::before {
-  content: '';
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  right: 3px;
-  height: 1px;
-  background: rgba(var(--text-primary), 0.3);
-}
-
-/* Horizontal slider */
-.slider-track {
-  width: 80px;
-  height: 6px;
-  background: rgb(var(--bg-inset));
-  border-radius: 3px;
-  position: relative;
-  transition: background-color var(--theme-transition);
-  --amb-groove: 1;
-  --amb-groove-w: 1;
-}
-
-.slider-cap {
-  width: 10px;
-  height: 18px;
-  background: rgb(var(--bg-raised));
-  border-radius: 2px;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  left: 30%;
-  cursor: ew-resize;
-  transition: background-color var(--theme-transition);
+.amb-fillet-2 {
   --amb-fillet: 1;
-  --amb-elevation: 1;
+  --amb-fillet-width: 2;
 }
 
 .amb-fillet-minus-1 {
@@ -131,36 +53,16 @@
   --amb-elevation: 0;
 }
 
-.btn.active {
-  background: hsl(var(--accent-h), var(--accent-s), var(--accent-l));
-  color: #000;
-}
-
-/* --------------------------------------------------------------------------
-   Section
-   -------------------------------------------------------------------------- */
-.section {
-  background: rgb(var(--bg-surface));
-  border-radius: 6px;
-  overflow: hidden;
-  transition: background-color var(--theme-transition);
-  --amb-fillet: 1;
-  --amb-fillet-w: 2;
+.amb-elevation-1 {
   --amb-elevation: 1;
 }
 
-.section-header {
-  background: hsl(var(--accent-h), var(--accent-s), var(--accent-l));
-  color: #000;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  padding: 5px 12px;
+.amb-elevation-2 {
+  --amb-elevation: 2;
 }
 
-.section-body {
-  padding: 16px;
+.amb-elevation-3 {
+  --amb-elevation: 3;
 }
 
 .ambient {

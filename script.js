@@ -34,37 +34,3 @@ document
     animateVar("--amb-fill-light-intensity", (val) => val > 0.1, -0.6 / 60);
     animateVar("--amb-light-saturation", (val) => val < 15, 15 / 60, "%");
   });
-
-  document.addEventListener('touchend', () => {
-    activeSlider = null;
-    sliderTrack = null;
-  });
-
-  // --------------------------------------------------------------------------
-  // Jack Click (visual feedback)
-  // --------------------------------------------------------------------------
-  document.querySelectorAll('.jack').forEach(jack => {
-    jack.addEventListener('click', () => {
-      jack.classList.toggle('connected');
-    });
-  });
-
-  // --------------------------------------------------------------------------
-  // Empty Slot Click
-  // --------------------------------------------------------------------------
-  document.querySelectorAll('.slot.empty').forEach(slot => {
-    slot.addEventListener('click', () => {
-      console.log('Add module clicked');
-    });
-  });
-
-  // --------------------------------------------------------------------------
-  // Menu Button
-  // --------------------------------------------------------------------------
-  const menuBtn = document.getElementById('menuBtn');
-  if (menuBtn) {
-    menuBtn.addEventListener('click', () => {
-      console.log('Menu clicked');
-    });
-  }
-});
