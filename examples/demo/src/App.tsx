@@ -62,7 +62,7 @@ export function App() {
 
   return (
     <AmbientProvider
-      className="amb-surface container"
+      className="amb-surface appliance-frame"
       theme={{
         lightX: light.lightX,
         lightY: -1,
@@ -72,36 +72,104 @@ export function App() {
         lightSaturation: light.lightSaturation,
       }}
     >
-      <div className="content">
-        <AmbientPanel className="box logo">
-          a m b i e n t <br />
-          <div style={{ fontSize: 35 }}>CSS</div>
+      <div className="appliance">
+        <AmbientPanel className="panel left">
+          <h2 className="panel-title">Sample Components</h2>
+          <p className="panel-subtitle">Touch points for a modular system.</p>
+          <div className="stack">
+            <div className="row align-center gap-lg">
+              <AmbientKnob value={knobValue} onChange={setKnobValue} label="Gain" />
+              <AmbientFader value={faderValue} min={0} max={100} onChange={setFaderValue} label="Mix" />
+              <AmbientSwitch checked={switchOn} onCheckedChange={setSwitchOn} led />
+            </div>
+            <div className="row">
+              <AmbientSlider value={sliderValue} min={0} max={100} onChange={setSliderValue} label="Depth" />
+            </div>
+          </div>
+        </AmbientPanel>
 
-          <div className="row" style={{ marginTop: "1rem" }}>
-            <DayNightWatchSwitch
-              night={nightMode}
-              onToggle={(nextNight) => {
-                setNightMode(nextNight);
-                animateTo(nextNight ? NIGHT : DAY);
-              }}
-            />
+        <AmbientPanel className="panel center">
+          <div className="center-header">
+            <div className="brand">
+              a m b i e n t <span>CSS</span>
+            </div>
+            <div className="subtitle">Lighting appliance · Model 12</div>
           </div>
 
-          <div className="row" style={{ marginTop: "2rem", gap: "2rem", alignItems: "center" }}>
-            <AmbientKnob value={knobValue} onChange={setKnobValue} label="Knob" />
-            <AmbientFader value={faderValue} min={0} max={100} onChange={setFaderValue} label="Fader" />
-            <AmbientSwitch checked={switchOn} onCheckedChange={setSwitchOn} led />
+          <div className="section">
+            <div className="section-title">Day / Night</div>
+            <div className="row">
+              <DayNightWatchSwitch
+                night={nightMode}
+                onToggle={(nextNight) => {
+                  setNightMode(nextNight);
+                  animateTo(nextNight ? NIGHT : DAY);
+                }}
+              />
+            </div>
           </div>
 
-          <div className="row" style={{ marginTop: "1.5rem" }}>
-            <AmbientSlider value={sliderValue} min={0} max={100} onChange={setSliderValue} label="Slider" />
+          <div className="section">
+            <div className="section-title">Global Lighting</div>
+            <div className="controls-grid">
+              <AmbientKnob
+                value={Math.round((light.lightX + 1) * 50)}
+                onChange={(next) => setLight((prev) => ({ ...prev, lightX: next / 50 - 1 }))}
+                label="Azimuth"
+              />
+              <AmbientFader
+                value={Math.round(light.keyLight * 100)}
+                min={0}
+                max={100}
+                onChange={(next) => setLight((prev) => ({ ...prev, keyLight: next / 100 }))}
+                label="Key"
+              />
+              <AmbientFader
+                value={Math.round(light.fillLight * 100)}
+                min={0}
+                max={100}
+                onChange={(next) => setLight((prev) => ({ ...prev, fillLight: next / 100 }))}
+                label="Fill"
+              />
+              <AmbientSlider
+                value={Math.round(light.lightSaturation)}
+                min={0}
+                max={30}
+                onChange={(next) => setLight((prev) => ({ ...prev, lightSaturation: next }))}
+                label="Saturation"
+              />
+            </div>
           </div>
+        </AmbientPanel>
 
-          <div className="row" style={{ marginTop: "2rem" }}>
-            <div className="circle ambient amb-fillet amb-elevation-0" />
-            <div className="circle ambient amb-fillet amb-elevation-1" />
-            <div className="circle ambient amb-fillet amb-elevation-2" />
-            <div className="circle ambient amb-fillet amb-elevation-3" />
+        <AmbientPanel className="panel right">
+          <h2 className="panel-title">Surface Treatments</h2>
+          <p className="panel-subtitle">Edges, elevation, and material studies.</p>
+          <div className="treatment-grid">
+            <div className="treatment">
+              <div className="circle ambient amb-fillet amb-elevation-0" />
+              <span>Fillet 0</span>
+            </div>
+            <div className="treatment">
+              <div className="circle ambient amb-fillet amb-elevation-1" />
+              <span>Fillet 1</span>
+            </div>
+            <div className="treatment">
+              <div className="circle ambient amb-fillet amb-elevation-2" />
+              <span>Fillet 2</span>
+            </div>
+            <div className="treatment">
+              <div className="circle ambient amb-fillet amb-elevation-3" />
+              <span>Fillet 3</span>
+            </div>
+            <div className="treatment">
+              <div className="circle ambient amb-round amb-elevation-1" />
+              <span>Round</span>
+            </div>
+            <div className="treatment">
+              <div className="circle ambient amb-square amb-elevation-2" />
+              <span>Square</span>
+            </div>
           </div>
         </AmbientPanel>
       </div>

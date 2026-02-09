@@ -3,37 +3,95 @@ body {
   transition: background-color 3s ease-in;
   padding: 0;
   margin: 0;
+  background: #0f131a;
 }
 
-.container {
-  display: grid;
+.appliance-frame {
   min-height: 100vh;
-  min-width: 100%;
-  column-gap: 30px;
-  gap: 30px;
+  padding: clamp(24px, 4vw, 56px);
+  box-sizing: border-box;
+  display: flex;
 }
 
-.content {
-  justify-self: center;
-  align-self: center;
+.appliance {
+  display: grid;
+  grid-template-columns: 0.9fr 1.2fr 0.9fr;
+  gap: clamp(20px, 3vw, 36px);
+  width: 100%;
+  min-height: calc(100vh - clamp(48px, 8vw, 112px));
 }
 
-.box {
-  padding: 4rem;
-  border-radius: 7px;
-  margin: 30px;
+.panel {
+  padding: clamp(24px, 3vw, 40px);
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
-.logo {
+.panel-title {
+  font-size: 20px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.panel-subtitle {
+  margin: -8px 0 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.48);
+  letter-spacing: 0.08em;
+}
+
+.center {
+  justify-content: space-between;
   text-align: center;
-  font-size: 49px;
-  color: #aaa;
+}
+
+.center-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.brand {
+  font-size: clamp(28px, 4vw, 44px);
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.brand span {
+  display: block;
+  font-size: clamp(18px, 2.4vw, 30px);
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.subtitle {
+  font-size: 12px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.section-title {
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
 }
 
 .circle {
-  width: 64px;
-  min-height: 64px;
-  margin: 30px;
+  width: 58px;
+  min-height: 58px;
   border-radius: 50%;
 }
 
@@ -41,6 +99,49 @@ body {
   display: flex;
   flex-direction: row;
   justify-content: center;
+  gap: 20px;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.gap-lg {
+  gap: 30px;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.controls-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  justify-items: center;
+}
+
+.treatment-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.treatment {
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.left,
+.right {
+  justify-content: space-between;
 }
 
 .day-night-watch {
@@ -96,4 +197,22 @@ body {
 .day-night-watch__icon--moon {
   opacity: var(--dn-progress);
   transform: rotate(calc((1 - var(--dn-progress)) * 90deg));
+}
+
+@media (max-width: 980px) {
+  .appliance {
+    grid-template-columns: 1fr;
+  }
+
+  .center {
+    min-height: calc(100vh - clamp(48px, 8vw, 112px));
+  }
+
+  .controls-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .treatment-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
