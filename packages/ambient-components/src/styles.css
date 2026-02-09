@@ -15,11 +15,6 @@
   display: inline-grid;
   place-items: center;
   padding: 0;
-  transition: transform 120ms ease;
-}
-
-.ambx-switch:active {
-  transform: translateY(1px);
 }
 
 .ambx-switch-sm {

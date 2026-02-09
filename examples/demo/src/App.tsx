@@ -28,15 +28,18 @@ function lerp(a: number, b: number, t: number): number {
 /* ── Treatment circles for the right-hand grid ─────────────────────────── */
 
 const TREATMENTS = [
+  /* Row 1 – Fillets */
   { classes: "amb-fillet amb-elevation-0", label: "Fillet" },
   { classes: "amb-fillet-2 amb-elevation-0", label: "Fillet 2" },
+  { classes: "amb-fillet-minus-1 amb-elevation-0", label: "Fillet -1" },
+  /* Row 2 – Chamfers & mixed */
   { classes: "amb-chamfer amb-elevation-0", label: "Chamfer" },
   { classes: "amb-chamfer-2 amb-elevation-0", label: "Chamfer 2" },
+  { classes: "amb-chamfer amb-elevation-1", label: "Chamfer\u00a0+\u00a0Elev" },
+  /* Row 3 – Elevations */
   { classes: "amb-fillet amb-elevation-1", label: "Elev 1" },
   { classes: "amb-fillet amb-elevation-2", label: "Elev 2" },
   { classes: "amb-fillet amb-elevation-3", label: "Elev 3" },
-  { classes: "amb-fillet-minus-1 amb-elevation-0", label: "Fillet -1" },
-  { classes: "amb-chamfer amb-elevation-1", label: "Chamfer\u00a0+\u00a0Elev" },
 ];
 
 export function App() {

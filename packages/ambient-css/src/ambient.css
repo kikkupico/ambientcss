@@ -225,6 +225,10 @@
   border-color: var(--amb-highlight-color);
 }
 
+.amb-button:active {
+  --amb-elevation: 0;
+}
+
 .amb-knob {
   border-radius: 50%;
   height: 64px;
