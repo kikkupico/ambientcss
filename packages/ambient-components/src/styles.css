@@ -15,11 +15,6 @@
   display: inline-grid;
   place-items: center;
   padding: 0;
-  transition: transform 120ms ease;
-}
-
-.ambx-switch:active {
-  transform: translateY(1px);
 }
 
 .ambx-switch-sm {
@@ -44,14 +39,14 @@
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1rem;
 }
 
 .ambx-label {
   font-size: 0.625rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--amb-lume);
+  color: var(--amb-label);
 }
 
 .ambx-knob {
