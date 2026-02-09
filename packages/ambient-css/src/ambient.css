@@ -1,3 +1,28 @@
+/* ==========================================================================
+   Ambient CSS v0.1
+   A CSS framework for skeuomorphic interfaces
+
+   Physically-based lighting, shadows, textures and shading for creating
+   realistic UI elements - buttons, knobs, sliders, panels, indicators,
+   and any interface that benefits from depth and materiality.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   LIGHTING MODEL (HSL-based)
+
+   Light Direction:
+   --amb-light-x : Horizontal component (-1 = left, 1 = right)
+   --amb-light-y : Vertical component (-1 = up, 1 = down)
+
+   Light Intensity:
+   --amb-key-light-intensity : Main light (0-1), creates primary highlights/shadows
+   --amb-fill-light-intensity : Secondary light (0-1), softens shadows
+
+   Light Hue (HSL):
+   --amb-light-hue        : Hue of the light color (0-360)
+   --amb-light-saturation  : Saturation of the light color (with % suffix)
+   -------------------------------------------------------------------------- */
+
 :root {
   --amb-light-x: -1;
   --amb-light-y: -1;
@@ -23,7 +48,11 @@
       calc((1 - sign(var(--amb-key-light-intensity) - 0.5)) * 50% + 25%)
     )
   );
-  }
+}
+
+/* --------------------------------------------------------------------------
+   EDGE TREATMENTS
+   -------------------------------------------------------------------------- */
 
 .amb-fillet {
   --amb-fillet: 1;
@@ -48,22 +77,25 @@
   --amb-chamfer-width: 2;
 }
 
+/* --------------------------------------------------------------------------
+   ELEVATION LEVELS
+   -------------------------------------------------------------------------- */
 
-.amb-elevation-0 {
-  --amb-elevation: 0;
-}
+.amb-elevation-0 { --amb-elevation: 0; }
+.amb-elevation-1 { --amb-elevation: 1; }
+.amb-elevation-2 { --amb-elevation: 2; }
+.amb-elevation-3 { --amb-elevation: 3; }
 
-.amb-elevation-1 {
-  --amb-elevation: 1;
-}
+/* --------------------------------------------------------------------------
+   CORE AMBIENT CLASS
 
-.amb-elevation-2 {
-  --amb-elevation: 2;
-}
-
-.amb-elevation-3 {
-  --amb-elevation: 3;
-}
+   Applies physically-based lighting via box-shadow:
+   1. Drop shadow - offset by light direction, scaled by elevation
+   2. Fillet highlight - inner lit edge (white on light side)
+   3. Fillet shadow - inner dark edge (black on shadow side)
+   4. Chamfer highlight - softer inner edge (light side)
+   5. Chamfer shadow - softer inner edge (shadow side)
+   -------------------------------------------------------------------------- */
 
 .ambient {
   box-shadow: hsl(
@@ -118,12 +150,9 @@
       );
 }
 
-.amb-knob {
-  border-radius: 50%;
-  height: 64px;
-  width: 64px;
-  border: medium solid var(--amb-lume);
-}
+/* --------------------------------------------------------------------------
+   SURFACES
+   -------------------------------------------------------------------------- */
 
 .amb-surface {
   background-color: hsl(
@@ -161,6 +190,10 @@
   );
 }
 
+/* --------------------------------------------------------------------------
+   COMPONENTS
+   -------------------------------------------------------------------------- */
+
 .amb-button {
   cursor: pointer;
   border: medium solid var(--amb-lume);
@@ -181,6 +214,13 @@
   border-color: var(--amb-highlight-color);
 }
 
+.amb-knob {
+  border-radius: 50%;
+  height: 64px;
+  width: 64px;
+  border: medium solid var(--amb-lume);
+}
+
 .amb-knob-indicator {
   position: absolute;
   top: 6px;
@@ -195,7 +235,7 @@
 }
 
 .amb-glow {
-   box-shadow: 0 0 4px var(--amb-lume);
+  box-shadow: 0 0 4px var(--amb-lume);
 }
 
 .amb-fader {
@@ -247,3 +287,37 @@
   border: medium solid var(--amb-lume);
   margin: 1em;
 }
+
+/* --------------------------------------------------------------------------
+   LIGHT POSITIONS
+   -------------------------------------------------------------------------- */
+
+.amb-light-tl { --amb-light-x: -1; --amb-light-y: -1; }
+.amb-light-tr { --amb-light-x: 1; --amb-light-y: -1; }
+.amb-light-bl { --amb-light-x: -1; --amb-light-y: 1; }
+.amb-light-br { --amb-light-x: 1; --amb-light-y: 1; }
+.amb-light-top { --amb-light-x: 0; --amb-light-y: -1; }
+.amb-light-bottom { --amb-light-x: 0; --amb-light-y: 1; }
+.amb-light-left { --amb-light-x: -1; --amb-light-y: 0; }
+.amb-light-right { --amb-light-x: 1; --amb-light-y: 0; }
+
+/* --------------------------------------------------------------------------
+   EMISSIVE (LEDs, Displays)
+   -------------------------------------------------------------------------- */
+
+.amb-emit-red { --amb-emit-color: #ef4444; }
+.amb-emit-green { --amb-emit-color: #4ade80; }
+.amb-emit-amber { --amb-emit-color: #f59e0b; }
+.amb-emit-cyan { --amb-emit-color: #22d3d3; }
+.amb-emit-blue { --amb-emit-color: #3b82f6; }
+.amb-emit-white { --amb-emit-color: #ffffff; }
+
+/* --------------------------------------------------------------------------
+   UTILITY CLASSES
+   -------------------------------------------------------------------------- */
+
+.amb-rounded { border-radius: 4px; }
+.amb-rounded-md { border-radius: 8px; }
+.amb-rounded-lg { border-radius: 12px; }
+.amb-rounded-xl { border-radius: 16px; }
+.amb-rounded-full { border-radius: 9999px; }

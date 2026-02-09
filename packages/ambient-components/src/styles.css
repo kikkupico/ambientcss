@@ -1,0 +1,61 @@
+.ambx-panel {
+  border-radius: 16px;
+  padding: 1rem;
+}
+
+.ambx-button {
+  min-width: 72px;
+  line-height: 1.2;
+}
+
+.ambx-switch {
+  transition: transform 120ms ease;
+}
+
+.ambx-switch:active {
+  transform: translateY(1px);
+}
+
+.amb-switch-on {
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.25),
+    0 0 0 2px color-mix(in srgb, var(--amb-highlight-color, coral) 15%, transparent);
+}
+
+.ambx-stack {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ambx-label {
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--amb-lume);
+}
+
+.ambx-knob {
+  position: relative;
+  display: grid;
+  place-items: center;
+  touch-action: none;
+  user-select: none;
+}
+
+.ambx-knob-rotation {
+  position: absolute;
+  inset: 0;
+}
+
+.ambx-fader {
+  width: 8px;
+  border-radius: 999px;
+  touch-action: none;
+  user-select: none;
+}
+
+.ambx-fader-thumb {
+  transform: translate(-50%, -50%);
+}
