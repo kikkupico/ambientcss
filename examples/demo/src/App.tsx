@@ -12,13 +12,14 @@ import { DayNightWatchSwitch } from "./components/DayNightWatchSwitch";
 
 type LightState = {
   lightX: number;
+  lightY: number;
   keyLight: number;
   fillLight: number;
   lightSaturation: number;
 };
 
-const DAY: LightState = { lightX: -1, keyLight: 0.9, fillLight: 0.7, lightSaturation: 0 };
-const NIGHT: LightState = { lightX: 1, keyLight: 0.3, fillLight: 0.1, lightSaturation: 15 };
+const DAY: LightState = { lightX: -1, lightY: -1, keyLight: 0.9, fillLight: 0.7, lightSaturation: 0 };
+const NIGHT: LightState = { lightX: 1, lightY: -1, keyLight: 0.3, fillLight: 0.1, lightSaturation: 15 };
 
 function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
@@ -48,9 +49,11 @@ export function App() {
   const [sliderValue, setSliderValue] = useState(50);
   const [switchOn, setSwitchOn] = useState(false);
 
-  /* Centre-section lighting controls */
+  /* Centre-section lighting controls (0-100 range for knob/slider UI) */
   const [keyLightKnob, setKeyLightKnob] = useState(90);
   const [fillLightKnob, setFillLightKnob] = useState(70);
+  const [lightXSlider, setLightXSlider] = useState(0);   // 0-100 maps to -1..1
+  const [lightYFader, setLightYFader] = useState(0);      // 0-100 maps to -1..1
 
   const animRef = useRef<number | null>(null);
   const lightRef = useRef(light);
@@ -67,16 +70,19 @@ export function App() {
       const t = Math.min((time - startTime) / duration, 1);
       const next: LightState = {
         lightX: lerp(start.lightX, target.lightX, t),
+        lightY: lerp(start.lightY, target.lightY, t),
         keyLight: lerp(start.keyLight, target.keyLight, t),
         fillLight: lerp(start.fillLight, target.fillLight, t),
         lightSaturation: lerp(start.lightSaturation, target.lightSaturation, t),
       };
       setLight(next);
+      /* Animate knobs/sliders in sync */
+      setKeyLightKnob(Math.round(next.keyLight * 100));
+      setFillLightKnob(Math.round(next.fillLight * 100));
+      setLightXSlider(Math.round((next.lightX + 1) * 50));
+      setLightYFader(Math.round((next.lightY + 1) * 50));
       if (t >= 1) {
         animRef.current = null;
-        /* Sync knobs with final state */
-        setKeyLightKnob(Math.round(target.keyLight * 100));
-        setFillLightKnob(Math.round(target.fillLight * 100));
       } else {
         animRef.current = requestAnimationFrame(step);
       }
@@ -91,7 +97,7 @@ export function App() {
       className="amb-surface container"
       theme={{
         lightX: light.lightX,
-        lightY: -1,
+        lightY: light.lightY,
         keyLight: light.keyLight,
         fillLight: light.fillLight,
         lightHue: 234,
@@ -156,6 +162,19 @@ export function App() {
           <div className="centre-controls">
             <div className="section-heading">Lighting</div>
 
+            <div className="control-group">
+              <AmbientSlider
+                value={lightXSlider}
+                min={0}
+                max={100}
+                onChange={(v) => {
+                  setLightXSlider(v);
+                  setLight((prev) => ({ ...prev, lightX: (v / 50) - 1 }));
+                }}
+              />
+              <span className="control-label">Light X</span>
+            </div>
+
             <div className="control-row">
               <div className="control-group">
                 <AmbientKnob
@@ -168,6 +187,19 @@ export function App() {
                   }}
                 />
                 <span className="control-label">Key Light</span>
+              </div>
+
+              <div className="control-group">
+                <AmbientFader
+                  value={lightYFader}
+                  min={0}
+                  max={100}
+                  onChange={(v) => {
+                    setLightYFader(v);
+                    setLight((prev) => ({ ...prev, lightY: (v / 50) - 1 }));
+                  }}
+                  label="Light Y"
+                />
               </div>
 
               <div className="control-group">
