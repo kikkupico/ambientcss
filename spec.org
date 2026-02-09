@@ -1,0 +1,4 @@
+#+title: v0.1 Spec
+* Develop the ambient css framework according to the concept in concept.md; use the existing files for reference.
+* Add additional options if you think they add value.
+* Create documentation in index.html, cleverly using the skeumorphism allowed by ambient css. (For eg: the whole page could be a synth rack with different sections being different devices)

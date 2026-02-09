@@ -56,6 +56,140 @@
         </div>
       </div>
     </div>
-    <script src="script.js"></script>
-  </body>
+
+    <script>
+        // Animation utilities
+        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+        const root = document.documentElement;
+        const style = getComputedStyle(root);
+
+        async function animateVar(variable, target, duration = 2000) {
+            const start = parseFloat(style.getPropertyValue(variable)) || 0;
+            const diff = target - start;
+            const steps = 60;
+            const stepTime = duration / steps;
+
+            for (let i = 1; i <= steps; i++) {
+                const progress = i / steps;
+                // Ease in-out
+                const eased = progress < 0.5
+                    ? 2 * progress * progress
+                    : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+                root.style.setProperty(variable, start + diff * eased);
+                await sleep(stepTime);
+            }
+        }
+
+        // Day/Night mode presets
+        const modeToggle = document.getElementById('modeToggle');
+        const keyLightKnob = document.getElementById('keyLight');
+        const fillLightKnob = document.getElementById('fillLight');
+        const lightXKnob = document.getElementById('lightX');
+
+        const presets = {
+            day: {
+                keyLight: 0.95,
+                fillLight: 0.65,
+                lightX: -1,
+                lightR: 255,
+                lightG: 255,
+                lightB: 255
+            },
+            night: {
+                keyLight: 0.05,
+                fillLight: 0.02,
+                lightX: 1,
+                lightR: 150,
+                lightG: 160,
+                lightB: 200
+            }
+        };
+
+        // Keep light Y at top for better shadow perception
+        document.documentElement.style.setProperty('--amb-light-y', -1);
+
+        // Detect OS color scheme and set initial mode
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const initialMode = prefersDark ? 'night' : 'day';
+        const initialPreset = presets[initialMode];
+
+        // Apply initial values immediately (no animation)
+        document.documentElement.style.setProperty('--amb-key-light', initialPreset.keyLight);
+        document.documentElement.style.setProperty('--amb-fill-light', initialPreset.fillLight);
+        document.documentElement.style.setProperty('--amb-light-x', initialPreset.lightX);
+        document.documentElement.style.setProperty('--amb-light-r', initialPreset.lightR);
+        document.documentElement.style.setProperty('--amb-light-g', initialPreset.lightG);
+        document.documentElement.style.setProperty('--amb-light-b', initialPreset.lightB);
+
+        // Set initial switch state (on = day)
+        modeToggle.on = !prefersDark;
+
+        // Update knobs to match initial state
+        keyLightKnob.value = initialPreset.keyLight * 100;
+        fillLightKnob.value = initialPreset.fillLight * 100;
+        lightXKnob.value = (initialPreset.lightX + 1) * 50;
+
+        let isAnimating = false;
+
+        async function setMode(mode) {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            const p = presets[mode];
+
+            // Animate all variables in parallel
+            await Promise.all([
+                animateVar('--amb-key-light', p.keyLight, 2500),
+                animateVar('--amb-fill-light', p.fillLight, 2500),
+                animateVar('--amb-light-x', p.lightX, 3000),
+                animateVar('--amb-light-r', p.lightR, 2500),
+                animateVar('--amb-light-g', p.lightG, 2500),
+                animateVar('--amb-light-b', p.lightB, 2500)
+            ]);
+
+            // Update knob positions after animation
+            keyLightKnob.value = p.keyLight * 100;
+            fillLightKnob.value = p.fillLight * 100;
+            lightXKnob.value = (p.lightX + 1) * 50;
+
+            isAnimating = false;
+        }
+
+        modeToggle.addEventListener('change', (e) => {
+            setMode(e.detail.on ? 'day' : 'night');
+        });
+
+        // Material toggle - uses body class for ::part() CSS
+        const materialToggle = document.getElementById('materialToggle');
+
+        // Set initial state (solid = on)
+        materialToggle.on = true;
+
+        materialToggle.addEventListener('change', (e) => {
+            if (e.detail.on) {
+                document.body.classList.remove('amb-flat');
+            } else {
+                document.body.classList.add('amb-flat');
+            }
+        });
+
+        // Lighting controls - update CSS variables
+        document.getElementById('keyLight').addEventListener('change', (e) => {
+            document.documentElement.style.setProperty('--amb-key-light', e.detail.value / 100);
+        });
+        document.getElementById('fillLight').addEventListener('change', (e) => {
+            document.documentElement.style.setProperty('--amb-fill-light', e.detail.value / 100);
+        });
+        document.getElementById('lightX').addEventListener('change', (e) => {
+            // Map 0-100 to -1 to 1
+            const x = (e.detail.value / 50) - 1;
+            document.documentElement.style.setProperty('--amb-light-x', x);
+        });
+        document.getElementById('lightY').addEventListener('change', (e) => {
+            // Map 0-100 to -1 to 1
+            const y = (e.detail.value / 50) - 1;
+            document.documentElement.style.setProperty('--amb-light-y', y);
+        });
+    </script>
+</body>
 </html>
