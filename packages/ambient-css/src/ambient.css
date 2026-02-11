@@ -333,7 +333,7 @@
   height: 6px;
   border-radius: 50%;
   background-color: var(--amb-led-color, #0f0);
-  box-shadow: 0 0 4px var(--amb-led-color, #0f0);
+  box-shadow: 0 0 1px var(--amb-led-color, #0f0);
   transition: background-color 150ms ease, box-shadow 150ms ease;
 }
 

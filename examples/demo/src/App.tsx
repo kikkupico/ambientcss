@@ -120,20 +120,17 @@ export function App() {
             </div>
 
             <div className="component-item-row">
-              <AmbientFader value={faderValue} min={0} max={100} onChange={setFaderValue} label="Fader" />
+              <AmbientSlider value={sliderValue} min={0} max={100} onChange={setSliderValue} label="Slider" />
               <div className="component-item">
                 <AmbientSwitch checked={switchOn} onCheckedChange={setSwitchOn} led />
                 <span className="control-label">Switch</span>
               </div>
+              <AmbientFader value={faderValue} min={0} max={100} onChange={setFaderValue} label="Fader" />
             </div>
-
-            <div className="component-item">
-              <AmbientSlider value={sliderValue} min={0} max={100} onChange={setSliderValue} label="Slider" />
-            </div>
-
             <div className="button-row">
               <AmbientButton>Play</AmbientButton>
               <AmbientButton>Stop</AmbientButton>
+              <AmbientButton>Vibe</AmbientButton>
             </div>
 
             {/* LED indicator strip */}
@@ -141,8 +138,6 @@ export function App() {
               <div className="amb-led amb-emit-green" style={{ "--amb-led-color": "#4ade80" } as React.CSSProperties} />
               <div className="amb-led amb-emit-amber" style={{ "--amb-led-color": "#f59e0b" } as React.CSSProperties} />
               <div className="amb-led amb-emit-red" style={{ "--amb-led-color": "#ef4444" } as React.CSSProperties} />
-              <div className="amb-led amb-emit-cyan" style={{ "--amb-led-color": "#22d3d3" } as React.CSSProperties} />
-              <div className="amb-led amb-emit-blue" style={{ "--amb-led-color": "#3b82f6" } as React.CSSProperties} />
             </div>
           </div>
         </div>

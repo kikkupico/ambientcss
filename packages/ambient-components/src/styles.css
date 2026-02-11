@@ -31,8 +31,7 @@
 
 .amb-switch-on {
   box-shadow:
-    inset 0 0 0 1px rgb(255 255 255 / 0.25),
-    0 0 0 2px color-mix(in srgb, var(--amb-highlight-color, coral) 15%, transparent);
+    inset 0 0 0 1px rgb(255 255 255 / 0.25);
 }
 
 .ambx-stack {
