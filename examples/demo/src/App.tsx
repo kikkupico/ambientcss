@@ -148,16 +148,15 @@ export function App() {
             <div className="title-sub">CSS</div>
           </div>
 
-          <DayNightWatchSwitch
-            night={nightMode}
-            onToggle={(nextNight) => {
-              setNightMode(nextNight);
-              animateTo(nextNight ? NIGHT : DAY);
-            }}
-          />
-
           <div className="centre-controls">
             <div className="section-heading">Lighting</div>
+            <DayNightWatchSwitch
+              night={nightMode}
+              onToggle={(nextNight) => {
+                setNightMode(nextNight);
+                animateTo(nextNight ? NIGHT : DAY);
+              }}
+            />
 
             <div className="control-group">
               <AmbientSlider

@@ -16,22 +16,36 @@
   --demo-grid-4: calc(var(--demo-grid) * 4);
   --demo-grid-5: calc(var(--demo-grid) * 5);
   --demo-grid-6: calc(var(--demo-grid) * 6);
+  --demo-grid-7: calc(var(--demo-grid) * 7);
   --demo-grid-8: calc(var(--demo-grid) * 8);
   --demo-grid-10: calc(var(--demo-grid) * 10);
   --demo-grid-12: calc(var(--demo-grid) * 12);
   --demo-grid-14: calc(var(--demo-grid) * 14);
+  --demo-grid-18: calc(var(--demo-grid) * 18);
+  --demo-grid-22: calc(var(--demo-grid) * 22);
   --demo-grid-15: calc(var(--demo-grid) * 15);
   --demo-grid-16: calc(var(--demo-grid) * 16);
   --demo-grid-20: calc(var(--demo-grid) * 20);
   --demo-type-label-size: var(--demo-grid-2_5);
   --demo-type-label-line: var(--demo-grid-3);
-  --demo-type-pane-size: var(--demo-grid-3);
-  --demo-type-pane-line: var(--demo-grid-4);
+  --demo-type-pane-size: var(--demo-grid-4);
+  --demo-type-pane-line: var(--demo-grid-5);
+  --demo-type-title-size: var(--demo-grid-12);
+  --demo-type-title-line: var(--demo-grid-14);
+  --demo-type-title-sub-size: var(--demo-type-title-size);
+  --demo-type-title-sub-line: var(--demo-type-title-line);
+  --demo-type-title-track: var(--demo-grid);
+  --demo-type-title-sub-track: var(--demo-grid-0_5);
   --demo-type-tracking-tight: var(--demo-grid-0_5);
   --demo-type-tracking-wide: var(--demo-grid-0_25);
   --demo-rhythm-section: var(--demo-grid-6);
   --demo-rhythm-block: var(--demo-grid-8);
   --demo-rhythm-control: var(--demo-grid-6);
+  --demo-centre-header-reserve: calc(
+    var(--demo-type-title-line) +
+    var(--demo-type-title-sub-line) +
+    var(--demo-rhythm-block)
+  );
 }
 
 body {
@@ -73,10 +87,11 @@ body {
    -------------------------------------------------------------------------- */
 
 .section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: min-content;
+  justify-items: center;
+  align-content: start;
   padding: var(--demo-grid-8) var(--demo-grid-6);
   gap: var(--demo-rhythm-section);
   position: relative;
@@ -114,24 +129,22 @@ body {
 }
 
 .centre-controls {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: grid;
+  justify-items: center;
   gap: var(--demo-rhythm-block);
 }
 
 .control-row {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-auto-flow: column;
   align-items: center;
   justify-content: center;
   gap: var(--demo-rhythm-control);
 }
 
 .control-group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: grid;
+  justify-items: center;
   gap: var(--demo-grid-2);
 }
 
@@ -161,29 +174,33 @@ body {
   margin-bottom: var(--demo-grid-3);
 }
 
+.section-left .section-heading,
+.section-right .section-heading {
+  margin-top: var(--demo-centre-header-reserve);
+}
+
 .component-grid {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: grid;
+  justify-items: center;
   gap: calc(var(--demo-grid) * 9);
 }
 
 .component-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: grid;
+  justify-items: center;
   gap: var(--demo-grid-2);
 }
 
 .component-item-row {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-auto-flow: column;
   align-items: center;
   gap: var(--demo-rhythm-control);
 }
 
 .button-row {
-  display: flex;
+  display: grid;
+  grid-auto-flow: column;
   gap: var(--demo-grid-3);
 }
 
@@ -204,8 +221,8 @@ body {
 }
 
 .grid-circle {
-  width: clamp(var(--demo-grid-12), 5vw, var(--demo-grid-16));
-  height: clamp(var(--demo-grid-12), 5vw, var(--demo-grid-16));
+  width: var(--demo-grid-14);
+  height: var(--demo-grid-14);
   border-radius: 50%;
 }
 
@@ -247,7 +264,7 @@ body {
 
 .day-night-watch:focus-visible {
   outline: 2px solid rgb(255 255 255 / 0.35);
-  outline-offset: 3px;
+  outline-offset: var(--demo-grid);
 }
 
 .day-night-watch__icon-wrap {
@@ -263,7 +280,7 @@ body {
   height: var(--demo-grid-5);
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.8;
+  stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
   transform-origin: 50% 50%;
@@ -285,7 +302,8 @@ body {
    -------------------------------------------------------------------------- */
 
 .led-strip {
-  display: flex;
+  display: grid;
+  grid-auto-flow: column;
   gap: var(--demo-grid-3);
   align-items: center;
 }
@@ -332,6 +350,21 @@ body {
 
   .section {
     padding: var(--demo-grid-12) var(--demo-grid-8);
+  }
+
+  .section-left .section-heading,
+  .section-right .section-heading {
+    margin-top: 0;
+  }
+
+  .title {
+    font-size: var(--demo-grid-6);
+    line-height: var(--demo-grid-8);
+  }
+
+  .title-sub {
+    font-size: var(--demo-grid-5);
+    line-height: var(--demo-grid-6);
   }
 
   .grid-circle {
