@@ -164,12 +164,12 @@ export function App() {
                 value={lightXSlider}
                 min={0}
                 max={100}
+                label="Light X"
                 onChange={(v) => {
                   setLightXSlider(v);
                   setLight((prev) => ({ ...prev, lightX: (v / 50) - 1 }));
                 }}
               />
-              <span className="control-label">Light X</span>
             </div>
 
             <div className="control-row">

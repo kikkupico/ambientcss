@@ -4,6 +4,36 @@
    Right (treatment grid).
    ========================================================================== */
 
+:root {
+  --demo-grid: 4px;
+  --demo-grid-0_25: calc(var(--demo-grid) / 4);
+  --demo-grid-0_5: calc(var(--demo-grid) / 2);
+  --demo-grid-0_75: calc(var(--demo-grid) * 0.75);
+  --demo-grid-1_5: calc(var(--demo-grid) * 1.5);
+  --demo-grid-2: calc(var(--demo-grid) * 2);
+  --demo-grid-2_5: calc(var(--demo-grid) * 2.5);
+  --demo-grid-3: calc(var(--demo-grid) * 3);
+  --demo-grid-4: calc(var(--demo-grid) * 4);
+  --demo-grid-5: calc(var(--demo-grid) * 5);
+  --demo-grid-6: calc(var(--demo-grid) * 6);
+  --demo-grid-8: calc(var(--demo-grid) * 8);
+  --demo-grid-10: calc(var(--demo-grid) * 10);
+  --demo-grid-12: calc(var(--demo-grid) * 12);
+  --demo-grid-14: calc(var(--demo-grid) * 14);
+  --demo-grid-15: calc(var(--demo-grid) * 15);
+  --demo-grid-16: calc(var(--demo-grid) * 16);
+  --demo-grid-20: calc(var(--demo-grid) * 20);
+  --demo-type-label-size: var(--demo-grid-2_5);
+  --demo-type-label-line: var(--demo-grid-3);
+  --demo-type-pane-size: var(--demo-grid-3);
+  --demo-type-pane-line: var(--demo-grid-4);
+  --demo-type-tracking-tight: var(--demo-grid-0_5);
+  --demo-type-tracking-wide: var(--demo-grid-0_25);
+  --demo-rhythm-section: var(--demo-grid-6);
+  --demo-rhythm-block: var(--demo-grid-8);
+  --demo-rhythm-control: var(--demo-grid-6);
+}
+
 body {
   font-family: "Michroma", sans-serif;
   transition: background-color 3s ease-in;
@@ -30,10 +60,10 @@ body {
 .appliance {
   display: grid;
   grid-template-columns: 1fr 1.2fr 1fr;
-  border-radius: 20px;
+  border-radius: var(--demo-grid-5);
   overflow: hidden;
-  width: calc(100vw - 80px);
-  height: calc(100vh - 80px);
+  width: calc(100vw - var(--demo-grid-20));
+  height: calc(100vh - var(--demo-grid-20));
   max-width: 1400px;
   max-height: 900px;
 }
@@ -47,8 +77,8 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2rem 1.5rem;
-  gap: 1.5rem;
+  padding: var(--demo-grid-8) var(--demo-grid-6);
+  gap: var(--demo-rhythm-section);
   position: relative;
 }
 
@@ -66,7 +96,7 @@ body {
    -------------------------------------------------------------------------- */
 
 .section-centre {
-  gap: 2rem;
+  gap: var(--demo-rhythm-block);
 }
 
 .title {
@@ -87,7 +117,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: var(--demo-rhythm-block);
 }
 
 .control-row {
@@ -95,19 +125,20 @@ body {
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 2rem;
+  gap: var(--demo-rhythm-control);
 }
 
 .control-group {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: var(--demo-grid-2);
 }
 
 .control-label {
-  font-size: 0.625rem;
-  letter-spacing: 0.08em;
+  font-size: var(--demo-type-label-size);
+  line-height: var(--demo-type-label-line);
+  letter-spacing: var(--demo-type-tracking-wide);
   text-transform: uppercase;
   color: var(--amb-label);
   text-align: center;
@@ -118,41 +149,42 @@ body {
    -------------------------------------------------------------------------- */
 
 .section-left {
-  gap: 2rem;
+  gap: var(--demo-rhythm-block);
 }
 
 .section-heading {
-  font-size: 0.625rem;
-  letter-spacing: 0.08em;
+  font-size: var(--demo-type-pane-size);
+  line-height: var(--demo-type-pane-line);
+  letter-spacing: var(--demo-type-tracking-tight);
   text-transform: uppercase;
   color: var(--amb-label);
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--demo-grid-3);
 }
 
 .component-grid {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2.5rem;
+  gap: calc(var(--demo-grid) * 9);
 }
 
 .component-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: var(--demo-grid-2);
 }
 
 .component-item-row {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 2rem;
+  gap: var(--demo-rhythm-control);
 }
 
 .button-row {
   display: flex;
-  gap: 1rem;
+  gap: var(--demo-grid-3);
 }
 
 /* --------------------------------------------------------------------------
@@ -160,31 +192,31 @@ body {
    -------------------------------------------------------------------------- */
 
 .section-right {
-  gap: 1.5rem;
+  gap: var(--demo-rhythm-section);
 }
 
 .circle-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.2rem;
+  gap: var(--demo-grid-5);
   justify-items: center;
   align-items: center;
 }
 
 .grid-circle {
-  width: clamp(48px, 5vw, 64px);
-  height: clamp(48px, 5vw, 64px);
+  width: clamp(var(--demo-grid-12), 5vw, var(--demo-grid-16));
+  height: clamp(var(--demo-grid-12), 5vw, var(--demo-grid-16));
   border-radius: 50%;
 }
 
 .grid-circle-label {
-  font-size: 0.625rem;
-  letter-spacing: 0.08em;
+  font-size: var(--demo-type-label-size);
+  line-height: var(--demo-type-label-line);
+  letter-spacing: var(--demo-type-tracking-wide);
   text-transform: uppercase;
   color: var(--amb-label);
   text-align: center;
-  margin-top: 0.75rem;
-  line-height: 1.3;
+  margin-top: var(--demo-grid-3);
 }
 
 .circle-cell {
@@ -220,15 +252,15 @@ body {
 
 .day-night-watch__icon-wrap {
   position: relative;
-  width: 20px;
-  height: 20px;
+  width: var(--demo-grid-5);
+  height: var(--demo-grid-5);
 }
 
 .day-night-watch__icon {
   position: absolute;
   inset: 0;
-  width: 20px;
-  height: 20px;
+  width: var(--demo-grid-5);
+  height: var(--demo-grid-5);
   fill: none;
   stroke: currentColor;
   stroke-width: 1.8;
@@ -254,7 +286,7 @@ body {
 
 .led-strip {
   display: flex;
-  gap: 12px;
+  gap: var(--demo-grid-3);
   align-items: center;
 }
 
@@ -299,11 +331,11 @@ body {
   }
 
   .section {
-    padding: 3rem 2rem;
+    padding: var(--demo-grid-12) var(--demo-grid-8);
   }
 
   .grid-circle {
-    width: 56px;
-    height: 56px;
+    width: var(--demo-grid-14);
+    height: var(--demo-grid-14);
   }
 }
