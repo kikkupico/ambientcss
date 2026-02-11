@@ -176,33 +176,81 @@
 }
 
 .amb-surface-concave {
-  --_concave-dark-stop: calc(50% + var(--amb-light-y) * 50%);
-  --_concave-light-stop: calc(50% - var(--amb-light-y) * 50%);
+  --_concave-y: clamp(-1, var(--amb-light-y), 1);
+  --_concave-contrast: calc(
+    max(0, var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)) * 20%
+  );
+  --_concave-top: calc(
+    var(--amb-key-light-intensity) * (100% + (var(--_concave-y) * var(--_concave-contrast)))
+  );
+  --_concave-mid-top: calc(
+    var(--amb-key-light-intensity) * (100% + (var(--_concave-y) * var(--_concave-contrast) * 0.45))
+  );
+  --_concave-mid-bottom: calc(
+    var(--amb-key-light-intensity) * (100% - (var(--_concave-y) * var(--_concave-contrast) * 0.45))
+  );
+  --_concave-bottom: calc(
+    var(--amb-key-light-intensity) * (100% - (var(--_concave-y) * var(--_concave-contrast)))
+  );
   background: linear-gradient(
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 90%)) var(--_concave-dark-stop),
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) var(--_concave-top)) 0%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) var(--_concave-mid-top)) 35%,
     hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 100%)) 50%,
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 110%)) var(--_concave-light-stop)
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) var(--_concave-mid-bottom)) 65%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) var(--_concave-bottom)) 100%
   );
 }
 
 .amb-surface-concave-h {
-  --_concave-dark-stop: calc(50% + var(--amb-light-x) * 50%);
-  --_concave-light-stop: calc(50% - var(--amb-light-x) * 50%);
+  --_concave-h-x: clamp(-1, var(--amb-light-x), 1);
+  --_concave-h-contrast: calc(
+    max(0, var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)) * 20%
+  );
+  --_concave-h-left: calc(
+    var(--amb-key-light-intensity) * (100% + (var(--_concave-h-x) * var(--_concave-h-contrast)))
+  );
+  --_concave-h-mid-left: calc(
+    var(--amb-key-light-intensity) * (100% + (var(--_concave-h-x) * var(--_concave-h-contrast) * 0.45))
+  );
+  --_concave-h-mid-right: calc(
+    var(--amb-key-light-intensity) * (100% - (var(--_concave-h-x) * var(--_concave-h-contrast) * 0.45))
+  );
+  --_concave-h-right: calc(
+    var(--amb-key-light-intensity) * (100% - (var(--_concave-h-x) * var(--_concave-h-contrast)))
+  );
   background: linear-gradient(
     to right,
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 95%)) var(--_concave-dark-stop),
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) var(--_concave-h-left)) 0%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) var(--_concave-h-mid-left)) 35%,
     hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 100%)) 50%,
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 105%)) var(--_concave-light-stop)
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) var(--_concave-h-mid-right)) 65%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) var(--_concave-h-right)) 100%
   );
 }
 
 .amb-surface-convex {
-  --_convex-light-stop: calc(50% + var(--amb-light-y) * 50%);
-  --_convex-dark-stop: calc(50% - var(--amb-light-y) * 50%);
+  --_convex-y: clamp(-1, var(--amb-light-y), 1);
+  --_convex-contrast: calc(
+    max(0, var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)) * 20%
+  );
+  --_convex-top: calc(
+    var(--amb-key-light-intensity) * (100% - (var(--_convex-y) * var(--_convex-contrast)))
+  );
+  --_convex-mid-top: calc(
+    var(--amb-key-light-intensity) * (100% - (var(--_convex-y) * var(--_convex-contrast) * 0.45))
+  );
+  --_convex-mid-bottom: calc(
+    var(--amb-key-light-intensity) * (100% + (var(--_convex-y) * var(--_convex-contrast) * 0.45))
+  );
+  --_convex-bottom: calc(
+    var(--amb-key-light-intensity) * (100% + (var(--_convex-y) * var(--_convex-contrast)))
+  );
   background: linear-gradient(
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 110%)) var(--_convex-light-stop),
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) var(--_convex-top)) 0%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) var(--_convex-mid-top)) 35%,
     hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 100%)) 50%,
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 90%)) var(--_convex-dark-stop)
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) var(--_convex-mid-bottom)) 65%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) var(--_convex-bottom)) 100%
   );
 }
 
