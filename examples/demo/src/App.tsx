@@ -122,8 +122,7 @@ export function App() {
             <div className="component-item-row">
               <AmbientSlider value={sliderValue} min={0} max={100} onChange={setSliderValue} label="Slider" />
               <div className="component-item">
-                <AmbientSwitch checked={switchOn} onCheckedChange={setSwitchOn} led />
-                <span className="control-label">Switch</span>
+                <AmbientSwitch checked={switchOn} onCheckedChange={setSwitchOn} led label="Switch" />
               </div>
               <AmbientFader value={faderValue} min={0} max={100} onChange={setFaderValue} label="Fader" />
             </div>
@@ -179,12 +178,12 @@ export function App() {
                   value={keyLightKnob}
                   min={0}
                   max={100}
+                  label="Key Light"
                   onChange={(v) => {
                     setKeyLightKnob(v);
                     setLight((prev) => ({ ...prev, keyLight: v / 100 }));
                   }}
                 />
-                <span className="control-label">Key Light</span>
               </div>
 
               <div className="control-group">
@@ -205,12 +204,12 @@ export function App() {
                   value={fillLightKnob}
                   min={0}
                   max={100}
+                  label="Fill Light"
                   onChange={(v) => {
                     setFillLightKnob(v);
                     setLight((prev) => ({ ...prev, fillLight: v / 100 }));
                   }}
                 />
-                <span className="control-label">Fill Light</span>
               </div>
             </div>
           </div>

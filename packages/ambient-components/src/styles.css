@@ -1,17 +1,54 @@
+:root {
+  --ambx-grid: 4px;
+  --ambx-grid-half: calc(var(--ambx-grid) / 2);
+  --ambx-grid-quarter: calc(var(--ambx-grid) / 4);
+  --ambx-type-1-size: calc(var(--ambx-grid) * 8);
+  --ambx-type-1-line: calc(var(--ambx-grid) * 10);
+  --ambx-type-2-size: calc(var(--ambx-grid) * 6);
+  --ambx-type-2-line: calc(var(--ambx-grid) * 8);
+  --ambx-type-3-size: calc(var(--ambx-grid) * 3);
+  --ambx-type-3-line: calc(var(--ambx-grid) * 4);
+  --ambx-type-tracking: var(--ambx-grid-quarter);
+  --ambx-label-size: calc(var(--ambx-grid) * 2 + var(--ambx-grid-half));
+  --ambx-label-line: calc(var(--ambx-grid) * 3);
+  --ambx-control-label-gap: calc(var(--ambx-grid) * 2);
+  --ambx-knob-label-clearance: calc(var(--ambx-grid) * 2);
+  --ambx-slider-label-clearance: calc(var(--ambx-grid) * 2);
+  --ambx-fader-label-clearance: calc(var(--ambx-grid) * 4);
+}
+
+.amb-heading-1 {
+  font-size: var(--ambx-type-1-size);
+  line-height: var(--ambx-type-1-line);
+  letter-spacing: var(--ambx-type-tracking);
+}
+
+.amb-heading-2 {
+  font-size: var(--ambx-type-2-size);
+  line-height: var(--ambx-type-2-line);
+  letter-spacing: var(--ambx-type-tracking);
+}
+
+.amb-heading-3 {
+  font-size: var(--ambx-type-3-size);
+  line-height: var(--ambx-type-3-line);
+  letter-spacing: var(--ambx-type-tracking);
+}
+
 .amb-button {
   cursor: pointer;
   border: medium solid var(--amb-lume);
   background-color: inherit;
-  padding: 0.5rem;
-  border-radius: 12px;
+  padding: calc(var(--ambx-grid) * 2);
+  border-radius: calc(var(--ambx-grid) * 3);
   text-transform: uppercase;
-  width: 64px;
+  width: calc(var(--ambx-grid) * 16);
   font-weight: 600;
   color: var(--amb-lume);
 }
 
 .amb-button:focus {
-  outline-offset: 2px;
+  outline-offset: var(--ambx-grid);
 }
 
 .amb-button:hover,
@@ -25,8 +62,8 @@
 
 .amb-knob {
   border-radius: 50%;
-  height: 64px;
-  width: 64px;
+  height: calc(var(--ambx-grid) * 16);
+  width: calc(var(--ambx-grid) * 16);
   border: medium solid var(--amb-lume);
 }
 
@@ -45,20 +82,20 @@
 
 .amb-fader {
   position: relative;
-  width: 4px;
-  height: 120px;
-  border-radius: 4px;
+  width: var(--ambx-grid);
+  height: calc(var(--ambx-grid) * 30);
+  border-radius: var(--ambx-grid);
   background-color: var(--amb-lume);
 }
 
 .amb-fader-thumb {
   position: absolute;
-  width: 24px;
-  height: 36px;
+  width: calc(var(--ambx-grid) * 6);
+  height: calc(var(--ambx-grid) * 9);
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  border-radius: 12px;
+  border-radius: calc(var(--ambx-grid) * 3);
   display: grid;
   place-items: center;
 }
@@ -82,20 +119,20 @@
 
 .amb-slider {
   position: relative;
-  height: 4px;
-  width: 120px;
-  border-radius: 4px;
+  height: var(--ambx-grid);
+  width: calc(var(--ambx-grid) * 30);
+  border-radius: var(--ambx-grid);
   background-color: var(--amb-lume);
 }
 
 .amb-slider-thumb {
   position: absolute;
-  width: 36px;
-  height: 24px;
+  width: calc(var(--ambx-grid) * 9);
+  height: calc(var(--ambx-grid) * 6);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  border-radius: 12px;
+  border-radius: calc(var(--ambx-grid) * 3);
   display: grid;
   place-items: center;
 }
@@ -105,16 +142,16 @@
   flex-direction: column;
   gap: 2px;
   box-shadow:
-    inset 0 1px 1px rgb(255 255 255 / 0.28),
-    inset 0 -1px 1px rgb(0 0 0 / 0.22);
+    inset 0 var(--ambx-grid-quarter) var(--ambx-grid-quarter) rgb(255 255 255 / 0.28),
+    inset 0 calc(var(--ambx-grid-quarter) * -1) var(--ambx-grid-quarter) rgb(0 0 0 / 0.22);
 }
 
 .amb-led {
-  width: 6px;
-  height: 6px;
+  width: calc(var(--ambx-grid) * 2);
+  height: calc(var(--ambx-grid) * 2);
   border-radius: 50%;
   background-color: var(--amb-led-color, #0f0);
-  box-shadow: 0 0 1px var(--amb-led-color, #0f0);
+  box-shadow: 0 0 var(--ambx-grid-quarter) var(--amb-led-color, #0f0);
   transition: background-color 150ms ease, box-shadow 150ms ease;
 }
 
@@ -129,26 +166,26 @@
 
 .amb-switch {
   position: relative;
-  width: 24px;
-  height: 24px;
+  width: calc(var(--ambx-grid) * 6);
+  height: calc(var(--ambx-grid) * 6);
   border-radius: 50%;
   cursor: pointer;
   border: medium solid var(--amb-lume);
-  margin: 1em;
+  margin: 0;
 }
 
 .ambx-panel {
-  border-radius: 16px;
-  padding: 1rem;
+  border-radius: calc(var(--ambx-grid) * 4);
+  padding: calc(var(--ambx-grid) * 4);
 }
 
 .ambx-button {
-  min-width: 72px;
-  line-height: 1.2;
+  min-width: calc(var(--ambx-grid) * 18);
+  line-height: var(--ambx-type-3-line);
 }
 
 .ambx-switch {
-  --ambx-switch-size: 24px;
+  --ambx-switch-size: calc(var(--ambx-grid) * 6);
   width: var(--ambx-switch-size);
   height: var(--ambx-switch-size);
   display: inline-grid;
@@ -157,34 +194,47 @@
 }
 
 .ambx-switch-sm {
-  --ambx-switch-size: 20px;
+  --ambx-switch-size: calc(var(--ambx-grid) * 5);
 }
 
 .ambx-switch-md {
-  --ambx-switch-size: 24px;
+  --ambx-switch-size: calc(var(--ambx-grid) * 6);
 }
 
 .ambx-switch-lg {
-  --ambx-switch-size: 32px;
+  --ambx-switch-size: calc(var(--ambx-grid) * 8);
 }
 
 .amb-switch-on {
   box-shadow:
-    inset 0 0 0 1px rgb(255 255 255 / 0.25);
+    inset 0 0 0 var(--ambx-grid-quarter) rgb(255 255 255 / 0.25);
 }
 
 .ambx-stack {
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: var(--ambx-control-label-gap);
 }
 
 .ambx-label {
-  font-size: 0.625rem;
-  letter-spacing: 0.08em;
+  font-size: var(--ambx-label-size);
+  line-height: var(--ambx-label-line);
+  letter-spacing: var(--ambx-grid-quarter);
   text-transform: uppercase;
   color: var(--amb-label);
+}
+
+.ambx-slider + .ambx-label {
+  margin-top: var(--ambx-slider-label-clearance);
+}
+
+.ambx-fader + .ambx-label {
+  margin-top: var(--ambx-fader-label-clearance);
+}
+
+.ambx-knob + .ambx-label {
+  margin-top: var(--ambx-knob-label-clearance);
 }
 
 .ambx-knob {
@@ -201,7 +251,7 @@
 }
 
 .ambx-fader {
-  width: 8px;
+  width: calc(var(--ambx-grid) * 2);
   border-radius: 999px;
   touch-action: none;
   user-select: none;
@@ -212,7 +262,7 @@
 }
 
 .ambx-slider {
-  height: 8px;
+  height: calc(var(--ambx-grid) * 2);
   border-radius: 999px;
   touch-action: none;
   user-select: none;

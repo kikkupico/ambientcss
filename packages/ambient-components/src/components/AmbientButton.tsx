@@ -7,7 +7,7 @@ export function AmbientButton({ className, children, ...props }: AmbientButtonPr
   return (
     <button
       type="button"
-      className={cn("ambient amb-button amb-fillet amb-elevation-1 ambx-button", className)}
+      className={cn("ambient amb-button amb-fillet amb-elevation-1 ambx-button amb-heading-3", className)}
       {...props}
     >
       {children}
