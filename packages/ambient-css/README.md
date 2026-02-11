@@ -1,6 +1,6 @@
 # @ambientcss/css
 
-Ambient lighting and skeuomorphic utility CSS.
+Ambient lighting primitives and surface utility CSS.
 
 ## Install
 
@@ -19,3 +19,8 @@ Or in JS:
 ```ts
 import "@ambientcss/css/ambient.css";
 ```
+
+`@ambientcss/css` contains foundational ambient primitives (lighting variables, edges,
+surfaces, light position helpers, and generic utilities). Component styling
+for `AmbientButton`, `AmbientKnob`, `AmbientSlider`, `AmbientFader`, and
+`AmbientSwitch` lives in `@ambientcss/components/styles.css`.

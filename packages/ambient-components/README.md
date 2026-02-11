@@ -11,6 +11,7 @@ pnpm add @ambientcss/components @ambientcss/css
 ## Usage
 
 ```tsx
+import "@ambientcss/css/ambient.css";
 import "@ambientcss/components/styles.css";
 
 import { AmbientButton, AmbientKnob, AmbientProvider } from "@ambientcss/components";
