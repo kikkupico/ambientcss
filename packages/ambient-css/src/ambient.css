@@ -23,6 +23,12 @@
    --amb-light-saturation  : Saturation of the light color (with % suffix)
    -------------------------------------------------------------------------- */
 
+@property --amb-elevation {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
 :root {
   --amb-light-x: -1;
   --amb-light-y: -1;
@@ -290,4 +296,22 @@
 
 .amb-glow {
   box-shadow: 0 0 4px var(--amb-lume);
+}
+
+/* --------------------------------------------------------------------------
+   ANIMATIONS
+   -------------------------------------------------------------------------- */
+
+@keyframes amb-bounce-elevation {
+  0%, 100% { --amb-elevation: 0; }
+  15%      { --amb-elevation: 3; }
+  30%      { --amb-elevation: 0; }
+  42%      { --amb-elevation: 2; }
+  54%      { --amb-elevation: 0; }
+  64%      { --amb-elevation: 1; }
+  74%      { --amb-elevation: 0; }
+}
+
+.amb-bounce {
+  animation: amb-bounce-elevation 2s ease-in-out infinite;
 }
