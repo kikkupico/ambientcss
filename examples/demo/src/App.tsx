@@ -119,26 +119,7 @@ const LED_COLORS = [
   "#4ade80", "#f59e0b", "#22d3d3", "#3b82f6", "#ffffff",
 ];
 
-/* ── Stable random elevations for orbit dancing ───────────────────────── */
-
-function seededRandom(seed: number) {
-  let s = seed;
-  return () => {
-    s = (s * 16807 + 0) % 2147483647;
-    return (s - 1) / 2147483646;
-  };
-}
-
-const ORBIT_COUNT = 15;
-const ORBIT_DANCE_FRAMES = 12;
-
-// Pre-compute elevation sequences for each circle
-const ORBIT_ELEVATIONS: number[][] = (() => {
-  const rand = seededRandom(42);
-  return Array.from({ length: ORBIT_COUNT }, () =>
-    Array.from({ length: ORBIT_DANCE_FRAMES }, () => Math.floor(rand() * 3) + 1)
-  );
-})();
+const ORBIT_COUNT = 9;
 
 /* ══════════════════════════════════════════════════════════════════════════
    APP
@@ -212,9 +193,7 @@ export function App() {
      Maps pointer position within the orbit section to light x/y.
      Also drives the dancing elevations based on pointer movement.      */
   const [orbitLight, setOrbitLight] = useState({ x: -1, y: -1 });
-  const [orbitDanceFrame, setOrbitDanceFrame] = useState(0);
   const orbitGridRef = useRef<HTMLDivElement>(null);
-  const orbitMoveCount = useRef(0);
 
   const handleOrbitPointer = useCallback((e: React.PointerEvent | React.TouchEvent) => {
     const el = orbitGridRef.current;
@@ -222,13 +201,10 @@ export function App() {
     const rect = el.getBoundingClientRect();
     const clientX = "touches" in e ? e.touches[0]!.clientX : (e as React.PointerEvent).clientX;
     const clientY = "touches" in e ? e.touches[0]!.clientY : (e as React.PointerEvent).clientY;
-    // Map to -1..1, clamped to perimeter (max abs = 1)
     const rawX = ((clientX - rect.left) / rect.width) * 2 - 1;
     const rawY = ((clientY - rect.top) / rect.height) * 2 - 1;
     const maxAbs = Math.max(Math.abs(rawX), Math.abs(rawY), 0.01);
     setOrbitLight({ x: rawX / maxAbs, y: rawY / maxAbs });
-    orbitMoveCount.current += 1;
-    setOrbitDanceFrame(Math.floor(orbitMoveCount.current / 3) % ORBIT_DANCE_FRAMES);
   }, []);
 
 
@@ -269,23 +245,19 @@ export function App() {
               touchAction: "none",
             } as React.CSSProperties}
           >
-            {Array.from({ length: ORBIT_COUNT }, (_, i) => {
-              const elev = ORBIT_ELEVATIONS[i]![orbitDanceFrame]!;
-              return (
+            {Array.from({ length: ORBIT_COUNT }, (_, i) => (
                 <div
                   key={i}
-                  className={`orbit-circle ambient amb-surface ${
+                  className={`orbit-circle ambient amb-surface amb-elevation-3 ${
                     i % 3 === 0 ? "amb-fillet" : i % 3 === 1 ? "amb-chamfer" : "amb-fillet-2"
                   }`}
                   style={{
-                    "--amb-elevation": elev,
                     opacity: orbitView.visible ? 1 : 0,
                     transform: orbitView.visible ? "scale(1)" : "scale(0.5)",
                     transition: `opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${i * 0.04}s, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${i * 0.04}s, box-shadow 0.3s ease`,
                   } as React.CSSProperties}
                 />
-              );
-            })}
+            ))}
           </div>
         </div>
       </section>

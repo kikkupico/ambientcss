@@ -52,7 +52,7 @@ body {
   font-size: 10px;
   letter-spacing: 0.35em;
   text-transform: uppercase;
-  color: #333;
+  color: var(--amb-lume);
   margin-bottom: 48px;
   text-align: center;
 }
@@ -61,7 +61,7 @@ body {
   font-size: 9px;
   letter-spacing: 0.25em;
   text-transform: lowercase;
-  color: #555;
+  color: var(--amb-lume);
   text-align: center;
   margin-bottom: 32px;
 }
@@ -72,11 +72,14 @@ body {
 
 .hero {
   min-height: 100vh;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   position: relative;
   max-width: 100vw;
   overflow: hidden;
+  padding-bottom: 120px;
 }
 
 .hero-title {
@@ -92,7 +95,7 @@ body {
 .hero-sub {
   font-size: clamp(12px, 1.8vw, 20px);
   letter-spacing: 0.6em;
-  color: #555;
+  color: var(--amb-lume);
   text-align: center;
   margin-top: 24px;
   text-transform: lowercase;
@@ -107,7 +110,7 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  color: #555;
+  color: var(--amb-lume);
   font-size: 9px;
   letter-spacing: 0.3em;
   text-transform: uppercase;
@@ -139,7 +142,7 @@ body {
 
 .orbit-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 32px;
   justify-items: center;
   align-items: center;
@@ -153,13 +156,6 @@ body {
   border-radius: 50%;
 }
 
-.orbit-circle:nth-child(odd) {
-  transform: scale(0.85);
-}
-
-.orbit-grid:hover .orbit-circle {
-  transform: scale(1.05);
-}
 
 /* --------------------------------------------------------------------------
    ELEVATION – static circles at different depths + bounce
@@ -202,7 +198,7 @@ body {
   font-size: 9px;
   letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: #333;
+  color: var(--amb-lume);
 }
 
 /* --------------------------------------------------------------------------
@@ -246,7 +242,7 @@ body {
   font-size: 9px;
   letter-spacing: 0.35em;
   text-transform: uppercase;
-  color: #333;
+  color: var(--amb-lume);
 }
 
 /* --------------------------------------------------------------------------
@@ -290,7 +286,7 @@ body {
   font-size: 8px;
   letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: #333;
+  color: var(--amb-lume);
 }
 
 /* --------------------------------------------------------------------------
@@ -355,7 +351,7 @@ body {
   font-size: 10px;
   letter-spacing: 0.5em;
   text-transform: uppercase;
-  color: #333;
+  color: var(--amb-lume);
   min-height: 1.4em;
   transition: opacity 0.5s ease;
 }
@@ -401,7 +397,7 @@ body {
   font-size: 8px;
   letter-spacing: 0.35em;
   text-transform: uppercase;
-  color: #333;
+  color: var(--amb-lume);
 }
 
 /* --------------------------------------------------------------------------
@@ -525,7 +521,7 @@ body {
   font-size: clamp(10px, 1.5vw, 14px);
   letter-spacing: 0.5em;
   text-transform: lowercase;
-  color: #555;
+  color: var(--amb-lume);
   margin-top: 16px;
   text-align: center;
 }
@@ -547,7 +543,7 @@ body {
   letter-spacing: 0.25em;
   text-transform: uppercase;
   text-decoration: none;
-  color: #333;
+  color: var(--amb-lume);
   cursor: pointer;
   transition: transform 0.2s ease;
 }
@@ -571,11 +567,6 @@ body {
    -------------------------------------------------------------------------- */
 
 @media (max-width: 768px) {
-  .orbit-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-  }
-
   .surface-gallery {
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
