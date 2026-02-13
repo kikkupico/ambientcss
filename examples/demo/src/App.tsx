@@ -33,14 +33,10 @@ const LIGHT_FRAMES: LightFrame[] = [
   { lightX: -1, lightY: 0, keyLight: 0.88, fillLight: 0.6, lightHue: 30, lightSaturation: 20 },
   // Edges – cool overhead
   { lightX: 0.3, lightY: -1, keyLight: 0.82, fillLight: 0.55, lightHue: 210, lightSaturation: 18 },
-  // Components day – neutral bright
+  // Components – neutral bright
   { lightX: -0.7, lightY: -0.7, keyLight: 0.9, fillLight: 0.7, lightHue: 234, lightSaturation: 5 },
-  // Components night (end of sticky) – deep blue night
-  { lightX: 0.7, lightY: -0.7, keyLight: 0.3, fillLight: 0.1, lightHue: 250, lightSaturation: 30 },
-  // Moods – stays night-ish
-  { lightX: 1, lightY: -1, keyLight: 0.35, fillLight: 0.12, lightHue: 250, lightSaturation: 30 },
-  // Mosaic – warm dusk
-  { lightX: -1, lightY: -0.3, keyLight: 0.7, fillLight: 0.45, lightHue: 20, lightSaturation: 25 },
+  // Theming playground – neutral bright (user takes over here)
+  { lightX: -0.7, lightY: -0.7, keyLight: 0.9, fillLight: 0.7, lightHue: 234, lightSaturation: 5 },
   // Finale – bright dawn
   { lightX: -1, lightY: -1, keyLight: 0.95, fillLight: 0.8, lightHue: 40, lightSaturation: 12 },
 ];
@@ -77,49 +73,29 @@ function useInView(threshold = 0.25) {
   return { ref, visible };
 }
 
-/* ── Section scroll progress hook ─────────────────────────────────────── */
+/* ── Theming presets ──────────────────────────────────────────────────── */
 
-function useSectionProgress(ref: React.RefObject<HTMLDivElement | null>) {
-  const [progress, setProgress] = useState(0);
+type ThemePreset = {
+  label: string;
+  lightX: number;      // -1..1
+  lightY: number;      // -1..1
+  keyLight: number;    // 0..1
+  fillLight: number;   // 0..1
+  lightHue: number;    // 0..360
+  lightSaturation: number; // 0..100
+  lumeHue: number; // 0..360
+};
 
-  useEffect(() => {
-    let ticking = false;
-    function onScroll() {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        const el = ref.current;
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          const vh = window.innerHeight;
-          // 0 when top enters viewport bottom, 1 when bottom leaves viewport top
-          const p = Math.max(0, Math.min(1, -rect.top / (rect.height - vh)));
-          setProgress(p);
-        }
-        ticking = false;
-      });
-    }
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [ref]);
-
-  return progress;
-}
-
-/* ── LED colors for the constellation ──────────────────────────────────── */
-
-const LED_COLORS = [
-  "#ef4444", "#4ade80", "#f59e0b", "#22d3d3", "#3b82f6",
-  "#ef4444", "#4ade80", "#f59e0b", "#22d3d3", "#3b82f6",
-  "#ffffff", "#ef4444", "#4ade80", "#f59e0b", "#22d3d3",
-  "#3b82f6", "#ffffff", "#ef4444", "#4ade80", "#f59e0b",
-  "#22d3d3", "#3b82f6", "#ffffff", "#ef4444", "#4ade80",
-  "#f59e0b", "#22d3d3", "#3b82f6", "#ffffff", "#ef4444",
-  "#4ade80", "#f59e0b", "#22d3d3", "#3b82f6", "#ffffff",
+// Day/Night use the exact values from the original sticky day→night transition
+const THEME_PRESETS: ThemePreset[] = [
+  { label: "Day",    lightX: -0.7, lightY: -0.7, keyLight: 0.9,  fillLight: 0.7,  lightHue: 234, lightSaturation: 5,  lumeHue: 16 },
+  { label: "Night",  lightX: 0.7,  lightY: -0.7, keyLight: 0.3,  fillLight: 0.1,  lightHue: 250, lightSaturation: 30, lumeHue: 16 },
+  { label: "Sci-Fi", lightX: 0,    lightY: -0.9, keyLight: 0.2,  fillLight: 0.05, lightHue: 190, lightSaturation: 50, lumeHue: 180 },
+  { label: "Retro",  lightX: -0.6, lightY: -0.3, keyLight: 0.7,  fillLight: 0.5,  lightHue: 25,  lightSaturation: 30, lumeHue: 25 },
 ];
 
 const ORBIT_COUNT = 9;
+const ANIM_DURATION = 800; // ms for preset transitions
 
 /* ══════════════════════════════════════════════════════════════════════════
    APP
@@ -137,11 +113,24 @@ export function App() {
 
   /* Scroll-driven lighting ------------------------------------------------ */
   const ticking = useRef(false);
+  const playgroundRef = useRef<HTMLDivElement>(null);
 
   const handleScroll = useCallback(() => {
     if (ticking.current) return;
     ticking.current = true;
     requestAnimationFrame(() => {
+      // Check if playground section is in view
+      const pgEl = playgroundRef.current;
+      if (pgEl) {
+        const rect = pgEl.getBoundingClientRect();
+        const vh = window.innerHeight;
+        const inView = rect.top < vh * 0.5 && rect.bottom > vh * 0.5;
+        if (inView) {
+          ticking.current = false;
+          return; // Don't update theme from scroll while playground is active
+        }
+      }
+
       const scrollY = window.scrollY;
       const vh = window.innerHeight;
       const totalScroll = document.documentElement.scrollHeight - vh;
@@ -171,7 +160,75 @@ export function App() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
-  /* Component demo state -------------------------------------------------- */
+  /* Animated theme transitions -------------------------------------------- */
+  const animRef = useRef<number>(0);
+  const animFrom = useRef<ThemePreset | null>(null);
+  const animTo = useRef<ThemePreset | null>(null);
+  const animStart = useRef(0);
+  const themeRef = useRef(theme);
+  themeRef.current = theme;
+
+  const animateToPreset = useCallback((target: ThemePreset) => {
+    // Cancel any running animation
+    if (animRef.current) cancelAnimationFrame(animRef.current);
+
+    // Snapshot current theme as starting point (via ref to avoid stale closure)
+    const cur = themeRef.current;
+    animFrom.current = {
+      label: "",
+      lightX: cur.lightX ?? 0,
+      lightY: cur.lightY ?? 0,
+      keyLight: cur.keyLight ?? 0.9,
+      fillLight: cur.fillLight ?? 0.7,
+      lightHue: cur.lightHue ?? 234,
+      lightSaturation: cur.lightSaturation ?? 5,
+      lumeHue: cur.lumeHue ?? 16,
+    };
+    animTo.current = target;
+    animStart.current = performance.now();
+
+    function tick(now: number) {
+      const from = animFrom.current!;
+      const to = animTo.current!;
+      const elapsed = now - animStart.current;
+      const rawT = Math.min(elapsed / ANIM_DURATION, 1);
+      // Ease out cubic for smooth deceleration
+      const t = 1 - Math.pow(1 - rawT, 3);
+
+      const lerp = (a: number, b: number) => a + (b - a) * t;
+
+      setTheme({
+        lightX: lerp(from.lightX, to.lightX),
+        lightY: lerp(from.lightY, to.lightY),
+        keyLight: lerp(from.keyLight, to.keyLight),
+        fillLight: lerp(from.fillLight, to.fillLight),
+        lightHue: lerp(from.lightHue, to.lightHue),
+        lightSaturation: lerp(from.lightSaturation, to.lightSaturation),
+        lumeHue: lerp(from.lumeHue, to.lumeHue),
+      });
+
+      if (rawT < 1) {
+        animRef.current = requestAnimationFrame(tick);
+      } else {
+        animRef.current = 0;
+      }
+    }
+
+    animRef.current = requestAnimationFrame(tick);
+  }, []);
+
+  // Cancel animation and set a single theme property (for control changes)
+  const setThemeProp = useCallback((key: keyof AmbientTheme, value: number) => {
+    if (animRef.current) { cancelAnimationFrame(animRef.current); animRef.current = 0; }
+    setTheme(prev => ({ ...prev, [key]: value }));
+  }, []);
+
+  // Cleanup animation on unmount
+  useEffect(() => {
+    return () => { if (animRef.current) cancelAnimationFrame(animRef.current); };
+  }, []);
+
+  /* Component demo state (local dummies) ---------------------------------- */
   const [knob1, setKnob1] = useState(65);
   const [knob2, setKnob2] = useState(30);
   const [slider1, setSlider1] = useState(50);
@@ -185,13 +242,9 @@ export function App() {
   const surfView = useInView(0.2);
   const edgeView = useInView(0.2);
   const compView = useInView(0.1);
-  const moodView = useInView(0.2);
-  const mosaicView = useInView(0.2);
-  const ledView = useInView(0.15);
+  const playgroundView = useInView(0.1);
 
-  /* Orbit: pointer/touch-driven light direction ─────────────────────────
-     Maps pointer position within the orbit section to light x/y.
-     Also drives the dancing elevations based on pointer movement.      */
+  /* Orbit: pointer/touch-driven light direction ───────────────────────── */
   const [orbitLight, setOrbitLight] = useState({ x: -1, y: -1 });
   const orbitGridRef = useRef<HTMLDivElement>(null);
 
@@ -206,11 +259,6 @@ export function App() {
     const maxAbs = Math.max(Math.abs(rawX), Math.abs(rawY), 0.01);
     setOrbitLight({ x: rawX / maxAbs, y: rawY / maxAbs });
   }, []);
-
-
-  /* Components sticky section ---------------------------------------------- */
-  const compStickyRef = useRef<HTMLDivElement>(null);
-  const compStickyProgress = useSectionProgress(compStickyRef);
 
   return (
     <AmbientProvider className="amb-surface" theme={theme}>
@@ -344,132 +392,124 @@ export function App() {
         </div>
       </section>
 
-      {/* ── 6. COMPONENTS (sticky day→night) ─────────────────────────── */}
-      <section className="comp-sticky-wrapper" ref={compStickyRef}>
-        <div className="comp-sticky-content amb-surface" ref={compView.ref}>
-          <div className="scene-inner">
-            <div className="scene-label">Components</div>
-            <div className="component-stage">
-              <div className="component-cell" data-visible={compView.visible}>
-                <AmbientKnob value={knob1} onChange={setKnob1} label="Knob" />
-              </div>
-              <div className="component-cell" data-visible={compView.visible}>
-                <AmbientKnob value={knob2} onChange={setKnob2} label="Knob" />
-              </div>
-              <div className="component-cell" data-visible={compView.visible}>
-                <AmbientSlider value={slider1} min={0} max={100} onChange={setSlider1} label="Slider" />
-              </div>
-              <div className="component-cell" data-visible={compView.visible}>
-                <AmbientFader value={fader1} min={0} max={100} onChange={setFader1} label="Fader" />
-              </div>
-              <div className="component-cell" data-visible={compView.visible}>
-                <AmbientSwitch checked={sw1} onCheckedChange={setSw1} led label="Switch" />
-              </div>
-              <div className="component-cell" data-visible={compView.visible}>
-                <AmbientSwitch checked={sw2} onCheckedChange={setSw2} led="amber" label="Switch" />
-              </div>
-              <div className="component-cell" data-visible={compView.visible}>
-                <AmbientButton>Button</AmbientButton>
-              </div>
-              <div className="component-cell" data-visible={compView.visible}>
-                <AmbientButton>Button</AmbientButton>
-              </div>
+      {/* ── 6. COMPONENTS ─────────────────────────────────────────────── */}
+      <section className="scene amb-surface">
+        <div className="scene-inner" ref={compView.ref}>
+          <div className="scene-label">Components</div>
+          <div className="scene-subtitle">(react only)</div>
+          <div className="component-stage">
+            <div className="component-cell" data-visible={compView.visible}>
+              <AmbientKnob value={knob1} onChange={setKnob1} label="Knob" />
             </div>
-            {/* Day / Night indicator */}
-            <div className="comp-time-label">
-              {compStickyProgress < 0.3 ? "day" : compStickyProgress > 0.7 ? "night" : ""}
+            <div className="component-cell" data-visible={compView.visible}>
+              <AmbientKnob value={knob2} onChange={setKnob2} label="Knob" />
             </div>
+            <div className="component-cell" data-visible={compView.visible}>
+              <AmbientSlider value={slider1} min={0} max={100} onChange={setSlider1} label="Slider" />
+            </div>
+            <div className="component-cell" data-visible={compView.visible}>
+              <AmbientFader value={fader1} min={0} max={100} onChange={setFader1} label="Fader" />
+            </div>
+            <div className="component-cell" data-visible={compView.visible}>
+              <AmbientSwitch checked={sw1} onCheckedChange={setSw1} led label="Switch" />
+            </div>
+            <div className="component-cell" data-visible={compView.visible}>
+              <AmbientSwitch checked={sw2} onCheckedChange={setSw2} led="amber" label="Switch" />
+            </div>
+            <div className="component-cell" data-visible={compView.visible}>
+              <AmbientButton>Button</AmbientButton>
+            </div>
+          </div>
+          <div className="comp-led-row" data-visible={compView.visible}>
+            <div className="amb-led" style={{ "--amb-led-color": "#ef4444" } as React.CSSProperties} />
+            <div className="amb-led" style={{ "--amb-led-color": "#4ade80" } as React.CSSProperties} />
+            <div className="amb-led" style={{ "--amb-led-color": "#3b82f6" } as React.CSSProperties} />
           </div>
         </div>
       </section>
 
-      {/* ── 7. COLOR MOODS ───────────────────────────────────────────── */}
-      <section className="scene amb-surface">
-        <div className="scene-inner" ref={moodView.ref}>
-          <div className="scene-label">Color Moods</div>
-          <div className="mood-strip">
-            {[
-              { hue: 234, sat: 5, key: 0.9, label: "Neutral" },
-              { hue: 20, sat: 25, key: 0.85, label: "Warm" },
-              { hue: 210, sat: 20, key: 0.75, label: "Cool" },
-              { hue: 280, sat: 18, key: 0.35, label: "Midnight" },
-            ].map(({ hue, sat, key, label }) => (
-              <div
-                key={label}
-                className="mood-card ambient amb-surface amb-fillet-2 amb-elevation-2"
-                data-visible={moodView.visible}
-                style={{
-                  "--amb-light-hue": hue,
-                  "--amb-light-saturation": `${sat}%`,
-                  "--amb-key-light-intensity": key,
-                  "--amb-fill-light-intensity": key * 0.6,
-                } as React.CSSProperties}
+      {/* ── 7. THEMING PLAYGROUND ─────────────────────────────────────── */}
+      <section className="scene amb-surface" ref={playgroundRef}>
+        <div className="scene-inner" ref={playgroundView.ref}>
+          <div className="scene-label">Endless Theming Possibilities</div>
+          <div className="scene-hint">tap a preset or tweak the controls</div>
+
+          <div className="theme-presets">
+            {THEME_PRESETS.map((preset) => (
+              <AmbientButton
+                key={preset.label}
+                onClick={() => animateToPreset(preset)}
               >
-                <span className="mood-label">{label}</span>
-              </div>
+                {preset.label}
+              </AmbientButton>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* ── 8. MOSAIC ────────────────────────────────────────────────── */}
-      <section className="scene amb-surface">
-        <div className="scene-inner" ref={mosaicView.ref}>
-          <div className="scene-label">Composition</div>
-          <div className="mosaic">
-            <AmbientPanel
-              className="mosaic-panel"
-              data-visible={mosaicView.visible}
-            >
-              <div className="mosaic-inner">
-                {Array.from({ length: 6 }, (_, i) => (
-                  <div
-                    key={i}
-                    className={`mosaic-dot ambient amb-surface-convex amb-chamfer amb-elevation-${(i % 3) + 1}`}
-                  />
-                ))}
+          <div className="theme-playground">
+            <div className="theme-controls">
+              <div className="theme-controls-row">
+                <AmbientKnob
+                  value={Math.round((theme.keyLight ?? 0.9) * 100)}
+                  onChange={(v) => setThemeProp("keyLight", v / 100)}
+                  label="Key Light"
+                />
+                <AmbientFader
+                  value={Math.round((theme.lightY ?? 0) * 100)}
+                  min={-100}
+                  max={100}
+                  onChange={(v) => setThemeProp("lightY", v / 100)}
+                  label="Light Y"
+                />
+                <AmbientKnob
+                  value={Math.round((theme.fillLight ?? 0.7) * 100)}
+                  onChange={(v) => setThemeProp("fillLight", v / 100)}
+                  label="Fill Light"
+                />
+              </div>
+              <div className="theme-controls-row">
+                <AmbientSlider
+                  value={Math.round((theme.lightX ?? 0) * 100)}
+                  min={-100}
+                  max={100}
+                  onChange={(v) => setThemeProp("lightX", v / 100)}
+                  label="Light X"
+                />
+              </div>
+              <div className="theme-controls-row">
+                <AmbientKnob
+                  value={Math.round(((theme.lightHue ?? 234) / 360) * 100)}
+                  onChange={(v) => setThemeProp("lightHue", (v / 100) * 360)}
+                  label="Hue"
+                />
+                <AmbientKnob
+                  value={Math.round(theme.lightSaturation ?? 5)}
+                  onChange={(v) => setThemeProp("lightSaturation", v)}
+                  label="Saturation"
+                />
+                <AmbientKnob
+                  value={Math.round(((theme.lumeHue ?? 16) / 360) * 100)}
+                  onChange={(v) => setThemeProp("lumeHue", (v / 100) * 360)}
+                  label="Lume Hue"
+                />
+              </div>
+            </div>
+
+            <AmbientPanel className="theme-preview-panel">
+              <div className="theme-preview-content">
+                <div className="ambient amb-surface-convex amb-fillet amb-elevation-1 theme-preview-circle" />
+                <div className="theme-preview-bars">
+                  <div className="ambient amb-surface-convex amb-chamfer amb-elevation-1 theme-preview-bar" style={{ width: "100%" }} />
+                  <div className="ambient amb-surface-convex amb-chamfer amb-elevation-1 theme-preview-bar" style={{ width: "72%" }} />
+                  <div className="ambient amb-surface-convex amb-chamfer amb-elevation-1 theme-preview-bar" style={{ width: "88%" }} />
+                </div>
+                <div className="ambient amb-surface amb-fillet amb-bounce theme-preview-circle" />
               </div>
             </AmbientPanel>
-
-            <div
-              className="mosaic-panel ambient amb-surface-concave amb-fillet amb-elevation-2"
-              data-visible={mosaicView.visible}
-            >
-              <div className="mosaic-bar-group">
-                {Array.from({ length: 4 }, (_, i) => (
-                  <div
-                    key={i}
-                    className="mosaic-bar ambient amb-surface-convex amb-chamfer amb-elevation-1"
-                    style={{ width: `${60 + i * 12}%` }}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div
-              className="mosaic-panel ambient amb-surface-darker amb-fillet amb-elevation-1"
-              data-visible={mosaicView.visible}
-              ref={ledView.ref}
-            >
-              <div className="led-constellation">
-                {LED_COLORS.map((color, i) => (
-                  <div
-                    key={i}
-                    className="led-dot amb-led"
-                    data-visible={ledView.visible}
-                    style={{
-                      "--amb-led-color": color,
-                      transitionDelay: `${i * 0.02}s`,
-                    } as React.CSSProperties}
-                  />
-                ))}
-              </div>
-            </div>
           </div>
         </div>
       </section>
 
-      {/* ── 9. FINALE ────────────────────────────────────────────────── */}
+      {/* ── 8. FINALE ────────────────────────────────────────────────── */}
       <section className="finale amb-surface">
         <div>
           <div className="finale-text">ambient</div>
@@ -477,7 +517,7 @@ export function App() {
           <div className="finale-links">
             <a
               className="finale-link ambient amb-surface amb-fillet amb-elevation-1 amb-rounded-lg"
-              href="https://github.com/kikkupico/ambientcss"
+              href="https://github.com/nickkadutskyi/ambientcss"
               target="_blank"
               rel="noopener noreferrer"
             >

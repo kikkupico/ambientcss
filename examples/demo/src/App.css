@@ -57,6 +57,17 @@ body {
   text-align: center;
 }
 
+.scene-subtitle {
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  text-transform: lowercase;
+  color: var(--amb-lume);
+  text-align: center;
+  margin-top: -36px;
+  margin-bottom: 48px;
+  opacity: 0.6;
+}
+
 .scene-hint {
   font-size: 9px;
   letter-spacing: 0.25em;
@@ -290,22 +301,8 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   COMPONENT STAGE – sticky day-to-night transition
+   COMPONENT STAGE
    -------------------------------------------------------------------------- */
-
-.comp-sticky-wrapper {
-  /* Extra height to create scroll runway for the day→night transition */
-  height: 300vh;
-  position: relative;
-}
-
-.comp-sticky-content {
-  position: sticky;
-  top: 0;
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-}
 
 .component-stage {
   display: flex;
@@ -343,157 +340,95 @@ body {
 .component-cell:nth-child(5) { transition-delay: 0.24s; }
 .component-cell:nth-child(6) { transition-delay: 0.30s; }
 .component-cell:nth-child(7) { transition-delay: 0.36s; }
-.component-cell:nth-child(8) { transition-delay: 0.42s; }
 
-.comp-time-label {
-  margin-top: 40px;
-  text-align: center;
-  font-size: 10px;
-  letter-spacing: 0.5em;
-  text-transform: uppercase;
-  color: var(--amb-lume);
-  min-height: 1.4em;
-  transition: opacity 0.5s ease;
-}
-
-/* --------------------------------------------------------------------------
-   MOOD STRIP
-   -------------------------------------------------------------------------- */
-
-.mood-strip {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+.comp-led-row {
+  display: flex;
+  justify-content: center;
   gap: 24px;
-  max-width: 900px;
-  margin: 0 auto;
+  margin-top: 48px;
+  transition: opacity 0.7s ease 0.42s;
 }
 
-.mood-card {
-  aspect-ratio: 3 / 4;
-  border-radius: 20px;
-  display: grid;
-  align-items: end;
-  padding: 20px;
-  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-              opacity 0.7s ease;
-}
-
-.mood-card[data-visible="false"] {
+.comp-led-row[data-visible="false"] {
   opacity: 0;
-  transform: translateY(50px) scale(0.9);
 }
 
-.mood-card[data-visible="true"] {
+.comp-led-row[data-visible="true"] {
   opacity: 1;
-  transform: translateY(0) scale(1);
 }
 
-.mood-card:nth-child(1) { transition-delay: 0s; }
-.mood-card:nth-child(2) { transition-delay: 0.1s; }
-.mood-card:nth-child(3) { transition-delay: 0.2s; }
-.mood-card:nth-child(4) { transition-delay: 0.3s; }
-
-.mood-label {
-  font-size: 8px;
-  letter-spacing: 0.35em;
-  text-transform: uppercase;
-  color: var(--amb-lume);
-}
-
-/* --------------------------------------------------------------------------
-   PANEL MOSAIC
-   -------------------------------------------------------------------------- */
-
-.mosaic {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 24px;
-  max-width: 900px;
-  height: min(600px, 70vh);
-  margin: 0 auto;
-}
-
-.mosaic-panel {
-  border-radius: 20px;
-  padding: 32px;
-  display: grid;
-  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1),
-              opacity 0.8s ease;
-}
-
-.mosaic-panel[data-visible="false"] {
-  opacity: 0;
-  transform: scale(0.85);
-}
-
-.mosaic-panel[data-visible="true"] {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.mosaic-panel:nth-child(1) {
-  grid-row: 1 / 3;
-  align-content: end;
-}
-
-.mosaic-panel:nth-child(2) { transition-delay: 0.1s; }
-.mosaic-panel:nth-child(3) { transition-delay: 0.2s; }
-
-.mosaic-inner {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-top: 24px;
-}
-
-.mosaic-dot {
-  width: 48px;
-  height: 48px;
+.comp-led-row .amb-led {
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
 }
 
-.mosaic-bar {
-  height: 12px;
-  border-radius: 6px;
-  width: 100%;
-}
-
-.mosaic-bar-group {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  align-self: center;
-}
-
 /* --------------------------------------------------------------------------
-   LED CONSTELLATION
+   THEMING PLAYGROUND
    -------------------------------------------------------------------------- */
 
-.led-constellation {
+.theme-presets {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 16px;
-  max-width: 500px;
+  margin-bottom: 48px;
+}
+
+.theme-playground {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  max-width: 1000px;
   margin: 0 auto;
+  align-items: center;
 }
 
-.led-dot {
-  width: 12px;
-  height: 12px;
+.theme-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.theme-controls-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+}
+
+.theme-preview-panel {
+  border-radius: 20px;
+  padding: 32px;
+  min-height: 240px;
+  display: grid;
+  place-items: center;
+}
+
+.theme-preview-content {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+}
+
+.theme-preview-circle {
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  transition: transform 0.5s ease, opacity 0.5s ease;
+  flex-shrink: 0;
 }
 
-.led-dot[data-visible="false"] {
-  opacity: 0;
-  transform: scale(0);
+.theme-preview-bars {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.led-dot[data-visible="true"] {
-  opacity: 1;
-  transform: scale(1);
+.theme-preview-bar {
+  height: 10px;
+  border-radius: 5px;
 }
 
 /* --------------------------------------------------------------------------
@@ -577,18 +512,18 @@ body {
     gap: 20px;
   }
 
-  .mood-strip {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .mosaic {
+  .theme-playground {
     grid-template-columns: 1fr;
-    grid-template-rows: auto;
-    height: auto;
+    gap: 32px;
   }
 
-  .mosaic-panel:nth-child(1) {
-    grid-row: auto;
+  .theme-controls-row {
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .theme-preview-content {
+    flex-direction: column;
   }
 
   .scene-inner {
