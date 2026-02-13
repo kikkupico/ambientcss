@@ -52,10 +52,18 @@ body {
   font-size: 10px;
   letter-spacing: 0.35em;
   text-transform: uppercase;
-  color: var(--amb-label);
-  opacity: 0.5;
+  color: #333;
   margin-bottom: 48px;
   text-align: center;
+}
+
+.scene-hint {
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  text-transform: lowercase;
+  color: #555;
+  text-align: center;
+  margin-bottom: 32px;
 }
 
 /* --------------------------------------------------------------------------
@@ -72,19 +80,19 @@ body {
 }
 
 .hero-title {
-  font-size: clamp(48px, 10vw, 160px);
-  letter-spacing: 0.4em;
+  font-size: clamp(36px, 8vw, 160px);
+  letter-spacing: 0.3em;
   color: var(--amb-label);
   text-align: center;
   line-height: 1.1;
   user-select: none;
+  padding: 0 20px;
 }
 
 .hero-sub {
   font-size: clamp(12px, 1.8vw, 20px);
   letter-spacing: 0.6em;
-  color: var(--amb-label);
-  opacity: 0.4;
+  color: #555;
   text-align: center;
   margin-top: 24px;
   text-transform: lowercase;
@@ -99,8 +107,7 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  color: var(--amb-label);
-  opacity: 0.3;
+  color: #555;
   font-size: 9px;
   letter-spacing: 0.3em;
   text-transform: uppercase;
@@ -114,10 +121,14 @@ body {
   place-items: center;
 }
 
+.hero-scroll-circle {
+  background: var(--amb-highlight-color);
+}
+
 .hero-scroll-circle svg {
   width: 20px;
   height: 20px;
-  stroke: var(--amb-label);
+  stroke: #fff;
   fill: none;
   stroke-width: 2;
 }
@@ -191,8 +202,7 @@ body {
   font-size: 9px;
   letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: var(--amb-label);
-  opacity: 0.5;
+  color: #333;
 }
 
 /* --------------------------------------------------------------------------
@@ -236,8 +246,7 @@ body {
   font-size: 9px;
   letter-spacing: 0.35em;
   text-transform: uppercase;
-  color: var(--amb-label);
-  opacity: 0.5;
+  color: #333;
 }
 
 /* --------------------------------------------------------------------------
@@ -281,8 +290,7 @@ body {
   font-size: 8px;
   letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: var(--amb-label);
-  opacity: 0.5;
+  color: #333;
 }
 
 /* --------------------------------------------------------------------------
@@ -347,8 +355,7 @@ body {
   font-size: 10px;
   letter-spacing: 0.5em;
   text-transform: uppercase;
-  color: var(--amb-label);
-  opacity: 0.4;
+  color: #333;
   min-height: 1.4em;
   transition: opacity 0.5s ease;
 }
@@ -394,8 +401,7 @@ body {
   font-size: 8px;
   letter-spacing: 0.35em;
   text-transform: uppercase;
-  color: var(--amb-label);
-  opacity: 0.6;
+  color: #333;
 }
 
 /* --------------------------------------------------------------------------
@@ -519,8 +525,7 @@ body {
   font-size: clamp(10px, 1.5vw, 14px);
   letter-spacing: 0.5em;
   text-transform: lowercase;
-  color: var(--amb-label);
-  opacity: 0.3;
+  color: #555;
   margin-top: 16px;
   text-align: center;
 }
@@ -542,7 +547,7 @@ body {
   letter-spacing: 0.25em;
   text-transform: uppercase;
   text-decoration: none;
-  color: var(--amb-label);
+  color: #333;
   cursor: pointer;
   transition: transform 0.2s ease;
 }

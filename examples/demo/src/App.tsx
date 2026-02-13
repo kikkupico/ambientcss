@@ -208,40 +208,28 @@ export function App() {
   const mosaicView = useInView(0.2);
   const ledView = useInView(0.15);
 
-  /* Orbit: auto-animating light around the square perimeter ─────────────
-     Runs continuously when the section is in view.
-     Segment 0: (-1,-1)→(1,-1)  top edge
-     Segment 1: (1,-1)→(1,1)    right edge
-     Segment 2: (1,1)→(-1,1)    bottom edge
-     Segment 3: (-1,1)→(-1,-1)  left edge                                */
+  /* Orbit: pointer/touch-driven light direction ─────────────────────────
+     Maps pointer position within the orbit section to light x/y.
+     Also drives the dancing elevations based on pointer movement.      */
   const [orbitLight, setOrbitLight] = useState({ x: -1, y: -1 });
   const [orbitDanceFrame, setOrbitDanceFrame] = useState(0);
+  const orbitGridRef = useRef<HTMLDivElement>(null);
+  const orbitMoveCount = useRef(0);
 
-  useEffect(() => {
-    if (!orbitView.visible) return;
-    let raf: number;
-    const CYCLE_MS = 6000; // one full lap
-    const start = performance.now();
-
-    function tick(now: number) {
-      const elapsed = now - start;
-      const t = (elapsed / CYCLE_MS) % 1;
-      const seg = t * 4;
-
-      let x: number, y: number;
-      if (seg < 1)      { x = -1 + 2 * seg;        y = -1; }
-      else if (seg < 2) { x = 1;                    y = -1 + 2 * (seg - 1); }
-      else if (seg < 3) { x = 1 - 2 * (seg - 2);   y = 1; }
-      else              { x = -1;                    y = 1 - 2 * (seg - 3); }
-
-      setOrbitLight({ x, y });
-      setOrbitDanceFrame(Math.floor(t * ORBIT_DANCE_FRAMES) % ORBIT_DANCE_FRAMES);
-      raf = requestAnimationFrame(tick);
-    }
-
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [orbitView.visible]);
+  const handleOrbitPointer = useCallback((e: React.PointerEvent | React.TouchEvent) => {
+    const el = orbitGridRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const clientX = "touches" in e ? e.touches[0]!.clientX : (e as React.PointerEvent).clientX;
+    const clientY = "touches" in e ? e.touches[0]!.clientY : (e as React.PointerEvent).clientY;
+    // Map to -1..1, clamped to perimeter (max abs = 1)
+    const rawX = ((clientX - rect.left) / rect.width) * 2 - 1;
+    const rawY = ((clientY - rect.top) / rect.height) * 2 - 1;
+    const maxAbs = Math.max(Math.abs(rawX), Math.abs(rawY), 0.01);
+    setOrbitLight({ x: rawX / maxAbs, y: rawY / maxAbs });
+    orbitMoveCount.current += 1;
+    setOrbitDanceFrame(Math.floor(orbitMoveCount.current / 3) % ORBIT_DANCE_FRAMES);
+  }, []);
 
 
   /* Components sticky section ---------------------------------------------- */
@@ -269,11 +257,16 @@ export function App() {
       <section className="scene amb-surface">
         <div className="scene-inner" ref={orbitView.ref}>
           <div className="scene-label">Light Direction</div>
+          <div className="scene-hint">move pointer to change light direction</div>
           <div
             className="orbit-grid"
+            ref={orbitGridRef}
+            onPointerMove={handleOrbitPointer}
+            onTouchMove={handleOrbitPointer}
             style={{
               "--amb-light-x": orbitLight.x,
               "--amb-light-y": orbitLight.y,
+              touchAction: "none",
             } as React.CSSProperties}
           >
             {Array.from({ length: ORBIT_COUNT }, (_, i) => {
@@ -359,16 +352,16 @@ export function App() {
           <div className="scene-label">Edge Treatments</div>
           <div className="edge-wall">
             {[
-              { cls: "amb-fillet", label: "Fillet" },
-              { cls: "amb-fillet-2", label: "Fillet 2x" },
-              { cls: "amb-fillet-minus-1", label: "Fillet -1" },
-              { cls: "amb-chamfer", label: "Chamfer" },
-              { cls: "amb-chamfer-2", label: "Chamfer 2x" },
-              { cls: "amb-chamfer amb-fillet", label: "Both" },
-            ].map(({ cls, label }, i) => (
+              { cls: "amb-fillet", elev: 1, label: "Fillet" },
+              { cls: "amb-fillet-2", elev: 1, label: "Fillet 2x" },
+              { cls: "amb-fillet-minus-1", elev: 0, label: "Fillet -1" },
+              { cls: "amb-chamfer", elev: 1, label: "Chamfer" },
+              { cls: "amb-chamfer-2", elev: 1, label: "Chamfer 2x" },
+              { cls: "amb-chamfer amb-fillet", elev: 1, label: "Both" },
+            ].map(({ cls, elev, label }, i) => (
               <div className="edge-item" key={label}>
                 <div
-                  className={`edge-swatch ambient amb-surface amb-elevation-1 ${cls}`}
+                  className={`edge-swatch ambient amb-surface amb-elevation-${elev} ${cls}`}
                   data-visible={edgeView.visible}
                   style={{ transitionDelay: `${i * 0.06}s` }}
                 />
@@ -386,28 +379,28 @@ export function App() {
             <div className="scene-label">Components</div>
             <div className="component-stage">
               <div className="component-cell" data-visible={compView.visible}>
-                <AmbientKnob value={knob1} onChange={setKnob1} label="Volume" />
+                <AmbientKnob value={knob1} onChange={setKnob1} label="Knob" />
               </div>
               <div className="component-cell" data-visible={compView.visible}>
-                <AmbientKnob value={knob2} onChange={setKnob2} label="Tone" />
+                <AmbientKnob value={knob2} onChange={setKnob2} label="Knob" />
               </div>
               <div className="component-cell" data-visible={compView.visible}>
-                <AmbientSlider value={slider1} min={0} max={100} onChange={setSlider1} label="Pan" />
+                <AmbientSlider value={slider1} min={0} max={100} onChange={setSlider1} label="Slider" />
               </div>
               <div className="component-cell" data-visible={compView.visible}>
-                <AmbientFader value={fader1} min={0} max={100} onChange={setFader1} label="Mix" />
+                <AmbientFader value={fader1} min={0} max={100} onChange={setFader1} label="Fader" />
               </div>
               <div className="component-cell" data-visible={compView.visible}>
-                <AmbientSwitch checked={sw1} onCheckedChange={setSw1} led label="Active" />
+                <AmbientSwitch checked={sw1} onCheckedChange={setSw1} led label="Switch" />
               </div>
               <div className="component-cell" data-visible={compView.visible}>
-                <AmbientSwitch checked={sw2} onCheckedChange={setSw2} led="amber" label="Bypass" />
+                <AmbientSwitch checked={sw2} onCheckedChange={setSw2} led="amber" label="Switch" />
               </div>
               <div className="component-cell" data-visible={compView.visible}>
-                <AmbientButton>Play</AmbientButton>
+                <AmbientButton>Button</AmbientButton>
               </div>
               <div className="component-cell" data-visible={compView.visible}>
-                <AmbientButton>Stop</AmbientButton>
+                <AmbientButton>Button</AmbientButton>
               </div>
             </div>
             {/* Day / Night indicator */}
