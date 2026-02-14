@@ -114,7 +114,7 @@ body {
 
 .hero-scroll-hint {
   position: absolute;
-  bottom: 40px;
+  bottom: 80px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -125,6 +125,8 @@ body {
   font-size: 9px;
   letter-spacing: 0.3em;
   text-transform: uppercase;
+  cursor: pointer;
+  user-select: none;
 }
 
 
@@ -142,6 +144,36 @@ body {
 .hero-scroll-circle svg {
   width: 20px;
   height: 20px;
+  stroke: #fff;
+  fill: none;
+  stroke-width: 2;
+}
+
+/* --------------------------------------------------------------------------
+   SCROLL DOWN BUTTON (for slides)
+   -------------------------------------------------------------------------- */
+
+.scroll-down-button {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: pointer;
+  user-select: none;
+  z-index: 10;
+}
+
+.scroll-down-circle {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  background: var(--amb-highlight-color);
+}
+
+.scroll-down-circle svg {
+  width: 18px;
+  height: 18px;
   stroke: #fff;
   fill: none;
   stroke-width: 2;
@@ -376,9 +408,9 @@ body {
 }
 
 .theme-playground {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
   max-width: 1000px;
   margin: 0 auto;
   align-items: center;
@@ -429,6 +461,27 @@ body {
 .theme-preview-bar {
   height: 10px;
   border-radius: 5px;
+}
+
+.theme-preview-compact {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+}
+
+.theme-preview-circle-small {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.theme-preview-bar-small {
+  width: 120px;
+  height: 8px;
+  border-radius: 4px;
 }
 
 /* --------------------------------------------------------------------------
@@ -539,7 +592,6 @@ body {
   }
 
   .theme-playground {
-    grid-template-columns: 1fr;
     gap: 32px;
   }
 
@@ -552,6 +604,11 @@ body {
     flex-direction: column;
   }
 
+  .theme-preview-compact {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
   .scene-inner {
     padding: 60px 20px;
   }
@@ -559,5 +616,9 @@ body {
   .finale-links {
     flex-direction: column;
     align-items: center;
+  }
+
+  .hero-scroll-hint {
+    bottom: 60px;
   }
 }

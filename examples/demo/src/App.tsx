@@ -111,6 +111,17 @@ export function App() {
     lightSaturation: LIGHT_FRAMES[0]!.lightSaturation,
   });
 
+  /* Scroll to next section helper -------------------------------------------- */
+  const scrollToNextSection = useCallback((currentRef: React.RefObject<HTMLElement>) => {
+    const current = currentRef.current;
+    if (!current) return;
+    const sections = Array.from(document.querySelectorAll('section'));
+    const currentIndex = sections.indexOf(current);
+    if (currentIndex >= 0 && currentIndex < sections.length - 1) {
+      sections[currentIndex + 1]?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
+
   /* Scroll-driven lighting ------------------------------------------------ */
   const ticking = useRef(false);
   const playgroundRef = useRef<HTMLDivElement>(null);
@@ -245,6 +256,15 @@ export function App() {
   const playgroundView = useInView(0.1);
   const finaleView = useInView(0.3);
 
+  /* Section refs for scroll navigation ------------------------------------ */
+  const heroRef = useRef<HTMLElement>(null);
+  const orbitSectionRef = useRef<HTMLElement>(null);
+  const elevSectionRef = useRef<HTMLElement>(null);
+  const surfSectionRef = useRef<HTMLElement>(null);
+  const edgeSectionRef = useRef<HTMLElement>(null);
+  const compSectionRef = useRef<HTMLElement>(null);
+  const playgroundSectionRef = useRef<HTMLElement>(null);
+
   /* Orbit: pointer/touch-driven light direction ───────────────────────── */
   const [orbitLight, setOrbitLight] = useState({ x: -1, y: -1 });
   const orbitGridRef = useRef<HTMLDivElement>(null);
@@ -261,16 +281,37 @@ export function App() {
     setOrbitLight({ x: rawX / maxAbs, y: rawY / maxAbs });
   }, []);
 
+  /* Scroll button component ----------------------------------------------- */
+  const ScrollButton = ({ sectionRef }: { sectionRef: React.RefObject<HTMLElement> }) => (
+    <div
+      className="scroll-down-button"
+      onClick={() => scrollToNextSection(sectionRef)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') scrollToNextSection(sectionRef); }}
+    >
+      <div className="scroll-down-circle ambient amb-surface amb-fillet amb-bounce amb-rounded-full">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7" /></svg>
+      </div>
+    </div>
+  );
+
   return (
     <AmbientProvider className="amb-surface" theme={theme}>
 
       {/* ── 1. HERO ──────────────────────────────────────────────────── */}
-      <section className="hero amb-surface">
+      <section className="hero amb-surface" ref={heroRef}>
         <div>
           <div className="hero-title">ambient</div>
           <div className="hero-sub">physically based css</div>
         </div>
-        <div className="hero-scroll-hint">
+        <div
+          className="hero-scroll-hint"
+          onClick={() => scrollToNextSection(heroRef)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') scrollToNextSection(heroRef); }}
+        >
           <div className="hero-scroll-circle ambient amb-surface amb-fillet amb-bounce amb-rounded-full">
             <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7" /></svg>
           </div>
@@ -279,7 +320,7 @@ export function App() {
       </section>
 
       {/* ── 2. LIGHT ORBIT ───────────────────────────────────────────── */}
-      <section className="scene amb-surface">
+      <section className="scene amb-surface" ref={orbitSectionRef}>
         <div className="scene-inner" ref={orbitView.ref}>
           <div className="scene-label">Light Direction</div>
           <div className="scene-hint">move pointer to change light direction</div>
@@ -309,10 +350,11 @@ export function App() {
             ))}
           </div>
         </div>
+        <ScrollButton sectionRef={orbitSectionRef} />
       </section>
 
       {/* ── 3. ELEVATION ─────────────────────────────────────────────── */}
-      <section className="scene amb-surface">
+      <section className="scene amb-surface" ref={elevSectionRef}>
         <div className="scene-inner" ref={elevView.ref}>
           <div className="scene-label">Elevation</div>
           <div className="elevation-row">
@@ -336,10 +378,11 @@ export function App() {
             </div>
           </div>
         </div>
+        <ScrollButton sectionRef={elevSectionRef} />
       </section>
 
       {/* ── 4. SURFACES ──────────────────────────────────────────────── */}
-      <section className="scene amb-surface">
+      <section className="scene amb-surface" ref={surfSectionRef}>
         <div className="scene-inner" ref={surfView.ref}>
           <div className="scene-label">Surfaces</div>
           <div className="surface-gallery">
@@ -365,10 +408,11 @@ export function App() {
             ))}
           </div>
         </div>
+        <ScrollButton sectionRef={surfSectionRef} />
       </section>
 
       {/* ── 5. EDGE TREATMENTS ───────────────────────────────────────── */}
-      <section className="scene amb-surface">
+      <section className="scene amb-surface" ref={edgeSectionRef}>
         <div className="scene-inner" ref={edgeView.ref}>
           <div className="scene-label">Edge Treatments</div>
           <div className="edge-wall">
@@ -391,10 +435,11 @@ export function App() {
             ))}
           </div>
         </div>
+        <ScrollButton sectionRef={edgeSectionRef} />
       </section>
 
       {/* ── 6. COMPONENTS ─────────────────────────────────────────────── */}
-      <section className="scene amb-surface">
+      <section className="scene amb-surface" ref={compSectionRef}>
         <div className="scene-inner" ref={compView.ref}>
           <div className="scene-label">Components</div>
           <div className="scene-subtitle">(react only)</div>
@@ -427,10 +472,11 @@ export function App() {
             <div className="amb-led" style={{ "--amb-led-color": "#3b82f6" } as React.CSSProperties} />
           </div>
         </div>
+        <ScrollButton sectionRef={compSectionRef} />
       </section>
 
       {/* ── 7. THEMING PLAYGROUND ─────────────────────────────────────── */}
-      <section className="scene amb-surface" ref={playgroundRef}>
+      <section className="scene amb-surface" ref={playgroundSectionRef}>
         <div className="scene-inner" ref={playgroundView.ref}>
           <div className="scene-label">Endless Theming Possibilities</div>
           <div className="scene-hint">tap a preset or tweak the controls</div>
@@ -495,19 +541,14 @@ export function App() {
               </div>
             </div>
 
-            <AmbientPanel className="theme-preview-panel">
-              <div className="theme-preview-content">
-                <div className="ambient amb-surface-convex amb-fillet amb-elevation-1 theme-preview-circle" />
-                <div className="theme-preview-bars">
-                  <div className="ambient amb-surface-convex amb-chamfer amb-elevation-1 theme-preview-bar" style={{ width: "100%" }} />
-                  <div className="ambient amb-surface-convex amb-chamfer amb-elevation-1 theme-preview-bar" style={{ width: "72%" }} />
-                  <div className="ambient amb-surface-convex amb-chamfer amb-elevation-1 theme-preview-bar" style={{ width: "88%" }} />
-                </div>
-                <div className="ambient amb-surface amb-fillet amb-bounce theme-preview-circle" />
-              </div>
-            </AmbientPanel>
+            <div className="theme-preview-compact">
+              <div className="ambient amb-surface-convex amb-fillet amb-elevation-1 theme-preview-circle-small" />
+              <div className="ambient amb-surface-convex amb-chamfer amb-elevation-1 theme-preview-bar-small" />
+              <div className="ambient amb-surface amb-fillet amb-bounce theme-preview-circle-small" />
+            </div>
           </div>
         </div>
+        <ScrollButton sectionRef={playgroundSectionRef} />
       </section>
 
       {/* ── 8. FINALE ────────────────────────────────────────────────── */}
