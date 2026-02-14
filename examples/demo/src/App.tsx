@@ -568,7 +568,7 @@ export function App() {
           <div className="finale-links">
             <a
               className="finale-link ambient amb-surface amb-fillet amb-elevation-1 amb-rounded-lg"
-              href="https://github.com/nickkadutskyi/ambientcss"
+              href="https://github.com/kikkupico/ambientcss"
               target="_blank"
               rel="noopener noreferrer"
             >
