@@ -37,7 +37,10 @@ jobs:
         run: pnpm install --no-frozen-lockfile
 
       - name: Build docs
-        run: pnpm docs:build
+        run: |
+          pnpm --filter @ambientcss/css build
+          pnpm --filter @ambientcss/components build
+          pnpm docs:build
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
