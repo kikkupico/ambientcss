@@ -622,11 +622,19 @@ body {
   }
 
   .theme-playground {
-    gap: 32px;
+    gap: 20px;
+  }
+
+  .theme-presets {
+    margin-bottom: 24px;
+  }
+
+  .theme-controls {
+    gap: 20px;
   }
 
   .theme-controls-row {
-    gap: 24px;
+    gap: 20px;
     flex-wrap: wrap;
   }
 
@@ -637,10 +645,19 @@ body {
   .theme-preview-compact {
     flex-wrap: wrap;
     gap: 12px;
+    padding: 16px;
   }
 
   .scene-inner {
     padding: 60px 20px;
+  }
+
+  .scene-label {
+    margin-bottom: 32px;
+  }
+
+  .scene-hint {
+    margin-bottom: 24px;
   }
 
   .finale-links {
