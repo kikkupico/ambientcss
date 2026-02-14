@@ -35,7 +35,7 @@ body {
   overflow: hidden;
   scroll-snap-align: start;
   max-width: 100vw;
-  padding-bottom: 80px;
+  padding-bottom: 6em;
 }
 
 .scene-inner {
@@ -156,7 +156,7 @@ body {
 
 .scroll-down-button {
   position: absolute;
-  bottom: 24px;
+  bottom: 2em;
   left: 50%;
   transform: translateX(-50%);
   cursor: pointer;
@@ -596,13 +596,12 @@ body {
   height: 48px;
   display: grid;
   place-items: center;
-  background: var(--amb-highlight-color);
 }
 
 .scroll-top-circle svg {
   width: 20px;
   height: 20px;
-  stroke: #fff;
+  stroke: var(--amb-lume);
   fill: none;
   stroke-width: 2;
 }

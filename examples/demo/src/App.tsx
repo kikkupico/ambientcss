@@ -295,7 +295,7 @@ export function App() {
       tabIndex={0}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') scrollToNextSection(sectionRef); }}
     >
-      <div className="scroll-down-circle ambient amb-surface amb-fillet amb-bounce amb-rounded-full">
+      <div className="scroll-down-circle ambient amb-surface amb-fillet amb-rounded-full">
         <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7" /></svg>
       </div>
     </div>
@@ -597,7 +597,7 @@ export function App() {
             tabIndex={0}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') scrollToTop(); }}
           >
-            <div className="scroll-top-circle ambient amb-surface amb-fillet amb-bounce amb-rounded-full">
+            <div className="scroll-top-circle ambient amb-surface amb-fillet amb-rounded-full">
               <svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7" /></svg>
             </div>
             <span>Top</span>
