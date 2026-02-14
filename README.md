@@ -24,3 +24,25 @@ A React demo app lives in `examples/demo`. To run it:
 ```bash
 pnpm --filter demo dev
 ```
+
+Production demo URL:
+
+- https://ambientcss.vercel.app/
+
+## Docs
+
+Documentation lives in `apps/docs` (Docusaurus). To run it:
+
+```bash
+pnpm docs:dev
+```
+
+To build docs:
+
+```bash
+pnpm docs:build
+```
+
+Production docs URL:
+
+- https://kikkupico.github.io/ambientcss/

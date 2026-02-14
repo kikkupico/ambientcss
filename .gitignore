@@ -7,3 +7,5 @@ packages/*/dist
 /examples/demo/.vite/
 /examples/demo/dist/
 /examples/demo/dist/
+/apps/docs/.docusaurus/
+/apps/docs/build/

@@ -14,6 +14,7 @@ const workspaces = [
   "packages/ambient-css",
   "packages/ambient-components",
   "examples/demo",
+  "apps/docs",
 ];
 
 for (const workspace of workspaces) {

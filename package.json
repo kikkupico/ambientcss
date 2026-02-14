@@ -7,7 +7,10 @@
   "scripts": {
     "build": "node scripts/run-workspace-task.mjs build",
     "clean": "node scripts/run-workspace-task.mjs clean",
-    "typecheck": "node scripts/run-workspace-task.mjs typecheck"
+    "typecheck": "node scripts/run-workspace-task.mjs typecheck",
+    "docs:dev": "pnpm --filter docs dev",
+    "docs:build": "pnpm --filter docs build",
+    "docs:preview": "pnpm --filter docs preview"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

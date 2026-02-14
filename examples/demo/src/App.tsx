@@ -533,7 +533,9 @@ export function App() {
             </a>
             <a
               className="finale-link ambient amb-surface amb-fillet amb-elevation-1 amb-rounded-lg"
-              href="#/docs"
+              href="https://kikkupico.github.io/ambientcss/"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               <svg className="finale-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
