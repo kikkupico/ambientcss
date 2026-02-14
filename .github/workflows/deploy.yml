@@ -34,13 +34,10 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
 
-      - name: Build packages
-        run: pnpm --filter @ambientcss/css build && pnpm --filter @ambientcss/components build
-
-      - name: Build demo
-        run: pnpm --filter demo build
+      - name: Build docs
+        run: pnpm docs:build
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -48,7 +45,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: examples/demo/dist
+          path: apps/docs/build
 
       - name: Deploy to GitHub Pages
         id: deployment
