@@ -29,7 +29,6 @@ Read [Guide > Concept](/guide/concept) for the full model.
 
 - Start with `Guide > Getting Started`.
 - Use [Guide > Concept](/guide/concept) for the lighting/shadow model.
-- Use `Guide > Theming` to tune light direction and color behavior.
 - Use `@ambientcss/components` pages for per-component props and examples.
 - Use `@ambientcss/css` pages for utility classes and recipes.
 
