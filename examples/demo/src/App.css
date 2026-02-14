@@ -450,6 +450,24 @@ body {
   text-align: center;
   line-height: 1.4;
   user-select: none;
+  display: flex;
+  justify-content: center;
+}
+
+.finale-letter {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(40px) scale(0.5);
+  filter: blur(8px);
+  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+              filter 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.finale-text[data-visible="true"] .finale-letter {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
 }
 
 .finale-sub {
@@ -459,6 +477,15 @@ body {
   color: var(--amb-lume);
   margin-top: 16px;
   text-align: center;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease 0.7s,
+              transform 0.8s ease 0.7s;
+}
+
+.finale-sub[data-visible="true"] {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .finale-links {
@@ -480,15 +507,14 @@ body {
   text-decoration: none;
   color: var(--amb-lume);
   cursor: pointer;
-  transition: transform 0.2s ease;
 }
 
 .finale-link:hover {
-  transform: translateY(-2px);
+  --amb-elevation: 2;
 }
 
 .finale-link:active {
-  transform: translateY(0);
+  --amb-elevation: 0;
 }
 
 .finale-link-icon {

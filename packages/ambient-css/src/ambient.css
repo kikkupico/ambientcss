@@ -88,6 +88,11 @@
   --amb-chamfer-width: 2;
 }
 
+.amb-chamfer-minus-1 {
+  --amb-chamfer: 1;
+  --amb-chamfer-width: -1;
+}
+
 /* --------------------------------------------------------------------------
    ELEVATION LEVELS
    -------------------------------------------------------------------------- */
@@ -139,15 +144,16 @@
               )
           )
       ),
-    inset calc(var(--amb-light-x) * -2px) calc(var(--amb-light-y) * -2px) 2px
-      0px
+    inset calc(var(--amb-light-x) * var(--amb-chamfer-width) * -2px)
+      calc(var(--amb-light-y) * var(--amb-chamfer-width) * -2px) 2px 0px
       hsl(
         var(--amb-light-hue)
         var(--amb-light-saturation)
         100%
         / calc(var(--amb-chamfer) * var(--amb-key-light-intensity))
       ),
-    inset calc(var(--amb-light-x) * 2px) calc(var(--amb-light-y) * 2px) 2px 0px
+    inset calc(var(--amb-light-x) * var(--amb-chamfer-width) * 2px)
+      calc(var(--amb-light-y) * var(--amb-chamfer-width) * 2px) 2px 0px
       hsl(
         var(--amb-light-hue)
         var(--amb-light-saturation)

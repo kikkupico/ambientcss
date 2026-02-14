@@ -91,7 +91,7 @@ const THEME_PRESETS: ThemePreset[] = [
   { label: "Day",    lightX: -0.7, lightY: -0.7, keyLight: 0.9,  fillLight: 0.7,  lightHue: 234, lightSaturation: 5,  lumeHue: 16 },
   { label: "Night",  lightX: 0.7,  lightY: -0.7, keyLight: 0.3,  fillLight: 0.1,  lightHue: 250, lightSaturation: 30, lumeHue: 16 },
   { label: "Sci-Fi", lightX: 0,    lightY: -0.9, keyLight: 0.2,  fillLight: 0.05, lightHue: 190, lightSaturation: 50, lumeHue: 180 },
-  { label: "Retro",  lightX: -0.6, lightY: -0.3, keyLight: 0.7,  fillLight: 0.5,  lightHue: 25,  lightSaturation: 30, lumeHue: 25 },
+  { label: "Fun",    lightX: 0,    lightY: -1,   keyLight: 0.55, fillLight: 0,    lightHue: 0,   lightSaturation: 100, lumeHue: 0 },
 ];
 
 const ORBIT_COUNT = 9;
@@ -243,6 +243,7 @@ export function App() {
   const edgeView = useInView(0.2);
   const compView = useInView(0.1);
   const playgroundView = useInView(0.1);
+  const finaleView = useInView(0.3);
 
   /* Orbit: pointer/touch-driven light direction ───────────────────────── */
   const [orbitLight, setOrbitLight] = useState({ x: -1, y: -1 });
@@ -377,7 +378,7 @@ export function App() {
               { cls: "amb-fillet-minus-1", elev: 0, label: "Fillet -1" },
               { cls: "amb-chamfer", elev: 1, label: "Chamfer" },
               { cls: "amb-chamfer-2", elev: 1, label: "Chamfer 2x" },
-              { cls: "amb-chamfer amb-fillet", elev: 1, label: "Both" },
+              { cls: "amb-chamfer-minus-1", elev: 0, label: "Chamfer -1" },
             ].map(({ cls, elev, label }, i) => (
               <div className="edge-item" key={label}>
                 <div
@@ -454,10 +455,10 @@ export function App() {
                   label="Key Light"
                 />
                 <AmbientFader
-                  value={Math.round((theme.lightY ?? 0) * 100)}
+                  value={Math.round((theme.lightY ?? 0) * -100)}
                   min={-100}
                   max={100}
-                  onChange={(v) => setThemeProp("lightY", v / 100)}
+                  onChange={(v) => setThemeProp("lightY", v / -100)}
                   label="Light Y"
                 />
                 <AmbientKnob
@@ -510,10 +511,14 @@ export function App() {
       </section>
 
       {/* ── 8. FINALE ────────────────────────────────────────────────── */}
-      <section className="finale amb-surface">
+      <section className="finale amb-surface" ref={finaleView.ref}>
         <div>
-          <div className="finale-text">ambient</div>
-          <div className="finale-sub">physically based css</div>
+          <div className="finale-text" data-visible={finaleView.visible}>
+            {"ambient".split("").map((ch, i) => (
+              <span key={i} className="finale-letter" style={{ transitionDelay: `${i * 0.08}s` }}>{ch}</span>
+            ))}
+          </div>
+          <div className="finale-sub" data-visible={finaleView.visible}>physically based css</div>
           <div className="finale-links">
             <a
               className="finale-link ambient amb-surface amb-fillet amb-elevation-1 amb-rounded-lg"
