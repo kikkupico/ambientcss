@@ -122,6 +122,11 @@ export function App() {
     }
   }, []);
 
+  /* Scroll to top helper ------------------------------------------------------ */
+  const scrollToTop = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
   /* Scroll-driven lighting ------------------------------------------------ */
   const ticking = useRef(false);
   const playgroundRef = useRef<HTMLDivElement>(null);
@@ -584,6 +589,18 @@ export function App() {
               </svg>
               Docs
             </a>
+          </div>
+          <div
+            className="finale-top-button"
+            onClick={scrollToTop}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') scrollToTop(); }}
+          >
+            <div className="scroll-top-circle ambient amb-surface amb-fillet amb-bounce amb-rounded-full">
+              <svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7" /></svg>
+            </div>
+            <span>Top</span>
           </div>
         </div>
       </section>
