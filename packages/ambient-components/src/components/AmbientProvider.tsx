@@ -8,6 +8,7 @@ export type AmbientTheme = {
   lightHue?: number;
   lightSaturation?: number;
   highlightColor?: string;
+  lumeHue?: number;
 };
 
 export type AmbientProviderProps = PropsWithChildren<{
@@ -24,6 +25,7 @@ const VAR_MAP: Record<string, keyof AmbientTheme> = {
   "--amb-light-hue": "lightHue",
   "--amb-light-saturation": "lightSaturation",
   "--amb-highlight-color": "highlightColor",
+  "--amb-lume-hue": "lumeHue",
 };
 
 export function AmbientProvider({ children, className, style, theme }: AmbientProviderProps) {

@@ -5,3 +5,5 @@ packages/*/dist
 
 .DS_Store
 /examples/demo/.vite/
+/examples/demo/dist/
+/examples/demo/dist/

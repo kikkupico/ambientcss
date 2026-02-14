@@ -1,374 +1,563 @@
 /* ==========================================================================
-   Appliance Demo – Dieter Rams inspired layout
-   Three-section appliance: Left (components), Centre (title + controls),
-   Right (treatment grid).
+   Ambient CSS – Scroll Showcase
    ========================================================================== */
 
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 :root {
-  --demo-grid: 4px;
-  --demo-grid-0_25: calc(var(--demo-grid) / 4);
-  --demo-grid-0_5: calc(var(--demo-grid) / 2);
-  --demo-grid-0_75: calc(var(--demo-grid) * 0.75);
-  --demo-grid-1_5: calc(var(--demo-grid) * 1.5);
-  --demo-grid-2: calc(var(--demo-grid) * 2);
-  --demo-grid-2_5: calc(var(--demo-grid) * 2.5);
-  --demo-grid-3: calc(var(--demo-grid) * 3);
-  --demo-grid-4: calc(var(--demo-grid) * 4);
-  --demo-grid-5: calc(var(--demo-grid) * 5);
-  --demo-grid-6: calc(var(--demo-grid) * 6);
-  --demo-grid-7: calc(var(--demo-grid) * 7);
-  --demo-grid-8: calc(var(--demo-grid) * 8);
-  --demo-grid-10: calc(var(--demo-grid) * 10);
-  --demo-grid-12: calc(var(--demo-grid) * 12);
-  --demo-grid-14: calc(var(--demo-grid) * 14);
-  --demo-grid-18: calc(var(--demo-grid) * 18);
-  --demo-grid-22: calc(var(--demo-grid) * 22);
-  --demo-grid-15: calc(var(--demo-grid) * 15);
-  --demo-grid-16: calc(var(--demo-grid) * 16);
-  --demo-grid-20: calc(var(--demo-grid) * 20);
-  --demo-type-label-size: var(--demo-grid-2_5);
-  --demo-type-label-line: var(--demo-grid-3);
-  --demo-type-pane-size: var(--demo-grid-4);
-  --demo-type-pane-line: var(--demo-grid-5);
-  --demo-type-title-size: var(--demo-grid-12);
-  --demo-type-title-line: var(--demo-grid-14);
-  --demo-type-title-sub-size: var(--demo-type-title-size);
-  --demo-type-title-sub-line: var(--demo-type-title-line);
-  --demo-type-title-track: var(--demo-grid);
-  --demo-type-title-sub-track: var(--demo-grid-0_5);
-  --demo-type-tracking-tight: var(--demo-grid-0_5);
-  --demo-type-tracking-wide: var(--demo-grid-0_25);
-  --demo-rhythm-section: var(--demo-grid-6);
-  --demo-rhythm-block: var(--demo-grid-8);
-  --demo-rhythm-control: var(--demo-grid-6);
-  --demo-centre-header-reserve: calc(
-    var(--demo-type-title-line) +
-    var(--demo-type-title-sub-line) +
-    var(--demo-rhythm-block)
-  );
+  --grid: 4px;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-snap-type: y proximity;
 }
 
 body {
   font-family: "Michroma", sans-serif;
-  transition: background-color 3s ease-in;
-  padding: 0;
   margin: 0;
-  overflow: hidden;
+  padding: 0;
+  overflow-x: hidden;
+  background: #000;
 }
 
 /* --------------------------------------------------------------------------
-   Outer container – fills viewport, provides thick margin on desktop
+   Shared section styles
    -------------------------------------------------------------------------- */
 
-.container {
-  display: grid;
+.scene {
   min-height: 100vh;
-  min-width: 100%;
+  display: grid;
   place-items: center;
-}
-
-/* --------------------------------------------------------------------------
-   Appliance shell – the main device
-   -------------------------------------------------------------------------- */
-
-.appliance {
-  display: grid;
-  grid-template-columns: 1fr 1.2fr 1fr;
-  border-radius: var(--demo-grid-5);
-  overflow: hidden;
-  width: calc(100vw - var(--demo-grid-20));
-  height: calc(100vh - var(--demo-grid-20));
-  max-width: 1400px;
-  max-height: 900px;
-}
-
-/* --------------------------------------------------------------------------
-   Section shared styles
-   -------------------------------------------------------------------------- */
-
-.section {
-  display: grid;
-  grid-auto-flow: row;
-  grid-auto-rows: min-content;
-  justify-items: center;
-  align-content: start;
-  padding: var(--demo-grid-8) var(--demo-grid-6);
-  gap: var(--demo-rhythm-section);
   position: relative;
+  overflow: hidden;
+  scroll-snap-align: start;
+  max-width: 100vw;
 }
 
-/* Subtle divider lines between sections */
-.section-left {
-  border-right: 1px solid hsl(0 0% 50% / 0.12);
-}
-
-.section-right {
-  border-left: 1px solid hsl(0 0% 50% / 0.12);
+.scene-inner {
+  width: 100%;
+  max-width: 1200px;
+  padding: 80px 40px;
+  margin: 0 auto;
 }
 
 /* --------------------------------------------------------------------------
-   Centre section – title, day/night, lighting knobs
+   Section label
    -------------------------------------------------------------------------- */
 
-.section-centre {
-  gap: var(--demo-rhythm-block);
+.scene-label {
+  font-size: 10px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--amb-lume);
+  margin-bottom: 48px;
+  text-align: center;
 }
 
-.title {
-  text-align: center;
-  color: var(--amb-label);
-  font-size: clamp(24px, 3vw, 42px);
+.scene-subtitle {
+  font-size: 9px;
   letter-spacing: 0.25em;
-  line-height: 1.4;
-  user-select: none;
+  text-transform: lowercase;
+  color: var(--amb-lume);
+  text-align: center;
+  margin-top: -36px;
+  margin-bottom: 48px;
+  opacity: 0.6;
 }
 
-.title-sub {
-  font-size: clamp(20px, 2.2vw, 35px);
-  letter-spacing: 0.12em;
+.scene-hint {
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  text-transform: lowercase;
+  color: var(--amb-lume);
+  text-align: center;
+  margin-bottom: 32px;
 }
 
-.centre-controls {
-  display: grid;
-  justify-items: center;
-  gap: var(--demo-rhythm-block);
-}
+/* --------------------------------------------------------------------------
+   HERO
+   -------------------------------------------------------------------------- */
 
-.control-row {
-  display: grid;
-  grid-auto-flow: column;
-  align-items: center;
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   justify-content: center;
-  gap: var(--demo-rhythm-control);
+  align-items: center;
+  position: relative;
+  max-width: 100vw;
+  overflow: hidden;
+  padding-bottom: 120px;
 }
 
-.control-group {
-  display: grid;
-  justify-items: center;
-  gap: var(--demo-grid-2);
-}
-
-.control-label {
-  font-size: var(--demo-type-label-size);
-  line-height: var(--demo-type-label-line);
-  letter-spacing: var(--demo-type-tracking-wide);
-  text-transform: uppercase;
+.hero-title {
+  font-size: clamp(36px, 8vw, 160px);
+  letter-spacing: 0.3em;
   color: var(--amb-label);
   text-align: center;
+  line-height: 1.1;
+  user-select: none;
+  padding: 0 20px;
 }
 
-/* --------------------------------------------------------------------------
-   Left section – sample interactive components
-   -------------------------------------------------------------------------- */
-
-.section-left {
-  gap: var(--demo-rhythm-block);
-}
-
-.section-heading {
-  font-size: var(--demo-type-pane-size);
-  line-height: var(--demo-type-pane-line);
-  letter-spacing: var(--demo-type-tracking-tight);
-  text-transform: uppercase;
-  color: var(--amb-label);
-  margin-bottom: var(--demo-grid-3);
-}
-
-.section-left .section-heading,
-.section-right .section-heading {
-  margin-top: var(--demo-centre-header-reserve);
-}
-
-.component-grid {
-  display: grid;
-  justify-items: center;
-  gap: calc(var(--demo-grid) * 9);
-}
-
-.component-item {
-  display: grid;
-  justify-items: center;
-  gap: var(--demo-grid-2);
-}
-
-.component-item-row {
-  display: grid;
-  grid-auto-flow: column;
-  align-items: center;
-  gap: var(--demo-rhythm-control);
-}
-
-.button-row {
-  display: grid;
-  grid-auto-flow: column;
-  gap: var(--demo-grid-3);
-}
-
-/* --------------------------------------------------------------------------
-   Right section – treatment circle grid
-   -------------------------------------------------------------------------- */
-
-.section-right {
-  gap: var(--demo-rhythm-section);
-}
-
-.circle-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--demo-grid-5);
-  justify-items: center;
-  align-items: center;
-}
-
-.grid-circle {
-  width: var(--demo-grid-14);
-  height: var(--demo-grid-14);
-  border-radius: 50%;
-}
-
-.grid-circle-label {
-  font-size: var(--demo-type-label-size);
-  line-height: var(--demo-type-label-line);
-  letter-spacing: var(--demo-type-tracking-wide);
-  text-transform: uppercase;
-  color: var(--amb-label);
+.hero-sub {
+  font-size: clamp(12px, 1.8vw, 20px);
+  letter-spacing: 0.6em;
+  color: var(--amb-lume);
   text-align: center;
-  margin-top: var(--demo-grid-3);
+  margin-top: 24px;
+  text-transform: lowercase;
 }
 
-.circle-cell {
+.hero-scroll-hint {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-/* --------------------------------------------------------------------------
-   Day-night switch styling (unchanged from original)
-   -------------------------------------------------------------------------- */
-
-.day-night-watch {
-  --dn-progress: 0;
-  cursor: pointer;
-  width: var(--ambx-switch-size);
-  height: var(--ambx-switch-size);
+  gap: 8px;
   color: var(--amb-lume);
-  display: inline-grid;
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+
+.hero-scroll-circle {
+  width: 48px;
+  height: 48px;
+  display: grid;
   place-items: center;
-  padding: 0;
-  margin: 0;
 }
 
-.day-night-watch:hover {
-  color: var(--amb-highlight-color);
+.hero-scroll-circle {
+  background: var(--amb-highlight-color);
 }
 
-.day-night-watch:focus-visible {
-  outline: 2px solid rgb(255 255 255 / 0.35);
-  outline-offset: var(--demo-grid);
-}
-
-.day-night-watch__icon-wrap {
-  position: relative;
-  width: var(--demo-grid-5);
-  height: var(--demo-grid-5);
-}
-
-.day-night-watch__icon {
-  position: absolute;
-  inset: 0;
-  width: var(--demo-grid-5);
-  height: var(--demo-grid-5);
+.hero-scroll-circle svg {
+  width: 20px;
+  height: 20px;
+  stroke: #fff;
   fill: none;
-  stroke: currentColor;
   stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  transform-origin: 50% 50%;
-  transition: transform 280ms ease, opacity 200ms ease;
-}
-
-.day-night-watch__icon--sun {
-  opacity: calc(1 - var(--dn-progress));
-  transform: rotate(calc(var(--dn-progress) * -90deg));
-}
-
-.day-night-watch__icon--moon {
-  opacity: var(--dn-progress);
-  transform: rotate(calc((1 - var(--dn-progress)) * 90deg));
 }
 
 /* --------------------------------------------------------------------------
-   LED strip decorations
+   LIGHT ORBIT – circles reacting to scroll-driven light position
    -------------------------------------------------------------------------- */
 
-.led-strip {
+.orbit-grid {
   display: grid;
-  grid-auto-flow: column;
-  gap: var(--demo-grid-3);
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  justify-items: center;
+  align-items: center;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.orbit-circle {
+  width: clamp(60px, 10vw, 100px);
+  height: clamp(60px, 10vw, 100px);
+  border-radius: 50%;
+}
+
+
+/* --------------------------------------------------------------------------
+   ELEVATION – static circles at different depths + bounce
+   -------------------------------------------------------------------------- */
+
+.elevation-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(24px, 4vw, 48px);
+  flex-wrap: wrap;
+}
+
+.elevation-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.elevation-circle {
+  width: clamp(72px, 12vw, 110px);
+  height: clamp(72px, 12vw, 110px);
+  border-radius: 50%;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.7s ease;
+}
+
+.elevation-circle[data-visible="false"] {
+  opacity: 0;
+  transform: scale(0.7);
+}
+
+.elevation-circle[data-visible="true"] {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.elevation-label {
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--amb-lume);
+}
+
+/* --------------------------------------------------------------------------
+   SURFACE GALLERY – circles with distinct lighting
+   -------------------------------------------------------------------------- */
+
+.surface-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.surface-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.surface-swatch {
+  width: clamp(80px, 16vw, 160px);
+  height: clamp(80px, 16vw, 160px);
+  border-radius: 50%;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.7s ease;
+}
+
+.surface-swatch[data-visible="false"] {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.surface-swatch[data-visible="true"] {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.surface-label {
+  font-size: 9px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--amb-lume);
+}
+
+/* --------------------------------------------------------------------------
+   EDGE TREATMENT WALL
+   -------------------------------------------------------------------------- */
+
+.edge-wall {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 32px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.edge-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.edge-swatch {
+  width: clamp(80px, 12vw, 120px);
+  height: clamp(80px, 12vw, 120px);
+  border-radius: 16px;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.6s ease;
+}
+
+.edge-swatch[data-visible="false"] {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.edge-swatch[data-visible="true"] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.edge-label {
+  font-size: 8px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--amb-lume);
+}
+
+/* --------------------------------------------------------------------------
+   COMPONENT STAGE
+   -------------------------------------------------------------------------- */
+
+.component-stage {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 48px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.component-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.7s ease;
+}
+
+.component-cell[data-visible="false"] {
+  opacity: 0;
+  transform: translateY(40px) scale(0.9);
+}
+
+.component-cell[data-visible="true"] {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.component-cell:nth-child(1) { transition-delay: 0s; }
+.component-cell:nth-child(2) { transition-delay: 0.06s; }
+.component-cell:nth-child(3) { transition-delay: 0.12s; }
+.component-cell:nth-child(4) { transition-delay: 0.18s; }
+.component-cell:nth-child(5) { transition-delay: 0.24s; }
+.component-cell:nth-child(6) { transition-delay: 0.30s; }
+.component-cell:nth-child(7) { transition-delay: 0.36s; }
+
+.comp-led-row {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 48px;
+  transition: opacity 0.7s ease 0.42s;
+}
+
+.comp-led-row[data-visible="false"] {
+  opacity: 0;
+}
+
+.comp-led-row[data-visible="true"] {
+  opacity: 1;
+}
+
+.comp-led-row .amb-led {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+/* --------------------------------------------------------------------------
+   THEMING PLAYGROUND
+   -------------------------------------------------------------------------- */
+
+.theme-presets {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 48px;
+}
+
+.theme-playground {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  max-width: 1000px;
+  margin: 0 auto;
   align-items: center;
 }
 
+.theme-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.theme-controls-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+}
+
+.theme-preview-panel {
+  border-radius: 20px;
+  padding: 32px;
+  min-height: 240px;
+  display: grid;
+  place-items: center;
+}
+
+.theme-preview-content {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+}
+
+.theme-preview-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.theme-preview-bars {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.theme-preview-bar {
+  height: 10px;
+  border-radius: 5px;
+}
+
 /* --------------------------------------------------------------------------
-   MOBILE LAYOUT
-   On narrow screens the appliance becomes a vertical scroll of sections.
-   The centre section fills the viewport initially.
+   FINALE
+   -------------------------------------------------------------------------- */
+
+.finale {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  max-width: 100vw;
+  overflow: hidden;
+}
+
+.finale-text {
+  font-size: clamp(32px, 6vw, 80px);
+  letter-spacing: 0.3em;
+  color: var(--amb-label);
+  text-align: center;
+  line-height: 1.4;
+  user-select: none;
+  display: flex;
+  justify-content: center;
+}
+
+.finale-letter {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(40px) scale(0.5);
+  filter: blur(8px);
+  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+              filter 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.finale-text[data-visible="true"] .finale-letter {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
+.finale-sub {
+  font-size: clamp(10px, 1.5vw, 14px);
+  letter-spacing: 0.5em;
+  text-transform: lowercase;
+  color: var(--amb-lume);
+  margin-top: 16px;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease 0.7s,
+              transform 0.8s ease 0.7s;
+}
+
+.finale-sub[data-visible="true"] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.finale-links {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 56px;
+}
+
+.finale-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  font-family: "Michroma", sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--amb-lume);
+  cursor: pointer;
+}
+
+.finale-link:hover {
+  --amb-elevation: 2;
+}
+
+.finale-link:active {
+  --amb-elevation: 0;
+}
+
+.finale-link-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* --------------------------------------------------------------------------
+   RESPONSIVE
    -------------------------------------------------------------------------- */
 
 @media (max-width: 768px) {
-  body {
-    overflow: auto;
+  .surface-gallery {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
   }
 
-  .container {
-    min-height: auto;
-    place-items: stretch;
+  .edge-wall {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
   }
 
-  .appliance {
+  .theme-playground {
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
-    width: 100vw;
-    height: auto;
-    max-width: none;
-    max-height: none;
-    border-radius: 0;
+    gap: 32px;
   }
 
-  /* Centre section first in visual order, fills viewport */
-  .section-centre {
-    order: -1;
-    min-height: 100vh;
-    min-height: 100dvh;
+  .theme-controls-row {
+    gap: 24px;
+    flex-wrap: wrap;
   }
 
-  .section-left,
-  .section-right {
-    border: none;
-    border-top: 1px solid hsl(0 0% 50% / 0.12);
-    min-height: 60vh;
+  .theme-preview-content {
+    flex-direction: column;
   }
 
-  .section {
-    padding: var(--demo-grid-12) var(--demo-grid-8);
+  .scene-inner {
+    padding: 60px 20px;
   }
 
-  .section-left .section-heading,
-  .section-right .section-heading {
-    margin-top: 0;
-  }
-
-  .title {
-    font-size: var(--demo-grid-6);
-    line-height: var(--demo-grid-8);
-  }
-
-  .title-sub {
-    font-size: var(--demo-grid-5);
-    line-height: var(--demo-grid-6);
-  }
-
-  .grid-circle {
-    width: var(--demo-grid-14);
-    height: var(--demo-grid-14);
+  .finale-links {
+    flex-direction: column;
+    align-items: center;
   }
 }
