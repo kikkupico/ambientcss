@@ -430,60 +430,6 @@ body {
   gap: 40px;
 }
 
-.theme-preview-panel {
-  border-radius: 20px;
-  padding: 32px;
-  min-height: 240px;
-  display: grid;
-  place-items: center;
-}
-
-.theme-preview-content {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  width: 100%;
-}
-
-.theme-preview-circle {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.theme-preview-bars {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.theme-preview-bar {
-  height: 10px;
-  border-radius: 5px;
-}
-
-.theme-preview-compact {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 16px;
-  padding: 20px;
-}
-
-.theme-preview-circle-small {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.theme-preview-bar-small {
-  width: 120px;
-  height: 8px;
-  border-radius: 4px;
-}
 
 /* --------------------------------------------------------------------------
    FINALE
@@ -636,16 +582,6 @@ body {
   .theme-controls-row {
     gap: 20px;
     flex-wrap: wrap;
-  }
-
-  .theme-preview-content {
-    flex-direction: column;
-  }
-
-  .theme-preview-compact {
-    flex-wrap: wrap;
-    gap: 12px;
-    padding: 16px;
   }
 
   .scene-inner {

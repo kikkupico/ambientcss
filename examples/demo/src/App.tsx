@@ -545,12 +545,6 @@ export function App() {
                 />
               </div>
             </div>
-
-            <div className="theme-preview-compact">
-              <div className="ambient amb-surface-convex amb-chamfer amb-elevation-1 theme-preview-circle-small" />
-              <div className="ambient amb-surface-convex amb-fillet amb-elevation-1 theme-preview-bar-small" />
-              <div className="ambient amb-surface amb-chamfer amb-bounce theme-preview-circle-small" />
-            </div>
           </div>
         </div>
         <ScrollButton sectionRef={playgroundSectionRef} />
