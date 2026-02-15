@@ -33,6 +33,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Install npm 11+ (required for trusted publishing)
+        run: npm install -g npm@latest
+
       - name: Create Version PR or Publish
         uses: changesets/action@v1
         with:

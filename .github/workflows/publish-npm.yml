@@ -39,13 +39,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Enforce OIDC auth path
-        run: |
-          npm config delete //registry.npmjs.org/:_authToken || true
-          rm -f ~/.npmrc
-        env:
-          NODE_AUTH_TOKEN: ""
-          NPM_TOKEN: ""
+      - name: Install npm 11+ (required for trusted publishing)
+        run: npm install -g npm@latest
 
       - name: Build and typecheck
         run: |
