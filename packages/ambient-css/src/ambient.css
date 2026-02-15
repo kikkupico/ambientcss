@@ -47,7 +47,7 @@
   --amb-lume-hue: 17;
   --amb-lume: color-mix(
     in oklab,
-    hsl(var(--amb-lume-hue) 100% 74%) clamp(0%, calc((0.5 - var(--amb-key-light-intensity)) * 500%), 100%),
+    hsl(var(--amb-lume-hue) 100% 74%) calc(clamp(0, (0.5 - var(--amb-key-light-intensity)) / 0.2, 1) * 100%),
     hsl(
       var(--amb-light-hue)
       var(--amb-light-saturation)

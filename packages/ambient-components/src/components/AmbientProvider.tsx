@@ -36,6 +36,17 @@ export function AmbientProvider({ children, className, style, theme }: AmbientPr
       themeVars[varName] = key === "lightSaturation" ? `${value}%` : String(value);
     }
   }
+  // Derived variables must be re-declared here so they recompute using the
+  // overridden input variables on this element rather than inheriting the
+  // already-resolved values from :root.
+  themeVars["--amb-lume"] = [
+    "color-mix(in oklab,",
+    "hsl(var(--amb-lume-hue) 100% 74%) calc(clamp(0, (0.5 - var(--amb-key-light-intensity)) / 0.2, 1) * 100%),",
+    "hsl(var(--amb-light-hue) var(--amb-light-saturation)",
+    "calc((1 - sign(var(--amb-key-light-intensity) - 0.5)) * 50% + 25%)))",
+  ].join(" ");
+  themeVars["--amb-label"] =
+    "hsl(var(--amb-light-hue) var(--amb-light-saturation) calc((1 - var(--amb-key-light-intensity)) * 60% + 20%))";
   const mergedStyle = { ...themeVars, ...style } as CSSProperties;
 
   return (

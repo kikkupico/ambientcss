@@ -130,7 +130,6 @@ export function App() {
   /* Scroll-driven lighting ------------------------------------------------ */
   const ticking = useRef(false);
   const playgroundRef = useRef<HTMLDivElement>(null);
-
   const handleScroll = useCallback(() => {
     if (ticking.current) return;
     ticking.current = true;
