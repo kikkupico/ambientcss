@@ -9,7 +9,8 @@ const sidebars: SidebarsConfig = {
       items: [
         "guide/getting-started",
         "guide/concept",
-        "guide/demo"
+        "guide/demo",
+        "guide/contributing"
       ]
     },
     {

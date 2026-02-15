@@ -27,13 +27,21 @@ npm login
 npm whoami
 ```
 
-If you publish from GitHub Actions, create an npm automation token and set it as:
+For GitHub Actions publishing, configure npm Trusted Publishing for each package:
 
-- Repo secret: `NPM_TOKEN`
+- `@ambientcss/css`
+- `@ambientcss/components`
 
-Also ensure GitHub Actions workflow is enabled:
+Trusted Publisher settings:
+
+- Provider: GitHub Actions
+- Repository: `kikkupico/ambientcss`
+- Workflow file: `.github/workflows/changesets.yml`
+
+Ensure GitHub Actions workflows are enabled:
 
 - `.github/workflows/changesets.yml`
+- `.github/workflows/publish-npm.yml`
 
 ## Preflight checks
 
@@ -84,6 +92,8 @@ Manual workflow (still available):
 - `dry_run=true` to verify without publishing
 - `dry_run=false` to publish
 - `tag` can be `latest`, `next`, `beta`, etc.
+
+No `NPM_TOKEN` secret is required when Trusted Publishing is configured correctly.
 
 ## Verify on npm
 
