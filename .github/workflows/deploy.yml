@@ -36,10 +36,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: Build docs
+      - name: Launch gate
         run: |
-          pnpm --filter @ambientcss/css build
-          pnpm --filter @ambientcss/components build
+          pnpm build
+          pnpm typecheck
           pnpm docs:build
 
       - name: Setup Pages

@@ -1,5 +1,5 @@
 import { useId, useRef } from "react";
-import type { HTMLAttributes, PointerEvent } from "react";
+import type { HTMLAttributes, KeyboardEvent, PointerEvent } from "react";
 import { cn } from "../lib/cn";
 
 export type AmbientKnobProps = Omit<HTMLAttributes<HTMLDivElement>, "onChange"> & {
@@ -27,6 +27,7 @@ export function AmbientKnob({
 }: AmbientKnobProps) {
   const id = useId();
   const dragStateRef = useRef<{ startY: number; startValue: number } | null>(null);
+  const safeStep = step > 0 ? step : 1;
 
   const percent = (value - min) / (max - min || 1);
   const rotation = percent * 270 - 135;
@@ -39,8 +40,47 @@ export function AmbientKnob({
     const range = max - min;
     const sensitivity = range / 180;
     const raw = drag.startValue + delta * sensitivity;
-    const snapped = Math.round(raw / step) * step;
+    const snapped = Math.round(raw / safeStep) * safeStep;
     onChange?.(clamp(snapped, min, max));
+  };
+
+  const setValue = (nextValue: number) => {
+    const snapped = Math.round(nextValue / safeStep) * safeStep;
+    onChange?.(clamp(snapped, min, max));
+  };
+
+  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    const pageStep = safeStep * 10;
+    switch (event.key) {
+      case "ArrowUp":
+      case "ArrowRight":
+        event.preventDefault();
+        setValue(value + safeStep);
+        break;
+      case "ArrowDown":
+      case "ArrowLeft":
+        event.preventDefault();
+        setValue(value - safeStep);
+        break;
+      case "PageUp":
+        event.preventDefault();
+        setValue(value + pageStep);
+        break;
+      case "PageDown":
+        event.preventDefault();
+        setValue(value - pageStep);
+        break;
+      case "Home":
+        event.preventDefault();
+        setValue(min);
+        break;
+      case "End":
+        event.preventDefault();
+        setValue(max);
+        break;
+      default:
+        break;
+    }
   };
 
   return (
@@ -53,6 +93,8 @@ export function AmbientKnob({
         aria-valuemax={max}
         aria-valuenow={value}
         aria-labelledby={label ? id : undefined}
+        aria-orientation="vertical"
+        tabIndex={0}
         onPointerDown={(event) => {
           event.currentTarget.setPointerCapture(event.pointerId);
           dragStateRef.current = { startY: event.clientY, startValue: value };
@@ -61,6 +103,10 @@ export function AmbientKnob({
         onPointerUp={() => {
           dragStateRef.current = null;
         }}
+        onPointerCancel={() => {
+          dragStateRef.current = null;
+        }}
+        onKeyDown={onKeyDown}
       >
         <div className="ambx-knob-rotation" style={{ transform: `rotate(${rotation}deg)` }}>
           <div className="amb-knob-indicator">

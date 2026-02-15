@@ -8,13 +8,24 @@
     "build": "node scripts/run-workspace-task.mjs build",
     "clean": "node scripts/run-workspace-task.mjs clean",
     "typecheck": "node scripts/run-workspace-task.mjs typecheck",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
     "docs:dev": "pnpm --filter docs dev",
     "docs:build": "pnpm --filter docs build",
-    "docs:preview": "pnpm --filter docs preview"
+    "docs:preview": "pnpm --filter docs preview",
+    "release:check": "pnpm build && pnpm typecheck && pnpm docs:build",
+    "release:publish:preflight": "pnpm build && pnpm typecheck",
+    "release:pack": "rm -rf .artifacts && mkdir -p .artifacts && (cd packages/ambient-css && pnpm pack --pack-destination ../../.artifacts) && (cd packages/ambient-components && pnpm pack --pack-destination ../../.artifacts)",
+    "release:changeset:publish": "pnpm release:publish:preflight && changeset publish",
+    "release:publish": "pnpm --filter @ambientcss/css publish --access public --no-git-checks && pnpm --filter @ambientcss/components publish --access public --no-git-checks",
+    "release:publish:next": "pnpm --filter @ambientcss/css publish --access public --tag next --no-git-checks && pnpm --filter @ambientcss/components publish --access public --tag next --no-git-checks"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
       "esbuild"
     ]
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.29.8"
   }
 }

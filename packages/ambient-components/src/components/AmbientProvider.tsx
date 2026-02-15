@@ -1,4 +1,4 @@
-import { useEffect, type CSSProperties, type PropsWithChildren } from "react";
+import type { CSSProperties, PropsWithChildren } from "react";
 
 export type AmbientTheme = {
   lightX?: number;
@@ -29,25 +29,17 @@ const VAR_MAP: Record<string, keyof AmbientTheme> = {
 };
 
 export function AmbientProvider({ children, className, style, theme }: AmbientProviderProps) {
-  useEffect(() => {
-    const el = document.documentElement;
-    const entries = Object.entries(VAR_MAP);
-    for (const [varName, key] of entries) {
-      const value = theme?.[key];
-      if (value !== undefined) {
-        const str = key === "lightSaturation" ? `${value}%` : String(value);
-        el.style.setProperty(varName, str);
-      }
+  const themeVars: Record<string, string> = {};
+  for (const [varName, key] of Object.entries(VAR_MAP)) {
+    const value = theme?.[key];
+    if (value !== undefined) {
+      themeVars[varName] = key === "lightSaturation" ? `${value}%` : String(value);
     }
-    return () => {
-      for (const [varName] of entries) {
-        el.style.removeProperty(varName);
-      }
-    };
-  }, [theme]);
+  }
+  const mergedStyle = { ...themeVars, ...style } as CSSProperties;
 
   return (
-    <div className={className} style={style}>
+    <div className={className} style={mergedStyle}>
       {children}
     </div>
   );

@@ -3,6 +3,19 @@
   "version": "0.1.0",
   "description": "React skeuomorphic components powered by Ambient CSS",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kikkupico/ambientcss.git",
+    "directory": "packages/ambient-components"
+  },
+  "homepage": "https://kikkupico.github.io/ambientcss/",
+  "bugs": {
+    "url": "https://github.com/kikkupico/ambientcss/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",

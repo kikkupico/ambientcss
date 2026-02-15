@@ -10,12 +10,32 @@ if (!task) {
 }
 
 // Keep deterministic topological order for package-local dependencies.
-const workspaces = [
-  "packages/ambient-css",
-  "packages/ambient-components",
-  "examples/demo",
-  "apps/docs",
-];
+const WORKSPACES_BY_TASK = {
+  build: [
+    "packages/ambient-css",
+    "packages/ambient-components",
+    "examples/demo",
+    "apps/docs",
+  ],
+  clean: [
+    "packages/ambient-css",
+    "packages/ambient-components",
+    "examples/demo",
+    "apps/docs",
+  ],
+  // docs:build is the docs quality gate; docs tsc is noisy with framework-level aliases.
+  typecheck: [
+    "packages/ambient-css",
+    "packages/ambient-components",
+    "examples/demo",
+  ],
+};
+
+const workspaces = WORKSPACES_BY_TASK[task];
+if (!workspaces) {
+  console.error(`Unsupported task: ${task}`);
+  process.exit(1);
+}
 
 for (const workspace of workspaces) {
   await new Promise((resolve, reject) => {

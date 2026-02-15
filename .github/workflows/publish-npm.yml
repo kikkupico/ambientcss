@@ -1,0 +1,66 @@
+name: Publish npm packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Run publish in dry-run mode"
+        required: true
+        type: boolean
+        default: true
+      tag:
+        description: "npm dist-tag (latest, next, beta, etc.)"
+        required: true
+        type: string
+        default: latest
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      NPM_CONFIG_PROVENANCE: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://registry.npmjs.org/
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build and typecheck
+        run: |
+          pnpm build
+          pnpm typecheck
+
+      - name: Pack dry-run sanity check
+        run: pnpm release:pack
+
+      - name: Publish @ambientcss/css (dry-run)
+        if: ${{ inputs.dry_run }}
+        run: pnpm --filter @ambientcss/css publish --access public --tag ${{ inputs.tag }} --no-git-checks --dry-run
+
+      - name: Publish @ambientcss/components (dry-run)
+        if: ${{ inputs.dry_run }}
+        run: pnpm --filter @ambientcss/components publish --access public --tag ${{ inputs.tag }} --no-git-checks --dry-run
+
+      - name: Publish @ambientcss/css
+        if: ${{ !inputs.dry_run }}
+        run: pnpm --filter @ambientcss/css publish --access public --tag ${{ inputs.tag }} --no-git-checks --provenance
+
+      - name: Publish @ambientcss/components
+        if: ${{ !inputs.dry_run }}
+        run: pnpm --filter @ambientcss/components publish --access public --tag ${{ inputs.tag }} --no-git-checks --provenance

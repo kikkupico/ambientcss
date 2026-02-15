@@ -10,3 +10,4 @@ packages/*/dist
 /apps/docs/.docusaurus/
 /apps/docs/build/
 /.claude/
+.artifacts/

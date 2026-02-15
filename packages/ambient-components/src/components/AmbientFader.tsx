@@ -1,5 +1,5 @@
 import { useId, useRef } from "react";
-import type { HTMLAttributes, PointerEvent } from "react";
+import type { HTMLAttributes, KeyboardEvent, PointerEvent } from "react";
 import { cn } from "../lib/cn";
 
 export type AmbientFaderProps = Omit<HTMLAttributes<HTMLDivElement>, "onChange"> & {
@@ -27,6 +27,7 @@ export function AmbientFader({
 }: AmbientFaderProps) {
   const id = useId();
   const trackRef = useRef<HTMLDivElement | null>(null);
+  const safeStep = step > 0 ? step : 1;
 
   const percent = ((value - min) / (max - min || 1)) * 100;
 
@@ -37,8 +38,47 @@ export function AmbientFader({
     const rect = track.getBoundingClientRect();
     const ratio = 1 - (clientY - rect.top) / rect.height;
     const nextValue = min + clamp(ratio, 0, 1) * (max - min);
-    const snapped = Math.round(nextValue / step) * step;
+    const snapped = Math.round(nextValue / safeStep) * safeStep;
     onChange?.(clamp(snapped, min, max));
+  };
+
+  const setValue = (nextValue: number) => {
+    const snapped = Math.round(nextValue / safeStep) * safeStep;
+    onChange?.(clamp(snapped, min, max));
+  };
+
+  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    const pageStep = safeStep * 10;
+    switch (event.key) {
+      case "ArrowUp":
+      case "ArrowRight":
+        event.preventDefault();
+        setValue(value + safeStep);
+        break;
+      case "ArrowDown":
+      case "ArrowLeft":
+        event.preventDefault();
+        setValue(value - safeStep);
+        break;
+      case "PageUp":
+        event.preventDefault();
+        setValue(value + pageStep);
+        break;
+      case "PageDown":
+        event.preventDefault();
+        setValue(value - pageStep);
+        break;
+      case "Home":
+        event.preventDefault();
+        setValue(min);
+        break;
+      case "End":
+        event.preventDefault();
+        setValue(max);
+        break;
+      default:
+        break;
+    }
   };
 
   const onPointerMove = (event: PointerEvent<HTMLDivElement>) => {
@@ -57,11 +97,14 @@ export function AmbientFader({
         aria-valuemin={min}
         aria-valuemax={max}
         aria-valuenow={value}
+        aria-orientation="vertical"
+        tabIndex={0}
         onPointerDown={(event) => {
           event.currentTarget.setPointerCapture(event.pointerId);
           updateFromClientY(event.clientY);
         }}
         onPointerMove={onPointerMove}
+        onKeyDown={onKeyDown}
       >
         <div
           className="amb-fader-thumb ambient amb-fillet amb-elevation-1 amb-surface-concave ambx-fader-thumb"

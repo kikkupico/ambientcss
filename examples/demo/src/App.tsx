@@ -112,7 +112,7 @@ export function App() {
   });
 
   /* Scroll to next section helper -------------------------------------------- */
-  const scrollToNextSection = useCallback((currentRef: React.RefObject<HTMLElement>) => {
+  const scrollToNextSection = useCallback((currentRef: React.RefObject<HTMLElement | null>) => {
     const current = currentRef.current;
     if (!current) return;
     const sections = Array.from(document.querySelectorAll('section'));
@@ -287,7 +287,7 @@ export function App() {
   }, []);
 
   /* Scroll button component ----------------------------------------------- */
-  const ScrollButton = ({ sectionRef }: { sectionRef: React.RefObject<HTMLElement> }) => (
+  const ScrollButton = ({ sectionRef }: { sectionRef: React.RefObject<HTMLElement | null> }) => (
     <div
       className="scroll-down-button"
       onClick={() => scrollToNextSection(sectionRef)}

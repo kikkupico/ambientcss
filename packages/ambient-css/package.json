@@ -3,6 +3,19 @@
   "version": "0.1.0",
   "description": "Pure CSS ambient lighting and skeuomorphic utility classes",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kikkupico/ambientcss.git",
+    "directory": "packages/ambient-css"
+  },
+  "homepage": "https://kikkupico.github.io/ambientcss/",
+  "bugs": {
+    "url": "https://github.com/kikkupico/ambientcss/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "sideEffects": [
     "*.css"
   ],
