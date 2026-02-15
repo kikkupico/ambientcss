@@ -85,6 +85,8 @@ Primary automated flow:
 3. Merge version PR
 4. Action publishes packages with `latest` tag
 
+Implementation detail: CI publish uses `npm publish` (via `scripts/publish-trusted.mjs`) to be compatible with npm Trusted Publishing. Release preflight validates publishable packages only (`@ambientcss/css` and `@ambientcss/components`) and does not build docs/demo.
+
 Manual workflow (still available):
 
 - `.github/workflows/publish-npm.yml`
