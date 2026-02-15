@@ -46,7 +46,7 @@ export function AmbientKnob({
   return (
     <div className={cn("ambx-stack", className)} {...props}>
       <div
-        className="ambient amb-knob amb-fillet amb-elevation-2 amb-surface ambx-knob"
+        className="ambient amb-knob amb-chamfer amb-elevation-2 amb-surface ambx-knob"
         role="slider"
         aria-label={label}
         aria-valuemin={min}

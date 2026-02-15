@@ -5,12 +5,12 @@ export function CssRecipeRenderedExamples() {
     <div className="docs-css-examples">
       <section className="docs-demo-shell docs-bright-theme">
         <h3 className="docs-css-title">Raised Card</h3>
-        <section className="ambient amb-surface amb-fillet amb-elevation-2 amb-rounded-lg docs-css-card">Raised card</section>
+        <section className="ambient amb-surface amb-chamfer amb-elevation-2 amb-rounded-lg docs-css-card">Raised card</section>
       </section>
 
       <section className="docs-demo-shell docs-bright-theme">
         <h3 className="docs-css-title">Inset Display Window</h3>
-        <div className="ambient amb-surface-concave amb-chamfer amb-elevation-1 amb-rounded-md docs-css-meter" />
+        <div className="ambient amb-surface-concave amb-fillet amb-elevation-1 amb-rounded-md docs-css-meter" />
       </section>
 
       <section className="docs-demo-shell docs-bright-theme">

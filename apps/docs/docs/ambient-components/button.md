@@ -36,4 +36,4 @@ Inherits all `ButtonHTMLAttributes<HTMLButtonElement>` props.
 
 ## Default class stack
 
-`ambient amb-button amb-fillet amb-elevation-1 ambx-button amb-heading-3`
+`ambient amb-button amb-chamfer amb-elevation-1 ambx-button amb-heading-3`

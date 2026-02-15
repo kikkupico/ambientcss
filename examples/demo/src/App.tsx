@@ -295,7 +295,7 @@ export function App() {
       tabIndex={0}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') scrollToNextSection(sectionRef); }}
     >
-      <div className="scroll-down-circle ambient amb-surface amb-fillet amb-rounded-full">
+      <div className="scroll-down-circle ambient amb-surface amb-chamfer amb-rounded-full">
         <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7" /></svg>
       </div>
     </div>
@@ -317,7 +317,7 @@ export function App() {
           tabIndex={0}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') scrollToNextSection(heroRef); }}
         >
-          <div className="hero-scroll-circle ambient amb-surface amb-fillet amb-bounce amb-rounded-full">
+          <div className="hero-scroll-circle ambient amb-surface amb-chamfer amb-bounce amb-rounded-full">
             <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7" /></svg>
           </div>
           <span>Scroll</span>
@@ -344,7 +344,7 @@ export function App() {
                 <div
                   key={i}
                   className={`orbit-circle ambient amb-surface amb-elevation-3 ${
-                    i % 3 === 0 ? "amb-fillet" : i % 3 === 1 ? "amb-chamfer" : "amb-fillet-2"
+                    i % 3 === 0 ? "amb-chamfer" : i % 3 === 1 ? "amb-fillet" : "amb-chamfer-2"
                   }`}
                   style={{
                     opacity: orbitView.visible ? 1 : 0,
@@ -366,7 +366,7 @@ export function App() {
             {([0, 1, 2, 3] as const).map((elev, i) => (
               <div className="elevation-item" key={elev}>
                 <div
-                  className={`elevation-circle ambient amb-surface amb-fillet amb-elevation-${elev}`}
+                  className={`elevation-circle ambient amb-surface amb-chamfer amb-elevation-${elev}`}
                   data-visible={elevView.visible}
                   style={{ transitionDelay: `${i * 0.08}s` }}
                 />
@@ -375,7 +375,7 @@ export function App() {
             ))}
             <div className="elevation-item">
               <div
-                className="elevation-circle ambient amb-surface amb-fillet amb-bounce"
+                className="elevation-circle ambient amb-surface amb-chamfer amb-bounce"
                 data-visible={elevView.visible}
                 style={{ transitionDelay: "0.32s" }}
               />
@@ -398,7 +398,7 @@ export function App() {
             ].map(({ cls, label }, i) => (
               <div className="surface-item" key={label}>
                 <div
-                  className={`surface-swatch ambient amb-fillet-2 amb-elevation-2 ${cls}`}
+                  className={`surface-swatch ambient amb-chamfer-2 amb-elevation-2 ${cls}`}
                   data-visible={surfView.visible}
                   style={{
                     transitionDelay: `${i * 0.12}s`,
@@ -422,12 +422,12 @@ export function App() {
           <div className="scene-label">Edge Treatments</div>
           <div className="edge-wall">
             {[
-              { cls: "amb-fillet", elev: 1, label: "Fillet" },
-              { cls: "amb-fillet-2", elev: 1, label: "Fillet 2x" },
-              { cls: "amb-fillet-minus-1", elev: 0, label: "Fillet -1" },
               { cls: "amb-chamfer", elev: 1, label: "Chamfer" },
               { cls: "amb-chamfer-2", elev: 1, label: "Chamfer 2x" },
               { cls: "amb-chamfer-minus-1", elev: 0, label: "Chamfer -1" },
+              { cls: "amb-fillet", elev: 1, label: "Fillet" },
+              { cls: "amb-fillet-2", elev: 1, label: "Fillet 2x" },
+              { cls: "amb-fillet-minus-1", elev: 0, label: "Fillet -1" },
             ].map(({ cls, elev, label }, i) => (
               <div className="edge-item" key={label}>
                 <div
@@ -547,9 +547,9 @@ export function App() {
             </div>
 
             <div className="theme-preview-compact">
-              <div className="ambient amb-surface-convex amb-fillet amb-elevation-1 theme-preview-circle-small" />
-              <div className="ambient amb-surface-convex amb-chamfer amb-elevation-1 theme-preview-bar-small" />
-              <div className="ambient amb-surface amb-fillet amb-bounce theme-preview-circle-small" />
+              <div className="ambient amb-surface-convex amb-chamfer amb-elevation-1 theme-preview-circle-small" />
+              <div className="ambient amb-surface-convex amb-fillet amb-elevation-1 theme-preview-bar-small" />
+              <div className="ambient amb-surface amb-chamfer amb-bounce theme-preview-circle-small" />
             </div>
           </div>
         </div>
@@ -567,7 +567,7 @@ export function App() {
           <div className="finale-sub" data-visible={finaleView.visible}>physically based css</div>
           <div className="finale-links">
             <a
-              className="finale-link ambient amb-surface amb-fillet amb-elevation-1 amb-rounded-lg"
+              className="finale-link ambient amb-surface amb-chamfer amb-elevation-1 amb-rounded-lg"
               href="https://github.com/kikkupico/ambientcss"
               target="_blank"
               rel="noopener noreferrer"
@@ -578,7 +578,7 @@ export function App() {
               GitHub
             </a>
             <a
-              className="finale-link ambient amb-surface amb-fillet amb-elevation-1 amb-rounded-lg"
+              className="finale-link ambient amb-surface amb-chamfer amb-elevation-1 amb-rounded-lg"
               href="https://kikkupico.github.io/ambientcss/"
               target="_blank"
               rel="noopener noreferrer"
@@ -597,7 +597,7 @@ export function App() {
             tabIndex={0}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') scrollToTop(); }}
           >
-            <div className="scroll-top-circle ambient amb-surface amb-fillet amb-rounded-full">
+            <div className="scroll-top-circle ambient amb-surface amb-chamfer amb-rounded-full">
               <svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7" /></svg>
             </div>
             <span>Top</span>

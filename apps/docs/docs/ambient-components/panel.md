@@ -30,4 +30,4 @@ export function RackPanel() {
 
 ## Default class stack
 
-`ambient amb-surface amb-fillet amb-elevation-2 ambx-panel`
+`ambient amb-surface amb-chamfer amb-elevation-2 ambx-panel`

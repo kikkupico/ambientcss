@@ -6,11 +6,11 @@ const tips = {
   fill: "Fill light: secondary source. Lifts shadow regions. Key-to-fill ratio controls contrast.",
   elevation:
     "Elevation (0–3) scales drop shadow offset and spread. Higher values = larger, softer shadow.",
-  edge: "Edge treatment: fillet gives rounded inner edges, chamfer gives beveled ones. Both follow the light direction.",
+  edge: "Edge treatment: chamfer gives rounded inner edges, fillet gives beveled ones. Both follow the light direction.",
   surface:
     "Surface type sets the background gradient. Flat is uniform, concave darkens toward light, convex brightens toward light.",
   shadow:
-    "Five-layer box-shadow: drop shadow + fillet highlight/shadow + chamfer highlight/shadow. All derived from the same light parameters.",
+    "Five-layer box-shadow: drop shadow + chamfer highlight/shadow + fillet highlight/shadow. All derived from the same light parameters.",
 };
 
 function Hotspot({
@@ -74,7 +74,7 @@ export function ConceptIsometricDiagrams() {
           {/* Elevation 0 layer — recessed elements */}
           <div className="td-layer td-layer-0">
             <div
-              className="td-meter ambient amb-surface-concave amb-fillet-minus-1 amb-elevation-0 amb-rounded-md"
+              className="td-meter ambient amb-surface-concave amb-chamfer-minus-1 amb-elevation-0 amb-rounded-md"
               aria-label="Recessed meter — elevation 0"
             />
           </div>
@@ -82,7 +82,7 @@ export function ConceptIsometricDiagrams() {
           {/* Elevation 1 layer — base plane */}
           <div className="td-layer td-layer-1">
             <div
-              className="td-panel ambient amb-surface amb-fillet amb-elevation-1 amb-rounded-xl"
+              className="td-panel ambient amb-surface amb-chamfer amb-elevation-1 amb-rounded-xl"
               aria-label="Panel background — elevation 1"
             >
               {/* Meter placeholder to maintain layout */}
@@ -90,14 +90,14 @@ export function ConceptIsometricDiagrams() {
 
               <div className="td-panel-row">
                 <div
-                  className="td-knob ambient amb-surface-convex amb-fillet amb-elevation-1 amb-rounded-full"
+                  className="td-knob ambient amb-surface-convex amb-chamfer amb-elevation-1 amb-rounded-full"
                   aria-label="Convex knob — elevation 1"
                 />
                 <div
-                  className="td-btn ambient amb-surface-convex amb-fillet amb-elevation-1 amb-rounded-md"
-                  aria-label="Fillet button — elevation 1"
+                  className="td-btn ambient amb-surface-convex amb-chamfer amb-elevation-1 amb-rounded-md"
+                  aria-label="Chamfer button — elevation 1"
                 >
-                  Fillet
+                  Chamfer
                 </div>
               </div>
 
@@ -109,10 +109,10 @@ export function ConceptIsometricDiagrams() {
           {/* Elevation 2 layer — raised elements */}
           <div className="td-layer td-layer-2">
             <div
-              className="td-btn td-btn-chamfer ambient amb-surface-convex amb-chamfer amb-elevation-2 amb-rounded-md"
-              aria-label="Chamfer button — elevation 2"
+              className="td-btn td-btn-chamfer ambient amb-surface-convex amb-fillet amb-elevation-2 amb-rounded-md"
+              aria-label="Fillet button — elevation 2"
             >
-              Chamfer
+              Fillet
             </div>
           </div>
 

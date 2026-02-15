@@ -11,7 +11,7 @@ import "@ambientcss/css/ambient.css";
 ## Minimal markup
 
 ```html
-<div class="ambient amb-surface amb-fillet amb-elevation-2 amb-rounded-lg">
+<div class="ambient amb-surface amb-chamfer amb-elevation-2 amb-rounded-lg">
   Ambient panel surface
 </div>
 ```
@@ -22,7 +22,7 @@ Most surfaces combine these layers:
 
 - `ambient`: enables physically based shadows/highlights.
 - One surface class: `amb-surface`, `amb-surface-convex`, or `amb-surface-concave`.
-- One edge class: `amb-fillet` or `amb-chamfer`.
+- One edge class: `amb-chamfer` or `amb-fillet`.
 - One elevation class: `amb-elevation-0` to `amb-elevation-3`.
 
 ## Bright baseline settings
@@ -44,10 +44,10 @@ Most surfaces combine these layers:
 
 ```html
 <!-- raised -->
-<div class="ambient amb-surface-convex amb-fillet amb-elevation-2 amb-rounded-md"></div>
+<div class="ambient amb-surface-convex amb-chamfer amb-elevation-2 amb-rounded-md"></div>
 
 <!-- inset -->
-<div class="ambient amb-surface-concave amb-chamfer amb-elevation-1 amb-rounded-md"></div>
+<div class="ambient amb-surface-concave amb-fillet amb-elevation-1 amb-rounded-md"></div>
 ```
 
 For React component visuals, also import:

@@ -37,12 +37,12 @@
   --amb-light-hue: 234;
   --amb-light-saturation: 15%;
   --amb-light-distance: 0px;
-  --amb-fillet: 0;
   --amb-chamfer: 0;
+  --amb-fillet: 0;
   --amb-thickness: 0;
   --amb-elevation: 0;
-  --amb-fillet-width: 1;
   --amb-chamfer-width: 1;
+  --amb-fillet-width: 1;
   --amb-highlight-color: coral;
   --amb-lume-hue: 17;
   --amb-lume: color-mix(
@@ -65,20 +65,6 @@
    EDGE TREATMENTS
    -------------------------------------------------------------------------- */
 
-.amb-fillet {
-  --amb-fillet: 1;
-}
-
-.amb-fillet-2 {
-  --amb-fillet: 1;
-  --amb-fillet-width: 2;
-}
-
-.amb-fillet-minus-1 {
-  --amb-fillet: 1;
-  --amb-fillet-width: -1;
-}
-
 .amb-chamfer {
   --amb-chamfer: 1;
 }
@@ -91,6 +77,20 @@
 .amb-chamfer-minus-1 {
   --amb-chamfer: 1;
   --amb-chamfer-width: -1;
+}
+
+.amb-fillet {
+  --amb-fillet: 1;
+}
+
+.amb-fillet-2 {
+  --amb-fillet: 1;
+  --amb-fillet-width: 2;
+}
+
+.amb-fillet-minus-1 {
+  --amb-fillet: 1;
+  --amb-fillet-width: -1;
 }
 
 /* --------------------------------------------------------------------------
@@ -107,10 +107,10 @@
 
    Applies physically-based lighting via box-shadow:
    1. Drop shadow - offset by light direction, scaled by elevation
-   2. Fillet highlight - inner lit edge (white on light side)
-   3. Fillet shadow - inner dark edge (black on shadow side)
-   4. Chamfer highlight - softer inner edge (light side)
-   5. Chamfer shadow - softer inner edge (shadow side)
+   2. Chamfer highlight - inner lit edge (white on light side)
+   3. Chamfer shadow - inner dark edge (black on shadow side)
+   4. Fillet highlight - softer inner edge (light side)
+   5. Fillet shadow - softer inner edge (shadow side)
    -------------------------------------------------------------------------- */
 
 .ambient {
@@ -123,43 +123,43 @@
       calc(var(--amb-light-x) * var(--amb-elevation) * -8px)
       calc(var(--amb-light-y) * var(--amb-elevation) * -8px)
       calc(var(--amb-elevation) * 8px) calc(var(--amb-elevation) * -4px),
-    inset calc(var(--amb-light-x) * var(--amb-fillet-width) * -1px)
-      calc(var(--amb-light-y) * var(--amb-fillet-width) * -1px) 0px 0px
-      hsl(
-        var(--amb-light-hue)
-        var(--amb-light-saturation)
-        100%
-        / calc(var(--amb-fillet) * var(--amb-key-light-intensity))
-      ),
-    inset calc(var(--amb-light-x) * var(--amb-fillet-width) * 1px)
-      calc(var(--amb-light-y) * var(--amb-fillet-width) * 1px) 0px 0px
-      hsl(
-        var(--amb-light-hue)
-        var(--amb-light-saturation)
-        0%
-        / calc(
-            var(--amb-fillet) *
-              calc(
-                var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
-              )
-          )
-      ),
-    inset calc(var(--amb-light-x) * var(--amb-chamfer-width) * -2px)
-      calc(var(--amb-light-y) * var(--amb-chamfer-width) * -2px) 2px 0px
+    inset calc(var(--amb-light-x) * var(--amb-chamfer-width) * -1px)
+      calc(var(--amb-light-y) * var(--amb-chamfer-width) * -1px) 0px 0px
       hsl(
         var(--amb-light-hue)
         var(--amb-light-saturation)
         100%
         / calc(var(--amb-chamfer) * var(--amb-key-light-intensity))
       ),
-    inset calc(var(--amb-light-x) * var(--amb-chamfer-width) * 2px)
-      calc(var(--amb-light-y) * var(--amb-chamfer-width) * 2px) 2px 0px
+    inset calc(var(--amb-light-x) * var(--amb-chamfer-width) * 1px)
+      calc(var(--amb-light-y) * var(--amb-chamfer-width) * 1px) 0px 0px
       hsl(
         var(--amb-light-hue)
         var(--amb-light-saturation)
         0%
         / calc(
             var(--amb-chamfer) *
+              calc(
+                var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
+              )
+          )
+      ),
+    inset calc(var(--amb-light-x) * var(--amb-fillet-width) * -2px)
+      calc(var(--amb-light-y) * var(--amb-fillet-width) * -2px) 2px 0px
+      hsl(
+        var(--amb-light-hue)
+        var(--amb-light-saturation)
+        100%
+        / calc(var(--amb-fillet) * var(--amb-key-light-intensity))
+      ),
+    inset calc(var(--amb-light-x) * var(--amb-fillet-width) * 2px)
+      calc(var(--amb-light-y) * var(--amb-fillet-width) * 2px) 2px 0px
+      hsl(
+        var(--amb-light-hue)
+        var(--amb-light-saturation)
+        0%
+        / calc(
+            var(--amb-fillet) *
               calc(
                 var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
               )
