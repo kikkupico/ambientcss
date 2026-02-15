@@ -4,6 +4,14 @@
 
 ### Patch Changes
 
+- a9b62c1: fix amb-lume
+- Updated dependencies [a9b62c1]
+  - @ambientcss/css@1.0.1
+
+## 1.0.1
+
+### Patch Changes
+
 - Fix `--amb-lume` and `--amb-label` not reacting to theme changes. Derived CSS variables are now re-declared on the provider element so they recompute when input variables like `--amb-key-light-intensity` are overridden.
 
 ## 1.0.0
