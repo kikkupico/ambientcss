@@ -119,14 +119,14 @@ pnpm release:changeset:publish
 
 ## npm Publishing and Auth
 
-Initial package publish is commonly done from local CLI (`npm login`).
+CI publishing uses [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers/) (OIDC) — no tokens or secrets needed. This requires **npm >= 11.5.1** (installed in CI via `npm install -g npm@latest`).
 
-After first publish, configure npm Trusted Publishing for CI releases:
+Trusted publishing is configured on npmjs.com for both packages:
 - Repository: `kikkupico/ambientcss`
 - Workflow: `.github/workflows/changesets.yml`
 
 Manual publish workflow also exists:
-- `.github/workflows/publish-npm.yml`
+- `.github/workflows/publish-npm.yml` (workflow_dispatch, supports dry-run)
 
 ## Contributor Checklist
 
