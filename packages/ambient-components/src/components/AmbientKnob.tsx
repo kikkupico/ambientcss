@@ -26,20 +26,33 @@ export function AmbientKnob({
   ...props
 }: AmbientKnobProps) {
   const id = useId();
-  const dragStateRef = useRef<{ startY: number; startValue: number } | null>(null);
+  const draggingRef = useRef(false);
+  const knobRef = useRef<HTMLDivElement>(null);
   const safeStep = step > 0 ? step : 1;
 
   const percent = (value - min) / (max - min || 1);
   const rotation = percent * 270 - 135;
 
-  const updateFromPointer = (event: PointerEvent<HTMLDivElement>) => {
-    const drag = dragStateRef.current;
-    if (!drag) return;
+  // Convert pointer position to a knob angle in [-180, 180] where 0 = up,
+  // positive = clockwise. The knob's active range is [-135, 135] (270°),
+  // with the dead zone at the bottom (~135° to ~225° i.e. past ±135°).
+  const pointerToValue = (event: PointerEvent<HTMLDivElement>) => {
+    const rect = knobRef.current!.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    // atan2 with screen coords: 0=right, 90=down; add 90 to rotate so 0=up
+    const atan2Deg = Math.atan2(event.clientY - cy, event.clientX - cx) * (180 / Math.PI);
+    let angle = atan2Deg + 90;
+    // Normalize to [-180, 180]
+    if (angle > 180) angle -= 360;
 
-    const delta = drag.startY - event.clientY;
+    // Clamp dead zone based on current value position
+    if (angle < -135 || angle > 135) {
+      angle = percent >= 0.5 ? 135 : -135;
+    }
+
     const range = max - min;
-    const sensitivity = range / 180;
-    const raw = drag.startValue + delta * sensitivity;
+    const raw = min + ((angle + 135) / 270) * range;
     const snapped = Math.round(raw / safeStep) * safeStep;
     onChange?.(clamp(snapped, min, max));
   };
@@ -86,6 +99,7 @@ export function AmbientKnob({
   return (
     <div className={cn("ambx-stack", className)} {...props}>
       <div
+        ref={knobRef}
         className="ambient amb-knob amb-chamfer amb-elevation-2 amb-surface ambx-knob"
         role="slider"
         aria-label={label}
@@ -97,14 +111,17 @@ export function AmbientKnob({
         tabIndex={0}
         onPointerDown={(event) => {
           event.currentTarget.setPointerCapture(event.pointerId);
-          dragStateRef.current = { startY: event.clientY, startValue: value };
+          draggingRef.current = true;
+          pointerToValue(event);
         }}
-        onPointerMove={updateFromPointer}
+        onPointerMove={(event) => {
+          if (draggingRef.current) pointerToValue(event);
+        }}
         onPointerUp={() => {
-          dragStateRef.current = null;
+          draggingRef.current = false;
         }}
         onPointerCancel={() => {
-          dragStateRef.current = null;
+          draggingRef.current = false;
         }}
         onKeyDown={onKeyDown}
       >
