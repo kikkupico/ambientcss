@@ -42,7 +42,7 @@
   padding: calc(var(--ambx-grid) * 2);
   border-radius: calc(var(--ambx-grid) * 3);
   text-transform: uppercase;
-  width: calc(var(--ambx-grid) * 16);
+  min-width: calc(var(--ambx-grid) * 16);
   font-weight: 600;
   color: var(--amb-lume);
 }
