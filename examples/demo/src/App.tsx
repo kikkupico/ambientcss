@@ -270,19 +270,24 @@ export function App() {
   const playgroundSectionRef = useRef<HTMLElement>(null);
 
   /* Orbit: pointer/touch-driven light direction ───────────────────────── */
-  const [orbitLight, setOrbitLight] = useState({ x: -1, y: -1 });
   const orbitGridRef = useRef<HTMLDivElement>(null);
 
-  const handleOrbitPointer = useCallback((e: React.PointerEvent | React.TouchEvent) => {
-    const el = orbitGridRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const clientX = "touches" in e ? e.touches[0]!.clientX : (e as React.PointerEvent).clientX;
-    const clientY = "touches" in e ? e.touches[0]!.clientY : (e as React.PointerEvent).clientY;
-    const rawX = ((clientX - rect.left) / rect.width) * 2 - 1;
-    const rawY = ((clientY - rect.top) / rect.height) * 2 - 1;
-    const maxAbs = Math.max(Math.abs(rawX), Math.abs(rawY), 0.01);
-    setOrbitLight({ x: rawX / maxAbs, y: rawY / maxAbs });
+  // Window-level pointer tracking — immediate, no smoothing, bypasses React
+  useEffect(() => {
+    function onPointerMove(e: PointerEvent) {
+      const el = orbitGridRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const rawX = (e.clientX - cx) / (window.innerWidth / 2);
+      const rawY = (e.clientY - cy) / (window.innerHeight / 2);
+      const maxAbs = Math.max(Math.abs(rawX), Math.abs(rawY), 0.01);
+      el.style.setProperty("--amb-light-x", String(Math.max(-1, Math.min(1, rawX / maxAbs))));
+      el.style.setProperty("--amb-light-y", String(Math.max(-1, Math.min(1, rawY / maxAbs))));
+    }
+    window.addEventListener("pointermove", onPointerMove);
+    return () => window.removeEventListener("pointermove", onPointerMove);
   }, []);
 
   /* Scroll button component ----------------------------------------------- */
@@ -331,13 +336,6 @@ export function App() {
           <div
             className="orbit-grid"
             ref={orbitGridRef}
-            onPointerMove={handleOrbitPointer}
-            onTouchMove={handleOrbitPointer}
-            style={{
-              "--amb-light-x": orbitLight.x,
-              "--amb-light-y": orbitLight.y,
-              touchAction: "none",
-            } as React.CSSProperties}
           >
             {Array.from({ length: ORBIT_COUNT }, (_, i) => (
                 <div
@@ -348,7 +346,7 @@ export function App() {
                   style={{
                     opacity: orbitView.visible ? 1 : 0,
                     transform: orbitView.visible ? "scale(1)" : "scale(0.5)",
-                    transition: `opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${i * 0.04}s, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${i * 0.04}s, box-shadow 0.3s ease`,
+                    transition: `opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${i * 0.04}s, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${i * 0.04}s`,
                   } as React.CSSProperties}
                 />
             ))}
