@@ -1,5 +1,16 @@
 # @ambientcss/components
 
+## 1.1.0
+
+### Minor Changes
+
+- ad9da82: fixing npm installation errors
+
+### Patch Changes
+
+- Updated dependencies [ad9da82]
+  - @ambientcss/css@1.1.1
+
 ## 1.0.2
 
 ### Patch Changes
