@@ -8,8 +8,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@ambientcss/components": "1.0.2",
-    "@ambientcss/css": "1.1.0",
+    "@ambientcss/components": "^1.1.0",
+    "@ambientcss/css": "^1.1.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
