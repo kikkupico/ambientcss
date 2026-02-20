@@ -1,5 +1,5 @@
 import { execFileSync, spawnSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { readFileSync, unlinkSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 
@@ -47,9 +47,24 @@ for (const pkg of packages) {
   }
 
   console.log(`Publishing ${pkg.name}@${localVersion} from ${pkg.dir}`);
-  runOrThrow(
-    "npm",
-    ["publish", "--access", "public", "--provenance"],
-    path.resolve(process.cwd(), pkg.dir)
-  );
+  const pkgDir = path.resolve(process.cwd(), pkg.dir);
+
+  // Use pnpm pack so workspace:* deps are replaced with real versions,
+  // then publish the resulting tarball with npm for provenance support.
+  const packOutput = execFileSync("pnpm", ["pack", "--pack-destination", pkgDir], {
+    cwd: pkgDir,
+    encoding: "utf8",
+    env: process.env,
+  }).trim();
+  const tarball = packOutput.split("\n").at(-1).trim();
+
+  try {
+    runOrThrow(
+      "npm",
+      ["publish", tarball, "--access", "public", "--provenance"],
+      pkgDir
+    );
+  } finally {
+    unlinkSync(tarball);
+  }
 }

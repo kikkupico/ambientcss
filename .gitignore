@@ -6,7 +6,7 @@ packages/*/dist
 .DS_Store
 /examples/demo/.vite/
 /examples/demo/dist/
-/examples/demo/dist/
+/examples/react-ambientcss/dist/
 /apps/docs/.docusaurus/
 /apps/docs/build/
 /.claude/
