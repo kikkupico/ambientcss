@@ -30,7 +30,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "scripts": {
     "build": "node ../../scripts/build-css.mjs src/ambient.css dist/ambient.css",
