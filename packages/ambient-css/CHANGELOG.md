@@ -1,5 +1,11 @@
 # @ambientcss/css
 
+## 1.1.0
+
+### Minor Changes
+
+- e0600a6: fixes the error with ambientcss package import
+
 ## 1.0.1
 
 ### Patch Changes
