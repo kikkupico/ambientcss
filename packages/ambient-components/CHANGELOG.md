@@ -1,5 +1,11 @@
 # @ambientcss/components
 
+## 1.1.1
+
+### Patch Changes
+
+- f12c295: sync publish script changes
+
 ## 1.1.0
 
 ### Minor Changes
