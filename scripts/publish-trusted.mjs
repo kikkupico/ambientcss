@@ -56,7 +56,7 @@ for (const pkg of packages) {
     encoding: "utf8",
     env: process.env,
   }).trim();
-  const tarball = packOutput.split("\n").at(-1).trim();
+  const tarball = path.resolve(pkgDir, packOutput.split("\n").at(-1).trim());
 
   try {
     runOrThrow(
