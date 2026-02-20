@@ -16,6 +16,7 @@
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
+  "style": "dist/ambient.css",
   "sideEffects": [
     "*.css"
   ],
