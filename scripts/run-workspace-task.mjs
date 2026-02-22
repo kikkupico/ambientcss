@@ -39,7 +39,7 @@ if (!workspaces) {
 
 for (const workspace of workspaces) {
   await new Promise((resolve, reject) => {
-    const child = spawn("npm", ["run", task], {
+    const child = spawn("pnpm", ["run", task], {
       cwd: path.resolve(process.cwd(), workspace),
       stdio: "inherit",
       env: process.env,
@@ -51,7 +51,7 @@ for (const workspace of workspaces) {
         resolve();
         return;
       }
-      reject(new Error(`${workspace}: npm run ${task} failed with exit code ${code}`));
+      reject(new Error(`${workspace}: pnpm run ${task} failed with exit code ${code}`));
     });
   });
 }
