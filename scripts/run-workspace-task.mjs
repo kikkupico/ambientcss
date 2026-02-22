@@ -14,20 +14,20 @@ const WORKSPACES_BY_TASK = {
   build: [
     "packages/ambient-css",
     "packages/ambient-components",
-    "examples/demo",
+    "apps/demo",
     "apps/docs",
   ],
   clean: [
     "packages/ambient-css",
     "packages/ambient-components",
-    "examples/demo",
+    "apps/demo",
     "apps/docs",
   ],
   // docs:build is the docs quality gate; docs tsc is noisy with framework-level aliases.
   typecheck: [
     "packages/ambient-css",
     "packages/ambient-components",
-    "examples/demo",
+    "apps/demo",
   ],
 };
 
@@ -42,7 +42,7 @@ for (const workspace of workspaces) {
     const child = spawn("pnpm", ["run", task], {
       cwd: path.resolve(process.cwd(), workspace),
       stdio: "inherit",
-      shell: true,
+      env: process.env,
     });
 
     child.on("error", reject);
