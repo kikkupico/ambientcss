@@ -4,9 +4,10 @@ node_modules
 packages/*/dist
 
 .DS_Store
-/examples/demo/.vite/
-/examples/demo/dist/
-/examples/react-ambientcss/dist/
+/apps/demo/.vite/
+/apps/demo/dist/
+/examples/*/dist/
+/examples/*/.vite/
 /apps/docs/.docusaurus/
 /apps/docs/build/
 /.claude/

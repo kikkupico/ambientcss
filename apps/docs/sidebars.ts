@@ -40,6 +40,18 @@ const sidebars: SidebarsConfig = {
         "ambient-components/slider-fader",
         "ambient-components/examples"
       ]
+    },
+    {
+      type: "category",
+      label: "Examples",
+      items: [
+        "examples/css-basic",
+        "examples/css-tailwind",
+        "examples/css-purecss",
+        "examples/react-basic",
+        "examples/react-tailwind",
+        "examples/react-bootstrap"
+      ]
     }
   ]
 };

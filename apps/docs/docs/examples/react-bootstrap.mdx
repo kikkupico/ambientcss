@@ -1,0 +1,72 @@
+---
+title: React – Bootstrap
+---
+
+import { SandpackExample } from "@site/src/components/SandpackExample";
+import { StackBlitzButton } from "@site/src/components/StackBlitzButton";
+
+Integrating AmbientCSS components into a Bootstrap layout.
+
+<StackBlitzButton examplePath="react-bootstrap" />
+
+## Live editor
+
+<SandpackExample
+  template="react-ts"
+  dependencies={{
+    "@ambientcss/components": "latest",
+    "react-bootstrap": "^2.10.0",
+    "bootstrap": "^5.3.0",
+  }}
+  externalResources={[
+    "https://cdn.jsdelivr.net/npm/bootstrap@5/dist/css/bootstrap.min.css",
+    "https://unpkg.com/@ambientcss/css/dist/ambient.css",
+    "https://unpkg.com/@ambientcss/components/dist/styles.css",
+  ]}
+  files={{
+    "/index.tsx": `import React from "react";
+import { createRoot } from "react-dom/client";
+import App from "./App";
+
+createRoot(document.getElementById("root")!).render(<App />);`,
+    "/App.tsx": `import React, { useState } from "react";
+import { Container, Row, Col, Stack } from "react-bootstrap";
+import {
+  AmbientProvider,
+  AmbientPanel,
+  AmbientButton,
+  AmbientKnob,
+  AmbientSwitch,
+} from "@ambientcss/components";
+
+export default function App() {
+  const [gain, setGain] = useState(50);
+  const [armed, setArmed] = useState(false);
+
+  return (
+    <div style={{ background: "#e8edf2", minHeight: "100vh" }}>
+      <Container className="py-5">
+        <Row className="justify-content-center">
+          <Col xs="auto">
+            <AmbientProvider theme={{ lightHue: 220, lightSaturation: 14, lumeHue: 190, keyLight: 0.9, fillLight: 0.72 }}>
+              <AmbientPanel style={{ padding: 24 }}>
+                <Stack gap={3} className="align-items-center">
+                  <AmbientButton>Play</AmbientButton>
+                  <AmbientSwitch label="Arm" checked={armed} onCheckedChange={setArmed} led="#ef4444" />
+                  <AmbientKnob label="Gain" value={gain} onChange={setGain} />
+                </Stack>
+              </AmbientPanel>
+            </AmbientProvider>
+          </Col>
+        </Row>
+      </Container>
+    </div>
+  );
+}`,
+  }}
+/>
+
+## Key points
+
+- Load Bootstrap CSS first.
+- AmbientCSS components work inside Bootstrap layout containers (`Container`, `Row`, `Col`).

@@ -1,0 +1,45 @@
+---
+title: CSS – Tailwind
+---
+
+import { SandpackExample } from "@site/src/components/SandpackExample";
+import { StackBlitzButton } from "@site/src/components/StackBlitzButton";
+
+Using AmbientCSS utility classes alongside Tailwind CSS utility classes.
+
+<StackBlitzButton examplePath="css-tailwind" />
+
+## Live editor
+
+<SandpackExample
+  template="static"
+  files={{
+    "/index.html": `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AmbientCSS + Tailwind</title>
+  <link rel="stylesheet" href="https://unpkg.com/@ambientcss/css/dist/ambient.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-300 flex items-center justify-center min-h-screen">
+  <div style="--amb-light-x:-1; --amb-light-y:-1; --amb-key-light-intensity:0.9; --amb-fill-light-intensity:0.72; --amb-light-hue:220; --amb-light-saturation:14%; --amb-highlight-color:#7dd3fc; --amb-lume-hue:190;">
+    <div class="ambient amb-surface amb-chamfer amb-elevation-2 amb-rounded-lg flex gap-4 items-center p-6">
+      <button class="ambient amb-surface-convex amb-chamfer amb-elevation-1 amb-rounded-md px-5 py-2.5 text-sm font-semibold text-slate-800">
+        Play
+      </button>
+      <button class="ambient amb-surface-concave amb-fillet amb-elevation-1 amb-rounded-md px-5 py-2.5 text-sm font-semibold text-slate-800">
+        Record
+      </button>
+    </div>
+  </div>
+</body>
+</html>`,
+  }}
+/>
+
+## Key points
+
+- Tailwind CDN script for quick prototyping.
+- AmbientCSS classes (`amb-*`) coexist with Tailwind classes (`flex`, `p-6`, etc.).

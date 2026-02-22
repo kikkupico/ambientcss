@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AmbientCSS + PureCSS</title>
+  <link rel="stylesheet" href="https://unpkg.com/purecss@3/build/pure-min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@ambientcss/css/dist/ambient.css" />
+  <style>
+    body { background: #e8edf2; padding: 40px; font-family: sans-serif; }
+    .wrapper {
+      --amb-light-x: -1; --amb-light-y: -1;
+      --amb-key-light-intensity: 0.9; --amb-fill-light-intensity: 0.72;
+      --amb-light-hue: 220; --amb-light-saturation: 14%;
+      --amb-highlight-color: #7dd3fc; --amb-lume-hue: 190;
+    }
+    .panel { padding: 24px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .amb-btn { padding: 10px 20px; font-size: 0.9rem; color: #1e293b; border: 0; cursor: pointer; background: transparent; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="pure-g">
+      <div class="pure-u-1 pure-u-md-1-2">
+        <div class="ambient amb-surface amb-chamfer amb-elevation-2 amb-rounded-lg panel">
+          <button class="pure-button ambient amb-surface-convex amb-chamfer amb-elevation-1 amb-rounded-md amb-btn">Play</button>
+          <button class="pure-button ambient amb-surface-convex amb-chamfer amb-elevation-1 amb-rounded-md amb-btn">Stop</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
