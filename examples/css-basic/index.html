@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AmbientCSS – Basic</title>
+  <link rel="stylesheet" href="https://unpkg.com/@ambientcss/css/dist/ambient.css" />
+  <style>
+    body {
+      background: #e8edf2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      font-family: sans-serif;
+    }
+    .wrapper {
+      --amb-light-x: -1; --amb-light-y: -1;
+      --amb-key-light-intensity: 0.9; --amb-fill-light-intensity: 0.72;
+      --amb-light-hue: 220; --amb-light-saturation: 14%;
+      --amb-highlight-color: #7dd3fc; --amb-lume-hue: 190;
+    }
+    .panel { padding: 24px; display: flex; gap: 16px; align-items: center; }
+    button {
+      padding: 10px 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #1e293b;
+      border: 0;
+      cursor: pointer;
+      background: transparent;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="ambient amb-surface amb-chamfer amb-elevation-2 amb-rounded-lg panel">
+      <button class="ambient amb-surface-convex amb-chamfer amb-elevation-1 amb-rounded-md">Play</button>
+      <button class="ambient amb-surface-convex amb-chamfer amb-elevation-1 amb-rounded-md">Stop</button>
+      <button class="ambient amb-surface-concave amb-fillet amb-elevation-1 amb-rounded-md">Record</button>
+    </div>
+  </div>
+</body>
+</html>

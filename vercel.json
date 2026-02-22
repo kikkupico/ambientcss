@@ -3,5 +3,5 @@
   "framework": "vite",
   "installCommand": "pnpm install --no-frozen-lockfile",
   "buildCommand": "pnpm --filter @ambientcss/css build && pnpm --filter @ambientcss/components build && pnpm --filter demo build",
-  "outputDirectory": "examples/demo/dist"
+  "outputDirectory": "apps/demo/dist"
 }

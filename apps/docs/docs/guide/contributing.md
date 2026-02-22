@@ -12,8 +12,9 @@ This page documents how this repo is built, tested, deployed, and released.
 - Language/tooling: TypeScript, Node.js
 - CSS package build: `lightningcss`
 - React package build: `tsup`
-- Demo app: React + Vite (`examples/demo`)
+- Demo app: React + Vite (`apps/demo`)
 - Docs site: Docusaurus (`apps/docs`)
+- Examples: Standalone starters (`examples/*`)
 - CI/CD: GitHub Actions
 - Versioning/releases: Changesets + npm publish
 
@@ -21,8 +22,9 @@ This page documents how this repo is built, tested, deployed, and released.
 
 - `packages/ambient-css`: `@ambientcss/css`
 - `packages/ambient-components`: `@ambientcss/components`
-- `examples/demo`: demo application
+- `apps/demo`: demo application
 - `apps/docs`: documentation site
+- `examples/*`: standalone example projects
 - `scripts`: workspace build/typecheck helpers
 - `.github/workflows`: deployment and release workflows
 

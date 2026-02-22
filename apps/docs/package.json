@@ -11,6 +11,7 @@
   "dependencies": {
     "@ambientcss/components": "workspace:*",
     "@ambientcss/css": "workspace:*",
+    "@codesandbox/sandpack-react": "^2.18.0",
     "@docusaurus/core": "^3.9.2",
     "@docusaurus/preset-classic": "^3.9.2",
     "@docusaurus/theme-mermaid": "^3.9.2",

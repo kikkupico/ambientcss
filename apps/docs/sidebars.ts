@@ -15,14 +15,25 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: "category",
+      label: "Examples",
+      items: [
+        "examples/css-basic",
+        "examples/css-tailwind",
+        "examples/css-purecss",
+        "examples/react-basic",
+        "examples/react-tailwind",
+        "examples/react-bootstrap"
+      ]
+    },
+    {
+      type: "category",
       label: "@ambientcss/css",
       items: [
         "ambient-css/overview",
         "ambient-css/install",
         "ambient-css/usage",
         "ambient-css/global-settings",
-        "ambient-css/classes",
-        "ambient-css/recipes"
+        "ambient-css/classes"
       ]
     },
     {

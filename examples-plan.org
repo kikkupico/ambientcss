@@ -1,0 +1,705 @@
+#+TITLE: AmbientCSS Interactive Examples — Implementation Plan
+#+DATE: 2026-02-22
+
+* Overview
+
+Add an "Examples" section to the AmbientCSS Docusaurus docs with two tiers per
+scenario:
+
+1. *Inline Sandpack sandbox* — users edit and see results without leaving the page
+2. *"Open in StackBlitz" button* — opens a full standalone starter project from
+   the repo
+
+** Example Scenarios
+
+| ID  | Title             | CSS Framework | JS/React |
+|-----+-------------------+---------------+----------|
+| 1.1 | CSS – Basic       | none extra    | none     |
+| 1.2 | CSS – Tailwind    | Tailwind      | none     |
+| 1.3 | CSS – PureCSS     | PureCSS 3     | none     |
+| 2.1 | React – Basic     | none extra    | React 19 |
+| 2.2 | React – Tailwind  | Tailwind      | React 19 |
+| 2.3 | React – Bootstrap | Bootstrap 5   | React 19 |
+
+** Repo Context (read before touching any file)
+
+- Monorepo root: ~kikkupico/ambientcss~, package manager: ~pnpm~
+- Docs framework: *Docusaurus 3.x* at ~apps/docs/~
+- Doc pages use ~.md~ extension with inline JSX imports (MDX mode)
+- Published npm packages (both at v1.1.1):
+  - ~@ambientcss/css~ — CSS only, CDN-ready
+  - ~@ambientcss/components~ — React components
+- CDN URLs (confirmed live):
+  - ~https://unpkg.com/@ambientcss/css/dist/ambient.css~
+  - ~https://unpkg.com/@ambientcss/components/dist/styles.css~
+
+** Bright Theme CSS Variables
+
+Every example must apply this variable block to a wrapper element so ambient
+effects render correctly against a light background:
+
+#+begin_src text
+--amb-light-x: -1
+--amb-light-y: -1
+--amb-key-light-intensity: 0.9
+--amb-fill-light-intensity: 0.72
+--amb-light-hue: 220
+--amb-light-saturation: 14%
+--amb-highlight-color: #7dd3fc
+--amb-lume-hue: 190
+#+end_src
+
+In HTML: set as inline style on the wrapper ~<div>~.
+In React: pass as ~theme~ prop to ~<AmbientProvider>~.
+
+* Phase 0 — Move demo to apps/demo
+
+The ~examples/demo~ app is a deployed Vercel app that uses ~workspace:*~ package
+resolution. It is architecturally different from the user-facing starters that
+will live in ~examples/~. Move it to ~apps/demo~ before adding the new starters
+so that ~examples/~ becomes a uniform collection of standalone templates.
+
+** 0.1 Move the folder
+
+#+begin_src sh
+mv examples/demo apps/demo
+#+end_src
+
+** 0.2 Update pnpm-workspace.yaml
+
+Change:
+#+begin_src yaml
+  - "examples/demo"
+#+end_src
+
+To:
+#+begin_src yaml
+  - "apps/demo"
+#+end_src
+
+** 0.3 Update vercel.json
+
+Change ~buildCommand~ and ~outputDirectory~:
+
+#+begin_src json
+{
+  "buildCommand": "pnpm --filter @ambientcss/css build && pnpm --filter @ambientcss/components build && pnpm --filter demo build",
+  "outputDirectory": "apps/demo/dist"
+}
+#+end_src
+
+(The ~framework~ and ~installCommand~ fields are unchanged.)
+
+** 0.4 Verify
+
+Run from the repo root:
+
+#+begin_src sh
+pnpm install
+pnpm --filter demo build
+#+end_src
+
+Confirm ~apps/demo/dist~ is produced with no errors. The ~examples/~ folder
+should now contain only ~react-ambientcss~ (an existing standalone starter).
+
+* Phase 1 — Sandpack Infrastructure
+
+** 1.1 Install Sandpack in the docs app
+
+File to edit: ~apps/docs/package.json~
+
+Add to ~"dependencies"~:
+
+#+begin_src json
+"@codesandbox/sandpack-react": "^2.18.0"
+#+end_src
+
+Then run from the monorepo root:
+
+#+begin_src sh
+pnpm install
+#+end_src
+
+** 1.2 Create the SandpackExample component
+
+Create file: ~apps/docs/src/components/SandpackExample.tsx~
+
+#+begin_src tsx
+import React from "react";
+import {
+  SandpackProvider,
+  SandpackLayout,
+  SandpackCodeEditor,
+  SandpackPreview,
+} from "@codesandbox/sandpack-react";
+import { sandpackDark } from "@codesandbox/sandpack-react/themes";
+
+type SandpackExampleProps = {
+  /** "static" for CSS-only HTML examples, "react-ts" for React examples */
+  template?: "static" | "react-ts";
+  /** File map passed to Sandpack. Keys are absolute paths, e.g. "/index.html" */
+  files: Record<string, string>;
+  /** Extra npm packages. For React examples include @ambientcss/components here. */
+  dependencies?: Record<string, string>;
+  /**
+   * CDN URLs injected into the preview iframe as <link> or <script> tags.
+   * URLs ending in .css become <link rel="stylesheet">.
+   * Other URLs (including extension-less CDN scripts) become <script>.
+   */
+  externalResources?: string[];
+  /** Height in px applied to both the editor and the preview pane. Default 320 */
+  previewHeight?: number;
+};
+
+export function SandpackExample({
+  template = "react-ts",
+  files,
+  dependencies = {},
+  externalResources = [],
+  previewHeight = 320,
+}: SandpackExampleProps) {
+  return (
+    <SandpackProvider
+      template={template}
+      files={files}
+      customSetup={{ dependencies }}
+      options={{ externalResources }}
+      theme={sandpackDark}
+    >
+      <SandpackLayout>
+        <SandpackCodeEditor style={{ height: previewHeight }} showLineNumbers />
+        <SandpackPreview style={{ height: previewHeight }} showNavigator={false} />
+      </SandpackLayout>
+    </SandpackProvider>
+  );
+}
+#+end_src
+
+** 1.3 Create the StackBlitzButton component
+
+Create file: ~apps/docs/src/components/StackBlitzButton.tsx~
+
+#+begin_src tsx
+import React from "react";
+
+type Props = {
+  /** Folder name inside examples/, e.g. "css-basic" */
+  examplePath: string;
+};
+
+export function StackBlitzButton({ examplePath }: Props) {
+  const url = `https://stackblitz.com/github/kikkupico/ambientcss/tree/master/examples/${examplePath}`;
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 6,
+        marginBottom: 20,
+        padding: "8px 16px",
+        borderRadius: 8,
+        background: "#1389FD",
+        color: "#fff",
+        fontWeight: 600,
+        fontSize: "0.875rem",
+        textDecoration: "none",
+      }}
+    >
+      Open in StackBlitz ↗
+    </a>
+  );
+}
+#+end_src
+
+* Phase 2 — Standalone Example Starters
+
+Create one folder per example under ~examples/~. These are opened by the
+StackBlitz buttons and are also useful as local clones. Do *not* add Vite-based
+starters to ~pnpm-workspace.yaml~ — they must remain self-contained.
+
+** 2.1 examples/css-basic/
+
+HTML-only, no package.json.
+
+*** examples/css-basic/index.html
+
+#+begin_src html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AmbientCSS – Basic</title>
+  <link rel="stylesheet" href="https://unpkg.com/@ambientcss/css/dist/ambient.css" />
+  <style>
+    body {
+      background: #e8edf2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      font-family: sans-serif;
+    }
+    .wrapper {
+      --amb-light-x: -1; --amb-light-y: -1;
+      --amb-key-light-intensity: 0.9; --amb-fill-light-intensity: 0.72;
+      --amb-light-hue: 220; --amb-light-saturation: 14%;
+      --amb-highlight-color: #7dd3fc; --amb-lume-hue: 190;
+    }
+    .panel { padding: 24px; display: flex; gap: 16px; align-items: center; }
+    button {
+      padding: 10px 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #1e293b;
+      border: 0;
+      cursor: pointer;
+      background: transparent;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="ambient amb-surface amb-chamfer amb-elevation-2 amb-rounded-lg panel">
+      <button class="ambient amb-surface-convex amb-chamfer amb-elevation-1 amb-rounded-md">Play</button>
+      <button class="ambient amb-surface-convex amb-chamfer amb-elevation-1 amb-rounded-md">Stop</button>
+      <button class="ambient amb-surface-concave amb-fillet amb-elevation-1 amb-rounded-md">Record</button>
+    </div>
+  </div>
+</body>
+</html>
+#+end_src
+
+*** examples/css-basic/.stackblitzrc
+
+#+begin_src json
+{ "startCommand": "" }
+#+end_src
+
+** 2.2 examples/css-tailwind/
+
+HTML-only. Tailwind Play CDN is loaded as a ~<script>~ tag — no build step needed.
+
+*** examples/css-tailwind/index.html
+
+#+begin_src html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AmbientCSS + Tailwind</title>
+  <link rel="stylesheet" href="https://unpkg.com/@ambientcss/css/dist/ambient.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-300 flex items-center justify-center min-h-screen">
+  <div style="--amb-light-x:-1; --amb-light-y:-1; --amb-key-light-intensity:0.9; --amb-fill-light-intensity:0.72; --amb-light-hue:220; --amb-light-saturation:14%; --amb-highlight-color:#7dd3fc; --amb-lume-hue:190;">
+    <div class="ambient amb-surface amb-chamfer amb-elevation-2 amb-rounded-lg flex gap-4 items-center p-6">
+      <button class="ambient amb-surface-convex amb-chamfer amb-elevation-1 amb-rounded-md px-5 py-2.5 text-sm font-semibold text-slate-800">
+        Play
+      </button>
+      <button class="ambient amb-surface-concave amb-fillet amb-elevation-1 amb-rounded-md px-5 py-2.5 text-sm font-semibold text-slate-800">
+        Record
+      </button>
+    </div>
+  </div>
+</body>
+</html>
+#+end_src
+
+*** examples/css-tailwind/.stackblitzrc
+
+#+begin_src json
+{ "startCommand": "" }
+#+end_src
+
+** 2.3 examples/css-purecss/
+
+PureCSS provides the layout reset and grid; AmbientCSS handles visual styling.
+Load PureCSS *before* AmbientCSS so AmbientCSS properties take precedence.
+
+*** examples/css-purecss/index.html
+
+#+begin_src html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AmbientCSS + PureCSS</title>
+  <link rel="stylesheet" href="https://unpkg.com/purecss@3/build/pure-min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@ambientcss/css/dist/ambient.css" />
+  <style>
+    body { background: #e8edf2; padding: 40px; font-family: sans-serif; }
+    .wrapper {
+      --amb-light-x: -1; --amb-light-y: -1;
+      --amb-key-light-intensity: 0.9; --amb-fill-light-intensity: 0.72;
+      --amb-light-hue: 220; --amb-light-saturation: 14%;
+      --amb-highlight-color: #7dd3fc; --amb-lume-hue: 190;
+    }
+    .panel { padding: 24px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .amb-btn { padding: 10px 20px; font-size: 0.9rem; color: #1e293b; border: 0; cursor: pointer; background: transparent; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="pure-g">
+      <div class="pure-u-1 pure-u-md-1-2">
+        <div class="ambient amb-surface amb-chamfer amb-elevation-2 amb-rounded-lg panel">
+          <button class="pure-button ambient amb-surface-convex amb-chamfer amb-elevation-1 amb-rounded-md amb-btn">Play</button>
+          <button class="pure-button ambient amb-surface-convex amb-chamfer amb-elevation-1 amb-rounded-md amb-btn">Stop</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+#+end_src
+
+*** examples/css-purecss/.stackblitzrc
+
+#+begin_src json
+{ "startCommand": "" }
+#+end_src
+
+** 2.4 examples/react-basic/
+
+Minimal Vite + React + TypeScript. Copy ~vite.config.ts~ and ~tsconfig.json~
+verbatim from ~examples/demo/~ — they are identical.
+
+*** examples/react-basic/package.json
+
+#+begin_src json
+{
+  "name": "ambientcss-react-basic",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@ambientcss/components": "latest",
+    "@ambientcss/css": "latest",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.8.0",
+    "vite": "^6.1.0"
+  }
+}
+#+end_src
+
+*** examples/react-basic/index.html
+
+Standard Vite HTML boilerplate. Root div id ~"root"~, script pointing to
+~src/main.tsx~.
+
+*** examples/react-basic/src/main.tsx
+
+#+begin_src tsx
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "@ambientcss/css/ambient.css";
+import "@ambientcss/components/styles.css";
+import App from "./App";
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+#+end_src
+
+*** examples/react-basic/src/App.tsx
+
+#+begin_src tsx
+import React, { useState } from "react";
+import {
+  AmbientProvider,
+  AmbientPanel,
+  AmbientButton,
+  AmbientKnob,
+  AmbientSwitch,
+} from "@ambientcss/components";
+
+export default function App() {
+  const [gain, setGain] = useState(50);
+  const [armed, setArmed] = useState(false);
+
+  return (
+    <div style={{ background: "#e8edf2", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <AmbientProvider theme={{ lightHue: 220, lightSaturation: 14, lumeHue: 190, keyLight: 0.9, fillLight: 0.72 }}>
+        <AmbientPanel style={{ display: "flex", flexDirection: "column", gap: 16, padding: 24, alignItems: "center" }}>
+          <AmbientButton>Play</AmbientButton>
+          <AmbientSwitch label="Arm" checked={armed} onCheckedChange={setArmed} led="#ef4444" />
+          <AmbientKnob label="Gain" value={gain} onChange={setGain} />
+        </AmbientPanel>
+      </AmbientProvider>
+    </div>
+  );
+}
+#+end_src
+
+** 2.5 examples/react-tailwind/
+
+Extends react-basic with Tailwind CSS (PostCSS, not Play CDN, for proper
+TypeScript support in the Vite build).
+
+*** Additional package.json deps
+
+Add to ~dependencies~:
+#+begin_src json
+"tailwindcss": "^3"
+#+end_src
+
+Add to ~devDependencies~:
+#+begin_src json
+"autoprefixer": "^10",
+"postcss": "^8"
+#+end_src
+
+*** examples/react-tailwind/tailwind.config.js
+
+#+begin_src js
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ["./index.html", "./src/**/*.{ts,tsx}"],
+  theme: { extend: {} },
+  plugins: [],
+};
+#+end_src
+
+*** examples/react-tailwind/postcss.config.js
+
+#+begin_src js
+export default {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+};
+#+end_src
+
+*** examples/react-tailwind/src/index.css
+
+#+begin_src css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+#+end_src
+
+*** examples/react-tailwind/src/main.tsx
+
+Import order matters — ambient CSS first, then Tailwind:
+
+#+begin_src tsx
+import "@ambientcss/css/ambient.css";
+import "@ambientcss/components/styles.css";
+import "./index.css";
+#+end_src
+
+*** examples/react-tailwind/src/App.tsx
+
+Same AmbientCSS components as react-basic, but use Tailwind utility classes for
+the outer wrapper/layout instead of inline styles:
+
+#+begin_src tsx
+<div className="bg-slate-300 min-h-screen flex items-center justify-center">
+  <AmbientProvider theme={...}>
+    <AmbientPanel className="flex flex-col gap-4 p-6 items-center">
+      ...
+    </AmbientPanel>
+  </AmbientProvider>
+</div>
+#+end_src
+
+** 2.6 examples/react-bootstrap/
+
+Extends react-basic with Bootstrap 5 for layout and react-bootstrap components.
+
+*** Additional package.json deps
+
+Add to ~dependencies~:
+#+begin_src json
+"bootstrap": "^5",
+"react-bootstrap": "^2"
+#+end_src
+
+*** examples/react-bootstrap/src/main.tsx
+
+Import Bootstrap CSS *before* AmbientCSS so AmbientCSS can override Bootstrap
+reset properties cleanly:
+
+#+begin_src tsx
+import "bootstrap/dist/css/bootstrap.min.css";
+import "@ambientcss/css/ambient.css";
+import "@ambientcss/components/styles.css";
+#+end_src
+
+*** examples/react-bootstrap/src/App.tsx
+
+Use Bootstrap ~Container~, ~Row~, ~Col~, and ~Stack~ for layout. Place
+AmbientCSS components inside for interactive controls:
+
+#+begin_src tsx
+import React, { useState } from "react";
+import { Container, Row, Col, Stack } from "react-bootstrap";
+import {
+  AmbientProvider,
+  AmbientPanel,
+  AmbientButton,
+  AmbientKnob,
+  AmbientSwitch,
+} from "@ambientcss/components";
+
+export default function App() {
+  const [gain, setGain] = useState(50);
+  const [armed, setArmed] = useState(false);
+
+  return (
+    <div style={{ background: "#e8edf2", minHeight: "100vh" }}>
+      <Container className="py-5">
+        <Row className="justify-content-center">
+          <Col xs="auto">
+            <AmbientProvider theme={{ lightHue: 220, lightSaturation: 14, lumeHue: 190, keyLight: 0.9, fillLight: 0.72 }}>
+              <AmbientPanel style={{ padding: 24 }}>
+                <Stack gap={3} className="align-items-center">
+                  <AmbientButton>Play</AmbientButton>
+                  <AmbientSwitch label="Arm" checked={armed} onCheckedChange={setArmed} led="#ef4444" />
+                  <AmbientKnob label="Gain" value={gain} onChange={setGain} />
+                </Stack>
+              </AmbientPanel>
+            </AmbientProvider>
+          </Col>
+        </Row>
+      </Container>
+    </div>
+  );
+}
+#+end_src
+
+* Phase 3 — Documentation Pages
+
+** 3.1 Add "Examples" to the sidebar
+
+Edit ~apps/docs/sidebars.ts~. Append a new category *after* the
+~"@ambientcss/components"~ category:
+
+#+begin_src ts
+{
+  type: "category",
+  label: "Examples",
+  items: [
+    "examples/css-basic",
+    "examples/css-tailwind",
+    "examples/css-purecss",
+    "examples/react-basic",
+    "examples/react-tailwind",
+    "examples/react-bootstrap",
+  ],
+},
+#+end_src
+
+** 3.2 Standard page template
+
+Every example page follows this structure. Create the files in
+~apps/docs/docs/examples/~.
+
+#+begin_src markdown
+---
+title: <Page Title>
+---
+
+import { SandpackExample } from "@site/src/components/SandpackExample";
+import { StackBlitzButton } from "@site/src/components/StackBlitzButton";
+
+One-sentence description of what this example demonstrates.
+
+<StackBlitzButton examplePath="<folder-name>" />
+
+## Live editor
+
+<SandpackExample
+  template="<static|react-ts>"
+  files={{ ... }}
+  dependencies={{ ... }}
+  externalResources={[ ... ]}
+/>
+
+## Key points
+
+- What to notice / why this combination works
+#+end_src
+
+** 3.3 Sandpack config table
+
+| Page             | template  | externalResources                                                         | dependencies                               |
+|------------------+-----------+---------------------------------------------------------------------------+--------------------------------------------|
+| css-basic        | static    | unpkg ambient.css                                                         | —                                          |
+| css-tailwind     | static    | unpkg ambient.css (Tailwind via script tag inside the HTML)               | —                                          |
+| css-purecss      | static    | unpkg purecss, then unpkg ambient.css                                     | —                                          |
+| react-basic      | react-ts  | unpkg ambient.css, unpkg components/styles.css                            | @ambientcss/components: latest             |
+| react-tailwind   | react-ts  | unpkg ambient.css, unpkg components/styles.css, cdn.tailwindcss.com      | @ambientcss/components: latest             |
+| react-bootstrap  | react-ts  | unpkg ambient.css, unpkg components/styles.css, jsdelivr bootstrap.min.css | @ambientcss/components: latest, react-bootstrap: ^2 |
+
+Notes:
+- For ~static~ template: embed CDN links/scripts directly in ~/index.html~ ~<head>~;
+  do not use ~externalResources~.
+- For ~react-ts~ template: pass CSS CDN URLs in ~externalResources~. Sandpack
+  injects ~.css~ URLs as ~<link rel="stylesheet">~ and extension-less URLs
+  (like ~cdn.tailwindcss.com~) as ~<script>~.
+- Recommended bootstrap CDN URL:
+  ~https://cdn.jsdelivr.net/npm/bootstrap@5/dist/css/bootstrap.min.css~
+
+** 3.4 Inline file content for each Sandpack page
+
+The ~files~ prop for ~react-ts~ examples must include at minimum:
+
+- ~/App.tsx~ — the component code the user sees and edits
+- ~/index.tsx~ — bootstraps React; imports ambient CSS from unpkg via a ~<style>~
+  injection trick OR rely on ~externalResources~ for CSS (preferred — simpler)
+
+Example ~/index.tsx~ for react-ts sandboxes (CSS via externalResources, not imports):
+
+#+begin_src tsx
+import React from "react";
+import { createRoot } from "react-dom/client";
+import App from "./App";
+
+createRoot(document.getElementById("root")!).render(<App />);
+#+end_src
+
+The App.tsx content should match the corresponding ~examples/<name>/src/App.tsx~
+so the inline sandbox and the StackBlitz starter stay in sync.
+
+* Phase 4 — pnpm Workspace Notes
+
+- Do *not* add ~examples/css-basic~, ~examples/css-tailwind~, or
+  ~examples/css-purecss~ to ~pnpm-workspace.yaml~ (they have no package.json).
+- Do *not* add ~examples/react-basic~, ~examples/react-tailwind~, or
+  ~examples/react-bootstrap~ to ~pnpm-workspace.yaml~. They use published npm
+  packages (~latest~) and must work independently for end users who clone them.
+- The existing ~examples/demo~ and ~examples/react-ambientcss~ entries in the
+  workspace (if any) are unaffected.
+
+* Acceptance Criteria
+
+- [ ] ~pnpm install~ succeeds with Sandpack added to ~apps/docs~
+- [ ] ~pnpm docs:dev~ starts without errors
+- [ ] All 6 example pages appear under "Examples" in the sidebar
+- [ ] Each Sandpack sandbox renders a working preview on load
+- [ ] Each Sandpack sandbox allows code editing and live-reloads the preview
+- [ ] Tailwind utility classes work in both Tailwind examples (class-based styling visible)
+- [ ] PureCSS grid/button styles are visible in the PureCSS example
+- [ ] Bootstrap layout is visible in the react-bootstrap example alongside AmbientCSS components
+- [ ] Each "Open in StackBlitz" link opens the correct folder in the repo
+- [ ] ~pnpm docs:build~ completes without TypeScript errors
