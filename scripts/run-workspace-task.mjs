@@ -42,7 +42,7 @@ for (const workspace of workspaces) {
     const child = spawn("pnpm", ["run", task], {
       cwd: path.resolve(process.cwd(), workspace),
       stdio: "inherit",
-      env: process.env,
+      shell: true,
     });
 
     child.on("error", reject);
