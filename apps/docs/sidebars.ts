@@ -21,8 +21,7 @@ const sidebars: SidebarsConfig = {
         "ambient-css/install",
         "ambient-css/usage",
         "ambient-css/global-settings",
-        "ambient-css/classes",
-        "ambient-css/recipes"
+        "ambient-css/classes"
       ]
     },
     {
