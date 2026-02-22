@@ -4,6 +4,8 @@
 
 [Live Demo](https://ambientcss.vercel.app/) &nbsp;&bull;&nbsp; [Documentation](https://kikkupico.github.io/ambientcss/) &nbsp;&bull;&nbsp; [npm](https://www.npmjs.com/package/@ambientcss/css)
 
+![Ambient CSS demo](./ambientcss.gif)
+
 ---
 
 ## Why?
