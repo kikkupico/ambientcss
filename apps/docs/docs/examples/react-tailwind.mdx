@@ -15,15 +15,16 @@ React components with Tailwind CSS for layout.
   template="react-ts"
   dependencies={{
     "@ambientcss/components": "latest",
+    "@ambientcss/css": "latest",
   }}
   externalResources={[
-    "https://cdn.jsdelivr.net/npm/@ambientcss/css/dist/ambient.css",
-    "https://cdn.jsdelivr.net/npm/@ambientcss/components/dist/styles.css",
     "https://cdn.tailwindcss.com",
   ]}
   files={{
     "/index.tsx": `import React from "react";
 import { createRoot } from "react-dom/client";
+import "@ambientcss/css/ambient.css";
+import "@ambientcss/components/styles.css";
 import App from "./App";
 
 createRoot(document.getElementById("root")!).render(<App />);`,
