@@ -2,7 +2,7 @@
 title: Demo App
 ---
 
-The demo application lives in `examples/demo` and is deployed at:
+The demo application lives in `apps/demo` and is deployed at:
 
 - https://ambientcss.vercel.app/
 
