@@ -246,6 +246,40 @@ body {
 }
 
 /* --------------------------------------------------------------------------
+   THICKNESS – static circles showcasing depth
+   -------------------------------------------------------------------------- */
+
+.thickness-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(24px, 4vw, 48px);
+  flex-wrap: wrap;
+}
+
+.thickness-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.thickness-item {
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.7s ease;
+}
+
+.thickness-item[data-visible="false"] {
+  opacity: 0;
+  transform: scale(0.7);
+}
+
+.thickness-item[data-visible="true"] {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* --------------------------------------------------------------------------
    SURFACE GALLERY – circles with distinct lighting
    -------------------------------------------------------------------------- */
 

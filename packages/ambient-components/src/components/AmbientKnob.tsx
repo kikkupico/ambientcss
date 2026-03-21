@@ -8,6 +8,7 @@ export type AmbientKnobProps = Omit<HTMLAttributes<HTMLDivElement>, "onChange"> 
   max?: number;
   step?: number;
   label?: string;
+  thickness?: 0 | 1 | 2;
   onChange?: (nextValue: number) => void;
 };
 
@@ -21,6 +22,7 @@ export function AmbientKnob({
   max = 100,
   step = 1,
   label,
+  thickness = 2,
   onChange,
   className,
   ...props
@@ -100,7 +102,10 @@ export function AmbientKnob({
     <div className={cn("ambx-stack", className)} {...props}>
       <div
         ref={knobRef}
-        className="ambient amb-knob amb-chamfer amb-elevation-2 amb-surface ambx-knob"
+        className={cn(
+          "ambient amb-knob amb-chamfer amb-elevation-2 amb-surface ambx-knob",
+          thickness > 0 && `amb-thickness-${thickness}`
+        )}
         role="slider"
         aria-label={label}
         aria-valuemin={min}

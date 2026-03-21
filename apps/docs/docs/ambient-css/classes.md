@@ -67,6 +67,19 @@ Elevation controls the depth of the element and the strength of its shadow.
 <div class="ambient amb-surface amb-chamfer amb-elevation-3">Elevation 3</div>
 ```
 
+## Thickness
+
+Thickness simulates the physical thickness of an object, generating "extrusion" sides that reach downward toward the surface, rather than just hovering above it like standard elevation.
+
+- `amb-thickness-1`: A thin physical layer (like a flat button).
+- `amb-thickness-2`: A thicker physical layer (like a tall knob).
+
+```html
+<div class="ambient amb-surface amb-chamfer amb-elevation-1">No Thickness</div>
+<div class="ambient amb-surface amb-chamfer amb-elevation-1 amb-thickness-1">Thickness 1</div>
+<div class="ambient amb-surface amb-chamfer amb-elevation-1 amb-thickness-2">Thickness 2</div>
+```
+
 ## Lighting Direction
 
 You can override the global light source for specific elements to simulate localized lighting or different orientations.

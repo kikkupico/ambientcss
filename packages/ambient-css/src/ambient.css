@@ -29,6 +29,12 @@
   initial-value: 0;
 }
 
+@property --amb-thickness {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
 :root {
   --amb-light-x: -1;
   --amb-light-y: -1;
@@ -94,6 +100,13 @@
 }
 
 /* --------------------------------------------------------------------------
+   THICKNESS LEVELS
+   -------------------------------------------------------------------------- */
+
+.amb-thickness-1 { --amb-thickness: 1; }
+.amb-thickness-2 { --amb-thickness: 2; }
+
+/* --------------------------------------------------------------------------
    ELEVATION LEVELS
    -------------------------------------------------------------------------- */
 
@@ -107,10 +120,11 @@
 
    Applies physically-based lighting via box-shadow:
    1. Drop shadow - offset by light direction, scaled by elevation
-   2. Chamfer highlight - inner lit edge (white on light side)
-   3. Chamfer shadow - inner dark edge (black on shadow side)
-   4. Fillet highlight - softer inner edge (light side)
-   5. Fillet shadow - softer inner edge (shadow side)
+   2. Thickness extrusion - multiple hard shadows simulating 3D side
+   3. Chamfer highlight - inner lit edge (white on light side)
+   4. Chamfer shadow - inner dark edge (black on shadow side)
+   5. Fillet highlight - softer inner edge (light side)
+   6. Fillet shadow - softer inner edge (shadow side)
    -------------------------------------------------------------------------- */
 
 .ambient {
@@ -120,9 +134,21 @@
         0%
         / calc((var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)))
       )
-      calc(var(--amb-light-x) * var(--amb-elevation) * -8px)
-      calc(var(--amb-light-y) * var(--amb-elevation) * -8px)
+      calc(var(--amb-light-x) * (var(--amb-elevation) * -8px + var(--amb-thickness) * -2px))
+      calc(var(--amb-light-y) * (var(--amb-elevation) * -8px + var(--amb-thickness) * -2px))
       calc(var(--amb-elevation) * 8px) calc(var(--amb-elevation) * -4px),
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 60%))
+      calc(var(--amb-light-x) * -1px * clamp(0, var(--amb-thickness), 1))
+      calc(var(--amb-light-y) * -1px * clamp(0, var(--amb-thickness), 1)) 0px 0px,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 50%))
+      calc(var(--amb-light-x) * -2px * clamp(0, var(--amb-thickness), 1))
+      calc(var(--amb-light-y) * -2px * clamp(0, var(--amb-thickness), 1)) 0px 0px,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 40%))
+      calc(var(--amb-light-x) * -3px * clamp(0, var(--amb-thickness) - 1, 1))
+      calc(var(--amb-light-y) * -3px * clamp(0, var(--amb-thickness) - 1, 1)) 0px 0px,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 30%))
+      calc(var(--amb-light-x) * -4px * clamp(0, var(--amb-thickness) - 1, 1))
+      calc(var(--amb-light-y) * -4px * clamp(0, var(--amb-thickness) - 1, 1)) 0px 0px,
     inset calc(var(--amb-light-x) * var(--amb-chamfer-width) * -1px)
       calc(var(--amb-light-y) * var(--amb-chamfer-width) * -1px) 0px 0px
       hsl(

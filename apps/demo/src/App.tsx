@@ -254,6 +254,7 @@ export function App() {
   /* InView hooks for each section ----------------------------------------- */
   const orbitView = useInView(0.2);
   const elevView = useInView(0.15);
+  const thickView = useInView(0.15);
   const surfView = useInView(0.2);
   const edgeView = useInView(0.2);
   const compView = useInView(0.1);
@@ -264,6 +265,7 @@ export function App() {
   const heroRef = useRef<HTMLElement>(null);
   const orbitSectionRef = useRef<HTMLElement>(null);
   const elevSectionRef = useRef<HTMLElement>(null);
+  const thickSectionRef = useRef<HTMLElement>(null);
   const surfSectionRef = useRef<HTMLElement>(null);
   const edgeSectionRef = useRef<HTMLElement>(null);
   const compSectionRef = useRef<HTMLElement>(null);
@@ -383,6 +385,28 @@ export function App() {
           </div>
         </div>
         <ScrollButton sectionRef={elevSectionRef} />
+      </section>
+
+      {/* ── 3.5 THICKNESS ───────────────────────────────────────────── */}
+      <section className="scene amb-surface" ref={thickSectionRef}>
+        <div className="scene-inner" ref={thickView.ref}>
+          <div className="scene-label">Thickness</div>
+          <div className="thickness-row">
+            {([0, 1, 2] as const).map((thick, i) => (
+              <div className="thickness-item" key={thick} data-visible={thickView.visible} style={{ transitionDelay: `${i * 0.1}s` }}>
+                <AmbientButton thickness={thick as 0 | 1 | 2}>Thickness {thick}</AmbientButton>
+              </div>
+            ))}
+          </div>
+          <div className="thickness-row" style={{ marginTop: 48 }}>
+            {([0, 1, 2] as const).map((thick, i) => (
+              <div className="thickness-item" key={thick} data-visible={thickView.visible} style={{ transitionDelay: `${i * 0.1}s` }}>
+                <AmbientKnob value={30 + thick * 20} thickness={thick as 0 | 1 | 2} label={`Thickness ${thick}`} />
+              </div>
+            ))}
+          </div>
+        </div>
+        <ScrollButton sectionRef={thickSectionRef} />
       </section>
 
       {/* ── 4. SURFACES ──────────────────────────────────────────────── */}
