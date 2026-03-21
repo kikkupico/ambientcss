@@ -131,64 +131,56 @@
   box-shadow: hsl(
         var(--amb-light-hue)
         var(--amb-light-saturation)
-        0%
-        / 100%
+        calc(var(--amb-key-light-intensity) * 100% * (1 - (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))))
       )
       calc(var(--amb-light-x) * -2px * clamp(0, var(--amb-thickness), 1))
       calc(var(--amb-light-y) * -2px * clamp(0, var(--amb-thickness), 1)) 0px 0px,
     hsl(
         var(--amb-light-hue)
         var(--amb-light-saturation)
-        0%
-        / 100%
+        calc(var(--amb-key-light-intensity) * 100% * (1 - (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))))
       )
       calc(var(--amb-light-x) * -4px * clamp(0, var(--amb-thickness), 1))
       calc(var(--amb-light-y) * -4px * clamp(0, var(--amb-thickness), 1)) 0px 0px,
     hsl(
         var(--amb-light-hue)
         var(--amb-light-saturation)
-        0%
-        / 100%
+        calc(var(--amb-key-light-intensity) * 100% * (1 - (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))))
       )
       calc(var(--amb-light-x) * -6px * clamp(0, var(--amb-thickness), 1))
       calc(var(--amb-light-y) * -6px * clamp(0, var(--amb-thickness), 1)) 0px 0px,
     hsl(
         var(--amb-light-hue)
         var(--amb-light-saturation)
-        0%
-        / 100%
+        calc(var(--amb-key-light-intensity) * 100% * (1 - (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))))
       )
       calc(var(--amb-light-x) * -8px * clamp(0, var(--amb-thickness), 1))
       calc(var(--amb-light-y) * -8px * clamp(0, var(--amb-thickness), 1)) 0px 0px,
     hsl(
         var(--amb-light-hue)
         var(--amb-light-saturation)
-        0%
-        / 100%
+        calc(var(--amb-key-light-intensity) * 100% * (1 - (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))))
       )
       calc(var(--amb-light-x) * -10px * clamp(0, var(--amb-thickness) - 1, 1))
       calc(var(--amb-light-y) * -10px * clamp(0, var(--amb-thickness) - 1, 1)) 0px 0px,
     hsl(
         var(--amb-light-hue)
         var(--amb-light-saturation)
-        0%
-        / 100%
+        calc(var(--amb-key-light-intensity) * 100% * (1 - (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))))
       )
       calc(var(--amb-light-x) * -12px * clamp(0, var(--amb-thickness) - 1, 1))
       calc(var(--amb-light-y) * -12px * clamp(0, var(--amb-thickness) - 1, 1)) 0px 0px,
     hsl(
         var(--amb-light-hue)
         var(--amb-light-saturation)
-        0%
-        / 100%
+        calc(var(--amb-key-light-intensity) * 100% * (1 - (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))))
       )
       calc(var(--amb-light-x) * -14px * clamp(0, var(--amb-thickness) - 1, 1))
       calc(var(--amb-light-y) * -14px * clamp(0, var(--amb-thickness) - 1, 1)) 0px 0px,
     hsl(
         var(--amb-light-hue)
         var(--amb-light-saturation)
-        0%
-        / 100%
+        calc(var(--amb-key-light-intensity) * 100% * (1 - (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))))
       )
       calc(var(--amb-light-x) * -16px * clamp(0, var(--amb-thickness) - 1, 1))
       calc(var(--amb-light-y) * -16px * clamp(0, var(--amb-thickness) - 1, 1)) 0px 0px,
