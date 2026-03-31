@@ -25,17 +25,20 @@ The default material will use the current surface logic.
 #+END_SRC
 
 *** Shiny
-Utilizes a gradient that aligns with the light direction (=--amb-light-x=, =--amb-light-y=).
+Refined to look flat yet highly reflective. Instead of a broad gradient, it uses a sharp specular highlight (sheen) and a slight brightness boost to differentiate it from matte.
 #+BEGIN_SRC css
 .amb-mat-shiny {
   --_shiny-angle: calc(atan2(var(--amb-light-y), var(--amb-light-x)) + 270deg);
+  /* A sharper, more localized highlight to avoid the convex look */
   background-image: linear-gradient(
     var(--_shiny-angle),
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0.5) 0%,
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0.05) 50%,
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% / 0.1) 100%
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0.6) 0%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 30%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 70%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% / 0.15) 100%
   );
-  background-blend-mode: soft-light;
+  background-blend-mode: screen;
+  filter: brightness(1.05) contrast(1.02);
 }
 #+END_SRC
 

@@ -199,11 +199,13 @@
   --_shiny-angle: calc(atan2(var(--amb-light-y), var(--amb-light-x)) + 270deg);
   background-image: linear-gradient(
     var(--_shiny-angle),
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0.5) 0%,
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0.05) 50%,
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% / 0.1) 100%
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0.6) 0%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 30%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 70%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% / 0.15) 100%
   );
-  background-blend-mode: soft-light;
+  background-blend-mode: screen;
+  filter: brightness(1.05) contrast(1.02);
 }
 
 .amb-mat-glass {
