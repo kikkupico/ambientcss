@@ -187,6 +187,36 @@
   );
 }
 
+/* --------------------------------------------------------------------------
+   MATERIALS
+   -------------------------------------------------------------------------- */
+
+.amb-mat-matte {
+  /* Default: no additional treatment */
+}
+
+.amb-mat-shiny {
+  --_shiny-angle: calc(atan2(var(--amb-light-y), var(--amb-light-x)) + 270deg);
+  background-image: linear-gradient(
+    var(--_shiny-angle),
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0.5) 0%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0.05) 50%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% / 0.1) 100%
+  );
+  background-blend-mode: soft-light;
+}
+
+.amb-mat-glass {
+  background-color: hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0.1);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border: 1px solid hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0.2);
+}
+
+/* --------------------------------------------------------------------------
+   SURFACE SHAPES (Concave/Convex)
+   -------------------------------------------------------------------------- */
+
 .amb-surface-concave {
   --_concave-y: clamp(-1, var(--amb-light-y), 1);
   --_concave-contrast: calc(

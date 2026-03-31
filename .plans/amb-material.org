@@ -1,0 +1,70 @@
+#+TITLE: Ambient Material Options (amb-mat)
+#+AUTHOR: Gemini CLI
+#+DATE: 2026-03-31
+
+* Goal
+Implement a new set of utility classes =amb-mat-*= to define the material properties of an element, affecting its background and texture while remaining consistent with the global ambient lighting model.
+
+* Requirements
+- Default: =amb-mat-matte=
+- Options:
+  - =amb-mat-matte=: Standard solid/flat skeuomorphic surface.
+  - =amb-mat-shiny=: Adds a light-reflective gradient.
+  - =amb-mat-glass=: Adds translucency and a background blur effect (frosted glass).
+
+* Proposed Implementation
+
+** CSS Definitions (packages/ambient-css/src/ambient.css)
+
+*** Matte (Default)
+The default material will use the current surface logic.
+#+BEGIN_SRC css
+.amb-mat-matte {
+  /* Default behavior, standard background-color */
+}
+#+END_SRC
+
+*** Shiny
+Utilizes a gradient that aligns with the light direction (=--amb-light-x=, =--amb-light-y=).
+#+BEGIN_SRC css
+.amb-mat-shiny {
+  --_shiny-angle: calc(atan2(var(--amb-light-y), var(--amb-light-x)) + 270deg);
+  background-image: linear-gradient(
+    var(--_shiny-angle),
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0.5) 0%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0.05) 50%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% / 0.1) 100%
+  );
+  background-blend-mode: soft-light;
+}
+#+END_SRC
+
+*** Glass
+Frosted glass effect using =backdrop-filter=.
+#+BEGIN_SRC css
+.amb-mat-glass {
+  background-color: hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0.1);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border: 1px solid hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0.2);
+}
+#+END_SRC
+
+** Component Integration (packages/ambient-components)
+- [X] Updated =AmbientButton= to support =material= prop.
+- [X] Updated =AmbientPanel= to support =material= prop.
+
+** Showcase & Documentation
+- [X] Updated the **Demo App** (=apps/demo=) to include a "Materials" section.
+- [X] Updated the **Documentation** (=apps/docs=):
+  - [X] Added "Materials" section to =apps/docs/docs/ambient-css/classes.md=.
+  - [X] Added "Material Variants" example to =apps/docs/docs/ambient-components/examples.md=.
+
+* Tasks
+1. [X] Research =atan2= compatibility or fallback for CSS gradients based on =--amb-light-x/y=.
+2. [X] Add =amb-mat-*= classes to =packages/ambient-css/src/ambient.css=.
+3. [X] Update documentation in =apps/docs/docs/ambient-css/classes.md= with a new "Materials" section.
+4. [X] Add "Material Variants" code example to documentation.
+5. [X] Add a "Materials" gallery to the primary Demo App (=apps/demo/src/App.tsx=).
+6. [X] Add =material= prop to React components in =packages/ambient-components=.
+7. [X] Verify the build and visual appearance across all material types. (Build successful after pnpm install).
