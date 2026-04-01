@@ -8,6 +8,7 @@ export type AmbientSliderProps = Omit<HTMLAttributes<HTMLDivElement>, "onChange"
   max?: number;
   step?: number;
   label?: string;
+  material?: "matte" | "shiny" | "glass";
   onChange?: (nextValue: number) => void;
 };
 
@@ -21,6 +22,7 @@ export function AmbientSlider({
   max = 100,
   step = 1,
   label,
+  material,
   onChange,
   className,
   ...props
@@ -107,7 +109,7 @@ export function AmbientSlider({
         onKeyDown={onKeyDown}
       >
         <div
-          className="amb-slider-thumb ambient amb-fillet amb-elevation-1 amb-surface-concave-h ambx-slider-thumb"
+          className={cn("amb-slider-thumb ambient amb-fillet amb-elevation-1 ambx-slider-thumb", material !== "glass" && "amb-surface-concave-h", material && `amb-mat-${material}`)}
           style={{ left: `${percent}%` }}
         >
           <div className="amb-slider-grip">

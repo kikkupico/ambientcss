@@ -83,37 +83,6 @@ importers:
         specifier: ^5.8.2
         version: 5.9.3
 
-  examples/demo:
-    dependencies:
-      '@ambientcss/components':
-        specifier: workspace:*
-        version: link:../../packages/ambient-components
-      '@ambientcss/css':
-        specifier: workspace:*
-        version: link:../../packages/ambient-css
-      react:
-        specifier: ^19.0.0
-        version: 19.2.4
-      react-dom:
-        specifier: ^19.0.0
-        version: 19.2.4(react@19.2.4)
-    devDependencies:
-      '@types/react':
-        specifier: ^19.0.8
-        version: 19.2.13
-      '@types/react-dom':
-        specifier: ^19.0.3
-        version: 19.2.3(@types/react@19.2.13)
-      '@vitejs/plugin-react':
-        specifier: ^4.3.4
-        version: 4.7.0(vite@6.4.1(@types/node@25.2.3)(jiti@1.21.7)(lightningcss@1.31.1)(terser@5.46.0))
-      typescript:
-        specifier: ^5.8.2
-        version: 5.9.3
-      vite:
-        specifier: ^6.1.0
-        version: 6.4.1(@types/node@25.2.3)(jiti@1.21.7)(lightningcss@1.31.1)(terser@5.46.0)
-
   packages/ambient-components:
     dependencies:
       '@ambientcss/css':

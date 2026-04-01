@@ -8,6 +8,7 @@ export type AmbientFaderProps = Omit<HTMLAttributes<HTMLDivElement>, "onChange">
   max?: number;
   step?: number;
   label?: string;
+  material?: "matte" | "shiny" | "glass";
   onChange?: (nextValue: number) => void;
 };
 
@@ -21,6 +22,7 @@ export function AmbientFader({
   max = 100,
   step = 1,
   label,
+  material,
   onChange,
   className,
   ...props
@@ -107,7 +109,7 @@ export function AmbientFader({
         onKeyDown={onKeyDown}
       >
         <div
-          className="amb-fader-thumb ambient amb-fillet amb-elevation-1 amb-surface-concave ambx-fader-thumb"
+          className={cn("amb-fader-thumb ambient amb-fillet amb-elevation-1 ambx-fader-thumb", material !== "glass" && "amb-surface-concave", material && `amb-mat-${material}`)}
           style={{ top: `${100 - percent}%` }}
         >
           <div className="amb-fader-grip">

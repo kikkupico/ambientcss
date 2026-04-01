@@ -69,3 +69,32 @@ export function ThemeToggleShell() {
   );
 }
 ```
+
+## Material Variants
+
+You can specify different physical finishes for components using the `material` prop.
+
+```tsx
+import { AmbientPanel, AmbientButton } from "@ambientcss/components";
+
+export function MaterialsDemo() {
+  return (
+    <div style={{ display: "flex", gap: 16 }}>
+      {/* Default Matte finish */}
+      <AmbientPanel material="matte">
+        <AmbientButton material="matte">Matte Button</AmbientButton>
+      </AmbientPanel>
+
+      {/* Shiny finish with light-driven highlights */}
+      <AmbientPanel material="shiny">
+        <AmbientButton material="shiny">Shiny Button</AmbientButton>
+      </AmbientPanel>
+
+      {/* Modern Frosted Glass effect */}
+      <AmbientPanel material="glass">
+        <AmbientButton material="glass">Glass Button</AmbientButton>
+      </AmbientPanel>
+    </div>
+  );
+}
+```

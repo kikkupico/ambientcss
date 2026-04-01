@@ -32,6 +32,34 @@ Use `amb-surface-convex` for raised elements like buttons, knobs, or faders.
 <div class="ambient amb-surface-convex amb-elevation-1">Convex Surface</div>
 ```
 
+## Materials
+
+Materials define the physical finish and texture of an element, affecting its background and response to light.
+
+### Matte (Default)
+
+The standard skeuomorphic surface. Use `amb-mat-matte` (or no class) for a flat, non-reflective finish.
+
+```html
+<div class="ambient amb-surface amb-mat-matte amb-elevation-1">Matte Surface</div>
+```
+
+### Shiny
+
+Adds a light-reflective gradient that aligns with the global light source. Use `amb-mat-shiny` for polished plastic or metal finishes.
+
+```html
+<div class="ambient amb-surface amb-mat-shiny amb-elevation-2">Shiny Surface</div>
+```
+
+### Glass
+
+A frosted glass effect with translucency and background blur. Use `amb-mat-glass` for overlay panels or modern frosted interfaces.
+
+```html
+<div class="ambient amb-surface amb-mat-glass amb-elevation-3">Glass Surface</div>
+```
+
 ## Edge Treatments
 
 Edge treatments define how the edges of an element catch light.

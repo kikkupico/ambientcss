@@ -130,6 +130,7 @@ export function App() {
   /* Scroll-driven lighting ------------------------------------------------ */
   const ticking = useRef(false);
   const playgroundRef = useRef<HTMLDivElement>(null);
+  const MAT_FRAME: LightFrame = { lightX: 0, lightY: -1, keyLight: 0.97, fillLight: 0.15, lightHue: 215, lightSaturation: 28 };
   const handleScroll = useCallback(() => {
     if (ticking.current) return;
     ticking.current = true;
@@ -156,7 +157,18 @@ export function App() {
       const idx = Math.min(Math.floor(raw), frameCount - 1);
       const t = raw - idx;
 
-      const frame = lerpFrame(LIGHT_FRAMES[idx]!, LIGHT_FRAMES[idx + 1]!, t);
+      let frame = lerpFrame(LIGHT_FRAMES[idx]!, LIGHT_FRAMES[idx + 1]!, t);
+
+      // Blend toward dramatic materials lighting as the materials section centres in the viewport
+      const matEl = matSectionRef.current;
+      if (matEl) {
+        const rect = matEl.getBoundingClientRect();
+        const sectionMid = rect.top + rect.height / 2;
+        const distFromCenter = Math.abs(sectionMid - vh / 2);
+        const blend = Math.max(0, 1 - distFromCenter / (vh * 0.6));
+        if (blend > 0) frame = lerpFrame(frame, MAT_FRAME, blend);
+      }
+
       setTheme({
         lightX: frame.lightX,
         lightY: frame.lightY,
@@ -255,6 +267,7 @@ export function App() {
   const orbitView = useInView(0.2);
   const elevView = useInView(0.15);
   const surfView = useInView(0.2);
+  const matView = useInView(0.2);
   const edgeView = useInView(0.2);
   const compView = useInView(0.1);
   const playgroundView = useInView(0.1);
@@ -265,6 +278,7 @@ export function App() {
   const orbitSectionRef = useRef<HTMLElement>(null);
   const elevSectionRef = useRef<HTMLElement>(null);
   const surfSectionRef = useRef<HTMLElement>(null);
+  const matSectionRef = useRef<HTMLElement>(null);
   const edgeSectionRef = useRef<HTMLElement>(null);
   const compSectionRef = useRef<HTMLElement>(null);
   const playgroundSectionRef = useRef<HTMLElement>(null);
@@ -415,7 +429,50 @@ export function App() {
         <ScrollButton sectionRef={surfSectionRef} />
       </section>
 
-      {/* ── 5. EDGE TREATMENTS ───────────────────────────────────────── */}
+      {/* ── 5. MATERIALS ─────────────────────────────────────────────── */}
+      <section className="scene amb-surface" ref={matSectionRef}>
+        <div className="scene-inner" ref={matView.ref}>
+          <div className="scene-label">Materials</div>
+          <div className="surface-gallery">
+            {[
+              { mat: "matte" as const, label: "Matte" },
+              { mat: "shiny" as const, label: "Shiny" },
+              { mat: "glass" as const, label: "Glass" },
+            ].map(({ mat, label }, i) => (
+              <div className="surface-item" key={label}>
+                <AmbientPanel
+                  material={mat}
+                  className="surface-swatch"
+                  data-visible={matView.visible}
+                  style={{
+                    transitionDelay: `${i * 0.12}s`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  } as React.CSSProperties}
+                >
+                  {mat === "glass" && (
+                    <div
+                      style={{
+                        width: "40%",
+                        height: "40%",
+                        borderRadius: "50%",
+                        background: "var(--amb-highlight-color)",
+                        opacity: 0.6,
+                        filter: "blur(8px)",
+                      }}
+                    />
+                  )}
+                </AmbientPanel>
+                <span className="surface-label">{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <ScrollButton sectionRef={matSectionRef} />
+      </section>
+
+      {/* ── 6. EDGE TREATMENTS ───────────────────────────────────────── */}
       <section className="scene amb-surface" ref={edgeSectionRef}>
         <div className="scene-inner" ref={edgeView.ref}>
           <div className="scene-label">Edge Treatments</div>
@@ -503,6 +560,7 @@ export function App() {
                   value={Math.round((theme.keyLight ?? 0.9) * 100)}
                   onChange={(v) => setThemeProp("keyLight", v / 100)}
                   label="Key Light"
+                  material="shiny"
                 />
                 <AmbientFader
                   value={Math.round((theme.lightY ?? 0) * -100)}
@@ -510,11 +568,13 @@ export function App() {
                   max={100}
                   onChange={(v) => setThemeProp("lightY", v / -100)}
                   label="Light Y"
+                  material="glass"
                 />
                 <AmbientKnob
                   value={Math.round((theme.fillLight ?? 0.7) * 100)}
                   onChange={(v) => setThemeProp("fillLight", v / 100)}
                   label="Fill Light"
+                  material="shiny"
                 />
               </div>
               <div className="theme-controls-row">
@@ -524,6 +584,7 @@ export function App() {
                   max={100}
                   onChange={(v) => setThemeProp("lightX", v / 100)}
                   label="Light X"
+                  material="glass"
                 />
               </div>
               <div className="theme-controls-row">

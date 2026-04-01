@@ -45,6 +45,9 @@
   --amb-fillet-width: 1;
   --amb-highlight-color: coral;
   --amb-lume-hue: 17;
+  --amb-mat-specular: 0;
+  --amb-mat-roughness: 1;
+  --amb-mat-opacity: 1;
   --amb-lume: color-mix(
     in oklab,
     hsl(var(--amb-lume-hue) 100% 74%) calc(clamp(0, (0.5 - var(--amb-key-light-intensity)) / 0.2, 1) * 100%),
@@ -186,6 +189,98 @@
     calc(var(--amb-key-light-intensity) * 30%)
   );
 }
+
+/* --------------------------------------------------------------------------
+   MATERIALS
+   -------------------------------------------------------------------------- */
+
+.amb-mat-matte {
+  /* Default: no additional treatment */
+}
+
+.amb-mat-shiny {
+  --amb-mat-specular: 1;
+  --amb-mat-roughness: 0;
+  --amb-mat-opacity: 1;
+  --_shiny-angle: calc(atan2(var(--amb-light-y), var(--amb-light-x)) + 270deg);
+  --_spec-peak: var(--amb-key-light-intensity);
+  /* Cylindrical dome env: light-y determines which half of the dome is lit */
+  --_ly-up: max(0, calc(var(--amb-light-y) * -1));
+  --_ly-down: max(0, var(--amb-light-y));
+  --_env-top-l: calc(70% * var(--_ly-up) + 5% * var(--_ly-down));
+  --_env-bot-l: calc(5% * var(--_ly-up) + 70% * var(--_ly-down));
+  --_env-top-a: calc(var(--_ly-up) * var(--amb-key-light-intensity) + var(--_ly-down) * (1 - var(--amb-fill-light-intensity)));
+  --_env-bot-a: calc(var(--_ly-up) * (1 - var(--amb-fill-light-intensity)) + var(--_ly-down) * var(--amb-key-light-intensity));
+  background-image:
+    /* Specular highlight — narrow band at the lit edge, driven by key light */
+    linear-gradient(
+      var(--_shiny-angle),
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / var(--_spec-peak)) 0%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--_spec-peak) * 0.08)) 8%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 13%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 100%
+    ),
+    /* Cylindrical dome env reflection — horizon at 50%, tapers to neutral at both edges */
+    linear-gradient(
+      to bottom,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 50% / 0) 0%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) var(--_env-top-l) / var(--_env-top-a)) 50%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) var(--_env-bot-l) / var(--_env-bot-a)) 50%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 50% / 0) 100%
+    );
+  background-blend-mode: screen, overlay;
+  filter: brightness(1.04) contrast(1.01);
+}
+
+.amb-mat-glass {
+  --amb-mat-specular: 0.3;
+  --amb-mat-roughness: 0.2;
+  --amb-mat-opacity: 0;
+  /* Shiny base — same two-layer model as amb-mat-shiny */
+  --_shiny-angle: calc(atan2(var(--amb-light-y), var(--amb-light-x)) + 270deg);
+  --_spec-peak: var(--amb-key-light-intensity);
+  --_ly-up: max(0, calc(var(--amb-light-y) * -1));
+  --_ly-down: max(0, var(--amb-light-y));
+  --_env-top-l: calc(70% * var(--_ly-up) + 5% * var(--_ly-down));
+  --_env-bot-l: calc(5% * var(--_ly-up) + 70% * var(--_ly-down));
+  --_env-top-a: calc(var(--_ly-up) * var(--amb-key-light-intensity) + var(--_ly-down) * (1 - var(--amb-fill-light-intensity)));
+  --_env-bot-a: calc(var(--_ly-up) * (1 - var(--amb-fill-light-intensity)) + var(--_ly-down) * var(--amb-key-light-intensity));
+  background-image:
+    linear-gradient(
+      var(--_shiny-angle),
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / var(--_spec-peak)) 0%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--_spec-peak) * 0.08)) 8%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 13%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 50% / 0) 0%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) var(--_env-top-l) / var(--_env-top-a)) 50%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) var(--_env-bot-l) / var(--_env-bot-a)) 50%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 50% / 0) 100%
+    );
+  background-blend-mode: screen, overlay;
+  filter: brightness(1.04) contrast(1.01);
+  /* Glass layer — translucency + frosted blur, scaling with light */
+  --_glass-lightness: calc(var(--amb-key-light-intensity) * 100%);
+  --_glass-alpha: calc(0.05 + var(--amb-key-light-intensity) * 0.1);
+  --_glass-blur: calc(8px + var(--amb-key-light-intensity) * 8px);
+  background-color: hsl(
+    var(--amb-light-hue) var(--amb-light-saturation)
+    var(--_glass-lightness) / var(--_glass-alpha)
+  );
+  backdrop-filter: blur(var(--_glass-blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--_glass-blur)) saturate(160%);
+  border: 1px solid hsl(
+    var(--amb-light-hue) var(--amb-light-saturation) 100% /
+    calc(0.1 + var(--amb-key-light-intensity) * 0.15)
+  );
+}
+
+/* --------------------------------------------------------------------------
+   SURFACE SHAPES (Concave/Convex)
+   -------------------------------------------------------------------------- */
 
 .amb-surface-concave {
   --_concave-y: clamp(-1, var(--amb-light-y), 1);
