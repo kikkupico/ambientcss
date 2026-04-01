@@ -447,31 +447,39 @@ export function App() {
               { mat: "glass" as const, label: "Glass" },
             ].map(({ mat, label }, i) => (
               <div className="surface-item" key={label}>
-                <AmbientPanel
-                  material={mat}
-                  className="surface-swatch"
-                  data-visible={matView.visible}
-                  style={{
-                    transitionDelay: `${i * 0.12}s`,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  } as React.CSSProperties}
-                >
+                <div style={{ position: "relative" }}>
                   {mat === "glass" && (
                     <div
-                      className="pulsing-circle"
+                      className="moving-circle"
                       style={{
-                        width: "40%",
-                        height: "40%",
+                        position: "absolute",
+                        width: "90px",
+                        height: "90px",
                         borderRadius: "50%",
                         background: "var(--amb-highlight-color)",
-                        opacity: 0.6,
-                        filter: "blur(8px)",
+                        top: "50%",
+                        left: "50%",
+                        marginTop: "-45px",
+                        marginLeft: "-45px",
+                        zIndex: 0,
+                        opacity: 0.8,
                       }}
                     />
                   )}
-                </AmbientPanel>
+                  <AmbientPanel
+                    material={mat}
+                    className="surface-swatch"
+                    data-visible={matView.visible}
+                    style={{
+                      transitionDelay: `${i * 0.12}s`,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      position: "relative",
+                      zIndex: 1,
+                    } as React.CSSProperties}
+                  />
+                </div>
                 <span className="surface-label">{label}</span>
               </div>
             ))}
