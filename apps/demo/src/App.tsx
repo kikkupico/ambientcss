@@ -130,7 +130,14 @@ export function App() {
   /* Scroll-driven lighting ------------------------------------------------ */
   const ticking = useRef(false);
   const playgroundRef = useRef<HTMLDivElement>(null);
-  const MAT_FRAME: LightFrame = { lightX: 0, lightY: -1, keyLight: 0.97, fillLight: 0.15, lightHue: 215, lightSaturation: 28 };
+  const MAT_FRAME: LightFrame = {
+    lightX: -0.07149788059853948,
+    lightY: -0.8371655411643154,
+    keyLight: 0.9096766095862159,
+    fillLight: 0.3450576107922515,
+    lightHue: 183.35334881144593,
+    lightSaturation: 23.652771721409685,
+  };
   const handleScroll = useCallback(() => {
     if (ticking.current) return;
     ticking.current = true;
@@ -453,6 +460,7 @@ export function App() {
                 >
                   {mat === "glass" && (
                     <div
+                      className="pulsing-circle"
                       style={{
                         width: "40%",
                         height: "40%",
