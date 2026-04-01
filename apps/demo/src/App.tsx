@@ -130,6 +130,7 @@ export function App() {
   /* Scroll-driven lighting ------------------------------------------------ */
   const ticking = useRef(false);
   const playgroundRef = useRef<HTMLDivElement>(null);
+  const MAT_FRAME: LightFrame = { lightX: 0, lightY: -1, keyLight: 0.97, fillLight: 0.15, lightHue: 215, lightSaturation: 28 };
   const handleScroll = useCallback(() => {
     if (ticking.current) return;
     ticking.current = true;
@@ -156,7 +157,18 @@ export function App() {
       const idx = Math.min(Math.floor(raw), frameCount - 1);
       const t = raw - idx;
 
-      const frame = lerpFrame(LIGHT_FRAMES[idx]!, LIGHT_FRAMES[idx + 1]!, t);
+      let frame = lerpFrame(LIGHT_FRAMES[idx]!, LIGHT_FRAMES[idx + 1]!, t);
+
+      // Blend toward dramatic materials lighting as the materials section centres in the viewport
+      const matEl = matSectionRef.current;
+      if (matEl) {
+        const rect = matEl.getBoundingClientRect();
+        const sectionMid = rect.top + rect.height / 2;
+        const distFromCenter = Math.abs(sectionMid - vh / 2);
+        const blend = Math.max(0, 1 - distFromCenter / (vh * 0.6));
+        if (blend > 0) frame = lerpFrame(frame, MAT_FRAME, blend);
+      }
+
       setTheme({
         lightX: frame.lightX,
         lightY: frame.lightY,
@@ -548,6 +560,7 @@ export function App() {
                   value={Math.round((theme.keyLight ?? 0.9) * 100)}
                   onChange={(v) => setThemeProp("keyLight", v / 100)}
                   label="Key Light"
+                  material="shiny"
                 />
                 <AmbientFader
                   value={Math.round((theme.lightY ?? 0) * -100)}
@@ -555,11 +568,13 @@ export function App() {
                   max={100}
                   onChange={(v) => setThemeProp("lightY", v / -100)}
                   label="Light Y"
+                  material="glass"
                 />
                 <AmbientKnob
                   value={Math.round((theme.fillLight ?? 0.7) * 100)}
                   onChange={(v) => setThemeProp("fillLight", v / 100)}
                   label="Fill Light"
+                  material="shiny"
                 />
               </div>
               <div className="theme-controls-row">
@@ -569,6 +584,7 @@ export function App() {
                   max={100}
                   onChange={(v) => setThemeProp("lightX", v / 100)}
                   label="Light X"
+                  material="glass"
                 />
               </div>
               <div className="theme-controls-row">

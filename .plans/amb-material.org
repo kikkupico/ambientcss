@@ -9,30 +9,61 @@ Implement a new set of utility classes =amb-mat-*= to define the material proper
 - Default: =amb-mat-matte=
 - Options:
   - =amb-mat-matte=: Standard solid/flat skeuomorphic surface.
-  - =amb-mat-shiny=: Adds a light-reflective gradient.
+  - =amb-mat-shiny=: Adds a linear gradient in the direction of the light, resembling specular highlight
   - =amb-mat-glass=: Adds translucency and a background blur effect (frosted glass).
 
-* Proposed Implementation
+* Status
+All three material classes already exist in =ambient.css= (lines 194–216).
+This plan covers improvements and refinements to make them more expressive.
 
-** CSS Definitions (packages/ambient-css/src/ambient.css)
+* Current Implementation (what exists)
+- =amb-mat-matte=: Empty rule (no-op, acts as default).
+- =amb-mat-shiny=: =atan2=-based gradient angle from light direction, white-to-dark
+  linear-gradient with =screen= blend mode and slight =brightness/contrast= filter.
+- =amb-mat-glass=: Fixed 10% white background, =backdrop-filter: blur(12px) saturate(160%)=,
+  thin semi-transparent border.
 
-*** Matte (Default)
-The default material will use the current surface logic.
-#+BEGIN_SRC css
-.amb-mat-matte {
-  /* Default behavior, standard background-color */
-}
-#+END_SRC
+* Problems / Gaps
+1. *Shiny doesn't respond to key/fill light intensity.* The highlight opacity is
+   hardcoded at 60%. Under dim fill light the highlight should sharpen; under
+   bright fill it should soften (diffused ambient wash).
+3. *Glass opacity/blur don't scale with lighting.* A glass surface in a dark scene
+   (low key light) should be darker and more transparent; in a bright scene the
+   frosted effect should be more visible.
+4. *No shared material variables.* Each class computes its own one-off temporaries.
+   A common set of =--amb-mat-*= properties would let components and users tune
+   materials without overriding entire gradient stacks.
 
-*** Shiny
-Refined to look flat yet highly reflective. Instead of a broad gradient, it uses a sharp specular highlight (sheen) and a slight brightness boost to differentiate it from matte.
-#+BEGIN_SRC css
+* Proposed Changes
+
+** 1. Introduce shared material custom properties
+Add to =.ambient= (or =:root=):
+#+begin_src css
+--amb-mat-specular: 0;      /* 0 = fully diffuse, 1 = mirror-like */
+--amb-mat-roughness: 1;     /* 1 = matte, 0 = polished */
+--amb-mat-opacity: 1;       /* 1 = opaque, 0 = fully transparent */
+#+end_src
+Each =amb-mat-*= class sets these, and existing shadow/gradient rules can
+read them to modulate their output.
+
+** 2. Make shiny respond to light intensity
+Replace the hardcoded 60% highlight opacity with a value derived from key light:
+#+begin_src css
 .amb-mat-shiny {
+  --amb-mat-specular: 1;
+  --amb-mat-roughness: 0;
+  --amb-mat-opacity: 1;
+
   --_shiny-angle: calc(atan2(var(--amb-light-y), var(--amb-light-x)) + 270deg);
-  /* A sharper, more localized highlight to avoid the convex look */
+  --_shiny-strength: calc(
+    var(--amb-key-light-intensity) *
+    max(0.1, 1 - var(--amb-fill-light-intensity))
+  );
+
   background-image: linear-gradient(
     var(--_shiny-angle),
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0.6) 0%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% /
+        var(--_shiny-strength)) 0%,
     hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 30%,
     hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 70%,
     hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% / 0.15) 100%
@@ -40,34 +71,74 @@ Refined to look flat yet highly reflective. Instead of a broad gradient, it uses
   background-blend-mode: screen;
   filter: brightness(1.05) contrast(1.02);
 }
-#+END_SRC
+#+end_src
+=--_shiny-strength= peaks when key light is high and fill light is low
+(strong directional light), and fades when fill light washes the scene.
 
-*** Glass
-Frosted glass effect using =backdrop-filter=.
-#+BEGIN_SRC css
+** 3. Make glass an extension of shiny
+Glass is physically a shiny surface — it produces specular highlights. Rather
+than treating glass and shiny as independent, glass inherits shiny's
+light-direction gradient and layers translucency + blur on top.
+
+#+begin_src css
 .amb-mat-glass {
-  background-color: hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0.1);
-  backdrop-filter: blur(12px) saturate(160%);
-  -webkit-backdrop-filter: blur(12px) saturate(160%);
-  border: 1px solid hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0.2);
+  --amb-mat-specular: 0.3;
+  --amb-mat-roughness: 0.2;
+  --amb-mat-opacity: 0;
+
+  /* Shiny base — specular highlight follows light direction */
+  --_shiny-angle: calc(atan2(var(--amb-light-y), var(--amb-light-x)) + 270deg);
+  --_shiny-strength: calc(
+    var(--amb-key-light-intensity) *
+    max(0.1, 1 - var(--amb-fill-light-intensity))
+  );
+
+  background-image: linear-gradient(
+    var(--_shiny-angle),
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% /
+        var(--_shiny-strength)) 0%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 30%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 70%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% / 0.15) 100%
+  );
+  background-blend-mode: screen;
+  filter: brightness(1.05) contrast(1.02);
+
+  /* Glass layer — translucency + frosted blur */
+  --_glass-lightness: calc(var(--amb-key-light-intensity) * 100%);
+  --_glass-alpha: calc(0.05 + var(--amb-key-light-intensity) * 0.1);
+  --_glass-blur: calc(8px + var(--amb-key-light-intensity) * 8px);
+
+  background-color: hsl(
+    var(--amb-light-hue) var(--amb-light-saturation)
+    var(--_glass-lightness) / var(--_glass-alpha)
+  );
+  backdrop-filter: blur(var(--_glass-blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--_glass-blur)) saturate(160%);
+  border: 1px solid hsl(
+    var(--amb-light-hue) var(--amb-light-saturation) 100% /
+    calc(0.1 + var(--amb-key-light-intensity) * 0.15)
+  );
 }
-#+END_SRC
+#+end_src
+Glass gets the directional specular highlight from shiny, plus its own
+translucent background, backdrop blur, and border — all scaling with lighting.
 
-** Component Integration (packages/ambient-components)
-- [X] Updated =AmbientButton= to support =material= prop.
-- [X] Updated =AmbientPanel= to support =material= prop.
+** 4. Update React components
+- =AmbientButton=, =AmbientPanel= already accept a =material= prop that maps to
+  these class names — no component changes needed for the CSS-only work.
+- Optionally expose =specular= / =roughness= / =opacity= in =AmbientTheme= so
+  the provider can set material defaults at the theme level.
 
-** Showcase & Documentation
-- [X] Updated the **Demo App** (=apps/demo=) to include a "Materials" section.
-- [X] Updated the **Documentation** (=apps/docs=):
-  - [X] Added "Materials" section to =apps/docs/docs/ambient-css/classes.md=.
-  - [X] Added "Material Variants" example to =apps/docs/docs/ambient-components/examples.md=.
+* Files to Modify
+| File                                           | Change                          |
+|------------------------------------------------+---------------------------------|
+| =packages/ambient-css/src/ambient.css=         | Material properties + 3 classes |
+| =packages/ambient-components/src/styles.css=   | No change expected              |
+| =apps/demo/src/App.tsx=                        | Optional: demo material toggle  |
 
-* Tasks
-1. [X] Research =atan2= compatibility or fallback for CSS gradients based on =--amb-light-x/y=.
-2. [X] Add =amb-mat-*= classes to =packages/ambient-css/src/ambient.css=.
-3. [X] Update documentation in =apps/docs/docs/ambient-css/classes.md= with a new "Materials" section.
-4. [X] Add "Material Variants" code example to documentation.
-5. [X] Add a "Materials" gallery to the primary Demo App (=apps/demo/src/App.tsx=).
-6. [X] Add =material= prop to React components in =packages/ambient-components=.
-7. [X] Verify the build and visual appearance across all material types. (Build successful after pnpm install).
+* Implementation Order
+1. Add =--amb-mat-*= custom properties to =.ambient= rule.
+2. Update =.amb-mat-matte=, =.amb-mat-shiny=, =.amb-mat-glass= in =ambient.css=.
+3. Build (=pnpm build=) and visually verify in demo app.
+4. (Optional) Wire material variables into =AmbientProvider= theme type.
