@@ -233,35 +233,21 @@
 }
 
 .amb-mat-glass {
-  --amb-mat-specular: 0.3;
-  --amb-mat-roughness: 0.2;
+  --amb-mat-specular: 0.05;
+  --amb-mat-roughness: 0.9;
   --amb-mat-opacity: 0;
-  /* Shiny base — same two-layer model as amb-mat-shiny */
+  /* Soft diffuse brightening — wide and faint, no sharp specular or env reflection */
   --_shiny-angle: calc(atan2(var(--amb-light-y), var(--amb-light-x)) + 270deg);
   --_spec-peak: var(--amb-key-light-intensity);
-  --_ly-up: max(0, calc(var(--amb-light-y) * -1));
-  --_ly-down: max(0, var(--amb-light-y));
-  --_env-top-l: calc(70% * var(--_ly-up) + 5% * var(--_ly-down));
-  --_env-bot-l: calc(5% * var(--_ly-up) + 70% * var(--_ly-down));
-  --_env-top-a: calc(var(--_ly-up) * var(--amb-key-light-intensity) + var(--_ly-down) * (1 - var(--amb-fill-light-intensity)));
-  --_env-bot-a: calc(var(--_ly-up) * (1 - var(--amb-fill-light-intensity)) + var(--_ly-down) * var(--amb-key-light-intensity));
   background-image:
     linear-gradient(
       var(--_shiny-angle),
-      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / var(--_spec-peak)) 0%,
-      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--_spec-peak) * 0.08)) 8%,
-      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 13%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--_spec-peak) * 0.12)) 0%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--_spec-peak) * 0.06)) 40%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 75%,
       hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 100%
-    ),
-    linear-gradient(
-      to bottom,
-      hsl(var(--amb-light-hue) var(--amb-light-saturation) 50% / 0) 0%,
-      hsl(var(--amb-light-hue) var(--amb-light-saturation) var(--_env-top-l) / var(--_env-top-a)) 50%,
-      hsl(var(--amb-light-hue) var(--amb-light-saturation) var(--_env-bot-l) / var(--_env-bot-a)) 50%,
-      hsl(var(--amb-light-hue) var(--amb-light-saturation) 50% / 0) 100%
     );
-  background-blend-mode: screen, overlay;
-  filter: brightness(1.04) contrast(1.01);
+  background-blend-mode: screen;
   /* Glass layer — translucency + frosted blur, scaling with light */
   --_glass-lightness: calc(var(--amb-key-light-intensity) * 100%);
   --_glass-alpha: calc(0.05 + var(--amb-key-light-intensity) * 0.1);
