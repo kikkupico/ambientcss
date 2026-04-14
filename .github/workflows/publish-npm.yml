@@ -39,9 +39,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install npm 11+ (required for trusted publishing)
-        run: npm install -g npm@latest
-
       - name: Build and typecheck
         run: |
           pnpm build
