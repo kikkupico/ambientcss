@@ -1,5 +1,12 @@
 # @ambientcss/components
 
+## 1.2.1
+
+### Patch Changes
+
+- Updated dependencies [7361ad7]
+  - @ambientcss/css@1.2.1
+
 ## 1.2.0
 
 ### Minor Changes
