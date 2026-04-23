@@ -89,7 +89,7 @@ body {
 }
 
 .a3d-pane.a3d-pane-css {
-  background: color-mix(in oklab, var(--amb-lume) 3%, #15151a);
+  background: hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 100%));
   padding: 40px;
   display: grid;
   place-items: center;

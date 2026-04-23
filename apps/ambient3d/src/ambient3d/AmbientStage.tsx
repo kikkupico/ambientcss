@@ -47,9 +47,10 @@ export function AmbientStage({
   return (
     <div className={className} style={{ position: "relative", width: "100%", height: "100%", ...style }}>
       <Canvas
+        orthographic
         shadows
         dpr={[1, 2]}
-        camera={{ position: [0, cameraY, cameraDistance], fov: 38 }}
+        camera={{ position: [0, cameraY, cameraDistance], zoom: 600 / cameraDistance }}
         gl={{ antialias: true, alpha: true }}
         style={{ width: "100%", height: "100%" }}
       >
