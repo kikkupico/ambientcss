@@ -6,6 +6,8 @@ packages/*/dist
 .DS_Store
 /apps/demo/.vite/
 /apps/demo/dist/
+/apps/ambient3d/.vite/
+/apps/ambient3d/dist/
 /examples/*/dist/
 /examples/*/.vite/
 /apps/docs/.docusaurus/

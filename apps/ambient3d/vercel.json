@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "installCommand": "pnpm install --no-frozen-lockfile",
+  "buildCommand": "pnpm --filter @ambientcss/css build && pnpm --filter @ambientcss/components build && pnpm --filter ambient3d build",
+  "outputDirectory": "dist"
+}

@@ -15,12 +15,14 @@ const WORKSPACES_BY_TASK = {
     "packages/ambient-css",
     "packages/ambient-components",
     "apps/demo",
+    "apps/ambient3d",
     "apps/docs",
   ],
   clean: [
     "packages/ambient-css",
     "packages/ambient-components",
     "apps/demo",
+    "apps/ambient3d",
     "apps/docs",
   ],
   // docs:build is the docs quality gate; docs tsc is noisy with framework-level aliases.
@@ -28,6 +30,7 @@ const WORKSPACES_BY_TASK = {
     "packages/ambient-css",
     "packages/ambient-components",
     "apps/demo",
+    "apps/ambient3d",
   ],
 };
 
