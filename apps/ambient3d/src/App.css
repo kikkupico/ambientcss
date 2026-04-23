@@ -1,0 +1,194 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #0a0a0d;
+  font-family: "Michroma", sans-serif;
+  color: var(--amb-lume);
+  overflow-x: hidden;
+}
+
+.a3d-root {
+  min-height: 100vh;
+}
+
+.a3d-header {
+  padding: 96px 40px 64px;
+  text-align: center;
+}
+
+.a3d-title {
+  font-size: clamp(36px, 6vw, 72px);
+  letter-spacing: 0.08em;
+  margin: 0 0 16px;
+  color: var(--amb-lume);
+}
+
+.a3d-sub {
+  font-size: 11px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  opacity: 0.8;
+  margin: 0 auto;
+  max-width: 720px;
+  line-height: 1.8;
+}
+
+.a3d-section {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 64px 40px;
+  border-top: 1px solid color-mix(in oklab, var(--amb-lume) 15%, transparent);
+}
+
+.a3d-section-label {
+  font-size: 10px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--amb-lume);
+  margin-bottom: 8px;
+}
+
+.a3d-section-desc {
+  font-size: 12px;
+  opacity: 0.7;
+  max-width: 720px;
+  line-height: 1.6;
+  margin: 0 0 32px;
+}
+
+.a3d-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  min-height: 420px;
+}
+
+@media (max-width: 900px) {
+  .a3d-split {
+    grid-template-columns: 1fr;
+    min-height: 340px;
+  }
+}
+
+.a3d-pane {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+}
+
+.a3d-pane.a3d-pane-3d {
+  background: color-mix(in oklab, var(--amb-lume) 6%, #0a0a0d);
+}
+
+.a3d-pane.a3d-pane-css {
+  background: color-mix(in oklab, var(--amb-lume) 3%, #15151a);
+  padding: 40px;
+  display: grid;
+  place-items: center;
+}
+
+.a3d-pane-tag {
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  z-index: 2;
+}
+
+.a3d-canvas {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.a3d-gallery {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.a3d-swatch {
+  width: 96px;
+  height: 96px;
+  display: grid;
+  place-items: center;
+}
+
+.a3d-swatch-label {
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.a3d-swatch-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.a3d-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  padding: 24px 32px;
+  margin-top: 24px;
+  background: color-mix(in oklab, var(--amb-lume) 3%, transparent);
+  border-radius: 14px;
+}
+
+.a3d-control {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.a3d-control label {
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.a3d-control input[type="range"] {
+  width: 100%;
+}
+
+.a3d-component-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 24px;
+  justify-items: center;
+  align-items: center;
+  padding: 24px;
+}
+
+.a3d-footer {
+  padding: 96px 40px 64px;
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.a3d-footer a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 2px;
+}

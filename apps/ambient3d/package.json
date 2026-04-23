@@ -1,0 +1,27 @@
+{
+  "name": "ambient3d",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "node ../../scripts/vite-build-compat.mjs build",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ambientcss/components": "workspace:*",
+    "@ambientcss/css": "workspace:*",
+    "@react-three/drei": "^10.0.6",
+    "@react-three/fiber": "^9.1.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "three": "^0.175.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "@types/three": "^0.175.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.8.2",
+    "vite": "^6.1.0"
+  }
+}
