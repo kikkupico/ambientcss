@@ -162,18 +162,22 @@ function OrbitScene() {
 function ElevationScene() {
   const stops: (0 | 1 | 2 | 3)[] = [0, 1, 2, 3];
   return (
-    <AmbientStage cameraDistance={8}>
-      {stops.map((elev, i) => (
-        <AmbientSurface3D
-          key={elev}
-          width={1}
-          height={1}
-          edge="chamfer"
-          surface="flat"
-          elevation={elev}
-          position={[(i - 1.5) * 1.4, 0, 0]}
-        />
-      ))}
+    <AmbientStage cameraDistance={6}>
+      {stops.map((elev, i) => {
+        const col = i % 2;
+        const row = Math.floor(i / 2);
+        return (
+          <AmbientSurface3D
+            key={elev}
+            width={1}
+            height={1}
+            edge="chamfer"
+            surface="flat"
+            elevation={elev}
+            position={[(col - 0.5) * 1.6, (0.5 - row) * 1.6, 0]}
+          />
+        );
+      })}
     </AmbientStage>
   );
 }
@@ -199,8 +203,12 @@ function SurfaceScene() {
 
 function EdgeScene() {
   const edges: AmbientEdge[] = ["chamfer", "chamfer-2", "fillet", "fillet-2", "square"];
+  const positions: [number, number, number][] = [
+    [-1.6, 0.9, 0], [0, 0.9, 0], [1.6, 0.9, 0],
+    [-0.8, -0.9, 0], [0.8, -0.9, 0],
+  ];
   return (
-    <AmbientStage cameraDistance={9}>
+    <AmbientStage cameraDistance={7}>
       {edges.map((edge, i) => (
         <AmbientSurface3D
           key={edge}
@@ -209,7 +217,7 @@ function EdgeScene() {
           edge={edge}
           surface="flat"
           elevation={1}
-          position={[(i - 2) * 1.6, 0, 0]}
+          position={positions[i] ?? [0, 0, 0]}
         />
       ))}
     </AmbientStage>
@@ -256,12 +264,14 @@ function ComponentScene({
   setSwtch: (b: boolean) => void;
 }) {
   return (
-    <AmbientStage cameraDistance={7}>
-      <AmbientKnob3D position={[-2, 0.6, 0]} value={knob} onChange={setKnob} material="shiny" />
-      <AmbientFader3D position={[-0.6, 0.1, 0]} value={fader} onChange={setFader} material="glass" />
-      <AmbientSlider3D position={[1.2, -1, 0]} value={slider} onChange={setSlider} />
-      <AmbientSwitch3D position={[1.4, 0.6, 0]} checked={swtch} onCheckedChange={setSwtch} tint="#4ade80" />
-      <AmbientButton3D position={[-2, -1, 0]} material="shiny" />
+    <AmbientStage cameraDistance={8}>
+      {/* Row 1: Knob | Fader | Slider */}
+      <AmbientKnob3D position={[-2.5, 0.8, 0]} value={knob} onChange={setKnob} material="shiny" />
+      <AmbientFader3D position={[0, 0.3, 0]} value={fader} onChange={setFader} material="glass" />
+      <AmbientSlider3D position={[2.5, 0.8, 0]} value={slider} onChange={setSlider} />
+      {/* Row 2: Switch | Button */}
+      <AmbientSwitch3D position={[-2.5, -0.8, 0]} checked={swtch} onCheckedChange={setSwtch} tint="#4ade80" />
+      <AmbientButton3D position={[0, -0.8, 0]} material="shiny" />
     </AmbientStage>
   );
 }
@@ -305,15 +315,17 @@ export function App() {
           left={<OrbitScene />}
           right={
             <div className="a3d-gallery">
-              {Array.from({ length: 9 }, (_, i) => (
-                <div
-                  key={i}
-                  className={`a3d-swatch ambient amb-surface amb-elevation-2 ${
-                    i % 3 === 0 ? "amb-chamfer" : i % 3 === 1 ? "amb-fillet" : "amb-chamfer-2"
-                  }`}
-                  style={{ borderRadius: 12 }}
-                />
-              ))}
+              {Array.from({ length: 9 }, (_, i) => {
+                const edgeClass = i % 3 === 0 ? "amb-chamfer" : i % 3 === 1 ? "amb-fillet" : "amb-chamfer-2";
+                const radius = i % 3 === 1 ? 12 : 4;
+                return (
+                  <div
+                    key={i}
+                    className={`a3d-swatch ambient amb-surface amb-elevation-2 ${edgeClass}`}
+                    style={{ borderRadius: radius }}
+                  />
+                );
+              })}
             </div>
           }
         />
@@ -326,12 +338,12 @@ export function App() {
         <Split
           left={<ElevationScene />}
           right={
-            <div className="a3d-gallery">
+            <div className="a3d-gallery a3d-gallery-2col">
               {[0, 1, 2, 3].map((e) => (
                 <div className="a3d-swatch-item" key={e}>
                   <div
                     className={`a3d-swatch ambient amb-surface amb-chamfer amb-elevation-${e}`}
-                    style={{ borderRadius: 14 }}
+                    style={{ borderRadius: 4 }}
                   />
                   <span className="a3d-swatch-label">elev {e}</span>
                 </div>
@@ -357,7 +369,7 @@ export function App() {
                 <div className="a3d-swatch-item" key={label}>
                   <div
                     className={`a3d-swatch ambient amb-chamfer-2 amb-elevation-2 ${cls}`}
-                    style={{ borderRadius: 16 }}
+                    style={{ borderRadius: 4 }}
                   />
                   <span className="a3d-swatch-label">{label}</span>
                 </div>
@@ -376,16 +388,16 @@ export function App() {
           right={
             <div className="a3d-gallery">
               {[
-                { cls: "amb-chamfer", label: "Chamfer" },
-                { cls: "amb-chamfer-2", label: "Chamfer 2x" },
-                { cls: "amb-fillet", label: "Fillet" },
-                { cls: "amb-fillet-2", label: "Fillet 2x" },
-                { cls: "", label: "Square" },
-              ].map(({ cls, label }) => (
+                { cls: "amb-chamfer", label: "Chamfer", radius: 4 },
+                { cls: "amb-chamfer-2", label: "Chamfer 2x", radius: 4 },
+                { cls: "amb-fillet", label: "Fillet", radius: 12 },
+                { cls: "amb-fillet-2", label: "Fillet 2x", radius: 20 },
+                { cls: "", label: "Square", radius: 0 },
+              ].map(({ cls, label, radius }) => (
                 <div className="a3d-swatch-item" key={label}>
                   <div
                     className={`a3d-swatch ambient amb-surface amb-elevation-1 ${cls}`}
-                    style={{ borderRadius: cls.startsWith("amb-fillet") ? 20 : 4 }}
+                    style={{ borderRadius: radius }}
                   />
                   <span className="a3d-swatch-label">{label}</span>
                 </div>
@@ -407,7 +419,7 @@ export function App() {
                 <div className="a3d-swatch-item" key={mat}>
                   <div
                     className={`a3d-swatch ambient amb-surface-convex amb-fillet amb-elevation-2 amb-mat-${mat}`}
-                    style={{ borderRadius: 16 }}
+                    style={{ borderRadius: 12 }}
                   />
                   <span className="a3d-swatch-label">{mat}</span>
                 </div>
@@ -436,9 +448,11 @@ export function App() {
           }
           right={
             <div className="a3d-component-grid">
+              {/* Row 1: Knob | Fader | Slider */}
               <AmbientKnob value={knob} onChange={setKnob} label="Knob" material="shiny" />
               <AmbientFader value={fader} min={0} max={100} onChange={setFader} label="Fader" material="glass" />
               <AmbientSlider value={slider} min={0} max={100} onChange={setSlider} label="Slider" />
+              {/* Row 2: Switch | Button */}
               <AmbientSwitch checked={swtch} onCheckedChange={setSwtch} led label="Switch" />
               <AmbientButton material="shiny">Press</AmbientButton>
             </div>
