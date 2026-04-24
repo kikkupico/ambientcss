@@ -23,7 +23,7 @@ function Backdrop() {
   const sat = Math.min(theme.lightSaturation, 12) / 100;
   const bg = new Color().setHSL(theme.lightHue / 360, sat, 0.68);
   return (
-    <mesh position={[0, 0, -4]} receiveShadow>
+    <mesh position={[0, 0, -0.2]} receiveShadow>
       <planeGeometry args={[40, 40]} />
       <meshStandardMaterial color={bg} roughness={0.9} metalness={0} />
     </mesh>
