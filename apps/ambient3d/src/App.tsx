@@ -1,4 +1,4 @@
-import { useState, type CSSProperties, type ReactNode } from "react";
+import { createContext, useContext, useState, type CSSProperties, type ReactNode } from "react";
 import {
   AmbientButton,
   AmbientFader,
@@ -24,6 +24,9 @@ import {
 } from "./ambient3d";
 
 type Theme = typeof DEFAULT_THEME;
+
+const IsometricContext = createContext(false);
+const useIsometric = () => useContext(IsometricContext);
 
 type SectionProps = {
   label: string;
@@ -61,7 +64,17 @@ function Split({ left, right }: SplitProps) {
   );
 }
 
-function LightControls({ theme, setTheme }: { theme: Theme; setTheme: (t: Theme) => void }) {
+function LightControls({
+  theme,
+  setTheme,
+  isometric,
+  setIsometric,
+}: {
+  theme: Theme;
+  setTheme: (t: Theme) => void;
+  isometric: boolean;
+  setIsometric: (v: boolean) => void;
+}) {
   return (
     <div className="a3d-controls">
       <div className="a3d-control">
@@ -130,6 +143,15 @@ function LightControls({ theme, setTheme }: { theme: Theme; setTheme: (t: Theme)
           onChange={(e) => setTheme({ ...theme, lightSaturation: Number(e.target.value) })}
         />
       </div>
+      <div className="a3d-control">
+        <label>3D Camera</label>
+        <button
+          className={`a3d-view-toggle${isometric ? " a3d-view-toggle--active" : ""}`}
+          onClick={() => setIsometric(!isometric)}
+        >
+          {isometric ? "Isometric" : "Top View"}
+        </button>
+      </div>
     </div>
   );
 }
@@ -137,8 +159,9 @@ function LightControls({ theme, setTheme }: { theme: Theme; setTheme: (t: Theme)
 /* ── Section-level 3D scenes ───────────────────────────────────────────── */
 
 function OrbitScene() {
+  const isometric = useIsometric();
   return (
-    <AmbientStage cameraDistance={7}>
+    <AmbientStage cameraDistance={7} isometric={isometric}>
       {Array.from({ length: 9 }, (_, i) => {
         const col = i % 3;
         const row = Math.floor(i / 3);
@@ -160,9 +183,10 @@ function OrbitScene() {
 }
 
 function ElevationScene() {
+  const isometric = useIsometric();
   const stops: (0 | 1 | 2 | 3)[] = [0, 1, 2, 3];
   return (
-    <AmbientStage cameraDistance={6}>
+    <AmbientStage cameraDistance={6} isometric={isometric}>
       {stops.map((elev, i) => {
         const col = i % 2;
         const row = Math.floor(i / 2);
@@ -183,9 +207,10 @@ function ElevationScene() {
 }
 
 function SurfaceScene() {
+  const isometric = useIsometric();
   const surfs: AmbientSurface[] = ["concave", "flat", "convex"];
   return (
-    <AmbientStage cameraDistance={7}>
+    <AmbientStage cameraDistance={7} isometric={isometric}>
       {surfs.map((s, i) => (
         <AmbientSurface3D
           key={s}
@@ -202,13 +227,14 @@ function SurfaceScene() {
 }
 
 function EdgeScene() {
+  const isometric = useIsometric();
   const edges: AmbientEdge[] = ["chamfer", "chamfer-2", "fillet", "fillet-2", "square"];
   const positions: [number, number, number][] = [
     [-1.6, 0.9, 0], [0, 0.9, 0], [1.6, 0.9, 0],
     [-0.8, -0.9, 0], [0.8, -0.9, 0],
   ];
   return (
-    <AmbientStage cameraDistance={7}>
+    <AmbientStage cameraDistance={7} isometric={isometric}>
       {edges.map((edge, i) => (
         <AmbientSurface3D
           key={edge}
@@ -225,9 +251,10 @@ function EdgeScene() {
 }
 
 function MaterialScene() {
+  const isometric = useIsometric();
   const mats: AmbientMaterial[] = ["matte", "shiny", "glass"];
   return (
-    <AmbientStage cameraDistance={7}>
+    <AmbientStage cameraDistance={7} isometric={isometric}>
       {mats.map((m, i) => (
         <AmbientSurface3D
           key={m}
@@ -263,8 +290,9 @@ function ComponentScene({
   swtch: boolean;
   setSwtch: (b: boolean) => void;
 }) {
+  const isometric = useIsometric();
   return (
-    <AmbientStage cameraDistance={8}>
+    <AmbientStage cameraDistance={8} isometric={isometric}>
       {/* Row 1: Knob | Fader | Slider */}
       <AmbientKnob3D position={[-2.5, 0.8, 0]} value={knob} onChange={setKnob} material="shiny" />
       <AmbientFader3D position={[0, 0.3, 0]} value={fader} onChange={setFader} material="glass" />
@@ -286,6 +314,7 @@ export function App() {
   const [slider, setSlider] = useState(50);
   const [fader, setFader] = useState(70);
   const [swtch, setSwtch] = useState(true);
+  const [isometric, setIsometric] = useState(false);
 
   const cssTheme: AmbientTheme = theme;
 
@@ -305,7 +334,8 @@ export function App() {
         </p>
       </header>
 
-      <LightControls theme={theme} setTheme={setTheme} />
+      <IsometricContext.Provider value={isometric}>
+      <LightControls theme={theme} setTheme={setTheme} isometric={isometric} setIsometric={setIsometric} />
 
       <Section
         label="Light Direction"
@@ -459,6 +489,7 @@ export function App() {
           }
         />
       </Section>
+      </IsometricContext.Provider>
 
       <footer className="a3d-footer">
         ambient3d · visual reference for{" "}

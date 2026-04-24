@@ -1,6 +1,7 @@
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { useMemo } from "react";
 import type { CSSProperties, PropsWithChildren, ReactNode } from "react";
-import { Color } from "three";
+import { Color, Vector3 } from "three";
 import { AmbientLights } from "./AmbientLights";
 import { useAmbient3DTheme } from "./Ambient3DProvider";
 
@@ -15,6 +16,8 @@ export type AmbientStageProps = PropsWithChildren<{
   overlay?: ReactNode;
   /** Show a softly-lit backdrop plate behind the scene */
   backdrop?: boolean;
+  /** Switch from top/front view to isometric 3/4 view */
+  isometric?: boolean;
 }>;
 
 function Backdrop() {
@@ -30,6 +33,32 @@ function Backdrop() {
   );
 }
 
+function CameraController({
+  isometric,
+  cameraY,
+  cameraDistance,
+}: {
+  isometric: boolean;
+  cameraY: number;
+  cameraDistance: number;
+}) {
+  const { camera } = useThree();
+  const target = useMemo(
+    () =>
+      isometric
+        ? new Vector3(cameraDistance * 0.7, cameraDistance * 0.5, cameraDistance * 0.7)
+        : new Vector3(0, cameraY, cameraDistance),
+    [isometric, cameraY, cameraDistance]
+  );
+
+  useFrame(() => {
+    camera.position.lerp(target, 0.1);
+    camera.lookAt(0, 0, 0);
+  });
+
+  return null;
+}
+
 /**
  * The canvas wrapper for every 3D ambient scene. It wires up the lights,
  * the background, the camera, and soft shadows — so each primitive only
@@ -43,6 +72,7 @@ export function AmbientStage({
   cameraDistance = 6,
   overlay,
   backdrop = true,
+  isometric = false,
 }: AmbientStageProps) {
   return (
     <div className={className} style={{ position: "relative", width: "100%", height: "100%", ...style }}>
@@ -54,6 +84,7 @@ export function AmbientStage({
         gl={{ antialias: true, alpha: true }}
         style={{ width: "100%", height: "100%" }}
       >
+        <CameraController isometric={isometric} cameraY={cameraY} cameraDistance={cameraDistance} />
         <AmbientLights />
         {backdrop && <Backdrop />}
         {children}
