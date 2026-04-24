@@ -1,5 +1,4 @@
 import { Canvas } from "@react-three/fiber";
-import { SoftShadows } from "@react-three/drei";
 import type { CSSProperties, PropsWithChildren, ReactNode } from "react";
 import { Color } from "three";
 import { AmbientLights } from "./AmbientLights";
@@ -49,13 +48,12 @@ export function AmbientStage({
     <div className={className} style={{ position: "relative", width: "100%", height: "100%", ...style }}>
       <Canvas
         orthographic
-        shadows
+        shadows="soft"
         dpr={[1, 2]}
         camera={{ position: [0, cameraY, cameraDistance], zoom: 600 / cameraDistance }}
         gl={{ antialias: true, alpha: true }}
         style={{ width: "100%", height: "100%" }}
       >
-        <SoftShadows size={30} samples={16} />
         <AmbientLights />
         {backdrop && <Backdrop />}
         {children}
