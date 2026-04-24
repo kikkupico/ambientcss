@@ -28,7 +28,7 @@ export function createAmbientMaterial(
       metalness: 0,
       roughness: 0.08,
       transmission: 0.9,
-      thickness: 0.4,
+      thickness: 0.08,
       ior: 1.4,
       clearcoat: 1,
       clearcoatRoughness: 0.08,

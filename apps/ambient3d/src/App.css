@@ -89,7 +89,7 @@ body {
 }
 
 .a3d-pane.a3d-pane-css {
-  background: color-mix(in oklab, var(--amb-lume) 3%, #15151a);
+  background: hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--amb-key-light-intensity) * 100%));
   padding: 40px;
   display: grid;
   place-items: center;
@@ -112,11 +112,16 @@ body {
 }
 
 .a3d-gallery {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 24px;
-  flex-wrap: wrap;
-  justify-content: center;
+  justify-items: center;
   align-items: center;
+  width: 100%;
+}
+
+.a3d-gallery-2col {
+  grid-template-columns: repeat(2, 1fr);
 }
 
 .a3d-swatch {
@@ -168,13 +173,38 @@ body {
   width: 100%;
 }
 
+.a3d-view-toggle {
+  background: transparent;
+  border: 1px solid color-mix(in oklab, var(--amb-lume) 20%, transparent);
+  color: var(--amb-lume);
+  font-family: "Michroma", sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  align-self: flex-start;
+}
+
+.a3d-view-toggle:hover {
+  background: color-mix(in oklab, var(--amb-lume) 8%, transparent);
+}
+
+.a3d-view-toggle--active {
+  background: color-mix(in oklab, var(--amb-lume) 14%, transparent);
+  border-color: color-mix(in oklab, var(--amb-lume) 35%, transparent);
+}
+
 .a3d-component-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 24px;
   justify-items: center;
   align-items: center;
   padding: 24px;
+  width: 100%;
 }
 
 .a3d-footer {

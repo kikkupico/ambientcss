@@ -31,7 +31,7 @@ export function AmbientButton3D({
 
   useFrame((_, delta) => {
     if (!groupRef.current) return;
-    const target = pressed ? -0.08 : hovered ? 0.04 : 0;
+    const target = pressed ? -0.04 : hovered ? 0.02 : 0;
     const current = groupRef.current.position.z;
     groupRef.current.position.z = current + (target - current) * Math.min(delta * 16, 1);
   });
@@ -41,7 +41,7 @@ export function AmbientButton3D({
       <AmbientSurface3D
         width={width}
         height={height}
-        depth={0.28}
+        depth={0.08}
         edge="chamfer"
         surface="flat"
         material={material}

@@ -1,4 +1,4 @@
-import { useState, type CSSProperties, type ReactNode } from "react";
+import { createContext, useContext, useState, type CSSProperties, type ReactNode } from "react";
 import {
   AmbientButton,
   AmbientFader,
@@ -24,6 +24,9 @@ import {
 } from "./ambient3d";
 
 type Theme = typeof DEFAULT_THEME;
+
+const IsometricContext = createContext(false);
+const useIsometric = () => useContext(IsometricContext);
 
 type SectionProps = {
   label: string;
@@ -61,7 +64,17 @@ function Split({ left, right }: SplitProps) {
   );
 }
 
-function LightControls({ theme, setTheme }: { theme: Theme; setTheme: (t: Theme) => void }) {
+function LightControls({
+  theme,
+  setTheme,
+  isometric,
+  setIsometric,
+}: {
+  theme: Theme;
+  setTheme: (t: Theme) => void;
+  isometric: boolean;
+  setIsometric: (v: boolean) => void;
+}) {
   return (
     <div className="a3d-controls">
       <div className="a3d-control">
@@ -130,6 +143,15 @@ function LightControls({ theme, setTheme }: { theme: Theme; setTheme: (t: Theme)
           onChange={(e) => setTheme({ ...theme, lightSaturation: Number(e.target.value) })}
         />
       </div>
+      <div className="a3d-control">
+        <label>3D Camera</label>
+        <button
+          className={`a3d-view-toggle${isometric ? " a3d-view-toggle--active" : ""}`}
+          onClick={() => setIsometric(!isometric)}
+        >
+          {isometric ? "Isometric" : "Top View"}
+        </button>
+      </div>
     </div>
   );
 }
@@ -137,8 +159,9 @@ function LightControls({ theme, setTheme }: { theme: Theme; setTheme: (t: Theme)
 /* ── Section-level 3D scenes ───────────────────────────────────────────── */
 
 function OrbitScene() {
+  const isometric = useIsometric();
   return (
-    <AmbientStage cameraDistance={7}>
+    <AmbientStage cameraDistance={7} isometric={isometric}>
       {Array.from({ length: 9 }, (_, i) => {
         const col = i % 3;
         const row = Math.floor(i / 3);
@@ -148,7 +171,6 @@ function OrbitScene() {
             key={i}
             width={0.9}
             height={0.9}
-            depth={0.3}
             edge={edges[i % 3] ?? "fillet"}
             surface="flat"
             elevation={2}
@@ -161,35 +183,39 @@ function OrbitScene() {
 }
 
 function ElevationScene() {
+  const isometric = useIsometric();
   const stops: (0 | 1 | 2 | 3)[] = [0, 1, 2, 3];
   return (
-    <AmbientStage cameraDistance={8}>
-      {stops.map((elev, i) => (
-        <AmbientSurface3D
-          key={elev}
-          width={1}
-          height={1}
-          depth={0.3}
-          edge="chamfer"
-          surface="flat"
-          elevation={elev}
-          position={[(i - 1.5) * 1.4, 0, 0]}
-        />
-      ))}
+    <AmbientStage cameraDistance={6} isometric={isometric}>
+      {stops.map((elev, i) => {
+        const col = i % 2;
+        const row = Math.floor(i / 2);
+        return (
+          <AmbientSurface3D
+            key={elev}
+            width={1}
+            height={1}
+            edge="chamfer"
+            surface="flat"
+            elevation={elev}
+            position={[(col - 0.5) * 1.6, (0.5 - row) * 1.6, 0]}
+          />
+        );
+      })}
     </AmbientStage>
   );
 }
 
 function SurfaceScene() {
+  const isometric = useIsometric();
   const surfs: AmbientSurface[] = ["concave", "flat", "convex"];
   return (
-    <AmbientStage cameraDistance={7}>
+    <AmbientStage cameraDistance={7} isometric={isometric}>
       {surfs.map((s, i) => (
         <AmbientSurface3D
           key={s}
           width={1.4}
           height={1.4}
-          depth={0.34}
           edge="chamfer-2"
           surface={s}
           elevation={2}
@@ -201,19 +227,23 @@ function SurfaceScene() {
 }
 
 function EdgeScene() {
+  const isometric = useIsometric();
   const edges: AmbientEdge[] = ["chamfer", "chamfer-2", "fillet", "fillet-2", "square"];
+  const positions: [number, number, number][] = [
+    [-1.6, 0.9, 0], [0, 0.9, 0], [1.6, 0.9, 0],
+    [-0.8, -0.9, 0], [0.8, -0.9, 0],
+  ];
   return (
-    <AmbientStage cameraDistance={9}>
+    <AmbientStage cameraDistance={7} isometric={isometric}>
       {edges.map((edge, i) => (
         <AmbientSurface3D
           key={edge}
           width={1.2}
           height={1.2}
-          depth={0.35}
           edge={edge}
           surface="flat"
           elevation={1}
-          position={[(i - 2) * 1.6, 0, 0]}
+          position={positions[i] ?? [0, 0, 0]}
         />
       ))}
     </AmbientStage>
@@ -221,25 +251,15 @@ function EdgeScene() {
 }
 
 function MaterialScene() {
+  const isometric = useIsometric();
   const mats: AmbientMaterial[] = ["matte", "shiny", "glass"];
   return (
-    <AmbientStage cameraDistance={7}>
-      {/* a subtle background panel to reflect onto the glass */}
-      <AmbientPanel3D
-        width={7}
-        height={3}
-        depth={0.2}
-        material="matte"
-        elevation={0}
-        position={[0, 0, -1.2]}
-        edge="fillet-2"
-      />
+    <AmbientStage cameraDistance={7} isometric={isometric}>
       {mats.map((m, i) => (
         <AmbientSurface3D
           key={m}
           width={1.6}
           height={1.8}
-          depth={0.4}
           edge="fillet"
           surface="convex"
           elevation={2}
@@ -270,22 +290,16 @@ function ComponentScene({
   swtch: boolean;
   setSwtch: (b: boolean) => void;
 }) {
+  const isometric = useIsometric();
   return (
-    <AmbientStage cameraDistance={7}>
-      <AmbientPanel3D
-        width={6}
-        height={3.5}
-        depth={0.25}
-        position={[0, 0, -0.2]}
-        edge="fillet-2"
-        elevation={0}
-        material="matte"
-      />
-      <AmbientKnob3D position={[-2, 0.6, 0]} value={knob} onChange={setKnob} material="shiny" />
-      <AmbientFader3D position={[-0.6, 0.1, 0]} value={fader} onChange={setFader} material="glass" />
-      <AmbientSlider3D position={[1.2, -1, 0]} value={slider} onChange={setSlider} />
-      <AmbientSwitch3D position={[1.4, 0.6, 0]} checked={swtch} onCheckedChange={setSwtch} tint="#4ade80" />
-      <AmbientButton3D position={[-2, -1, 0]} material="shiny" />
+    <AmbientStage cameraDistance={8} isometric={isometric}>
+      {/* Row 1: Knob | Fader | Slider */}
+      <AmbientKnob3D position={[-2.5, 0.8, 0]} value={knob} onChange={setKnob} material="shiny" />
+      <AmbientFader3D position={[0, 0.3, 0]} value={fader} onChange={setFader} material="glass" />
+      <AmbientSlider3D position={[2.5, 0.8, 0]} value={slider} onChange={setSlider} />
+      {/* Row 2: Switch | Button */}
+      <AmbientSwitch3D position={[-2.5, -0.8, 0]} checked={swtch} onCheckedChange={setSwtch} tint="#4ade80" />
+      <AmbientButton3D position={[0, -0.8, 0]} material="shiny" />
     </AmbientStage>
   );
 }
@@ -300,6 +314,7 @@ export function App() {
   const [slider, setSlider] = useState(50);
   const [fader, setFader] = useState(70);
   const [swtch, setSwtch] = useState(true);
+  const [isometric, setIsometric] = useState(false);
 
   const cssTheme: AmbientTheme = theme;
 
@@ -319,7 +334,8 @@ export function App() {
         </p>
       </header>
 
-      <LightControls theme={theme} setTheme={setTheme} />
+      <IsometricContext.Provider value={isometric}>
+      <LightControls theme={theme} setTheme={setTheme} isometric={isometric} setIsometric={setIsometric} />
 
       <Section
         label="Light Direction"
@@ -329,15 +345,17 @@ export function App() {
           left={<OrbitScene />}
           right={
             <div className="a3d-gallery">
-              {Array.from({ length: 9 }, (_, i) => (
-                <div
-                  key={i}
-                  className={`a3d-swatch ambient amb-surface amb-elevation-2 ${
-                    i % 3 === 0 ? "amb-chamfer" : i % 3 === 1 ? "amb-fillet" : "amb-chamfer-2"
-                  }`}
-                  style={{ borderRadius: 12 }}
-                />
-              ))}
+              {Array.from({ length: 9 }, (_, i) => {
+                const edgeClass = i % 3 === 0 ? "amb-chamfer" : i % 3 === 1 ? "amb-fillet" : "amb-chamfer-2";
+                const radius = i % 3 === 1 ? 12 : 4;
+                return (
+                  <div
+                    key={i}
+                    className={`a3d-swatch ambient amb-surface amb-elevation-2 ${edgeClass}`}
+                    style={{ borderRadius: radius }}
+                  />
+                );
+              })}
             </div>
           }
         />
@@ -350,12 +368,12 @@ export function App() {
         <Split
           left={<ElevationScene />}
           right={
-            <div className="a3d-gallery">
+            <div className="a3d-gallery a3d-gallery-2col">
               {[0, 1, 2, 3].map((e) => (
                 <div className="a3d-swatch-item" key={e}>
                   <div
                     className={`a3d-swatch ambient amb-surface amb-chamfer amb-elevation-${e}`}
-                    style={{ borderRadius: 14 }}
+                    style={{ borderRadius: 4 }}
                   />
                   <span className="a3d-swatch-label">elev {e}</span>
                 </div>
@@ -381,7 +399,7 @@ export function App() {
                 <div className="a3d-swatch-item" key={label}>
                   <div
                     className={`a3d-swatch ambient amb-chamfer-2 amb-elevation-2 ${cls}`}
-                    style={{ borderRadius: 16 }}
+                    style={{ borderRadius: 4 }}
                   />
                   <span className="a3d-swatch-label">{label}</span>
                 </div>
@@ -400,16 +418,16 @@ export function App() {
           right={
             <div className="a3d-gallery">
               {[
-                { cls: "amb-chamfer", label: "Chamfer" },
-                { cls: "amb-chamfer-2", label: "Chamfer 2x" },
-                { cls: "amb-fillet", label: "Fillet" },
-                { cls: "amb-fillet-2", label: "Fillet 2x" },
-                { cls: "", label: "Square" },
-              ].map(({ cls, label }) => (
+                { cls: "amb-chamfer", label: "Chamfer", radius: 4 },
+                { cls: "amb-chamfer-2", label: "Chamfer 2x", radius: 4 },
+                { cls: "amb-fillet", label: "Fillet", radius: 12 },
+                { cls: "amb-fillet-2", label: "Fillet 2x", radius: 20 },
+                { cls: "", label: "Square", radius: 0 },
+              ].map(({ cls, label, radius }) => (
                 <div className="a3d-swatch-item" key={label}>
                   <div
                     className={`a3d-swatch ambient amb-surface amb-elevation-1 ${cls}`}
-                    style={{ borderRadius: cls.startsWith("amb-fillet") ? 20 : 4 }}
+                    style={{ borderRadius: radius }}
                   />
                   <span className="a3d-swatch-label">{label}</span>
                 </div>
@@ -431,7 +449,7 @@ export function App() {
                 <div className="a3d-swatch-item" key={mat}>
                   <div
                     className={`a3d-swatch ambient amb-surface-convex amb-fillet amb-elevation-2 amb-mat-${mat}`}
-                    style={{ borderRadius: 16 }}
+                    style={{ borderRadius: 12 }}
                   />
                   <span className="a3d-swatch-label">{mat}</span>
                 </div>
@@ -460,15 +478,18 @@ export function App() {
           }
           right={
             <div className="a3d-component-grid">
+              {/* Row 1: Knob | Fader | Slider */}
               <AmbientKnob value={knob} onChange={setKnob} label="Knob" material="shiny" />
               <AmbientFader value={fader} min={0} max={100} onChange={setFader} label="Fader" material="glass" />
               <AmbientSlider value={slider} min={0} max={100} onChange={setSlider} label="Slider" />
+              {/* Row 2: Switch | Button */}
               <AmbientSwitch checked={swtch} onCheckedChange={setSwtch} led label="Switch" />
               <AmbientButton material="shiny">Press</AmbientButton>
             </div>
           }
         />
       </Section>
+      </IsometricContext.Provider>
 
       <footer className="a3d-footer">
         ambient3d · visual reference for{" "}

@@ -23,7 +23,7 @@ export function AmbientLights({ distance = 8, shadows = true }: AmbientLightsPro
     const kp: [number, number, number] = [
       theme.lightX * distance,
       -theme.lightY * distance,
-      distance * 0.7,
+      distance * 1.8,
     ];
     const fp: [number, number, number] = [
       -theme.lightX * distance * 0.6,
@@ -45,14 +45,14 @@ export function AmbientLights({ distance = 8, shadows = true }: AmbientLightsPro
         color={keyColor}
         intensity={theme.keyLight * 2.4}
         castShadow={shadows}
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
         shadow-camera-left={-6}
         shadow-camera-right={6}
         shadow-camera-top={6}
         shadow-camera-bottom={-6}
         shadow-camera-near={0.1}
-        shadow-camera-far={30}
+        shadow-camera-far={20}
       />
       <directionalLight
         position={fillPos}

@@ -44,8 +44,8 @@ export function AmbientSwitch3D({
     [theme.lightHue, theme.lightSaturation, tint]
   );
 
-  const baseGeom = useMemo(() => createPlateGeometry(0.9, 0.55, 0.16, "fillet", "concave"), []);
-  const rockerGeom = useMemo(() => createPlateGeometry(0.78, 0.44, 0.14, "fillet", "convex"), []);
+  const baseGeom = useMemo(() => createPlateGeometry(0.9, 0.55, 0.08, "fillet", "concave"), []);
+  const rockerGeom = useMemo(() => createPlateGeometry(0.78, 0.44, 0.06, "fillet", "convex"), []);
 
   const targetAngle = checked ? -0.45 : 0.45;
 
@@ -66,7 +66,7 @@ export function AmbientSwitch3D({
   return (
     <group position={position} onClick={handleClick}>
       <mesh geometry={baseGeom} material={baseMaterial} castShadow receiveShadow />
-      <group ref={tiltRef} position={[0, 0, 0.1]}>
+      <group ref={tiltRef} position={[0, 0, 0.06]}>
         <mesh geometry={rockerGeom} material={rockerMaterial} castShadow receiveShadow />
       </group>
     </group>

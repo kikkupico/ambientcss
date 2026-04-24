@@ -6,7 +6,7 @@ export type AmbientPanel3DProps = AmbientSurface3DProps;
 export function AmbientPanel3D({
   width = 2.4,
   height = 1.6,
-  depth = 0.35,
+  depth = 0.08,
   edge = "fillet",
   surface = "flat",
   material = "matte",
