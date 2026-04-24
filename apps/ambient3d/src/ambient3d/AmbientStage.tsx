@@ -19,9 +19,9 @@ export type AmbientStageProps = PropsWithChildren<{
 
 function Backdrop() {
   const theme = useAmbient3DTheme();
-  const sat = Math.min(theme.lightSaturation, 100) / 100;
-  const lightness = 0.12 + theme.keyLight * 0.12;
-  const bg = new Color().setHSL(theme.lightHue / 360, sat * 0.5, lightness);
+  // Match the matte surface base colour so shadows read naturally against it
+  const sat = Math.min(theme.lightSaturation, 12) / 100;
+  const bg = new Color().setHSL(theme.lightHue / 360, sat, 0.68);
   return (
     <mesh position={[0, 0, -4]} receiveShadow>
       <planeGeometry args={[40, 40]} />
