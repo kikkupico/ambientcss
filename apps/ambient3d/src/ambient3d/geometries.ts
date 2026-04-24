@@ -9,10 +9,10 @@ import type { AmbientEdge, AmbientSurface } from "./types";
 
 const EDGE_SIZE: Record<AmbientEdge, number> = {
   square: 0,
-  chamfer: 0.06,
-  "chamfer-2": 0.14,
-  fillet: 0.1,
-  "fillet-2": 0.24,
+  chamfer: 0.018,
+  "chamfer-2": 0.032,
+  fillet: 0.022,
+  "fillet-2": 0.036,
 };
 
 /**

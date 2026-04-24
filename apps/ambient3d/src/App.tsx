@@ -148,7 +148,6 @@ function OrbitScene() {
             key={i}
             width={0.9}
             height={0.9}
-            depth={0.3}
             edge={edges[i % 3] ?? "fillet"}
             surface="flat"
             elevation={2}
@@ -169,7 +168,6 @@ function ElevationScene() {
           key={elev}
           width={1}
           height={1}
-          depth={0.3}
           edge="chamfer"
           surface="flat"
           elevation={elev}
@@ -189,7 +187,6 @@ function SurfaceScene() {
           key={s}
           width={1.4}
           height={1.4}
-          depth={0.34}
           edge="chamfer-2"
           surface={s}
           elevation={2}
@@ -209,7 +206,6 @@ function EdgeScene() {
           key={edge}
           width={1.2}
           height={1.2}
-          depth={0.35}
           edge={edge}
           surface="flat"
           elevation={1}
@@ -224,22 +220,11 @@ function MaterialScene() {
   const mats: AmbientMaterial[] = ["matte", "shiny", "glass"];
   return (
     <AmbientStage cameraDistance={7}>
-      {/* a subtle background panel to reflect onto the glass */}
-      <AmbientPanel3D
-        width={7}
-        height={3}
-        depth={0.2}
-        material="matte"
-        elevation={0}
-        position={[0, 0, -1.2]}
-        edge="fillet-2"
-      />
       {mats.map((m, i) => (
         <AmbientSurface3D
           key={m}
           width={1.6}
           height={1.8}
-          depth={0.4}
           edge="fillet"
           surface="convex"
           elevation={2}
@@ -272,15 +257,6 @@ function ComponentScene({
 }) {
   return (
     <AmbientStage cameraDistance={7}>
-      <AmbientPanel3D
-        width={6}
-        height={3.5}
-        depth={0.25}
-        position={[0, 0, -0.2]}
-        edge="fillet-2"
-        elevation={0}
-        material="matte"
-      />
       <AmbientKnob3D position={[-2, 0.6, 0]} value={knob} onChange={setKnob} material="shiny" />
       <AmbientFader3D position={[-0.6, 0.1, 0]} value={fader} onChange={setFader} material="glass" />
       <AmbientSlider3D position={[1.2, -1, 0]} value={slider} onChange={setSlider} />

@@ -101,22 +101,22 @@ export function AmbientKnob3D({
   return (
     <group position={position}>
       {/* Base plate — cylinder rotated so its axis points along world Z */}
-      <mesh position={[0, 0, -0.05]} rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow material={bodyMaterial}>
-        <cylinderGeometry args={[radius * 1.3, radius * 1.3, 0.12, 48]} />
+      <mesh position={[0, 0, 0.00]} rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow material={bodyMaterial}>
+        <cylinderGeometry args={[radius * 1.3, radius * 1.3, 0.08, 48]} />
       </mesh>
       {/* Rotating cap group — rotations.z drives the knob angle */}
       <group
         ref={capGroupRef}
-        position={[0, 0, 0.15]}
+        position={[0, 0, 0.08]}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
       >
         <mesh rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow material={capMaterial}>
-          <cylinderGeometry args={[radius, radius, 0.2, 48]} />
+          <cylinderGeometry args={[radius, radius, 0.10, 48]} />
         </mesh>
-        <mesh position={[0, radius * 0.55, 0.11]} castShadow material={markerMaterial}>
+        <mesh position={[0, radius * 0.55, 0.06]} castShadow material={markerMaterial}>
           <boxGeometry args={[0.06, 0.12, 0.04]} />
         </mesh>
       </group>

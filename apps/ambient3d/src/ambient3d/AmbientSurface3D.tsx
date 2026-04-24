@@ -12,9 +12,9 @@ import type {
 
 const ELEVATION_Z: Record<AmbientElevation, number> = {
   0: 0,
-  1: 0.25,
-  2: 0.55,
-  3: 0.95,
+  1: 0.06,
+  2: 0.12,
+  3: 0.20,
 };
 
 export type AmbientSurface3DProps = {
@@ -45,7 +45,7 @@ export const AmbientSurface3D = forwardRef<Mesh, AmbientSurface3DProps>(function
   {
     width = 1.6,
     height = 1.0,
-    depth = 0.25,
+    depth = 0.08,
     surface = "flat",
     edge = "fillet",
     material = "matte",

@@ -60,7 +60,7 @@ export function AmbientFader3D({
   );
 
   const baseGeom = useMemo(
-    () => createPlateGeometry(0.55, height, 0.18, "fillet", "flat"),
+    () => createPlateGeometry(0.55, height, 0.08, "fillet", "flat"),
     [height]
   );
   const slotGeom = useMemo(
@@ -68,7 +68,7 @@ export function AmbientFader3D({
     [height]
   );
   const capGeom = useMemo(
-    () => createPlateGeometry(0.42, 0.28, 0.18, "fillet", "convex"),
+    () => createPlateGeometry(0.42, 0.28, 0.08, "fillet", "convex"),
     []
   );
 
@@ -111,10 +111,10 @@ export function AmbientFader3D({
   return (
     <group position={position}>
       <mesh geometry={baseGeom} material={baseMaterial} castShadow receiveShadow />
-      <mesh geometry={slotGeom} material={slotMaterial} position={[0, 0, 0.09]} receiveShadow />
+      <mesh geometry={slotGeom} material={slotMaterial} position={[0, 0, 0.04]} receiveShadow />
       <group
         ref={capRef}
-        position={[0, targetY, 0.18]}
+        position={[0, targetY, 0.08]}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}

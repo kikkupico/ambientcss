@@ -60,7 +60,7 @@ export function AmbientSlider3D({
   );
 
   const baseGeom = useMemo(
-    () => createPlateGeometry(width, 0.55, 0.18, "fillet", "flat"),
+    () => createPlateGeometry(width, 0.55, 0.08, "fillet", "flat"),
     [width]
   );
   const trackGeom = useMemo(
@@ -107,17 +107,17 @@ export function AmbientSlider3D({
   return (
     <group position={position}>
       <mesh geometry={baseGeom} material={baseMaterial} castShadow receiveShadow />
-      <mesh geometry={trackGeom} material={trackMaterial} position={[0, 0, 0.09]} receiveShadow />
+      <mesh geometry={trackGeom} material={trackMaterial} position={[0, 0, 0.04]} receiveShadow />
       <group
         ref={puckRef}
-        position={[targetX, 0, 0.18]}
+        position={[targetX, 0, 0.08]}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
       >
         <mesh rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow material={puckMaterial}>
-          <cylinderGeometry args={[0.2, 0.2, 0.18, 40]} />
+          <cylinderGeometry args={[0.2, 0.2, 0.08, 40]} />
         </mesh>
       </group>
     </group>
