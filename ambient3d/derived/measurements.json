@@ -1,0 +1,1072 @@
+{
+  "calib/chamfer_default.png": {
+    "amb": {
+      "chamfer": 1,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "edge_bands": {
+        "bottom": {
+          "baseline_srgb": 0.8902460463352011,
+          "mean_delta_srgb": -0.22550125953159064,
+          "peak_srgb": -0.23672713877217577,
+          "width_mm": 0.75
+        },
+        "left": {
+          "baseline_srgb": 0.9096609477124172,
+          "mean_delta_srgb": 0.09030014783691365,
+          "peak_srgb": 0.09033905228758277,
+          "width_mm": 0.75
+        },
+        "right": {
+          "baseline_srgb": 0.8903988678804833,
+          "mean_delta_srgb": -0.22601005680049469,
+          "peak_srgb": -0.2377611461251129,
+          "width_mm": 0.75
+        },
+        "top": {
+          "baseline_srgb": 0.9096981500933708,
+          "mean_delta_srgb": 0.09017930088702135,
+          "peak_srgb": 0.09030184990662915,
+          "width_mm": 0.75
+        }
+      }
+    }
+  },
+  "calib/surface_default.png": {
+    "amb": {
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 91.12589179714912,
+        "noise": 0.007148071451134525,
+        "srgb_pct": 90.00982207697896
+      }
+    }
+  },
+  "sweeps/chamfer/chamfer_width=2.png": {
+    "amb": {
+      "chamfer": 1,
+      "chamfer_width": 2,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "edge_bands": {
+        "bottom": {
+          "baseline_srgb": 0.8902219742063495,
+          "mean_delta_srgb": -0.23208788723822885,
+          "peak_srgb": -0.23763677345938394,
+          "width_mm": 1.75
+        },
+        "left": {
+          "baseline_srgb": 0.909608061974789,
+          "mean_delta_srgb": 0.09037026268840957,
+          "peak_srgb": 0.09039193802521095,
+          "width_mm": 1.75
+        },
+        "right": {
+          "baseline_srgb": 0.8904740021008379,
+          "mean_delta_srgb": -0.23208397942509978,
+          "peak_srgb": -0.2381222280578862,
+          "width_mm": 1.75
+        },
+        "top": {
+          "baseline_srgb": 0.9097065388655464,
+          "mean_delta_srgb": 0.09022843512404942,
+          "peak_srgb": 0.09029346113445358,
+          "width_mm": 1.75
+        }
+      }
+    }
+  },
+  "sweeps/chamfer/fill_light_intensity=0.3.png": {
+    "amb": {
+      "chamfer": 1,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.3,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "edge_bands": {
+        "bottom": {
+          "baseline_srgb": 0.790638494981326,
+          "mean_delta_srgb": -0.280815121187364,
+          "peak_srgb": -0.2967309319561159,
+          "width_mm": 0.75
+        },
+        "left": {
+          "baseline_srgb": 0.813157606792718,
+          "mean_delta_srgb": 0.12465168359010059,
+          "peak_srgb": 0.13022474614845791,
+          "width_mm": 0.75
+        },
+        "right": {
+          "baseline_srgb": 0.7907198295985043,
+          "mean_delta_srgb": -0.2819643829754109,
+          "peak_srgb": -0.29735498366012875,
+          "width_mm": 0.75
+        },
+        "top": {
+          "baseline_srgb": 0.8132210696778714,
+          "mean_delta_srgb": 0.12545384473233712,
+          "peak_srgb": 0.13160269316059725,
+          "width_mm": 0.75
+        }
+      }
+    }
+  },
+  "sweeps/chamfer/fill_light_intensity=0.5.png": {
+    "amb": {
+      "chamfer": 1,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.5,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "edge_bands": {
+        "bottom": {
+          "baseline_srgb": 0.8423837243230626,
+          "mean_delta_srgb": -0.248596765094927,
+          "peak_srgb": -0.2615247140522877,
+          "width_mm": 0.75
+        },
+        "left": {
+          "baseline_srgb": 0.8631659955648892,
+          "mean_delta_srgb": 0.11549102279801005,
+          "peak_srgb": 0.12089679621848826,
+          "width_mm": 0.75
+        },
+        "right": {
+          "baseline_srgb": 0.842486213235295,
+          "mean_delta_srgb": -0.24935479400093477,
+          "peak_srgb": -0.262543402777779,
+          "width_mm": 0.75
+        },
+        "top": {
+          "baseline_srgb": 0.8632367530345474,
+          "mean_delta_srgb": 0.11619835434173642,
+          "peak_srgb": 0.12211572128851511,
+          "width_mm": 0.75
+        }
+      }
+    }
+  },
+  "sweeps/chamfer/fill_light_intensity=0.7.png": {
+    "amb": {
+      "chamfer": 1,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "edge_bands": {
+        "bottom": {
+          "baseline_srgb": 0.8902467757936511,
+          "mean_delta_srgb": -0.22550587943510758,
+          "peak_srgb": -0.23672786823062575,
+          "width_mm": 0.75
+        },
+        "left": {
+          "baseline_srgb": 0.9096583946078421,
+          "mean_delta_srgb": 0.09030270094148873,
+          "peak_srgb": 0.09034160539215785,
+          "width_mm": 0.75
+        },
+        "right": {
+          "baseline_srgb": 0.8903981384220332,
+          "mean_delta_srgb": -0.22598792989417651,
+          "peak_srgb": -0.23774874533146217,
+          "width_mm": 0.75
+        },
+        "top": {
+          "baseline_srgb": 0.9096981500933708,
+          "mean_delta_srgb": 0.09017930088702135,
+          "peak_srgb": 0.09030184990662915,
+          "width_mm": 0.75
+        }
+      }
+    }
+  },
+  "sweeps/chamfer/key_light_intensity=0.3.png": {
+    "amb": {
+      "chamfer": 1,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.3,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "edge_bands": {
+        "bottom": {
+          "baseline_srgb": 0.7127421802054155,
+          "mean_delta_srgb": -0.09561644102085287,
+          "peak_srgb": -0.0997228057889823,
+          "width_mm": 0.75
+        },
+        "left": {
+          "baseline_srgb": 0.7214464431605967,
+          "mean_delta_srgb": 0.04713432247899085,
+          "peak_srgb": 0.04914179213351988,
+          "width_mm": 0.75
+        },
+        "right": {
+          "baseline_srgb": 0.712829350490197,
+          "mean_delta_srgb": -0.0960770940320587,
+          "peak_srgb": -0.10085456057423114,
+          "width_mm": 0.75
+        },
+        "top": {
+          "baseline_srgb": 0.7215441905929038,
+          "mean_delta_srgb": 0.04762403225178976,
+          "peak_srgb": 0.050199506886087986,
+          "width_mm": 0.75
+        }
+      }
+    }
+  },
+  "sweeps/chamfer/key_light_intensity=0.5.png": {
+    "amb": {
+      "chamfer": 1,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.5,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "edge_bands": {
+        "bottom": {
+          "baseline_srgb": 0.7778620302287584,
+          "mean_delta_srgb": -0.14427192752100873,
+          "peak_srgb": -0.15123971463585473,
+          "width_mm": 0.75
+        },
+        "left": {
+          "baseline_srgb": 0.790782198295983,
+          "mean_delta_srgb": 0.07141629221132868,
+          "peak_srgb": 0.07481070553221314,
+          "width_mm": 0.75
+        },
+        "right": {
+          "baseline_srgb": 0.7779802024976674,
+          "mean_delta_srgb": -0.14471106150793878,
+          "peak_srgb": -0.15203482434640703,
+          "width_mm": 0.75
+        },
+        "top": {
+          "baseline_srgb": 0.7908555088702148,
+          "mean_delta_srgb": 0.07201408341114242,
+          "peak_srgb": 0.07580532212885172,
+          "width_mm": 0.75
+        }
+      }
+    }
+  },
+  "sweeps/chamfer/key_light_intensity=0.7.png": {
+    "amb": {
+      "chamfer": 1,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.7,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "edge_bands": {
+        "bottom": {
+          "baseline_srgb": 0.8365593633286649,
+          "mean_delta_srgb": -0.18725964344070978,
+          "peak_srgb": -0.19636912056489286,
+          "width_mm": 0.75
+        },
+        "left": {
+          "baseline_srgb": 0.8529532125350116,
+          "mean_delta_srgb": 0.09117221541394475,
+          "peak_srgb": 0.09538362219887975,
+          "width_mm": 0.75
+        },
+        "right": {
+          "baseline_srgb": 0.8366811828898238,
+          "mean_delta_srgb": -0.18756431392001408,
+          "peak_srgb": -0.19734878326330674,
+          "width_mm": 0.75
+        },
+        "top": {
+          "baseline_srgb": 0.8529871323529412,
+          "mean_delta_srgb": 0.09176854769685656,
+          "peak_srgb": 0.09663938492063495,
+          "width_mm": 0.75
+        }
+      }
+    }
+  },
+  "sweeps/chamfer/key_light_intensity=0.9.png": {
+    "amb": {
+      "chamfer": 1,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "edge_bands": {
+        "bottom": {
+          "baseline_srgb": 0.890246411064426,
+          "mean_delta_srgb": -0.22550356948334904,
+          "peak_srgb": -0.2367275035014007,
+          "width_mm": 0.75
+        },
+        "left": {
+          "baseline_srgb": 0.9096580298786172,
+          "mean_delta_srgb": 0.09030306567071367,
+          "peak_srgb": 0.09034197012138279,
+          "width_mm": 0.75
+        },
+        "right": {
+          "baseline_srgb": 0.8903988678804833,
+          "mean_delta_srgb": -0.22598865935262666,
+          "peak_srgb": -0.23772613211951066,
+          "width_mm": 0.75
+        },
+        "top": {
+          "baseline_srgb": 0.9096977853641458,
+          "mean_delta_srgb": 0.0901796656162464,
+          "peak_srgb": 0.0903022146358542,
+          "width_mm": 0.75
+        }
+      }
+    }
+  },
+  "sweeps/chamfer/light=-1,-1.png": {
+    "amb": {
+      "chamfer": 1,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "edge_bands": {
+        "bottom": {
+          "baseline_srgb": 0.8902456816059761,
+          "mean_delta_srgb": -0.2255008948023656,
+          "peak_srgb": -0.23672677404295073,
+          "width_mm": 0.75
+        },
+        "left": {
+          "baseline_srgb": 0.9096576651493922,
+          "mean_delta_srgb": 0.09030343039993871,
+          "peak_srgb": 0.09034233485060783,
+          "width_mm": 0.75
+        },
+        "right": {
+          "baseline_srgb": 0.8903977736928081,
+          "mean_delta_srgb": -0.22598172949735115,
+          "peak_srgb": -0.23771920226423526,
+          "width_mm": 0.75
+        },
+        "top": {
+          "baseline_srgb": 0.9096981500933708,
+          "mean_delta_srgb": 0.09017930088702135,
+          "peak_srgb": 0.09030184990662915,
+          "width_mm": 0.75
+        }
+      }
+    }
+  },
+  "sweeps/chamfer/light=-1,0.png": {
+    "amb": {
+      "chamfer": 1,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": 0.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "edge_bands": {
+        "bottom": {
+          "baseline_srgb": 0.8945133782679741,
+          "mean_delta_srgb": -0.0540469139044509,
+          "peak_srgb": -0.05609134278711514,
+          "width_mm": 0.75
+        },
+        "left": {
+          "baseline_srgb": 0.9089245594070938,
+          "mean_delta_srgb": 0.09107544059290618,
+          "peak_srgb": 0.09107544059290618,
+          "width_mm": 0.75
+        },
+        "right": {
+          "baseline_srgb": 0.8810275151727319,
+          "mean_delta_srgb": -0.21929782329598013,
+          "peak_srgb": -0.23078241713351488,
+          "width_mm": 0.75
+        },
+        "top": {
+          "baseline_srgb": 0.8946176908263308,
+          "mean_delta_srgb": -0.054347693938686735,
+          "peak_srgb": -0.057211061507936645,
+          "width_mm": 0.75
+        }
+      }
+    }
+  },
+  "sweeps/chamfer/light=-1,1.png": {
+    "amb": {
+      "chamfer": 1,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": 1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "edge_bands": {
+        "bottom": {
+          "baseline_srgb": 0.9097269637021477,
+          "mean_delta_srgb": 0.09015243250077794,
+          "peak_srgb": 0.09027303629785233,
+          "width_mm": 0.75
+        },
+        "left": {
+          "baseline_srgb": 0.9096711601307166,
+          "mean_delta_srgb": 0.09030355197634847,
+          "peak_srgb": 0.09032883986928342,
+          "width_mm": 0.75
+        },
+        "right": {
+          "baseline_srgb": 0.8903908438375372,
+          "mean_delta_srgb": -0.22605066332088575,
+          "peak_srgb": -0.23798071311858204,
+          "width_mm": 0.75
+        },
+        "top": {
+          "baseline_srgb": 0.8904678017040152,
+          "mean_delta_srgb": -0.22602646961562423,
+          "peak_srgb": -0.23879296510270798,
+          "width_mm": 0.75
+        }
+      }
+    }
+  },
+  "sweeps/chamfer/light=0,-1.png": {
+    "amb": {
+      "chamfer": 1,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": 0.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "edge_bands": {
+        "bottom": {
+          "baseline_srgb": 0.8808987657563028,
+          "mean_delta_srgb": -0.2188403312713976,
+          "peak_srgb": -0.22959157621381898,
+          "width_mm": 0.75
+        },
+        "left": {
+          "baseline_srgb": 0.8944473622782412,
+          "mean_delta_srgb": -0.05460531434795698,
+          "peak_srgb": -0.05660305788981834,
+          "width_mm": 0.75
+        },
+        "right": {
+          "baseline_srgb": 0.8944229254201648,
+          "mean_delta_srgb": -0.05484931819949904,
+          "peak_srgb": -0.058317649976655894,
+          "width_mm": 0.75
+        },
+        "top": {
+          "baseline_srgb": 0.9089668679971992,
+          "mean_delta_srgb": 0.09103313200280083,
+          "peak_srgb": 0.09103313200280083,
+          "width_mm": 0.75
+        }
+      }
+    }
+  },
+  "sweeps/chamfer/light=0,1.png": {
+    "amb": {
+      "chamfer": 1,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": 0.0,
+      "light_y": 1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "edge_bands": {
+        "bottom": {
+          "baseline_srgb": 0.9089796335200748,
+          "mean_delta_srgb": 0.09102036647992517,
+          "peak_srgb": 0.09102036647992517,
+          "width_mm": 0.75
+        },
+        "left": {
+          "baseline_srgb": 0.8944309494631184,
+          "mean_delta_srgb": -0.05449358562869688,
+          "peak_srgb": -0.05654579540149507,
+          "width_mm": 0.75
+        },
+        "right": {
+          "baseline_srgb": 0.8944517390289447,
+          "mean_delta_srgb": -0.05483922735761052,
+          "peak_srgb": -0.05829394257703069,
+          "width_mm": 0.75
+        },
+        "top": {
+          "baseline_srgb": 0.8811241684173673,
+          "mean_delta_srgb": -0.21944894277155336,
+          "peak_srgb": -0.23164937850140088,
+          "width_mm": 0.75
+        }
+      }
+    }
+  },
+  "sweeps/chamfer/light=1,-1.png": {
+    "amb": {
+      "chamfer": 1,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": 1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "edge_bands": {
+        "bottom": {
+          "baseline_srgb": 0.8902281746031749,
+          "mean_delta_srgb": -0.22546199035169653,
+          "peak_srgb": -0.2366275676937445,
+          "width_mm": 0.75
+        },
+        "left": {
+          "baseline_srgb": 0.8903470763305299,
+          "mean_delta_srgb": -0.22574429077186117,
+          "peak_srgb": -0.2373008578431336,
+          "width_mm": 0.75
+        },
+        "right": {
+          "baseline_srgb": 0.90970252684407,
+          "mean_delta_srgb": 0.09027996615312883,
+          "peak_srgb": 0.09029747315592995,
+          "width_mm": 0.75
+        },
+        "top": {
+          "baseline_srgb": 0.9096908555088703,
+          "mean_delta_srgb": 0.0902352260348583,
+          "peak_srgb": 0.0903091444911297,
+          "width_mm": 0.75
+        }
+      }
+    }
+  },
+  "sweeps/chamfer/light=1,0.png": {
+    "amb": {
+      "chamfer": 1,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": 1.0,
+      "light_y": 0.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "edge_bands": {
+        "bottom": {
+          "baseline_srgb": 0.8945214023109247,
+          "mean_delta_srgb": -0.05392655326019328,
+          "peak_srgb": -0.05593013246965495,
+          "width_mm": 0.75
+        },
+        "left": {
+          "baseline_srgb": 0.8810180322128813,
+          "mean_delta_srgb": -0.21932724478679907,
+          "peak_srgb": -0.2303819444444395,
+          "width_mm": 0.75
+        },
+        "right": {
+          "baseline_srgb": 0.9089544672035457,
+          "mean_delta_srgb": 0.09104553279645433,
+          "peak_srgb": 0.09104553279645433,
+          "width_mm": 0.75
+        },
+        "top": {
+          "baseline_srgb": 0.8945998190943047,
+          "mean_delta_srgb": -0.05424617763772207,
+          "peak_srgb": -0.05712316176470622,
+          "width_mm": 0.75
+        }
+      }
+    }
+  },
+  "sweeps/chamfer/light=1,1.png": {
+    "amb": {
+      "chamfer": 1,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": 1.0,
+      "light_y": 1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "edge_bands": {
+        "bottom": {
+          "baseline_srgb": 0.909747023809524,
+          "mean_delta_srgb": 0.09011875583566742,
+          "peak_srgb": 0.09025297619047601,
+          "width_mm": 0.75
+        },
+        "left": {
+          "baseline_srgb": 0.8903540061858096,
+          "mean_delta_srgb": -0.2258251390834127,
+          "peak_srgb": -0.23723192401960913,
+          "width_mm": 0.75
+        },
+        "right": {
+          "baseline_srgb": 0.9097065388655438,
+          "mean_delta_srgb": 0.09026233757392092,
+          "peak_srgb": 0.09029346113445624,
+          "width_mm": 0.75
+        },
+        "top": {
+          "baseline_srgb": 0.8904696253501403,
+          "mean_delta_srgb": -0.22598355314347982,
+          "peak_srgb": -0.238654732726424,
+          "width_mm": 0.75
+        }
+      }
+    }
+  },
+  "sweeps/surface/fill_light_intensity=0.35.png": {
+    "amb": {
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.35,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 83.4336894080158,
+        "noise": 0.008100860406109052,
+        "srgb_pct": 81.51555918663765
+      }
+    }
+  },
+  "sweeps/surface/fill_light_intensity=0.7.png": {
+    "amb": {
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 91.12588976079886,
+        "noise": 0.007148150615706421,
+        "srgb_pct": 90.00981980755269
+      }
+    }
+  },
+  "sweeps/surface/fill_light_intensity=0.png": {
+    "amb": {
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.0,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 74.32210937938207,
+        "noise": 0.009520711994208475,
+        "srgb_pct": 71.66539124909221
+      }
+    }
+  },
+  "sweeps/surface/key_light_intensity=0.1.png": {
+    "amb": {
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.1,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 67.1232928069519,
+        "noise": 0.002023559653650702,
+        "srgb_pct": 64.05580746187363
+      }
+    }
+  },
+  "sweeps/surface/key_light_intensity=0.2.png": {
+    "amb": {
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.2,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 70.90021308831156,
+        "noise": 0.002752225695753486,
+        "srgb_pct": 68.02855392156862
+      }
+    }
+  },
+  "sweeps/surface/key_light_intensity=0.3.png": {
+    "amb": {
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.3,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 74.37333957198966,
+        "noise": 0.003507250743478128,
+        "srgb_pct": 71.72010484749454
+      }
+    }
+  },
+  "sweeps/surface/key_light_intensity=0.4.png": {
+    "amb": {
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.4,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 77.59794157092838,
+        "noise": 0.004240975878721348,
+        "srgb_pct": 75.1794344589688
+      }
+    }
+  },
+  "sweeps/surface/key_light_intensity=0.5.png": {
+    "amb": {
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.5,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 80.61599795977678,
+        "noise": 0.004906985870236624,
+        "srgb_pct": 78.44431281771969
+      }
+    }
+  },
+  "sweeps/surface/key_light_intensity=0.6.png": {
+    "amb": {
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.6,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 83.45569657829067,
+        "noise": 0.005523526290858821,
+        "srgb_pct": 81.5396332607117
+      }
+    }
+  },
+  "sweeps/surface/key_light_intensity=0.7.png": {
+    "amb": {
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.7,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 86.14121650206432,
+        "noise": 0.006099094312321935,
+        "srgb_pct": 84.48730709876544
+      }
+    }
+  },
+  "sweeps/surface/key_light_intensity=0.8.png": {
+    "amb": {
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.8,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 88.69285952235384,
+        "noise": 0.006644148952462708,
+        "srgb_pct": 87.3060525599129
+      }
+    }
+  },
+  "sweeps/surface/key_light_intensity=0.9.png": {
+    "amb": {
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 91.12587754269697,
+        "noise": 0.007148106833505609,
+        "srgb_pct": 90.00980619099494
+      }
+    }
+  },
+  "sweeps/surface/key_light_intensity=1.png": {
+    "amb": {
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 1.0,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat"
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 93.45337012970211,
+        "noise": 0.007626070791008943,
+        "srgb_pct": 92.6107048838054
+      }
+    }
+  }
+}

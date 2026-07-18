@@ -126,13 +126,25 @@
       calc(var(--amb-light-x) * var(--amb-elevation) * -8px)
       calc(var(--amb-light-y) * var(--amb-elevation) * -8px)
       calc(var(--amb-elevation) * 8px) calc(var(--amb-elevation) * -4px),
+    /* Chamfer bands, grounded (ambient3d/derived/notes/chamfer.md): both
+       alphas are affine and the highlight rides the fill light too — a
+       45deg face keeps a residual band even when key equals fill, which
+       the old proportional formulas zeroed out. hl R^2 0.99, sh R^2 0.98
+       (residual: a faint band on edges perpendicular to an axis-aligned
+       light, inexpressible per-edge in box-shadow). */
     inset calc(var(--amb-light-x) * var(--amb-chamfer-width) * -1px)
       calc(var(--amb-light-y) * var(--amb-chamfer-width) * -1px) 0px 0px
       hsl(
         var(--amb-light-hue)
         var(--amb-light-saturation)
         100%
-        / calc(var(--amb-chamfer) * var(--amb-key-light-intensity))
+        / calc(
+            var(--amb-chamfer) *
+              (
+                var(--amb-key-light-intensity) * 1.48 +
+                  var(--amb-fill-light-intensity) * 0.79 - 0.89
+              )
+          )
       ),
     inset calc(var(--amb-light-x) * var(--amb-chamfer-width) * 1px)
       calc(var(--amb-light-y) * var(--amb-chamfer-width) * 1px) 0px 0px
@@ -142,8 +154,9 @@
         0%
         / calc(
             var(--amb-chamfer) *
-              calc(
-                var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
+              (
+                (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
+                  * 0.21 + 0.22
               )
           )
       ),
@@ -175,10 +188,17 @@
    -------------------------------------------------------------------------- */
 
 .amb-surface {
+  /* Grounded fit (ambient3d/derived/notes/surface.md): both lights brighten
+     a surface, so lightness is affine in key AND fill intensity — the fill
+     floors it and sRGB gamma compresses the key slope. R^2 0.996 over the
+     key+fill sweeps; reproduces the old 90% at the (0.9, 0.7) defaults. */
   background-color: hsl(
     var(--amb-light-hue)
     var(--amb-light-saturation)
-    calc(var(--amb-key-light-intensity) * 100%)
+    calc(
+      var(--amb-key-light-intensity) * 31.5% +
+        var(--amb-fill-light-intensity) * 26.4% + 43.6%
+    )
   );
 }
 

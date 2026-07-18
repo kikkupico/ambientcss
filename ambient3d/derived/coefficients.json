@@ -1,0 +1,94 @@
+{
+  "chamfer": {
+    "model": "hl_alpha = p * Ik + pf * If + p0; sh_alpha = q * (Ik - If) + q0; offset_px = w * chamfer_width",
+    "n_highlight_samples": 30,
+    "n_shadow_samples": 30,
+    "p0_highlight": -0.893,
+    "p_highlight_per_key": 1.479,
+    "pf_highlight_per_fill": 0.793,
+    "q0_shadow": 0.216,
+    "q_shadow_per_contrast": 0.205,
+    "r2_highlight": 0.9865,
+    "r2_shadow": 0.9779,
+    "w_px_per_width": 1.0,
+    "width_mm_by_chamfer_width": {
+      "1": 0.75,
+      "2": 1.75
+    }
+  },
+  "surface": {
+    "f_pct": 26.38,
+    "floor_pct": 43.56,
+    "k_pct": 31.45,
+    "max_resid_pct": 1.116,
+    "model": "L% = k * key_intensity + f * fill_intensity + floor",
+    "r2": 0.99599,
+    "samples": [
+      [
+        0.1,
+        0.7,
+        64.06
+      ],
+      [
+        0.2,
+        0.7,
+        68.03
+      ],
+      [
+        0.3,
+        0.7,
+        71.72
+      ],
+      [
+        0.4,
+        0.7,
+        75.18
+      ],
+      [
+        0.5,
+        0.7,
+        78.44
+      ],
+      [
+        0.6,
+        0.7,
+        81.54
+      ],
+      [
+        0.7,
+        0.7,
+        84.49
+      ],
+      [
+        0.8,
+        0.7,
+        87.31
+      ],
+      [
+        0.9,
+        0.0,
+        71.67
+      ],
+      [
+        0.9,
+        0.35,
+        81.52
+      ],
+      [
+        0.9,
+        0.7,
+        90.01
+      ],
+      [
+        0.9,
+        0.7,
+        90.01
+      ],
+      [
+        1.0,
+        0.7,
+        92.61
+      ]
+    ]
+  }
+}

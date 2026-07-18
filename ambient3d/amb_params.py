@@ -1,0 +1,221 @@
+"""The ambientcss parameter vocabulary, mapped to physical scene values.
+
+This module is the bridge between the CSS lighting model (--amb-* custom
+properties) and the Blender kit: the same names, mapped to millimetres,
+light positions, energies and BSDF settings. generate.py uses it to light
+beauty shots from amb params; calibrate.py uses it to build the flat-on
+orthographic rig whose renders ground the CSS coefficients.
+
+Rig geometry (fixed design constants — the CSS is derived from these,
+never the other way around):
+
+  1 CSS px = 1 mm, rendered at PX_PER_MM px/mm for sub-pixel measurement.
+  Orthographic camera at (0, 0, CAM_Z) looking straight down -Z with
+  image-up = +Y, so CSS screen coords map as sx = X, sy = -Y.
+  Key light: one AREA light of size LIGHT_SIZE at
+  (LIGHT_R * light_x, -LIGHT_R * light_y, LIGHT_Z), tracked at the origin,
+  energy E0 * key_light_intensity. Components deliberately unnormalized so
+  per-axis behavior matches the per-axis CSS formulas.
+  Fill light: uniform world background of strength S0 * fill_light_intensity
+  (this is what CSS fill is: a directionless lift that softens shadows).
+"""
+
+import bpy
+
+from components._common import prism_object
+
+# The pure half of the model (constants, amb(), mm mappings) lives in
+# amb_model.py so the measurement pipeline can import it without bpy.
+from amb_model import (  # noqa: F401  (re-exported for callers)
+    PX_PER_MM, FRAME_MM, CAM_Z, LIGHT_R, LIGHT_Z, LIGHT_SIZE,
+    GROUND_MM, GROUND_ALBEDO, E0, S0, key_energy,
+    CHAMFER_MM_PER_WIDTH, FILLET_MM_PER_WIDTH, ELEVATION_MM_PER_LEVEL,
+    AMB_DEFAULTS, amb, edge_mm, elevation_mm,
+)
+
+
+# ------------------------------------------------------------- materials ---
+
+def calib_material(name, albedo, rough=1.0):
+    """Near-Lambertian neutral: linear-space albedo, no specular sheen."""
+    mat = bpy.data.materials.new(name)
+    mat.use_nodes = True
+    bsdf = next(n for n in mat.node_tree.nodes if n.type == "BSDF_PRINCIPLED")
+    bsdf.inputs["Base Color"].default_value = (albedo, albedo, albedo, 1.0)
+    bsdf.inputs["Roughness"].default_value = rough
+    for socket in ("Specular IOR Level", "Specular"):
+        if socket in bsdf.inputs:
+            bsdf.inputs[socket].default_value = 0.0
+            break
+    return mat
+
+
+def material_for(a, name="PlateMat", albedo=GROUND_ALBEDO):
+    """Plate material for an amb material kind (calibration variant)."""
+    kind = a["mat"]
+    if a["emit"]:
+        mat = calib_material(name, 0.05)
+        bsdf = next(n for n in mat.node_tree.nodes
+                    if n.type == "BSDF_PRINCIPLED")
+        from skeuo_kit import hex_to_linear
+        bsdf.inputs["Emission Color"].default_value = (
+            *hex_to_linear(a["emit"]), 1.0)
+        bsdf.inputs["Emission Strength"].default_value = 4.0
+        return mat
+    if kind == "matte":
+        return calib_material(name, albedo, rough=1.0)
+    if kind == "shiny":
+        mat = calib_material(name, albedo, rough=0.08)
+        bsdf = next(n for n in mat.node_tree.nodes
+                    if n.type == "BSDF_PRINCIPLED")
+        for socket in ("Specular IOR Level", "Specular"):
+            if socket in bsdf.inputs:
+                bsdf.inputs[socket].default_value = 0.5
+                break
+        return mat
+    if kind == "glass":
+        mat = calib_material(name, albedo, rough=0.35)
+        bsdf = next(n for n in mat.node_tree.nodes
+                    if n.type == "BSDF_PRINCIPLED")
+        bsdf.inputs["Transmission Weight"].default_value = 1.0
+        return mat
+    raise ValueError(f"unknown material kind '{kind}'")
+
+
+# --------------------------------------------------------------- lighting ---
+
+def apply_lighting(a, target=(0.0, 0.0, 0.0)):
+    """Key area light positioned from light-x/y + uniform world fill.
+    Replaces any studio lights; returns the key light object."""
+    scene = bpy.context.scene
+
+    world = bpy.data.worlds.new("AmbFill")
+    world.use_nodes = True
+    bg = world.node_tree.nodes["Background"]
+    bg.inputs["Color"].default_value = (1.0, 1.0, 1.0, 1.0)
+    bg.inputs["Strength"].default_value = S0 * a["fill_light_intensity"]
+    scene.world = world
+
+    empty = bpy.data.objects.new("AmbLightTarget", None)
+    empty.location = target
+    bpy.context.collection.objects.link(empty)
+
+    ldata = bpy.data.lights.new("AmbKey", type="AREA")
+    ldata.energy = key_energy(a)
+    ldata.size = LIGHT_SIZE
+    key = bpy.data.objects.new("AmbKey", ldata)
+    key.location = (LIGHT_R * a["light_x"], -LIGHT_R * a["light_y"], LIGHT_Z)
+    bpy.context.collection.objects.link(key)
+    tc = key.constraints.new("TRACK_TO")
+    tc.target = empty
+    tc.track_axis = "TRACK_NEGATIVE_Z"
+    tc.up_axis = "UP_Y"
+    return key
+
+
+# ---------------------------------------------------------------- the rig ---
+
+def _reference_patches(a, ground_mat):
+    """White tile and black light-trap in the frame margin, placed on the
+    light side of the frame so plate shadows can never reach them. Measured
+    values are anchored against these to neutralize exposure drift."""
+    lx, ly = a["light_x"], a["light_y"]
+    # unit-ish direction toward the light in screen coords; default top-left
+    if lx == 0 and ly == 0:
+        lx, ly = -1.0, -1.0
+    norm = max(abs(lx), abs(ly))
+    cx, cy = 52.0 * lx / norm, 52.0 * ly / norm  # screen mm, corner-ish
+    by = -cy  # blender Y
+
+    white = calib_material("RefWhite", 1.0)
+    patch = prism_object("RefWhite", [(-5, -5), (5, -5), (5, 5), (-5, 5)],
+                         0.0, 0.2, location=(cx, by, 0.0), material=white)
+
+    # black trap: open-topped box, interior traps light
+    black = calib_material("RefBlack", 0.0)
+    trap_pts = [(-5, -5), (5, -5), (5, 5), (-5, 5)]
+    trap = prism_object("RefBlack", trap_pts, 0.0, 0.2,
+                        location=(cx - (12 if abs(lx) >= abs(ly) else 0),
+                                  by + (0 if abs(lx) >= abs(ly) else -12),
+                                  0.0),
+                        material=black)
+    return patch, trap
+
+
+def setup_calibration_rig(a, resolution=None):
+    """Ground plane, reference patches, flat-on ortho camera and amb
+    lighting. Call on a reset scene; add the subject afterwards (or before —
+    order does not matter). Returns the ground object."""
+    scene = bpy.context.scene
+
+    ground_mat = calib_material("GroundMat", GROUND_ALBEDO)
+    g = GROUND_MM / 2
+    ground = prism_object("Ground", [(-g, -g), (g, -g), (g, g), (-g, g)],
+                          -2.0, 0.0, material=ground_mat)
+
+    _reference_patches(a, ground_mat)
+
+    cam_data = bpy.data.cameras.new("CalibCam")
+    cam_data.type = "ORTHO"
+    cam_data.ortho_scale = FRAME_MM
+    cam_data.clip_start = 1.0
+    cam_data.clip_end = CAM_Z * 4
+    cam = bpy.data.objects.new("CalibCam", cam_data)
+    cam.location = (0.0, 0.0, CAM_Z)
+    cam.rotation_euler = (0.0, 0.0, 0.0)  # looks down -Z, image-up = +Y
+    bpy.context.collection.objects.link(cam)
+    scene.camera = cam
+
+    apply_lighting(a)
+
+    res = resolution or FRAME_MM * PX_PER_MM
+    scene.render.resolution_x = res
+    scene.render.resolution_y = res
+    return ground
+
+
+def finalize_calibration_render(samples=512):
+    """Deterministic, measurement-grade render settings. Call after
+    skeuo_kit.setup_render(); asserts the Standard view transform, which the
+    whole measurement pipeline depends on (AgX would poison every fit)."""
+    scene = bpy.context.scene
+    scene.cycles.samples = samples
+    scene.cycles.seed = 0
+    scene.cycles.use_denoising = True
+    try:
+        scene.cycles.denoiser = "OPENIMAGEDENOISE"
+    except TypeError:
+        pass
+    assert scene.view_settings.view_transform == "Standard", (
+        "calibration renders require the Standard view transform")
+
+
+# ---------------------------------------------------------------- argparse ---
+
+def add_argparse_group(parser):
+    """--amb-* flags mirroring the CSS custom properties, for generate.py.
+    Returns the group. Use amb_from_args() to collect them."""
+    group = parser.add_argument_group("ambientcss parameters")
+    group.add_argument("--amb-light-x", type=float, default=None)
+    group.add_argument("--amb-light-y", type=float, default=None)
+    group.add_argument("--amb-key-light-intensity", type=float, default=None)
+    group.add_argument("--amb-fill-light-intensity", type=float, default=None)
+    group.add_argument("--amb-elevation", type=float, default=None)
+    group.add_argument("--amb-chamfer", type=float, default=None)
+    group.add_argument("--amb-chamfer-width", type=float, default=None)
+    group.add_argument("--amb-fillet", type=float, default=None)
+    group.add_argument("--amb-fillet-width", type=float, default=None)
+    group.add_argument("--amb-mat", choices=["matte", "shiny", "glass"],
+                       default=None)
+    group.add_argument("--amb-emit", default=None, metavar="HEX")
+    return group
+
+
+def amb_from_args(args):
+    """Collect --amb-* argparse values into an amb dict; None if none given."""
+    overrides = {}
+    for key in AMB_DEFAULTS:
+        val = getattr(args, f"amb_{key}", None)
+        if val is not None:
+            overrides[key] = val
+    return amb(**overrides) if overrides else None

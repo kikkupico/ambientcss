@@ -1,0 +1,51 @@
+{
+  "pxPerMm": 4,
+  "frameMm": 128,
+  "plate": { "size": [80, 80], "thickness": 6 },
+  "scenes": [
+    {
+      "id": "surface_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": {},
+      "css": { "classes": ["amb-surface"], "size": [80, 80] },
+      "measure": ["surface_lightness"],
+      "docs": { "publish": true, "slug": "surface" }
+    },
+    {
+      "id": "chamfer_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": { "chamfer": 1 },
+      "css": { "classes": ["ambient", "amb-chamfer", "amb-surface"], "size": [80, 80] },
+      "measure": ["edge_bands"],
+      "docs": { "publish": true, "slug": "chamfer" }
+    }
+  ],
+  "sweeps": [
+    {
+      "id": "surface",
+      "builder": "plate",
+      "amb": {},
+      "css": { "classes": ["amb-surface"], "size": [80, 80] },
+      "measure": ["surface_lightness"],
+      "axes": [
+        { "vary": { "key_light_intensity": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0] } },
+        { "vary": { "fill_light_intensity": [0.0, 0.35, 0.7] } }
+      ]
+    },
+    {
+      "id": "chamfer",
+      "builder": "plate",
+      "amb": { "chamfer": 1 },
+      "css": { "classes": ["ambient", "amb-chamfer", "amb-surface"], "size": [80, 80] },
+      "measure": ["edge_bands"],
+      "axes": [
+        { "vary": { "light": [[-1, -1], [1, -1], [-1, 1], [1, 1], [0, -1], [0, 1], [-1, 0], [1, 0]] } },
+        { "vary": { "chamfer_width": [2] } },
+        { "vary": { "key_light_intensity": [0.3, 0.5, 0.7, 0.9] } },
+        { "vary": { "fill_light_intensity": [0.3, 0.5, 0.7] } }
+      ]
+    }
+  ]
+}
