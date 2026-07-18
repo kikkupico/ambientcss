@@ -38,6 +38,7 @@ jobs:
 
       - name: Launch gate
         run: |
+          pnpm api:check
           pnpm build
           pnpm typecheck
           pnpm docs:build

@@ -6,11 +6,15 @@ packages/*/dist
 .DS_Store
 /apps/demo/.vite/
 /apps/demo/dist/
-/apps/ambient3d/.vite/
-/apps/ambient3d/dist/
 /examples/*/dist/
 /examples/*/.vite/
 /apps/docs/.docusaurus/
 /apps/docs/build/
 /.claude/
 .artifacts/
+
+# ambient3d blender kit: scratch output and regenerable scene files
+/ambient3d/out/
+*.blend
+*.blend1
+__pycache__/
