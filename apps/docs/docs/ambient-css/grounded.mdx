@@ -54,12 +54,13 @@ washes out with height as light spills underneath.
 ## Thickness
 
 `.amb-thickness-1` at rest — a button-scale slab. Its shadow is the
-silhouette projection *swept* from the body's bottom to its top: a crisp
-chevron hugging the two shadow-side edges with a mitred corner, not an
-offset square. Two stacked box-shadow layers approximate the sweep (the
-top-silhouette layer at `8px·elevation + 4.5px·thickness`, plus a
-thickness-gated mid-height layer that fills the sweep toward the lit
-corners); new corner and contact-hug metrics gate the shape.
+silhouette projection *swept* from the body's bottom to its top: a wedge
+that hugs the two shadow-side edges, mitres the corner and fades outward,
+not an offset square. Four stacked box-shadow layers sample the sweep at
+quarter-heights up to the top silhouette (`8px·elevation +
+4.5px·thickness`); their multiplicative overlap *is* the outward fade,
+with each layer's blur erasing the steps. New corner and contact-hug
+metrics gate the shape.
 
 <RenderComparison slug="thickness" classes="ambient amb-thickness-1 amb-surface" size={[40, 40]} />
 

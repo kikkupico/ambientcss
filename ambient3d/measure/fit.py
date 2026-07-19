@@ -323,21 +323,26 @@ def fit_shadow(m):
     se = np.array([s[0] for s in sigmas]); sv = np.array([s[1] for s in sigmas])
     B_sigma = float((se * sv).sum() / (se * se).sum())
 
-    # balance the two alphas per slab frame (grid search; errors weighted
-    # by the compare tolerances: peak 0.06, hug 0.08, plus a light pull
-    # of the far-only zone toward the measured flat profile)
+    # balance the far and shared-body alphas per slab frame for the
+    # 4-layer sweep (far + three body layers at 1/4, 1/2, 3/4 height):
+    # grid search, errors weighted by the compare tolerances (peak 0.06,
+    # hug 0.10), plus a light pull of the far-only zone toward the
+    # measured flat profile
     far_fit, mid_fit = list(far_rows), []
     grid = np.arange(0.0, 0.601, 0.005)
     third = 40.0 / 3                # shadow scenes render the 40 mm plate
     for contrast, e, t, peak, lit in mid_rows:
         cf = max(0.0, 1.0 - float(A) * (8 * e + 4.5 * t) / third)
-        cm = max(0.0, 1.0 - float(A) * (8 * e + 2.25 * t) / third)
+        cbody = [max(0.0, 1.0 - float(A) * (8 * e + f * 4.5 * t) / third)
+                 for f in (0.25, 0.5, 0.75)]
         af_g, am_g = np.meshgrid(grid, grid, indexing="ij")
-        deep = 1.0 - (1.0 - af_g) * (1.0 - am_g)
+        deep = 1.0 - (1.0 - af_g) * (1.0 - am_g) ** 3
         err = ((deep - peak) / 0.06) ** 2 + 0.3 * ((af_g - peak) / 0.06) ** 2
         if lit is not None:
-            hug_css = af_g * cf + am_g * cm - af_g * am_g * cf
-            err = err + ((hug_css - lit) / 0.08) ** 2
+            hug_css = 1.0 - (1.0 - af_g * cf)
+            for c in cbody:
+                hug_css = hug_css + (1.0 - hug_css) * am_g * c
+            err = err + ((hug_css - lit) / 0.10) ** 2
         i, j = np.unravel_index(np.argmin(err), err.shape)
         far_fit.append((contrast, e, t, float(grid[i])))
         mid_fit.append((contrast, t, float(grid[j])))
@@ -350,13 +355,13 @@ def fit_shadow(m):
     (E, F, G), *_ = np.linalg.lstsq(mX, my, rcond=None)
 
     return {
-        "model": ("far: h = 8*elevation + 4.5*thickness, offset = A*h, "
-                  "blur = B*h, spread = C, "
+        "model": ("4-layer sweep. far: h = 8*elevation + 4.5*thickness, "
+                  "offset = A*h, blur = B*h, spread = C, "
                   "alpha = D*(Ik-If) + De*elevation + Dt*thickness + D0; "
-                  "mid (thickness-gated): hm = 8*elevation + "
-                  "2.25*thickness, offset = A*hm, blur = B*hm, "
-                  "alpha = E*(Ik-If) + F*thickness + G; "
-                  "layers composite multiplicatively"),
+                  "three body layers (thickness-gated) at 1/4, 1/2, 3/4 "
+                  "of body height, same A/B scaling, shared "
+                  "alpha = E*(Ik-If) + F*thickness + G; layers composite "
+                  "multiplicatively (the stack IS the outward fade)"),
         "A_offset_px_per_mm": round(float(A), 4),
         "B_css_blur_px_per_mm": round(2 * B_sigma, 4),
         "C_spread_px": round(float(C), 3),

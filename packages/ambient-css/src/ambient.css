@@ -164,28 +164,41 @@
      than the body is thick (negative widths cap symmetrically). */
   --_amb-chamfer-w: max(-1 * var(--amb-thickness), min(var(--amb-chamfer-width), var(--amb-thickness)));
   --_amb-fillet-w: max(-1 * var(--amb-thickness), min(var(--amb-fillet-width), var(--amb-thickness)));
+  /* Sweep-shadow helpers: the overall gate (a sheet at rest casts
+     nothing), the body gate (sheets have no body: the sweep collapses to
+     the single top-silhouette layer), and the shared alpha of the three
+     body layers (harness-balanced against the render's contact depth). */
+  --_amb-sh-gate: max(0, min(var(--amb-elevation) + var(--amb-thickness), 1));
+  --_amb-body-gate: max(0, min(var(--amb-thickness), 1));
+  --_amb-sweep-a: calc(
+    var(--_amb-sh-gate) * var(--_amb-body-gate) *
+      max(0, 1 - var(--amb-elevation) / 3) *
+      (var(--amb-thickness) * 0.02 + 0.047)
+  );
   /* Drop shadow, grounded (ambient3d/derived/notes/shadow.md): the umbra
      is the silhouette projection SWEPT from the body's bottom (elevation)
-     to its top (elevation + thickness) — at rest a crisp chevron hugging
-     the shadow-side edges with a mitred corner; elevated, a detached
-     blurred square. Two stacked layers approximate the sweep: the FAR
-     layer at the top silhouette h = 8px*elevation + 4.5px*thickness
-     (offset 0.85px/mm, blur 0.60px/mm, R^2 0.99, constant spread), and a
-     thickness-gated MID layer at the body's mid-height that fills the
-     sweep toward the lit corners and shapes the miter. Overlaps
-     composite multiplicatively, so the per-layer alphas are balanced
-     against the render's peak and contact-hug measurements (the max/min
-     gates zero both for a sheet at rest). Residual: axis-aligned lights
-     read deeper than diagonal, inexpressible in one alpha. */
+     to its top (elevation + thickness) — at rest a smooth wedge hugging
+     the shadow-side edges with a mitred corner and fading outward;
+     elevated, a detached blurred square. FOUR stacked layers sample the
+     sweep at 1/4, 1/2, 3/4 and the full body height (offset 0.85px/mm of
+     silhouette height, blur 0.60px/mm, R^2 0.99): overlaps composite
+     multiplicatively, so the geometric stack itself produces the graded
+     falloff, with each layer's blur erasing the steps. The FAR layer
+     carries the fitted alpha model (thickness sheds part of it to the
+     body layers); the three body layers share one small harness-balanced
+     alpha and vanish for sheets, which keep the single-layer model.
+     Residual: axis-aligned lights read deeper than diagonal,
+     inexpressible in one alpha. */
   box-shadow: hsl(
         var(--amb-light-hue)
         var(--amb-light-saturation)
         0%
         / calc(
-            max(0, min(var(--amb-elevation) + var(--amb-thickness), 1)) *
+            var(--_amb-sh-gate) *
               (
                 (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
-                  * 0.13 + var(--amb-elevation) * -0.077 + 0.368
+                  * 0.13 + var(--amb-elevation) * -0.077 + 0.368 -
+                  var(--_amb-body-gate) * max(0, 1 - var(--amb-elevation)) * 0.14
               )
           )
       )
@@ -199,15 +212,18 @@
       )
       calc(var(--amb-elevation) * 4.8px + var(--amb-thickness) * 2.7px)
       0.8px,
-    hsl(
-        var(--amb-light-hue)
-        var(--amb-light-saturation)
-        0%
-        / calc(
-            max(0, min(var(--amb-thickness), 1)) *
-              (var(--amb-thickness) * 0.037 + 0.013)
-          )
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% / var(--_amb-sweep-a))
+      calc(
+        var(--amb-light-x) *
+          (var(--amb-elevation) * 6.8px + var(--amb-thickness) * 2.85px) * -1
       )
+      calc(
+        var(--amb-light-y) *
+          (var(--amb-elevation) * 6.8px + var(--amb-thickness) * 2.85px) * -1
+      )
+      calc(var(--amb-elevation) * 4.8px + var(--amb-thickness) * 2px)
+      calc(var(--amb-thickness) * 0.9px),
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% / var(--_amb-sweep-a))
       calc(
         var(--amb-light-x) *
           (var(--amb-elevation) * 6.8px + var(--amb-thickness) * 1.9px) * -1
@@ -217,7 +233,18 @@
           (var(--amb-elevation) * 6.8px + var(--amb-thickness) * 1.9px) * -1
       )
       calc(var(--amb-elevation) * 4.8px + var(--amb-thickness) * 1.35px)
-      0px,
+      calc(var(--amb-thickness) * 0.6px),
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% / var(--_amb-sweep-a))
+      calc(
+        var(--amb-light-x) *
+          (var(--amb-elevation) * 6.8px + var(--amb-thickness) * 0.95px) * -1
+      )
+      calc(
+        var(--amb-light-y) *
+          (var(--amb-elevation) * 6.8px + var(--amb-thickness) * 0.95px) * -1
+      )
+      calc(var(--amb-elevation) * 4.8px + var(--amb-thickness) * 0.7px)
+      calc(var(--amb-thickness) * 0.3px),
     /* Chamfer bands, grounded (ambient3d/derived/notes/chamfer.md): both
        alphas are affine and the highlight rides the fill light too — a
        45deg face keeps a residual band even when key equals fill, which

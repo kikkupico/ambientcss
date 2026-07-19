@@ -17,9 +17,10 @@ throughout, anchored so the default look (key 0.9, fill 0.7) is preserved.
   never flipping with the key), replacing the old sky/ground split
 - **swept drop shadow**: the umbra is the silhouette projection swept
   from the body's bottom (elevation) to its top (elevation + thickness) —
-  two stacked box-shadow layers produce the chevron that hugs the
-  shadow-side edges with a mitred corner at rest and detaches cleanly
-  when elevated; new corner/contact-hug metrics gate the shape
+  four stacked box-shadow layers sample the sweep at quarter-heights,
+  producing a wedge that hugs the shadow-side edges, mitres the corner
+  and fades outward at rest, detaching cleanly when elevated; new
+  corner/contact-hug metrics gate the shape
 - NEW `.amb-groove`: a grounded recessed slot (depth reuses the thickness
   vocabulary): near-surface floor, crisp lit-wall shadow band, and the
   far wall's key bounce — the physical origin of the inset highlight
