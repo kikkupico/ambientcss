@@ -59,6 +59,23 @@ def metal_material(name, hexcode="#D2D2D6", rough=0.5):
     return mat
 
 
+def materials_for(preset_name):
+    """(body, accent) plastic materials for a palette preset."""
+    preset = PRESETS[preset_name]
+    body = plastic_material(f"Body_{preset_name}", preset["body"],
+                            preset["rough"])
+    accent = plastic_material(f"Accent_{preset_name}", preset["accent"], 0.45)
+    return body, accent
+
+
+def base_material_for(name_or_alu, fallback="alu"):
+    """Base-tile material: a palette preset body, or brushed aluminum."""
+    choice = name_or_alu or fallback
+    if choice == "alu":
+        return metal_material("BaseAlu")
+    return materials_for(choice)[0]
+
+
 # ------------------------------------------------------------------ scene ---
 
 def reset_scene():

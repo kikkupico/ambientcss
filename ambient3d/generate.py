@@ -16,17 +16,24 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+import bpy
+
 import skeuo_kit as kit
+import amb_params as ap
 from components.knob import build_knob
 from components.button import build_button
 from components.fader import build_fader
 from components.grille import build_grille
+from components.slider import build_slider
+from components.switch import build_switch
+from components.panel import build_demo_panel
 
 
 def parse_args():
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
     p = argparse.ArgumentParser(prog="generate.py")
     p.add_argument("mode", choices=["knob", "button", "fader", "grille",
+                                    "slider", "switch",
                                     "lineup", "catalog", "panel"])
     p.add_argument("--preset", default=None, choices=sorted(kit.PRESETS))
     # knob
@@ -81,25 +88,21 @@ def parse_args():
     p.add_argument("--pitch", type=float, default=3.4)
     p.add_argument("--pattern", choices=["grid", "hex"], default="grid")
     p.add_argument("--margin", type=float, default=3.5)
+    # switch
+    p.add_argument("--led", action="store_true")
     # output
     p.add_argument("--out-dir", default=None)
     p.add_argument("--resolution", type=int, default=900)
     p.add_argument("--samples", type=int, default=96)
+    # every mode also accepts the ambientcss vocabulary (--amb-light-x,
+    # --amb-key-light-intensity, ...): when any is given, the studio's
+    # three-point lights are replaced by the amb key/fill rig
+    ap.add_argparse_group(p)
     return p.parse_args(argv)
 
 
-def materials_for(preset_name):
-    preset = kit.PRESETS[preset_name]
-    body = kit.plastic_material(f"Body_{preset_name}", preset["body"], preset["rough"])
-    accent = kit.plastic_material(f"Accent_{preset_name}", preset["accent"], 0.45)
-    return body, accent
-
-
-def base_material_for(name_or_alu, fallback="alu"):
-    choice = name_or_alu or fallback
-    if choice == "alu":
-        return kit.metal_material("BaseAlu")
-    return materials_for(choice)[0]
+materials_for = kit.materials_for
+base_material_for = kit.base_material_for
 
 
 def main():
@@ -233,6 +236,37 @@ def main():
                          azimuth=22, elevation=38)
         stem = f"fader_{preset}"
 
+    elif args.mode == "slider":
+        preset = args.preset or "grey"
+        body, _ = materials_for(preset)
+        base_w, base_d = args.base or (48.0, 14.0)
+        build_slider(
+            name=f"Slider_{preset}",
+            base_w=base_w, base_d=base_d, base_h=args.base_h,
+            value=args.value if args.value is not None else 0.5,
+            plate_material=base_material_for(args.base_preset, "bone"),
+            thumb_material=body,
+        )
+        kit.setup_studio(center=(0, 0, 2.5), extent=max(base_w * 0.46, 14),
+                         azimuth=22, elevation=38)
+        stem = f"slider_{preset}"
+
+    elif args.mode == "switch":
+        preset = args.preset or "cream"
+        body, _ = materials_for(preset)
+        led_mat, _ = materials_for("orange")
+        value = 1.0 if args.pressed else (
+            args.value if args.value is not None else 0.0)
+        build_switch(
+            name=f"Switch_{preset}",
+            value=value, led=args.led,
+            plate_material=base_material_for(args.base_preset, "graphite"),
+            pill_material=body, led_material=led_mat,
+        )
+        kit.setup_studio(center=(0, 0, 2.0), extent=16, azimuth=24,
+                         elevation=40)
+        stem = f"switch_{preset}"
+
     elif args.mode == "grille":
         dark, _ = materials_for("graphite")
         width, depth = args.base or (42.0, 28.0)
@@ -275,60 +309,7 @@ def main():
 
     elif args.mode == "panel":
         # mock device, 112x72mm, butted tiles, mixed component sizes
-        bone, _ = materials_for("bone")
-        orange, orange_acc = materials_for("orange")
-        graphite, graphite_acc = materials_for("graphite")
-        grey, _ = materials_for("grey")
-        panel = base_material_for(args.base_preset, "bone")
-        alu_bright = kit.metal_material("AluBright", rough=0.32)
-
-        # row 1 (y center 21, depth 30): grille + knobs, large to small
-        build_grille(name="Grille", width=36, depth=30, height=2.5,
-                     margin=4.5, plate_material=panel,
-                     backing_material=graphite, location=(-38, 21, 0))
-        knob_specs = [
-            (-9, 22, 7.0, 10.0, "orange", 0.15),
-            (11, 18, 5.5, 8.0, "grey", 0.4),
-            (29, 18, 5.5, 8.0, "graphite", 0.7),
-            (47, 18, 4.0, 6.0, "orange", 0.95),
-        ]
-        for x, tile_w, r, h, preset_name, v in knob_specs:
-            kb, ka = materials_for(preset_name)
-            build_knob(name=f"PKnob_{x}", radius=r, height=h, ribs=48,
-                       value=v, base=(tile_w, 30), base_material=panel,
-                       body_material=kb, accent_material=ka,
-                       location=(x, 21, 0))
-
-        # row 2 (y center -5, depth 22): long fader + metal button
-        build_fader(name="PFader", base_w=88, base_d=22, slot_len=74,
-                    cap_shape="disc", ticks=9, value=0.65,
-                    plate_material=panel, cap_material=grey,
-                    well_material=graphite, tick_material=graphite,
-                    location=(-12, -5, 0))
-        build_button(name="PMetal", shape_n=2.0, width=8.0, dome=0.05,
-                     fillet=0.35, height=3.5, base_style="well", travel=0.5,
-                     base_size=(24, 22), label="@plus",
-                     label_material=graphite,
-                     cap_material=alu_bright, base_material=panel,
-                     location=(44, -5, 0))
-
-        # row 3 (y center -26, depth 20): wide transport keys + small keys
-        transport = (("@rec", -46, orange, orange_acc),
-                     ("@play", -26, bone, graphite),
-                     ("@stop", -6, bone, graphite))
-        for lab, x, cap, lab_mat in transport:
-            build_button(name=f"PT{lab[1:]}", shape_n=4.5, width=16.0,
-                         depth=11.0, height=3.2, dome=0.2, fillet=0.8,
-                         base_size=(20, 20), cap_material=cap,
-                         base_material=panel, label=lab,
-                         label_material=lab_mat, location=(x, -26, 0))
-        for i, x in enumerate((10.5, 23.5, 36.5, 49.5)):
-            build_button(name=f"PKey_{i}", shape_n=4.5, width=9.0,
-                         base_size=(13, 20), cap_material=bone,
-                         base_material=panel, value=1.0 if i == 1 else 0.0,
-                         label=str(i + 1), label_material=graphite,
-                         location=(x, -26, 0))
-
+        build_demo_panel(panel_preset=args.base_preset, base_h=args.base_h)
         kit.setup_studio(center=(0, -4, 1.5), extent=50, azimuth=8,
                          elevation=55)
         stem = "panel"
@@ -387,9 +368,23 @@ def main():
                      label_material=graphite_acc, base_size=(18, 18),
                      cap_material=graphite, base_material=grey,
                      location=(45, -17, 0))
-        kit.setup_studio(center=(2, 1, 1.5), extent=44, azimuth=12,
+        # slider + slide switch, the newest counterparts
+        build_slider(name="Slider", base_w=44, base_d=13, value=0.7,
+                     plate_material=alu, thumb_material=grey,
+                     location=(8, -33, 0))
+        build_switch(name="Switch", value=1.0, led=True,
+                     plate_material=graphite, pill_material=bone,
+                     led_material=orange, location=(41, -33, 0))
+        kit.setup_studio(center=(2, -2, 1.5), extent=46, azimuth=12,
                          elevation=52)
         stem = "catalog"
+
+    amb = ap.amb_from_args(args)
+    if amb:
+        for obj in list(bpy.context.scene.objects):
+            if obj.type == "LIGHT":
+                bpy.data.objects.remove(obj)
+        ap.apply_lighting(amb)
 
     png = os.path.join(out_dir, stem + ".png")
     blend = os.path.join(out_dir, stem + ".blend")

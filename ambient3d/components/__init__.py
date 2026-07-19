@@ -19,9 +19,10 @@ def _find_stateful(obj, handlers):
 
 
 def set_value(obj, value):
-    from components import button, fader, knob
+    from components import button, fader, knob, slider, switch
 
-    handlers = {"knob": knob, "button": button, "fader": fader}
+    handlers = {"knob": knob, "button": button, "fader": fader,
+                "slider": slider, "switch": switch}
     target = _find_stateful(obj, handlers)
     if target is None:
         raise ValueError(f"{obj.name} has no skeuo state in its hierarchy")
