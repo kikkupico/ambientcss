@@ -1,0 +1,87 @@
+---
+title: Grounded on Blender renders
+description: Every ambient.css coefficient is derived from measured Cycles renders of an equivalent physical scene.
+---
+
+import { RenderComparison } from "@site/src/components/RenderComparison";
+
+# Grounded on Blender renders
+
+Ambient CSS calls itself *physically based*, and as of the Blender-grounded
+rewrite that is literal: every coefficient in `ambient.css` is fitted from
+measured Cycles renders of an equivalent physical scene — a millimetre-scale
+plate on a reference ground under a calibrated key light and fill, viewed
+flat-on (1 CSS px = 1 mm). The renders below are the committed ground truth
+each effect is verified against; the left side is the live CSS running in
+your browser right now. A comparison harness measures both sides with the
+same extractors and gates every release.
+
+The fitted models, residuals and R² values live in
+[`ambient3d/derived/notes/`](https://github.com/kikkupico/ambientcss/tree/master/ambient3d/derived/notes)
+in the repository.
+
+## Surface
+
+`.amb-surface` — lightness is affine in *both* light intensities: the fill
+floors it, and sRGB gamma compresses the key slope.
+
+<RenderComparison slug="surface" classes="amb-surface" />
+
+## Chamfer
+
+`.amb-chamfer` — both band alphas are affine: a 45° face keeps a residual
+band even when key equals fill. Edge treatments imply thickness (material
+to cut into).
+
+<RenderComparison slug="chamfer" classes="ambient amb-chamfer amb-surface" />
+
+## Fillet
+
+`.amb-fillet` — the round-over concentrates its highlight at 1.5px per
+width unit, softer than the chamfer.
+
+<RenderComparison slug="fillet" classes="ambient amb-fillet amb-surface" />
+
+## Elevation
+
+`.amb-elevation-1` on a paper-thin sheet — only the drop shadow reveals it.
+The shadow is cast by the top silhouette; blur grows and alpha washes out
+with height as light spills underneath.
+
+<RenderComparison slug="elevation" classes="ambient amb-elevation-1 amb-thickness-0 amb-surface" size={[40, 40]} />
+
+## Thickness
+
+`.amb-thickness-1` at rest — a button-scale slab. Its walls block the fill
+light, so the contact shadow stays dark and crisp: the same physical model
+as elevation, at silhouette height `8px·elevation + 4.5px·thickness`.
+
+<RenderComparison slug="thickness" classes="ambient amb-thickness-1 amb-surface" size={[40, 40]} />
+
+## Curved surfaces
+
+Cylindrical dishes and domes: the gradient stops ride the grounded surface
+base, with the end-stop delta affine in light contrast.
+
+<RenderComparison slug="surface-concave" classes="amb-surface-concave" />
+<RenderComparison slug="surface-concave-h" classes="amb-surface-concave-h" />
+<RenderComparison slug="surface-convex" classes="amb-surface-convex" />
+
+## Darker surface
+
+<RenderComparison slug="surface-darker" classes="amb-surface-darker" />
+
+## Shiny
+
+`.amb-mat-shiny` — grounded on a glossy dome referent. The specular has two
+physical features: a grazing Fresnel rim at the lit edge, and the key
+light's mirror band at 29% in from it (the sine of half the light zenith).
+
+<RenderComparison slug="mat-shiny" classes="amb-mat-shiny amb-surface" size={[40, 40]} />
+
+## Glow
+
+`.amb-glow` — halo radius from the emissive plate's measured bloom falloff.
+The lume color's bright/dark switching is a design semantic layered on top.
+
+<RenderComparison slug="glow" classes="amb-glow" size={[40, 40]} subjectStyle={{ background: "#ffffff" }} />
