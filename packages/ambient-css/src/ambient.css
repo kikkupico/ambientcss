@@ -48,9 +48,13 @@
   --amb-mat-specular: 0;
   --amb-mat-roughness: 1;
   --amb-mat-opacity: 1;
+  /* max(min()) instead of clamp() throughout this file: postcss-preset-env's
+     clamp downlevel mangles clamp() whose middle argument is an expression
+     (it drops all but the last operand), which zeroed the elevation shadow in
+     any consumer running that pipeline. max/min pass through untouched. */
   --amb-lume: color-mix(
     in oklab,
-    hsl(var(--amb-lume-hue) 100% 74%) calc(clamp(0, (0.5 - var(--amb-key-light-intensity)) / 0.2, 1) * 100%),
+    hsl(var(--amb-lume-hue) 100% 74%) calc(max(0, min((0.5 - var(--amb-key-light-intensity)) / 0.2, 1)) * 100%),
     hsl(
       var(--amb-light-hue)
       var(--amb-light-saturation)
@@ -77,10 +81,15 @@
   --amb-thickness: 1;
 }
 
+/* A width-2 cut needs a knob-scale body: level-for-level, edge width N
+   requires thickness >= N (a 4mm round-over on a 4.5mm slab would round
+   off the entire edge). The .ambient rule also caps the effective width
+   at the thickness level, so a width-2 class forced onto a thinner body
+   degrades to the widest cut the material allows instead of lying. */
 .amb-chamfer-2 {
   --amb-chamfer: 1;
   --amb-chamfer-width: 2;
-  --amb-thickness: 1;
+  --amb-thickness: 2;
 }
 
 .amb-chamfer-minus-1 {
@@ -97,7 +106,7 @@
 .amb-fillet-2 {
   --amb-fillet: 1;
   --amb-fillet-width: 2;
-  --amb-thickness: 1;
+  --amb-thickness: 2;
 }
 
 .amb-fillet-minus-1 {
@@ -143,13 +152,17 @@
    -------------------------------------------------------------------------- */
 
 .ambient {
+  /* Effective edge widths, capped level-for-level: the cut cannot be wider
+     than the body is thick (negative widths cap symmetrically). */
+  --_amb-chamfer-w: max(-1 * var(--amb-thickness), min(var(--amb-chamfer-width), var(--amb-thickness)));
+  --_amb-fillet-w: max(-1 * var(--amb-thickness), min(var(--amb-fillet-width), var(--amb-thickness)));
   /* Drop shadow, grounded (ambient3d/derived/notes/shadow.md): cast by
      the top silhouette at h = 8px*elevation + 4.5px*thickness, so both
      variables displace and blur it (offset 0.86px/mm, blur 0.60px/mm,
      R^2 0.99). Spread is a small constant, not proportional. Alpha decays
      with elevation only — light washes under an elevated sheet, but a
-     resting slab's walls keep the contact shadow dark; the clamp() zeroes
-     it for a sheet at rest. Alpha coefficients are compensated for CSS
+     resting slab's walls keep the contact shadow dark; the max/min gate
+     zeroes it for a sheet at rest. Alpha coefficients are compensated for CSS
      blur dilution (the blur flattens the painted peak, the render's core
      stays dark), fitted through the screenshot harness. Residual:
      axis-aligned lights read ~0.13 deeper than diagonal, inexpressible
@@ -159,7 +172,7 @@
         var(--amb-light-saturation)
         0%
         / calc(
-            clamp(0, var(--amb-elevation) + var(--amb-thickness), 1) *
+            max(0, min(var(--amb-elevation) + var(--amb-thickness), 1)) *
               (
                 (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
                   * 0.17 + var(--amb-elevation) * -0.02 +
@@ -183,28 +196,28 @@
        the old proportional formulas zeroed out. hl R^2 0.99, sh R^2 0.98
        (residual: a faint band on edges perpendicular to an axis-aligned
        light, inexpressible per-edge in box-shadow). */
-    inset calc(var(--amb-light-x) * var(--amb-chamfer-width) * -1px)
-      calc(var(--amb-light-y) * var(--amb-chamfer-width) * -1px) 0px 0px
+    inset calc(var(--amb-light-x) * var(--_amb-chamfer-w) * -1px)
+      calc(var(--amb-light-y) * var(--_amb-chamfer-w) * -1px) 0px 0px
       hsl(
         var(--amb-light-hue)
         var(--amb-light-saturation)
         100%
         / calc(
-            var(--amb-chamfer) * clamp(0, var(--amb-thickness), 1) *
+            var(--amb-chamfer) * max(0, min(var(--amb-thickness), 1)) *
               (
                 var(--amb-key-light-intensity) * 1.48 +
                   var(--amb-fill-light-intensity) * 0.79 - 0.89
               )
           )
       ),
-    inset calc(var(--amb-light-x) * var(--amb-chamfer-width) * 1px)
-      calc(var(--amb-light-y) * var(--amb-chamfer-width) * 1px) 0px 0px
+    inset calc(var(--amb-light-x) * var(--_amb-chamfer-w) * 1px)
+      calc(var(--amb-light-y) * var(--_amb-chamfer-w) * 1px) 0px 0px
       hsl(
         var(--amb-light-hue)
         var(--amb-light-saturation)
         0%
         / calc(
-            var(--amb-chamfer) * clamp(0, var(--amb-thickness), 1) *
+            var(--amb-chamfer) * max(0, min(var(--amb-thickness), 1)) *
               (
                 (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
                   * 0.21 + 0.22
@@ -216,28 +229,28 @@
        round-over's highlight concentrates at 1.5px per width unit.
        hl R^2 0.98, sh R^2 0.98; the shadow alpha is compensated for the
        2px blur's dilution of the painted band. */
-    inset calc(var(--amb-light-x) * var(--amb-fillet-width) * -1.5px)
-      calc(var(--amb-light-y) * var(--amb-fillet-width) * -1.5px) 2px 0px
+    inset calc(var(--amb-light-x) * var(--_amb-fillet-w) * -1.5px)
+      calc(var(--amb-light-y) * var(--_amb-fillet-w) * -1.5px) 2px 0px
       hsl(
         var(--amb-light-hue)
         var(--amb-light-saturation)
         100%
         / calc(
-            var(--amb-fillet) * clamp(0, var(--amb-thickness), 1) *
+            var(--amb-fillet) * max(0, min(var(--amb-thickness), 1)) *
               (
                 var(--amb-key-light-intensity) * 1.39 +
                   var(--amb-fill-light-intensity) * 0.83 - 0.91
               )
           )
       ),
-    inset calc(var(--amb-light-x) * var(--amb-fillet-width) * 1.5px)
-      calc(var(--amb-light-y) * var(--amb-fillet-width) * 1.5px) 2px 0px
+    inset calc(var(--amb-light-x) * var(--_amb-fillet-w) * 1.5px)
+      calc(var(--amb-light-y) * var(--_amb-fillet-w) * 1.5px) 2px 0px
       hsl(
         var(--amb-light-hue)
         var(--amb-light-saturation)
         0%
         / calc(
-            var(--amb-fillet) * clamp(0, var(--amb-thickness), 1) *
+            var(--amb-fillet) * max(0, min(var(--amb-thickness), 1)) *
               (
                 (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
                   * 0.26 + 0.28
@@ -372,7 +385,7 @@
    at 0.33 of it. R^2 0.94 over the light/intensity sweeps. */
 
 .amb-surface-concave {
-  --_concave-y: clamp(-1, var(--amb-light-y), 1);
+  --_concave-y: max(-1, min(var(--amb-light-y), 1));
   --_surface-base: calc(
     var(--amb-key-light-intensity) * 31.5% +
       var(--amb-fill-light-intensity) * 26.4% + 43.6%
@@ -394,7 +407,7 @@
 }
 
 .amb-surface-concave-h {
-  --_concave-h-x: clamp(-1, var(--amb-light-x), 1);
+  --_concave-h-x: max(-1, min(var(--amb-light-x), 1));
   --_surface-base: calc(
     var(--amb-key-light-intensity) * 31.5% +
       var(--amb-fill-light-intensity) * 26.4% + 43.6%
@@ -417,7 +430,7 @@
 }
 
 .amb-surface-convex {
-  --_convex-y: clamp(-1, var(--amb-light-y), 1);
+  --_convex-y: max(-1, min(var(--amb-light-y), 1));
   --_surface-base: calc(
     var(--amb-key-light-intensity) * 31.5% +
       var(--amb-fill-light-intensity) * 26.4% + 43.6%

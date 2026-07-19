@@ -120,6 +120,7 @@ def _fit_edge_effect(m, effect):
     hl, sh, widths = [], [], {}
     for rel, entry in m.items():
         if not (rel.startswith(f"sweeps/{effect}/") or
+                rel.startswith(f"sweeps/{effect}_w2/") or
                 rel == f"calib/{effect}_default.png"):
             continue
         for kind, alpha, width_mm, a in band_alphas(entry):

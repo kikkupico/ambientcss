@@ -439,13 +439,6 @@
         },
         {
           "vary": {
-            "chamfer_width": [
-              2
-            ]
-          }
-        },
-        {
-          "vary": {
             "key_light_intensity": [
               0.3,
               0.5,
@@ -460,6 +453,37 @@
               0.3,
               0.5,
               0.7
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "chamfer_w2",
+      "builder": "plate",
+      "amb": {
+        "chamfer": 1,
+        "thickness": 2
+      },
+      "css": {
+        "classes": [
+          "ambient",
+          "amb-chamfer-2",
+          "amb-surface"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "edge_bands"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "chamfer_width": [
+              2
             ]
           }
         }
@@ -527,13 +551,6 @@
         },
         {
           "vary": {
-            "fillet_width": [
-              2
-            ]
-          }
-        },
-        {
-          "vary": {
             "key_light_intensity": [
               0.3,
               0.5,
@@ -548,6 +565,37 @@
               0.3,
               0.5,
               0.7
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "fillet_w2",
+      "builder": "plate",
+      "amb": {
+        "fillet": 1,
+        "thickness": 2
+      },
+      "css": {
+        "classes": [
+          "ambient",
+          "amb-fillet-2",
+          "amb-surface"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "edge_bands"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "fillet_width": [
+              2
             ]
           }
         }

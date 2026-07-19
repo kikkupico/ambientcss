@@ -108,13 +108,22 @@ def thickness_mm(a):
 
 def edge_mm(a):
     """(chamfer_mm, fillet_mm) for the plate's top edge. A sheet (t < 1)
-    has no material to cut, so edge treatments require thickness >= 1;
-    the cut is also capped so it never exceeds the slab."""
+    has no material to cut, so edge treatments require thickness >= 1.
+    Widths cap level-for-level (|width| <= thickness: a width-2 cut needs a
+    knob-scale body — mirrored by the --_amb-*-w vars in ambient.css), with
+    the old mm safety cap kept so the cut never consumes the whole slab."""
     if a["thickness"] < 1:
         return 0.0, 0.0
+    t = a["thickness"]
+
+    def level_cap(width):
+        return max(-t, min(width, t))
+
     cap = thickness_mm(a) - 0.5
-    chamfer = min(cap, a["chamfer"] * a["chamfer_width"] * CHAMFER_MM_PER_WIDTH)
-    fillet = min(cap, a["fillet"] * a["fillet_width"] * FILLET_MM_PER_WIDTH)
+    chamfer = min(cap, a["chamfer"] * level_cap(a["chamfer_width"])
+                  * CHAMFER_MM_PER_WIDTH)
+    fillet = min(cap, a["fillet"] * level_cap(a["fillet_width"])
+                 * FILLET_MM_PER_WIDTH)
     return max(0.0, chamfer), max(0.0, fillet)
 
 
