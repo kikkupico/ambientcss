@@ -49,6 +49,42 @@
       "css": { "classes": ["ambient", "amb-thickness-1", "amb-surface"], "size": [40, 40] },
       "measure": ["drop_shadow"],
       "docs": { "publish": true, "slug": "thickness" }
+    },
+    {
+      "id": "surface_concave_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": { "surface": "concave", "thickness": 1 },
+      "css": { "classes": ["amb-surface-concave"], "size": [80, 80] },
+      "measure": ["surface_gradient"],
+      "docs": { "publish": true, "slug": "surface-concave" }
+    },
+    {
+      "id": "surface_concave_h_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": { "surface": "concave-h", "thickness": 1 },
+      "css": { "classes": ["amb-surface-concave-h"], "size": [80, 80] },
+      "measure": ["surface_gradient"],
+      "docs": { "publish": true, "slug": "surface-concave-h" }
+    },
+    {
+      "id": "surface_convex_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": { "surface": "convex", "thickness": 1 },
+      "css": { "classes": ["amb-surface-convex"], "size": [80, 80] },
+      "measure": ["surface_gradient"],
+      "docs": { "publish": true, "slug": "surface-convex" }
+    },
+    {
+      "id": "surface_darker_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": { "albedo": 0.06 },
+      "css": { "classes": ["amb-surface-darker"], "size": [80, 80] },
+      "measure": ["surface_lightness"],
+      "docs": { "publish": true, "slug": "surface-darker" }
     }
   ],
   "sweeps": [
@@ -114,6 +150,52 @@
       "axes": [
         { "vary": { "thickness": [0, 1, 2] } },
         { "vary": { "light": [[-1, -1], [1, -1], [-1, 1], [1, 1], [0, -1], [0, 1], [-1, 0], [1, 0]] } }
+      ]
+    },
+    {
+      "id": "concave",
+      "builder": "plate",
+      "amb": { "surface": "concave", "thickness": 1 },
+      "css": { "classes": ["amb-surface-concave"], "size": [80, 80] },
+      "measure": ["surface_gradient"],
+      "axes": [
+        { "vary": { "light": [[-1, -1], [0, -1], [1, -1], [0, 1], [-1, 0]] } },
+        { "vary": { "key_light_intensity": [0.3, 0.6, 0.9] } },
+        { "vary": { "fill_light_intensity": [0.3, 0.7] } }
+      ]
+    },
+    {
+      "id": "concave_h",
+      "builder": "plate",
+      "amb": { "surface": "concave-h", "thickness": 1 },
+      "css": { "classes": ["amb-surface-concave-h"], "size": [80, 80] },
+      "measure": ["surface_gradient"],
+      "axes": [
+        { "vary": { "light": [[-1, -1], [-1, 0], [1, 0], [0, -1]] } },
+        { "vary": { "key_light_intensity": [0.3, 0.9] } }
+      ]
+    },
+    {
+      "id": "convex",
+      "builder": "plate",
+      "amb": { "surface": "convex", "thickness": 1 },
+      "css": { "classes": ["amb-surface-convex"], "size": [80, 80] },
+      "measure": ["surface_gradient"],
+      "axes": [
+        { "vary": { "light": [[0, -1], [0, 1], [-1, -1]] } },
+        { "vary": { "key_light_intensity": [0.3, 0.9] } },
+        { "vary": { "fill_light_intensity": [0.3] } }
+      ]
+    },
+    {
+      "id": "darker",
+      "builder": "plate",
+      "amb": { "albedo": 0.06 },
+      "css": { "classes": ["amb-surface-darker"], "size": [80, 80] },
+      "measure": ["surface_lightness"],
+      "axes": [
+        { "vary": { "key_light_intensity": [0.1, 0.3, 0.5, 0.7, 0.9, 1.0] } },
+        { "vary": { "fill_light_intensity": [0.0, 0.35, 0.7] } }
       ]
     }
   ]

@@ -46,6 +46,8 @@ def render_job(rel, amb_over, spec, manifest, args):
             width=plate_cfg["size"][0], depth=plate_cfg["size"][1],
             thickness=ap.thickness_mm(a),
             chamfer=chamfer_mm, fillet=fillet_mm,
+            surface=a["surface"],
+            sagitta=ap.SAGITTA_MM if a["surface"] != "flat" else 0.0,
             location=(0, 0, ap.elevation_mm(a)),
             material=ap.material_for(a),
         )

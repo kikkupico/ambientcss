@@ -18,12 +18,67 @@ def _rect(w, d):
     return [(-w / 2, -d / 2), (w / 2, -d / 2), (w / 2, d / 2), (-w / 2, d / 2)]
 
 
+def _surface_dz(surface, sagitta, x, y, hw, hd):
+    """Top-face displacement for the curved surface variants. The CSS
+    gradients run along one axis, so the physical shapes are cylinders:
+    concave dips along y (screen-vertical), concave-h along x, convex
+    bulges along y."""
+    if surface == "concave":
+        return -sagitta * (1.0 - (y / hd) ** 2)
+    if surface == "concave-h":
+        return -sagitta * (1.0 - (x / hw) ** 2)
+    if surface == "convex":
+        return sagitta * (1.0 - (y / hd) ** 2)
+    return 0.0
+
+
+def _curved_plate(name, width, depth, thickness, surface, sagitta,
+                  location, material, segs=48):
+    """Slab whose top face is a displaced grid (curved surface variants)."""
+    hw, hd = width / 2, depth / 2
+    bm = bmesh.new()
+    grid = []
+    for j in range(segs + 1):
+        row = []
+        for i in range(segs + 1):
+            x = -hw + width * i / segs
+            y = -hd + depth * j / segs
+            z = thickness + _surface_dz(surface, sagitta, x, y, hw, hd)
+            row.append(bm.verts.new((x, y, z)))
+        grid.append(row)
+    for j in range(segs):
+        for i in range(segs):
+            bm.faces.new((grid[j][i], grid[j][i + 1],
+                          grid[j + 1][i + 1], grid[j + 1][i]))
+    # boundary ring, CCW seen from above, dropped to the base
+    ring = (grid[0][:-1] + [row[-1] for row in grid[:-1]] +
+            grid[-1][:0:-1] + [row[0] for row in grid[:0:-1]])
+    base = [bm.verts.new((v.co.x, v.co.y, 0.0)) for v in ring]
+    n = len(ring)
+    for i in range(n):
+        bm.faces.new((ring[i], base[i], base[(i + 1) % n],
+                      ring[(i + 1) % n]))
+    bm.faces.new(list(reversed(base)))
+    obj = _finish(bm, name, location, material, smooth=True)
+    for poly in obj.data.polygons:   # flat-shade the walls and bottom
+        if abs(poly.normal.z) < 0.99 or poly.center.z < 0.01:
+            poly.use_smooth = False
+    return obj
+
+
 def build_plate(name="Plate", width=80.0, depth=80.0, thickness=6.0,
-                chamfer=0.0, fillet=0.0, location=(0, 0, 0), material=None):
+                chamfer=0.0, fillet=0.0, surface="flat", sagitta=0.0,
+                location=(0, 0, 0), material=None):
     """Slab with an optional top-edge chamfer (45 deg, `chamfer` mm) or
-    fillet (radius `fillet` mm). Only one of the two may be nonzero."""
+    fillet (radius `fillet` mm), or a curved top surface. Only one
+    treatment at a time."""
     if chamfer and fillet:
         raise ValueError("plate takes a chamfer or a fillet, not both")
+    if surface != "flat" and sagitta > 0:
+        if chamfer or fillet:
+            raise ValueError("curved surfaces take no edge treatment")
+        return _curved_plate(name, width, depth, thickness, surface,
+                             sagitta, location, material)
     inset_max = max(chamfer, fillet)
     if inset_max * 2 >= min(width, depth) or inset_max >= thickness:
         raise ValueError("edge treatment larger than the plate")

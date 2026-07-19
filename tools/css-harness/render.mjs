@@ -21,7 +21,7 @@ const css = await readFile(
 
 // python-spelled amb overrides -> inline --amb-* declarations
 function inlineVars(amb) {
-  const skip = new Set(["mat", "emit", "surface"]); // class-level, not vars
+  const skip = new Set(["mat", "emit", "surface", "albedo"]); // class-level, not vars
   return Object.entries(amb)
     .filter(([k]) => !skip.has(k))
     .map(([k, v]) => `--amb-${k.replaceAll("_", "-")}: ${v};`)

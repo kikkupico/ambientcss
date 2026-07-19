@@ -36,6 +36,10 @@ TOLERANCES = {
     "sigma_mm": 1.2,        # drop-shadow falloff sigma, mm
     "peak_alpha": 0.06,
     "v_ref": 0.04,          # unshadowed ground value
+    "0": 3.0, "0.35": 3.0, "0.5": 3.0, "0.65": 3.0, "1": 3.0,  # stop %
+    "delta_end_srgb": 0.022,   # render keeps the ~1.4% ambient plate
+    "delta_mid_srgb": 0.022,   # gradient the CSS doesn't paint
+    "center_srgb_pct": 3.0,
 }
 SKIP_KEYS = {"noise"}
 

@@ -1,6 +1,7 @@
 {
   "calib/chamfer_default.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 1,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -46,6 +47,7 @@
   },
   "calib/elevation_default.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 1,
@@ -91,6 +93,7 @@
   },
   "calib/fillet_default.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -134,8 +137,130 @@
       }
     }
   },
+  "calib/surface_concave_default.png": {
+    "amb": {
+      "albedo": null,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "concave",
+      "thickness": 1
+    },
+    "metrics": {
+      "surface_gradient": {
+        "center_srgb_pct": 90.102,
+        "delta_end_srgb": 0.031540108327281546,
+        "delta_mid_srgb": 0.010555858145727515,
+        "stop_srgb_pct": {
+          "0": 86.407,
+          "0.35": 88.988,
+          "0.5": 90.102,
+          "0.65": 91.099,
+          "1": 92.715
+        }
+      }
+    }
+  },
+  "calib/surface_concave_h_default.png": {
+    "amb": {
+      "albedo": null,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "concave-h",
+      "thickness": 1
+    },
+    "metrics": {
+      "surface_gradient": {
+        "center_srgb_pct": 90.1,
+        "delta_end_srgb": 0.031665683248609466,
+        "delta_mid_srgb": 0.010487018881626897,
+        "stop_srgb_pct": {
+          "0": 86.393,
+          "0.35": 88.988,
+          "0.5": 90.1,
+          "0.65": 91.085,
+          "1": 92.726
+        }
+      }
+    }
+  },
+  "calib/surface_convex_default.png": {
+    "amb": {
+      "albedo": null,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "convex",
+      "thickness": 1
+    },
+    "metrics": {
+      "surface_gradient": {
+        "center_srgb_pct": 89.992,
+        "delta_end_srgb": -0.05921992253691605,
+        "delta_mid_srgb": -0.01731383139675613,
+        "stop_srgb_pct": {
+          "0": 95.262,
+          "0.35": 91.68,
+          "0.5": 89.992,
+          "0.65": 88.217,
+          "1": 83.419
+        }
+      }
+    }
+  },
+  "calib/surface_darker_default.png": {
+    "amb": {
+      "albedo": 0.06,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 28.803234972526738,
+        "noise": 0.002866752467550389,
+        "srgb_pct": 26.62304375453885
+      }
+    }
+  },
   "calib/surface_default.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -160,6 +285,7 @@
   },
   "calib/thickness_default.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -205,6 +331,7 @@
   },
   "sweeps/chamfer/chamfer_width=2.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 1,
       "chamfer_width": 2,
       "elevation": 0.0,
@@ -250,6 +377,7 @@
   },
   "sweeps/chamfer/fill_light_intensity=0.3.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 1,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -295,6 +423,7 @@
   },
   "sweeps/chamfer/fill_light_intensity=0.5.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 1,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -340,6 +469,7 @@
   },
   "sweeps/chamfer/fill_light_intensity=0.7.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 1,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -385,6 +515,7 @@
   },
   "sweeps/chamfer/key_light_intensity=0.3.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 1,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -430,6 +561,7 @@
   },
   "sweeps/chamfer/key_light_intensity=0.5.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 1,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -475,6 +607,7 @@
   },
   "sweeps/chamfer/key_light_intensity=0.7.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 1,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -520,6 +653,7 @@
   },
   "sweeps/chamfer/key_light_intensity=0.9.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 1,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -565,6 +699,7 @@
   },
   "sweeps/chamfer/light=-1,-1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 1,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -610,6 +745,7 @@
   },
   "sweeps/chamfer/light=-1,0.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 1,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -655,6 +791,7 @@
   },
   "sweeps/chamfer/light=-1,1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 1,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -700,6 +837,7 @@
   },
   "sweeps/chamfer/light=0,-1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 1,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -745,6 +883,7 @@
   },
   "sweeps/chamfer/light=0,1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 1,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -790,6 +929,7 @@
   },
   "sweeps/chamfer/light=1,-1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 1,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -835,6 +975,7 @@
   },
   "sweeps/chamfer/light=1,0.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 1,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -880,6 +1021,7 @@
   },
   "sweeps/chamfer/light=1,1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 1,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -923,8 +1065,938 @@
       }
     }
   },
+  "sweeps/concave/fill_light_intensity=0.3.png": {
+    "amb": {
+      "albedo": null,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.3,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "concave",
+      "thickness": 1
+    },
+    "metrics": {
+      "surface_gradient": {
+        "center_srgb_pct": 80.322,
+        "delta_end_srgb": 0.03688385076252726,
+        "delta_mid_srgb": 0.012290456305979358,
+        "stop_srgb_pct": {
+          "0": 76.014,
+          "0.35": 79.017,
+          "0.5": 80.322,
+          "0.65": 81.475,
+          "1": 83.391
+        }
+      }
+    }
+  },
+  "sweeps/concave/fill_light_intensity=0.7.png": {
+    "amb": {
+      "albedo": null,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "concave",
+      "thickness": 1
+    },
+    "metrics": {
+      "surface_gradient": {
+        "center_srgb_pct": 90.102,
+        "delta_end_srgb": 0.03154048656499636,
+        "delta_mid_srgb": 0.010555858145727515,
+        "stop_srgb_pct": {
+          "0": 86.407,
+          "0.35": 88.988,
+          "0.5": 90.102,
+          "0.65": 91.099,
+          "1": 92.715
+        }
+      }
+    }
+  },
+  "sweeps/concave/key_light_intensity=0.3.png": {
+    "amb": {
+      "albedo": null,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.3,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "concave",
+      "thickness": 1
+    },
+    "metrics": {
+      "surface_gradient": {
+        "center_srgb_pct": 71.756,
+        "delta_end_srgb": 0.014088220164609089,
+        "delta_mid_srgb": 0.004738183853788436,
+        "stop_srgb_pct": {
+          "0": 70.083,
+          "0.35": 71.252,
+          "0.5": 71.756,
+          "0.65": 72.2,
+          "1": 72.9
+        }
+      }
+    }
+  },
+  "sweeps/concave/key_light_intensity=0.6.png": {
+    "amb": {
+      "albedo": null,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.6,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "concave",
+      "thickness": 1
+    },
+    "metrics": {
+      "surface_gradient": {
+        "center_srgb_pct": 81.602,
+        "delta_end_srgb": 0.0239133230452675,
+        "delta_mid_srgb": 0.00800653594771239,
+        "stop_srgb_pct": {
+          "0": 78.799,
+          "0.35": 80.752,
+          "0.5": 81.602,
+          "0.65": 82.353,
+          "1": 83.582
+        }
+      }
+    }
+  },
+  "sweeps/concave/key_light_intensity=0.9.png": {
+    "amb": {
+      "albedo": null,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "concave",
+      "thickness": 1
+    },
+    "metrics": {
+      "surface_gradient": {
+        "center_srgb_pct": 90.102,
+        "delta_end_srgb": 0.03154048656499636,
+        "delta_mid_srgb": 0.01055623638344233,
+        "stop_srgb_pct": {
+          "0": 86.407,
+          "0.35": 88.988,
+          "0.5": 90.102,
+          "0.65": 91.099,
+          "1": 92.715
+        }
+      }
+    }
+  },
+  "sweeps/concave/light=-1,-1.png": {
+    "amb": {
+      "albedo": null,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "concave",
+      "thickness": 1
+    },
+    "metrics": {
+      "surface_gradient": {
+        "center_srgb_pct": 90.102,
+        "delta_end_srgb": 0.031540108327281546,
+        "delta_mid_srgb": 0.010556614621157201,
+        "stop_srgb_pct": {
+          "0": 86.407,
+          "0.35": 88.988,
+          "0.5": 90.102,
+          "0.65": 91.099,
+          "1": 92.715
+        }
+      }
+    }
+  },
+  "sweeps/concave/light=-1,0.png": {
+    "amb": {
+      "albedo": null,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": 0.0,
+      "mat": "matte",
+      "surface": "concave",
+      "thickness": 1
+    },
+    "metrics": {
+      "surface_gradient": {
+        "center_srgb_pct": 89.492,
+        "delta_end_srgb": 5.1440329218166436e-05,
+        "delta_mid_srgb": 1.8911885741990098e-05,
+        "stop_srgb_pct": {
+          "0": 89.125,
+          "0.35": 89.473,
+          "0.5": 89.492,
+          "0.65": 89.476,
+          "1": 89.135
+        }
+      }
+    }
+  },
+  "sweeps/concave/light=0,-1.png": {
+    "amb": {
+      "albedo": null,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": 0.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "concave",
+      "thickness": 1
+    },
+    "metrics": {
+      "surface_gradient": {
+        "center_srgb_pct": 89.497,
+        "delta_end_srgb": 0.026151355603969917,
+        "delta_mid_srgb": 0.008878752118131106,
+        "stop_srgb_pct": {
+          "0": 86.363,
+          "0.35": 88.55,
+          "0.5": 89.497,
+          "0.65": 90.326,
+          "1": 91.594
+        }
+      }
+    }
+  },
+  "sweeps/concave/light=0,1.png": {
+    "amb": {
+      "albedo": null,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": 0.0,
+      "light_y": 1.0,
+      "mat": "matte",
+      "surface": "concave",
+      "thickness": 1
+    },
+    "metrics": {
+      "surface_gradient": {
+        "center_srgb_pct": 89.471,
+        "delta_end_srgb": -0.026571577705156224,
+        "delta_mid_srgb": -0.008802726337448497,
+        "stop_srgb_pct": {
+          "0": 91.611,
+          "0.35": 90.318,
+          "0.5": 89.471,
+          "0.65": 88.557,
+          "1": 86.296
+        }
+      }
+    }
+  },
+  "sweeps/concave/light=1,-1.png": {
+    "amb": {
+      "albedo": null,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": 1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "concave",
+      "thickness": 1
+    },
+    "metrics": {
+      "surface_gradient": {
+        "center_srgb_pct": 90.101,
+        "delta_end_srgb": 0.03153973008956662,
+        "delta_mid_srgb": 0.010558127572016462,
+        "stop_srgb_pct": {
+          "0": 86.41,
+          "0.35": 88.982,
+          "0.5": 90.101,
+          "0.65": 91.094,
+          "1": 92.718
+        }
+      }
+    }
+  },
+  "sweeps/concave_h/key_light_intensity=0.3.png": {
+    "amb": {
+      "albedo": null,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.3,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "concave-h",
+      "thickness": 1
+    },
+    "metrics": {
+      "surface_gradient": {
+        "center_srgb_pct": 71.754,
+        "delta_end_srgb": 0.014160841805858027,
+        "delta_mid_srgb": 0.004697712418300692,
+        "stop_srgb_pct": {
+          "0": 70.061,
+          "0.35": 71.253,
+          "0.5": 71.754,
+          "0.65": 72.193,
+          "1": 72.894
+        }
+      }
+    }
+  },
+  "sweeps/concave_h/key_light_intensity=0.9.png": {
+    "amb": {
+      "albedo": null,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "concave-h",
+      "thickness": 1
+    },
+    "metrics": {
+      "surface_gradient": {
+        "center_srgb_pct": 90.1,
+        "delta_end_srgb": 0.03166833091261334,
+        "delta_mid_srgb": 0.010487018881626897,
+        "stop_srgb_pct": {
+          "0": 86.392,
+          "0.35": 88.988,
+          "0.5": 90.1,
+          "0.65": 91.085,
+          "1": 92.726
+        }
+      }
+    }
+  },
+  "sweeps/concave_h/light=-1,-1.png": {
+    "amb": {
+      "albedo": null,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "concave-h",
+      "thickness": 1
+    },
+    "metrics": {
+      "surface_gradient": {
+        "center_srgb_pct": 90.1,
+        "delta_end_srgb": 0.03166681796175397,
+        "delta_mid_srgb": 0.010487397119341768,
+        "stop_srgb_pct": {
+          "0": 86.393,
+          "0.35": 88.988,
+          "0.5": 90.1,
+          "0.65": 91.086,
+          "1": 92.726
+        }
+      }
+    }
+  },
+  "sweeps/concave_h/light=-1,0.png": {
+    "amb": {
+      "albedo": null,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": 0.0,
+      "mat": "matte",
+      "surface": "concave-h",
+      "thickness": 1
+    },
+    "metrics": {
+      "surface_gradient": {
+        "center_srgb_pct": 89.495,
+        "delta_end_srgb": 0.026259909828128092,
+        "delta_mid_srgb": 0.008820503510046818,
+        "stop_srgb_pct": {
+          "0": 86.355,
+          "0.35": 88.556,
+          "0.5": 89.495,
+          "0.65": 90.321,
+          "1": 91.607
+        }
+      }
+    }
+  },
+  "sweeps/concave_h/light=0,-1.png": {
+    "amb": {
+      "albedo": null,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": 0.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "concave-h",
+      "thickness": 1
+    },
+    "metrics": {
+      "surface_gradient": {
+        "center_srgb_pct": 89.5,
+        "delta_end_srgb": -7.564754297417764e-07,
+        "delta_mid_srgb": -1.8155410312359344e-05,
+        "stop_srgb_pct": {
+          "0": 89.167,
+          "0.35": 89.472,
+          "0.5": 89.5,
+          "0.65": 89.468,
+          "1": 89.167
+        }
+      }
+    }
+  },
+  "sweeps/concave_h/light=1,0.png": {
+    "amb": {
+      "albedo": null,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": 1.0,
+      "light_y": 0.0,
+      "mat": "matte",
+      "surface": "concave-h",
+      "thickness": 1
+    },
+    "metrics": {
+      "surface_gradient": {
+        "center_srgb_pct": 89.477,
+        "delta_end_srgb": -0.02620695654805033,
+        "delta_mid_srgb": -0.008890855725006919,
+        "stop_srgb_pct": {
+          "0": 91.627,
+          "0.35": 90.326,
+          "0.5": 89.477,
+          "0.65": 88.548,
+          "1": 86.386
+        }
+      }
+    }
+  },
+  "sweeps/convex/fill_light_intensity=0.3.png": {
+    "amb": {
+      "albedo": null,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.3,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "convex",
+      "thickness": 1
+    },
+    "metrics": {
+      "surface_gradient": {
+        "center_srgb_pct": 80.182,
+        "delta_end_srgb": -0.06909419632050356,
+        "delta_mid_srgb": -0.02011430343742432,
+        "stop_srgb_pct": {
+          "0": 86.284,
+          "0.35": 82.138,
+          "0.5": 80.182,
+          "0.65": 78.115,
+          "1": 72.466
+        }
+      }
+    }
+  },
+  "sweeps/convex/key_light_intensity=0.3.png": {
+    "amb": {
+      "albedo": null,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.3,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "convex",
+      "thickness": 1
+    },
+    "metrics": {
+      "surface_gradient": {
+        "center_srgb_pct": 71.716,
+        "delta_end_srgb": -0.02643805979181796,
+        "delta_mid_srgb": -0.007754251391914768,
+        "stop_srgb_pct": {
+          "0": 74.075,
+          "0.35": 72.473,
+          "0.5": 71.716,
+          "0.65": 70.922,
+          "1": 68.788
+        }
+      }
+    }
+  },
+  "sweeps/convex/key_light_intensity=0.9.png": {
+    "amb": {
+      "albedo": null,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "convex",
+      "thickness": 1
+    },
+    "metrics": {
+      "surface_gradient": {
+        "center_srgb_pct": 89.992,
+        "delta_end_srgb": -0.05922067901234579,
+        "delta_mid_srgb": -0.01731383139675613,
+        "stop_srgb_pct": {
+          "0": 95.262,
+          "0.35": 91.68,
+          "0.5": 89.992,
+          "0.65": 88.217,
+          "1": 83.418
+        }
+      }
+    }
+  },
+  "sweeps/convex/light=-1,-1.png": {
+    "amb": {
+      "albedo": null,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "convex",
+      "thickness": 1
+    },
+    "metrics": {
+      "surface_gradient": {
+        "center_srgb_pct": 89.992,
+        "delta_end_srgb": -0.05921992253691605,
+        "delta_mid_srgb": -0.01731383139675613,
+        "stop_srgb_pct": {
+          "0": 95.262,
+          "0.35": 91.68,
+          "0.5": 89.992,
+          "0.65": 88.217,
+          "1": 83.419
+        }
+      }
+    }
+  },
+  "sweeps/convex/light=0,-1.png": {
+    "amb": {
+      "albedo": null,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": 0.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "convex",
+      "thickness": 1
+    },
+    "metrics": {
+      "surface_gradient": {
+        "center_srgb_pct": 89.504,
+        "delta_end_srgb": -0.06330072924231417,
+        "delta_mid_srgb": -0.018597570200919733,
+        "stop_srgb_pct": {
+          "0": 95.241,
+          "0.35": 91.324,
+          "0.5": 89.504,
+          "0.65": 87.604,
+          "1": 82.581
+        }
+      }
+    }
+  },
+  "sweeps/convex/light=0,1.png": {
+    "amb": {
+      "albedo": null,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": 0.0,
+      "light_y": 1.0,
+      "mat": "matte",
+      "surface": "convex",
+      "thickness": 1
+    },
+    "metrics": {
+      "surface_gradient": {
+        "center_srgb_pct": 89.542,
+        "delta_end_srgb": 0.06289979726458489,
+        "delta_mid_srgb": 0.018580549503752153,
+        "stop_srgb_pct": {
+          "0": 82.601,
+          "0.35": 87.609,
+          "0.5": 89.542,
+          "0.65": 91.325,
+          "1": 95.181
+        }
+      }
+    }
+  },
+  "sweeps/darker/fill_light_intensity=0.35.png": {
+    "amb": {
+      "albedo": 0.06,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.35,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 25.585145263740117,
+        "noise": 0.00314886362446345,
+        "srgb_pct": 23.765284586056644
+      }
+    }
+  },
+  "sweeps/darker/fill_light_intensity=0.7.png": {
+    "amb": {
+      "albedo": 0.06,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 28.803237504731086,
+        "noise": 0.0028666990052591077,
+        "srgb_pct": 26.623046023965145
+      }
+    }
+  },
+  "sweeps/darker/fill_light_intensity=0.png": {
+    "amb": {
+      "albedo": 0.06,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.0,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 21.776487243759817,
+        "noise": 0.0035783110483306323,
+        "srgb_pct": 20.454157588961515
+      }
+    }
+  },
+  "sweeps/darker/key_light_intensity=0.1.png": {
+    "amb": {
+      "albedo": 0.06,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.1,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 18.767293256998933,
+        "noise": 0.0018612987726438596,
+        "srgb_pct": 17.896105664488008
+      }
+    }
+  },
+  "sweeps/darker/key_light_intensity=0.3.png": {
+    "amb": {
+      "albedo": 0.06,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.3,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 21.795596846674144,
+        "noise": 0.001981759623672921,
+        "srgb_pct": 20.47057007988381
+      }
+    }
+  },
+  "sweeps/darker/key_light_intensity=0.5.png": {
+    "amb": {
+      "albedo": 0.06,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.5,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 24.40783465768294,
+        "noise": 0.0022920795558324545,
+        "srgb_pct": 22.7333197167756
+      }
+    }
+  },
+  "sweeps/darker/key_light_intensity=0.7.png": {
+    "amb": {
+      "albedo": 0.06,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.7,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 26.71853890830497,
+        "noise": 0.0025916872763152776,
+        "srgb_pct": 24.76568173565723
+      }
+    }
+  },
+  "sweeps/darker/key_light_intensity=0.9.png": {
+    "amb": {
+      "albedo": 0.06,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 28.803234972526738,
+        "noise": 0.0028667007261266382,
+        "srgb_pct": 26.62304375453885
+      }
+    }
+  },
+  "sweeps/darker/key_light_intensity=1.png": {
+    "amb": {
+      "albedo": 0.06,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 1.0,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 29.776638757063218,
+        "noise": 0.003011702002136439,
+        "srgb_pct": 27.497789578794478
+      }
+    }
+  },
   "sweeps/elevation/elevation=0.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0,
@@ -970,6 +2042,7 @@
   },
   "sweeps/elevation/elevation=1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 1,
@@ -1015,6 +2088,7 @@
   },
   "sweeps/elevation/elevation=2.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 2,
@@ -1060,6 +2134,7 @@
   },
   "sweeps/elevation/elevation=3.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 3,
@@ -1105,6 +2180,7 @@
   },
   "sweeps/elevation/fill_light_intensity=0.3.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 2,
@@ -1150,6 +2226,7 @@
   },
   "sweeps/elevation/fill_light_intensity=0.5.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 2,
@@ -1195,6 +2272,7 @@
   },
   "sweeps/elevation/fill_light_intensity=0.7.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 2,
@@ -1240,6 +2318,7 @@
   },
   "sweeps/elevation/key_light_intensity=0.3.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 2,
@@ -1285,6 +2364,7 @@
   },
   "sweeps/elevation/key_light_intensity=0.6.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 2,
@@ -1330,6 +2410,7 @@
   },
   "sweeps/elevation/key_light_intensity=0.9.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 2,
@@ -1375,6 +2456,7 @@
   },
   "sweeps/elevation/light=-1,-1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 2,
@@ -1420,6 +2502,7 @@
   },
   "sweeps/elevation/light=-1,0.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 2,
@@ -1465,6 +2548,7 @@
   },
   "sweeps/elevation/light=-1,1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 2,
@@ -1510,6 +2594,7 @@
   },
   "sweeps/elevation/light=0,-1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 2,
@@ -1555,6 +2640,7 @@
   },
   "sweeps/elevation/light=0,1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 2,
@@ -1600,6 +2686,7 @@
   },
   "sweeps/elevation/light=1,-1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 2,
@@ -1645,6 +2732,7 @@
   },
   "sweeps/elevation/light=1,0.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 2,
@@ -1690,6 +2778,7 @@
   },
   "sweeps/elevation/light=1,1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 2,
@@ -1735,6 +2824,7 @@
   },
   "sweeps/elevation/thickness=1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 2,
@@ -1780,6 +2870,7 @@
   },
   "sweeps/elevation/thickness=2.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 2,
@@ -1825,6 +2916,7 @@
   },
   "sweeps/fillet/fill_light_intensity=0.3.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -1870,6 +2962,7 @@
   },
   "sweeps/fillet/fill_light_intensity=0.5.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -1915,6 +3008,7 @@
   },
   "sweeps/fillet/fill_light_intensity=0.7.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -1960,6 +3054,7 @@
   },
   "sweeps/fillet/fillet_width=2.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -2005,6 +3100,7 @@
   },
   "sweeps/fillet/key_light_intensity=0.3.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -2050,6 +3146,7 @@
   },
   "sweeps/fillet/key_light_intensity=0.5.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -2095,6 +3192,7 @@
   },
   "sweeps/fillet/key_light_intensity=0.7.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -2140,6 +3238,7 @@
   },
   "sweeps/fillet/key_light_intensity=0.9.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -2185,6 +3284,7 @@
   },
   "sweeps/fillet/light=-1,-1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -2230,6 +3330,7 @@
   },
   "sweeps/fillet/light=-1,0.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -2275,6 +3376,7 @@
   },
   "sweeps/fillet/light=-1,1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -2320,6 +3422,7 @@
   },
   "sweeps/fillet/light=0,-1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -2365,6 +3468,7 @@
   },
   "sweeps/fillet/light=0,1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -2410,6 +3514,7 @@
   },
   "sweeps/fillet/light=1,-1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -2455,6 +3560,7 @@
   },
   "sweeps/fillet/light=1,0.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -2500,6 +3606,7 @@
   },
   "sweeps/fillet/light=1,1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -2545,6 +3652,7 @@
   },
   "sweeps/surface/fill_light_intensity=0.35.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -2569,6 +3677,7 @@
   },
   "sweeps/surface/fill_light_intensity=0.7.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -2593,6 +3702,7 @@
   },
   "sweeps/surface/fill_light_intensity=0.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -2617,6 +3727,7 @@
   },
   "sweeps/surface/key_light_intensity=0.1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -2641,6 +3752,7 @@
   },
   "sweeps/surface/key_light_intensity=0.2.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -2665,6 +3777,7 @@
   },
   "sweeps/surface/key_light_intensity=0.3.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -2689,6 +3802,7 @@
   },
   "sweeps/surface/key_light_intensity=0.4.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -2713,6 +3827,7 @@
   },
   "sweeps/surface/key_light_intensity=0.5.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -2737,6 +3852,7 @@
   },
   "sweeps/surface/key_light_intensity=0.6.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -2761,6 +3877,7 @@
   },
   "sweeps/surface/key_light_intensity=0.7.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -2785,6 +3902,7 @@
   },
   "sweeps/surface/key_light_intensity=0.8.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -2809,6 +3927,7 @@
   },
   "sweeps/surface/key_light_intensity=0.9.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -2833,6 +3952,7 @@
   },
   "sweeps/surface/key_light_intensity=1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0.0,
@@ -2857,6 +3977,7 @@
   },
   "sweeps/thickness/light=-1,-1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0,
@@ -2902,6 +4023,7 @@
   },
   "sweeps/thickness/light=-1,0.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0,
@@ -2947,6 +4069,7 @@
   },
   "sweeps/thickness/light=-1,1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0,
@@ -2992,6 +4115,7 @@
   },
   "sweeps/thickness/light=0,-1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0,
@@ -3037,6 +4161,7 @@
   },
   "sweeps/thickness/light=0,1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0,
@@ -3082,6 +4207,7 @@
   },
   "sweeps/thickness/light=1,-1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0,
@@ -3127,6 +4253,7 @@
   },
   "sweeps/thickness/light=1,0.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0,
@@ -3172,6 +4299,7 @@
   },
   "sweeps/thickness/light=1,1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0,
@@ -3217,6 +4345,7 @@
   },
   "sweeps/thickness/thickness=0.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0,
@@ -3262,6 +4391,7 @@
   },
   "sweeps/thickness/thickness=1.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0,
@@ -3307,6 +4437,7 @@
   },
   "sweeps/thickness/thickness=2.png": {
     "amb": {
+      "albedo": null,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
       "elevation": 0,

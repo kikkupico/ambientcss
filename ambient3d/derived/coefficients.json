@@ -16,6 +16,23 @@
       "2": 1.75
     }
   },
+  "curved": {
+    "G_ambient_pct": 1.39,
+    "K0_pct": 3.77,
+    "K_per_contrast_pct": 3.16,
+    "mid_ratio": 0.33,
+    "model": "delta_end = K * (Ik - If) + K0 (sRGB, signed by the light component along the gradient axis; convex flipped); delta_mid = mid_ratio * delta_end; ambient plate gradient G separated out, not part of the CSS",
+    "n_samples": 23,
+    "r2_end": 0.9395
+  },
+  "darker": {
+    "f_pct": 8.77,
+    "floor_pct": 11.03,
+    "k_pct": 10.56,
+    "max_resid_pct": 0.325,
+    "model": "L% = k * key_intensity + f * fill_intensity + floor",
+    "r2": 0.99646
+  },
   "fillet": {
     "model": "hl_alpha = p * Ik + pf * If + p0; sh_alpha = q * (Ik - If) + q0; offset_px = w * width",
     "n_highlight_samples": 30,

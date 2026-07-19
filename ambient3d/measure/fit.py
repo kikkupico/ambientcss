@@ -165,6 +165,82 @@ def _fit_edge_effect(m, effect):
     }
 
 
+# ----------------------------------------------------- curved surfaces ---
+
+def fit_curved(m):
+    """Joint model for concave / concave-h / convex (shape of the CSS
+    5-stop gradients): the half-difference between the far and near stop
+    is affine in light contrast, delta_end = K * (Ik - If) + K0, with the
+    35/65% stops at a fixed ratio of it. The gradient runs along the axis
+    of the corresponding light component (y; x for -h) and flips sign for
+    convex."""
+    ends, mids = [], []
+    for rel, entry in m.items():
+        if not any(rel.startswith(f"sweeps/{s}/") or
+                   rel == f"calib/surface_{s.replace('-', '_')}_default.png"
+                   for s in ("concave", "concave_h", "convex")):
+            continue
+        a = entry["amb"]
+        variant = a["surface"]
+        comp = a["light_x"] if variant == "concave-h" else a["light_y"]
+        if comp == 0:
+            continue                    # CSS predicts flat; validated in compare
+        g = entry["metrics"]["surface_gradient"]
+        # far-minus-near along +axis; CSS concave predicts -comp * delta.
+        # The plate-wide irradiance gradient (lit side slightly closer to
+        # the light) contaminates the measurement with opposite signs for
+        # concave vs convex after normalization, so it gets its own
+        # separable column g_sign and is excluded from the CSS model.
+        sign = comp if variant == "convex" else -comp
+        g_sign = 1.0 if variant == "convex" else -1.0
+        c = a["key_light_intensity"] - a["fill_light_intensity"]
+        ends.append((c, g_sign, g["delta_end_srgb"] / sign))
+        mids.append((c, g_sign, g["delta_mid_srgb"] / sign))
+
+    eX = np.array([[v[0], 1.0, v[1]] for v in ends])
+    ey = np.array([v[2] for v in ends])
+    (K, K0, G), *_ = np.linalg.lstsq(eX, ey, rcond=None)
+    my = np.array([v[2] for v in mids])
+    dish = ey - G * eX[:, 2]            # ambient-gradient-corrected
+    mid_dish = my - G * 0.45 * eX[:, 2]
+    mid_ratio = float((mid_dish * dish).sum() / (dish * dish).sum())
+    return {
+        "model": ("delta_end = K * (Ik - If) + K0 (sRGB, signed by the "
+                  "light component along the gradient axis; convex "
+                  "flipped); delta_mid = mid_ratio * delta_end; ambient "
+                  "plate gradient G separated out, not part of the CSS"),
+        "K_per_contrast_pct": round(float(K) * 100, 2),
+        "K0_pct": round(float(K0) * 100, 2),
+        "G_ambient_pct": round(float(G) * 100, 2),
+        "mid_ratio": round(mid_ratio, 3),
+        "r2_end": round(r2(ey, eX @ [K, K0, G]), 4),
+        "n_samples": len(ends),
+    }
+
+
+def fit_darker(m):
+    """Same affine surface model as .amb-surface, fit on the dark plate."""
+    pts = []
+    for rel, entry in m.items():
+        if (rel.startswith("sweeps/darker/") or
+                rel == "calib/surface_darker_default.png"):
+            a = entry["amb"]
+            pts.append((a["key_light_intensity"], a["fill_light_intensity"],
+                        entry["metrics"]["surface_lightness"]["srgb_pct"]))
+    A = np.array([[p[0], p[1], 1.0] for p in pts])
+    L = np.array([p[2] for p in pts])
+    (k, f, floor), *_ = np.linalg.lstsq(A, L, rcond=None)
+    pred = A @ [k, f, floor]
+    return {
+        "model": "L% = k * key_intensity + f * fill_intensity + floor",
+        "k_pct": round(float(k), 2),
+        "f_pct": round(float(f), 2),
+        "floor_pct": round(float(floor), 2),
+        "r2": round(r2(L, pred), 5),
+        "max_resid_pct": round(float(np.abs(L - pred).max()), 3),
+    }
+
+
 # -------------------------------------------------------------- elevation ---
 
 def shadow_components(a):
@@ -248,7 +324,8 @@ def fit_shadow(m):
 # ------------------------------------------------------------------- main ---
 
 FITTERS = {"surface": fit_surface, "chamfer": fit_chamfer,
-           "fillet": fit_fillet, "shadow": fit_shadow}
+           "fillet": fit_fillet, "shadow": fit_shadow,
+           "curved": fit_curved, "darker": fit_darker}
 
 
 def write_note(effect, coeffs):

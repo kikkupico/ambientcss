@@ -64,6 +64,11 @@ ELEVATION_MM_PER_LEVEL = 8.0
 # thickness feed one unified shadow model. Edge treatments require t >= 1.
 THICKNESS_MM_PER_LEVEL = 4.5
 SHEET_MM = 0.15           # physical stand-in for thickness 0
+SAGITTA_MM = 4.0          # dish/dome depth of the curved surface variants
+                          # (deep enough that its shading dominates the
+                          # residual plate-wide irradiance gradient)
+DARKER_ALBEDO = 0.06      # .amb-surface-darker plate (~30% of the default
+                          # lightness at the (0.9, 0.7) defaults)
 
 # Defaults mirror the :root block of packages/ambient-css/src/ambient.css.
 AMB_DEFAULTS = {
@@ -80,6 +85,7 @@ AMB_DEFAULTS = {
     "mat": "matte",       # matte | shiny | glass
     "emit": None,         # hex color for emissive plates
     "surface": "flat",    # flat | concave | concave-h | convex
+    "albedo": None,       # None = ground albedo; darker plates override
 }
 
 

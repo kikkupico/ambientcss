@@ -28,7 +28,7 @@ from components._common import prism_object
 # amb_model.py so the measurement pipeline can import it without bpy.
 from amb_model import (  # noqa: F401  (re-exported for callers)
     PX_PER_MM, FRAME_MM, CAM_Z, LIGHT_R, LIGHT_Z, LIGHT_SIZE,
-    GROUND_MM, GROUND_ALBEDO, E0, S0, key_energy,
+    GROUND_MM, GROUND_ALBEDO, E0, S0, key_energy, SAGITTA_MM, DARKER_ALBEDO,
     CHAMFER_MM_PER_WIDTH, FILLET_MM_PER_WIDTH, ELEVATION_MM_PER_LEVEL,
     THICKNESS_MM_PER_LEVEL, SHEET_MM,
     AMB_DEFAULTS, amb, edge_mm, elevation_mm, thickness_mm, silhouette_mm,
@@ -51,8 +51,10 @@ def calib_material(name, albedo, rough=1.0):
     return mat
 
 
-def material_for(a, name="PlateMat", albedo=GROUND_ALBEDO):
+def material_for(a, name="PlateMat", albedo=None):
     """Plate material for an amb material kind (calibration variant)."""
+    if albedo is None:
+        albedo = a["albedo"] if a["albedo"] is not None else GROUND_ALBEDO
     kind = a["mat"]
     if a["emit"]:
         mat = calib_material(name, 0.05)

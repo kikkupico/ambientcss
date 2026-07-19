@@ -341,6 +341,133 @@
       "tol": 0.6
     }
   },
+  "calib/surface_concave_default.png": {
+    "surface_gradient.center_srgb_pct": {
+      "css": 90.058,
+      "diff": 0.044,
+      "ok": true,
+      "render": 90.102,
+      "tol": 3.0
+    },
+    "surface_gradient.delta_end_srgb": {
+      "css": 0.045,
+      "diff": 0.0134,
+      "ok": true,
+      "render": 0.0315,
+      "tol": 0.022
+    },
+    "surface_gradient.delta_mid_srgb": {
+      "css": 0.0148,
+      "diff": 0.0042,
+      "ok": true,
+      "render": 0.0106,
+      "tol": 0.022
+    },
+    "surface_gradient.stop_srgb_pct.0": {
+      "css": 85.546,
+      "diff": 0.861,
+      "ok": true,
+      "render": 86.407,
+      "tol": 3.0
+    },
+    "surface_gradient.stop_srgb_pct.1": {
+      "css": 94.539,
+      "diff": 1.824,
+      "ok": true,
+      "render": 92.715,
+      "tol": 3.0
+    }
+  },
+  "calib/surface_concave_h_default.png": {
+    "surface_gradient.center_srgb_pct": {
+      "css": 90.062,
+      "diff": 0.038,
+      "ok": true,
+      "render": 90.1,
+      "tol": 3.0
+    },
+    "surface_gradient.delta_end_srgb": {
+      "css": 0.045,
+      "diff": 0.0133,
+      "ok": true,
+      "render": 0.0317,
+      "tol": 0.022
+    },
+    "surface_gradient.delta_mid_srgb": {
+      "css": 0.0147,
+      "diff": 0.0042,
+      "ok": true,
+      "render": 0.0105,
+      "tol": 0.022
+    },
+    "surface_gradient.stop_srgb_pct.0": {
+      "css": 85.552,
+      "diff": 0.841,
+      "ok": true,
+      "render": 86.393,
+      "tol": 3.0
+    },
+    "surface_gradient.stop_srgb_pct.1": {
+      "css": 94.544,
+      "diff": 1.818,
+      "ok": true,
+      "render": 92.726,
+      "tol": 3.0
+    }
+  },
+  "calib/surface_convex_default.png": {
+    "surface_gradient.center_srgb_pct": {
+      "css": 90.032,
+      "diff": 0.04,
+      "ok": true,
+      "render": 89.992,
+      "tol": 3.0
+    },
+    "surface_gradient.delta_end_srgb": {
+      "css": -0.045,
+      "diff": 0.0143,
+      "ok": true,
+      "render": -0.0592,
+      "tol": 0.022
+    },
+    "surface_gradient.delta_mid_srgb": {
+      "css": -0.0148,
+      "diff": 0.0026,
+      "ok": true,
+      "render": -0.0173,
+      "tol": 0.022
+    },
+    "surface_gradient.stop_srgb_pct.0": {
+      "css": 94.548,
+      "diff": 0.714,
+      "ok": true,
+      "render": 95.262,
+      "tol": 3.0
+    },
+    "surface_gradient.stop_srgb_pct.1": {
+      "css": 85.555,
+      "diff": 2.136,
+      "ok": true,
+      "render": 83.419,
+      "tol": 3.0
+    }
+  },
+  "calib/surface_darker_default.png": {
+    "surface_lightness.lstar": {
+      "css": 27.6815,
+      "diff": 1.1217,
+      "ok": true,
+      "render": 28.8032,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 25.6209,
+      "diff": 1.0021,
+      "ok": true,
+      "render": 26.623,
+      "tol": 3.0
+    }
+  },
   "calib/surface_default.png": {
     "surface_lightness.lstar": {
       "css": 91.1757,
@@ -2229,6 +2356,964 @@
       "ok": true,
       "render": 0.75,
       "tol": 0.6
+    }
+  },
+  "sweeps/concave/fill_light_intensity=0.3.png": {
+    "surface_gradient.center_srgb_pct": {
+      "css": 79.085,
+      "diff": 1.237,
+      "ok": true,
+      "render": 80.322,
+      "tol": 3.0
+    },
+    "surface_gradient.delta_end_srgb": {
+      "css": 0.0579,
+      "diff": 0.021,
+      "ok": true,
+      "render": 0.0369,
+      "tol": 0.022
+    },
+    "surface_gradient.delta_mid_srgb": {
+      "css": 0.019,
+      "diff": 0.0067,
+      "ok": true,
+      "render": 0.0123,
+      "tol": 0.022
+    },
+    "surface_gradient.stop_srgb_pct.0": {
+      "css": 73.275,
+      "diff": 2.739,
+      "ok": true,
+      "render": 76.014,
+      "tol": 3.0
+    },
+    "surface_gradient.stop_srgb_pct.1": {
+      "css": 84.849,
+      "diff": 1.458,
+      "ok": true,
+      "render": 83.391,
+      "tol": 3.0
+    }
+  },
+  "sweeps/concave/fill_light_intensity=0.7.png": {
+    "surface_gradient.center_srgb_pct": {
+      "css": 90.058,
+      "diff": 0.044,
+      "ok": true,
+      "render": 90.102,
+      "tol": 3.0
+    },
+    "surface_gradient.delta_end_srgb": {
+      "css": 0.045,
+      "diff": 0.0134,
+      "ok": true,
+      "render": 0.0315,
+      "tol": 0.022
+    },
+    "surface_gradient.delta_mid_srgb": {
+      "css": 0.0148,
+      "diff": 0.0042,
+      "ok": true,
+      "render": 0.0106,
+      "tol": 0.022
+    },
+    "surface_gradient.stop_srgb_pct.0": {
+      "css": 85.546,
+      "diff": 0.861,
+      "ok": true,
+      "render": 86.407,
+      "tol": 3.0
+    },
+    "surface_gradient.stop_srgb_pct.1": {
+      "css": 94.539,
+      "diff": 1.824,
+      "ok": true,
+      "render": 92.715,
+      "tol": 3.0
+    }
+  },
+  "sweeps/concave/key_light_intensity=0.3.png": {
+    "surface_gradient.center_srgb_pct": {
+      "css": 70.397,
+      "diff": 1.359,
+      "ok": true,
+      "render": 71.756,
+      "tol": 3.0
+    },
+    "surface_gradient.delta_end_srgb": {
+      "css": 0.0255,
+      "diff": 0.0114,
+      "ok": true,
+      "render": 0.0141,
+      "tol": 0.022
+    },
+    "surface_gradient.delta_mid_srgb": {
+      "css": 0.0084,
+      "diff": 0.0036,
+      "ok": true,
+      "render": 0.0047,
+      "tol": 0.022
+    },
+    "surface_gradient.stop_srgb_pct.0": {
+      "css": 67.845,
+      "diff": 2.238,
+      "ok": true,
+      "render": 70.083,
+      "tol": 3.0
+    },
+    "surface_gradient.stop_srgb_pct.1": {
+      "css": 72.941,
+      "diff": 0.041,
+      "ok": true,
+      "render": 72.9,
+      "tol": 3.0
+    }
+  },
+  "sweeps/concave/key_light_intensity=0.6.png": {
+    "surface_gradient.center_srgb_pct": {
+      "css": 80.229,
+      "diff": 1.373,
+      "ok": true,
+      "render": 81.602,
+      "tol": 3.0
+    },
+    "surface_gradient.delta_end_srgb": {
+      "css": 0.0352,
+      "diff": 0.0113,
+      "ok": true,
+      "render": 0.0239,
+      "tol": 0.022
+    },
+    "surface_gradient.delta_mid_srgb": {
+      "css": 0.0116,
+      "diff": 0.0036,
+      "ok": true,
+      "render": 0.008,
+      "tol": 0.022
+    },
+    "surface_gradient.stop_srgb_pct.0": {
+      "css": 76.703,
+      "diff": 2.096,
+      "ok": true,
+      "render": 78.799,
+      "tol": 3.0
+    },
+    "surface_gradient.stop_srgb_pct.1": {
+      "css": 83.749,
+      "diff": 0.167,
+      "ok": true,
+      "render": 83.582,
+      "tol": 3.0
+    }
+  },
+  "sweeps/concave/key_light_intensity=0.9.png": {
+    "surface_gradient.center_srgb_pct": {
+      "css": 90.058,
+      "diff": 0.044,
+      "ok": true,
+      "render": 90.102,
+      "tol": 3.0
+    },
+    "surface_gradient.delta_end_srgb": {
+      "css": 0.045,
+      "diff": 0.0134,
+      "ok": true,
+      "render": 0.0315,
+      "tol": 0.022
+    },
+    "surface_gradient.delta_mid_srgb": {
+      "css": 0.0148,
+      "diff": 0.0042,
+      "ok": true,
+      "render": 0.0106,
+      "tol": 0.022
+    },
+    "surface_gradient.stop_srgb_pct.0": {
+      "css": 85.546,
+      "diff": 0.861,
+      "ok": true,
+      "render": 86.407,
+      "tol": 3.0
+    },
+    "surface_gradient.stop_srgb_pct.1": {
+      "css": 94.539,
+      "diff": 1.824,
+      "ok": true,
+      "render": 92.715,
+      "tol": 3.0
+    }
+  },
+  "sweeps/concave/light=-1,-1.png": {
+    "surface_gradient.center_srgb_pct": {
+      "css": 90.058,
+      "diff": 0.044,
+      "ok": true,
+      "render": 90.102,
+      "tol": 3.0
+    },
+    "surface_gradient.delta_end_srgb": {
+      "css": 0.045,
+      "diff": 0.0134,
+      "ok": true,
+      "render": 0.0315,
+      "tol": 0.022
+    },
+    "surface_gradient.delta_mid_srgb": {
+      "css": 0.0148,
+      "diff": 0.0042,
+      "ok": true,
+      "render": 0.0106,
+      "tol": 0.022
+    },
+    "surface_gradient.stop_srgb_pct.0": {
+      "css": 85.546,
+      "diff": 0.861,
+      "ok": true,
+      "render": 86.407,
+      "tol": 3.0
+    },
+    "surface_gradient.stop_srgb_pct.1": {
+      "css": 94.539,
+      "diff": 1.824,
+      "ok": true,
+      "render": 92.715,
+      "tol": 3.0
+    }
+  },
+  "sweeps/concave/light=-1,0.png": {
+    "surface_gradient.center_srgb_pct": {
+      "css": 90.045,
+      "diff": 0.553,
+      "ok": true,
+      "render": 89.492,
+      "tol": 3.0
+    },
+    "surface_gradient.delta_end_srgb": {
+      "css": -0.0,
+      "diff": 0.0001,
+      "ok": true,
+      "render": 0.0001,
+      "tol": 0.022
+    },
+    "surface_gradient.delta_mid_srgb": {
+      "css": 0.0,
+      "diff": 0.0,
+      "ok": true,
+      "render": 0.0,
+      "tol": 0.022
+    },
+    "surface_gradient.stop_srgb_pct.0": {
+      "css": 90.045,
+      "diff": 0.92,
+      "ok": true,
+      "render": 89.125,
+      "tol": 3.0
+    },
+    "surface_gradient.stop_srgb_pct.1": {
+      "css": 90.045,
+      "diff": 0.91,
+      "ok": true,
+      "render": 89.135,
+      "tol": 3.0
+    }
+  },
+  "sweeps/concave/light=0,-1.png": {
+    "surface_gradient.center_srgb_pct": {
+      "css": 90.058,
+      "diff": 0.561,
+      "ok": true,
+      "render": 89.497,
+      "tol": 3.0
+    },
+    "surface_gradient.delta_end_srgb": {
+      "css": 0.045,
+      "diff": 0.0188,
+      "ok": true,
+      "render": 0.0262,
+      "tol": 0.022
+    },
+    "surface_gradient.delta_mid_srgb": {
+      "css": 0.0148,
+      "diff": 0.0059,
+      "ok": true,
+      "render": 0.0089,
+      "tol": 0.022
+    },
+    "surface_gradient.stop_srgb_pct.0": {
+      "css": 85.546,
+      "diff": 0.817,
+      "ok": true,
+      "render": 86.363,
+      "tol": 3.0
+    },
+    "surface_gradient.stop_srgb_pct.1": {
+      "css": 94.539,
+      "diff": 2.945,
+      "ok": true,
+      "render": 91.594,
+      "tol": 3.0
+    }
+  },
+  "sweeps/concave/light=0,1.png": {
+    "surface_gradient.center_srgb_pct": {
+      "css": 90.032,
+      "diff": 0.561,
+      "ok": true,
+      "render": 89.471,
+      "tol": 3.0
+    },
+    "surface_gradient.delta_end_srgb": {
+      "css": -0.045,
+      "diff": 0.0184,
+      "ok": true,
+      "render": -0.0266,
+      "tol": 0.022
+    },
+    "surface_gradient.delta_mid_srgb": {
+      "css": -0.0148,
+      "diff": 0.006,
+      "ok": true,
+      "render": -0.0088,
+      "tol": 0.022
+    },
+    "surface_gradient.stop_srgb_pct.0": {
+      "css": 94.548,
+      "diff": 2.937,
+      "ok": true,
+      "render": 91.611,
+      "tol": 3.0
+    },
+    "surface_gradient.stop_srgb_pct.1": {
+      "css": 85.555,
+      "diff": 0.741,
+      "ok": true,
+      "render": 86.296,
+      "tol": 3.0
+    }
+  },
+  "sweeps/concave/light=1,-1.png": {
+    "surface_gradient.center_srgb_pct": {
+      "css": 90.058,
+      "diff": 0.043,
+      "ok": true,
+      "render": 90.101,
+      "tol": 3.0
+    },
+    "surface_gradient.delta_end_srgb": {
+      "css": 0.045,
+      "diff": 0.0134,
+      "ok": true,
+      "render": 0.0315,
+      "tol": 0.022
+    },
+    "surface_gradient.delta_mid_srgb": {
+      "css": 0.0148,
+      "diff": 0.0042,
+      "ok": true,
+      "render": 0.0106,
+      "tol": 0.022
+    },
+    "surface_gradient.stop_srgb_pct.0": {
+      "css": 85.546,
+      "diff": 0.864,
+      "ok": true,
+      "render": 86.41,
+      "tol": 3.0
+    },
+    "surface_gradient.stop_srgb_pct.1": {
+      "css": 94.539,
+      "diff": 1.821,
+      "ok": true,
+      "render": 92.718,
+      "tol": 3.0
+    }
+  },
+  "sweeps/concave_h/key_light_intensity=0.3.png": {
+    "surface_gradient.center_srgb_pct": {
+      "css": 70.394,
+      "diff": 1.36,
+      "ok": true,
+      "render": 71.754,
+      "tol": 3.0
+    },
+    "surface_gradient.delta_end_srgb": {
+      "css": 0.0255,
+      "diff": 0.0114,
+      "ok": true,
+      "render": 0.0142,
+      "tol": 0.022
+    },
+    "surface_gradient.delta_mid_srgb": {
+      "css": 0.0083,
+      "diff": 0.0036,
+      "ok": true,
+      "render": 0.0047,
+      "tol": 0.022
+    },
+    "surface_gradient.stop_srgb_pct.0": {
+      "css": 67.834,
+      "diff": 2.227,
+      "ok": true,
+      "render": 70.061,
+      "tol": 3.0
+    },
+    "surface_gradient.stop_srgb_pct.1": {
+      "css": 72.939,
+      "diff": 0.045,
+      "ok": true,
+      "render": 72.894,
+      "tol": 3.0
+    }
+  },
+  "sweeps/concave_h/key_light_intensity=0.9.png": {
+    "surface_gradient.center_srgb_pct": {
+      "css": 90.062,
+      "diff": 0.038,
+      "ok": true,
+      "render": 90.1,
+      "tol": 3.0
+    },
+    "surface_gradient.delta_end_srgb": {
+      "css": 0.045,
+      "diff": 0.0133,
+      "ok": true,
+      "render": 0.0317,
+      "tol": 0.022
+    },
+    "surface_gradient.delta_mid_srgb": {
+      "css": 0.0147,
+      "diff": 0.0042,
+      "ok": true,
+      "render": 0.0105,
+      "tol": 0.022
+    },
+    "surface_gradient.stop_srgb_pct.0": {
+      "css": 85.552,
+      "diff": 0.84,
+      "ok": true,
+      "render": 86.392,
+      "tol": 3.0
+    },
+    "surface_gradient.stop_srgb_pct.1": {
+      "css": 94.544,
+      "diff": 1.818,
+      "ok": true,
+      "render": 92.726,
+      "tol": 3.0
+    }
+  },
+  "sweeps/concave_h/light=-1,-1.png": {
+    "surface_gradient.center_srgb_pct": {
+      "css": 90.062,
+      "diff": 0.038,
+      "ok": true,
+      "render": 90.1,
+      "tol": 3.0
+    },
+    "surface_gradient.delta_end_srgb": {
+      "css": 0.045,
+      "diff": 0.0133,
+      "ok": true,
+      "render": 0.0317,
+      "tol": 0.022
+    },
+    "surface_gradient.delta_mid_srgb": {
+      "css": 0.0147,
+      "diff": 0.0042,
+      "ok": true,
+      "render": 0.0105,
+      "tol": 0.022
+    },
+    "surface_gradient.stop_srgb_pct.0": {
+      "css": 85.552,
+      "diff": 0.841,
+      "ok": true,
+      "render": 86.393,
+      "tol": 3.0
+    },
+    "surface_gradient.stop_srgb_pct.1": {
+      "css": 94.544,
+      "diff": 1.818,
+      "ok": true,
+      "render": 92.726,
+      "tol": 3.0
+    }
+  },
+  "sweeps/concave_h/light=-1,0.png": {
+    "surface_gradient.center_srgb_pct": {
+      "css": 90.062,
+      "diff": 0.567,
+      "ok": true,
+      "render": 89.495,
+      "tol": 3.0
+    },
+    "surface_gradient.delta_end_srgb": {
+      "css": 0.045,
+      "diff": 0.0187,
+      "ok": true,
+      "render": 0.0263,
+      "tol": 0.022
+    },
+    "surface_gradient.delta_mid_srgb": {
+      "css": 0.0147,
+      "diff": 0.0059,
+      "ok": true,
+      "render": 0.0088,
+      "tol": 0.022
+    },
+    "surface_gradient.stop_srgb_pct.0": {
+      "css": 85.552,
+      "diff": 0.803,
+      "ok": true,
+      "render": 86.355,
+      "tol": 3.0
+    },
+    "surface_gradient.stop_srgb_pct.1": {
+      "css": 94.544,
+      "diff": 2.937,
+      "ok": true,
+      "render": 91.607,
+      "tol": 3.0
+    }
+  },
+  "sweeps/concave_h/light=0,-1.png": {
+    "surface_gradient.center_srgb_pct": {
+      "css": 90.038,
+      "diff": 0.538,
+      "ok": true,
+      "render": 89.5,
+      "tol": 3.0
+    },
+    "surface_gradient.delta_end_srgb": {
+      "css": 0.0001,
+      "diff": 0.0001,
+      "ok": true,
+      "render": -0.0,
+      "tol": 0.022
+    },
+    "surface_gradient.delta_mid_srgb": {
+      "css": -0.0001,
+      "diff": 0.0001,
+      "ok": true,
+      "render": -0.0,
+      "tol": 0.022
+    },
+    "surface_gradient.stop_srgb_pct.0": {
+      "css": 90.038,
+      "diff": 0.871,
+      "ok": true,
+      "render": 89.167,
+      "tol": 3.0
+    },
+    "surface_gradient.stop_srgb_pct.1": {
+      "css": 90.052,
+      "diff": 0.885,
+      "ok": true,
+      "render": 89.167,
+      "tol": 3.0
+    }
+  },
+  "sweeps/concave_h/light=1,0.png": {
+    "surface_gradient.center_srgb_pct": {
+      "css": 90.029,
+      "diff": 0.552,
+      "ok": true,
+      "render": 89.477,
+      "tol": 3.0
+    },
+    "surface_gradient.delta_end_srgb": {
+      "css": -0.0449,
+      "diff": 0.0187,
+      "ok": true,
+      "render": -0.0262,
+      "tol": 0.022
+    },
+    "surface_gradient.delta_mid_srgb": {
+      "css": -0.0148,
+      "diff": 0.0059,
+      "ok": true,
+      "render": -0.0089,
+      "tol": 0.022
+    },
+    "surface_gradient.stop_srgb_pct.0": {
+      "css": 94.53,
+      "diff": 2.903,
+      "ok": true,
+      "render": 91.627,
+      "tol": 3.0
+    },
+    "surface_gradient.stop_srgb_pct.1": {
+      "css": 85.555,
+      "diff": 0.831,
+      "ok": true,
+      "render": 86.386,
+      "tol": 3.0
+    }
+  },
+  "sweeps/convex/fill_light_intensity=0.3.png": {
+    "surface_gradient.center_srgb_pct": {
+      "css": 79.045,
+      "diff": 1.137,
+      "ok": true,
+      "render": 80.182,
+      "tol": 3.0
+    },
+    "surface_gradient.delta_end_srgb": {
+      "css": -0.0578,
+      "diff": 0.0113,
+      "ok": true,
+      "render": -0.0691,
+      "tol": 0.022
+    },
+    "surface_gradient.delta_mid_srgb": {
+      "css": -0.019,
+      "diff": 0.0011,
+      "ok": true,
+      "render": -0.0201,
+      "tol": 0.022
+    },
+    "surface_gradient.stop_srgb_pct.0": {
+      "css": 84.853,
+      "diff": 1.431,
+      "ok": true,
+      "render": 86.284,
+      "tol": 3.0
+    },
+    "surface_gradient.stop_srgb_pct.1": {
+      "css": 73.284,
+      "diff": 0.818,
+      "ok": true,
+      "render": 72.466,
+      "tol": 3.0
+    }
+  },
+  "sweeps/convex/key_light_intensity=0.3.png": {
+    "surface_gradient.center_srgb_pct": {
+      "css": 70.383,
+      "diff": 1.333,
+      "ok": true,
+      "render": 71.716,
+      "tol": 3.0
+    },
+    "surface_gradient.delta_end_srgb": {
+      "css": -0.0255,
+      "diff": 0.001,
+      "ok": true,
+      "render": -0.0264,
+      "tol": 0.022
+    },
+    "surface_gradient.delta_mid_srgb": {
+      "css": -0.0084,
+      "diff": 0.0006,
+      "ok": true,
+      "render": -0.0078,
+      "tol": 0.022
+    },
+    "surface_gradient.stop_srgb_pct.0": {
+      "css": 72.934,
+      "diff": 1.141,
+      "ok": true,
+      "render": 74.075,
+      "tol": 3.0
+    },
+    "surface_gradient.stop_srgb_pct.1": {
+      "css": 67.839,
+      "diff": 0.949,
+      "ok": true,
+      "render": 68.788,
+      "tol": 3.0
+    }
+  },
+  "sweeps/convex/key_light_intensity=0.9.png": {
+    "surface_gradient.center_srgb_pct": {
+      "css": 90.032,
+      "diff": 0.04,
+      "ok": true,
+      "render": 89.992,
+      "tol": 3.0
+    },
+    "surface_gradient.delta_end_srgb": {
+      "css": -0.045,
+      "diff": 0.0143,
+      "ok": true,
+      "render": -0.0592,
+      "tol": 0.022
+    },
+    "surface_gradient.delta_mid_srgb": {
+      "css": -0.0148,
+      "diff": 0.0026,
+      "ok": true,
+      "render": -0.0173,
+      "tol": 0.022
+    },
+    "surface_gradient.stop_srgb_pct.0": {
+      "css": 94.548,
+      "diff": 0.714,
+      "ok": true,
+      "render": 95.262,
+      "tol": 3.0
+    },
+    "surface_gradient.stop_srgb_pct.1": {
+      "css": 85.555,
+      "diff": 2.137,
+      "ok": true,
+      "render": 83.418,
+      "tol": 3.0
+    }
+  },
+  "sweeps/convex/light=-1,-1.png": {
+    "surface_gradient.center_srgb_pct": {
+      "css": 90.032,
+      "diff": 0.04,
+      "ok": true,
+      "render": 89.992,
+      "tol": 3.0
+    },
+    "surface_gradient.delta_end_srgb": {
+      "css": -0.045,
+      "diff": 0.0143,
+      "ok": true,
+      "render": -0.0592,
+      "tol": 0.022
+    },
+    "surface_gradient.delta_mid_srgb": {
+      "css": -0.0148,
+      "diff": 0.0026,
+      "ok": true,
+      "render": -0.0173,
+      "tol": 0.022
+    },
+    "surface_gradient.stop_srgb_pct.0": {
+      "css": 94.548,
+      "diff": 0.714,
+      "ok": true,
+      "render": 95.262,
+      "tol": 3.0
+    },
+    "surface_gradient.stop_srgb_pct.1": {
+      "css": 85.555,
+      "diff": 2.136,
+      "ok": true,
+      "render": 83.419,
+      "tol": 3.0
+    }
+  },
+  "sweeps/convex/light=0,-1.png": {
+    "surface_gradient.center_srgb_pct": {
+      "css": 90.032,
+      "diff": 0.528,
+      "ok": true,
+      "render": 89.504,
+      "tol": 3.0
+    },
+    "surface_gradient.delta_end_srgb": {
+      "css": -0.045,
+      "diff": 0.0183,
+      "ok": true,
+      "render": -0.0633,
+      "tol": 0.022
+    },
+    "surface_gradient.delta_mid_srgb": {
+      "css": -0.0148,
+      "diff": 0.0038,
+      "ok": true,
+      "render": -0.0186,
+      "tol": 0.022
+    },
+    "surface_gradient.stop_srgb_pct.0": {
+      "css": 94.548,
+      "diff": 0.693,
+      "ok": true,
+      "render": 95.241,
+      "tol": 3.0
+    },
+    "surface_gradient.stop_srgb_pct.1": {
+      "css": 85.555,
+      "diff": 2.974,
+      "ok": true,
+      "render": 82.581,
+      "tol": 3.0
+    }
+  },
+  "sweeps/convex/light=0,1.png": {
+    "surface_gradient.center_srgb_pct": {
+      "css": 90.058,
+      "diff": 0.516,
+      "ok": true,
+      "render": 89.542,
+      "tol": 3.0
+    },
+    "surface_gradient.delta_end_srgb": {
+      "css": 0.045,
+      "diff": 0.0179,
+      "ok": true,
+      "render": 0.0629,
+      "tol": 0.022
+    },
+    "surface_gradient.delta_mid_srgb": {
+      "css": 0.0148,
+      "diff": 0.0038,
+      "ok": true,
+      "render": 0.0186,
+      "tol": 0.022
+    },
+    "surface_gradient.stop_srgb_pct.0": {
+      "css": 85.546,
+      "diff": 2.945,
+      "ok": true,
+      "render": 82.601,
+      "tol": 3.0
+    },
+    "surface_gradient.stop_srgb_pct.1": {
+      "css": 94.539,
+      "diff": 0.642,
+      "ok": true,
+      "render": 95.181,
+      "tol": 3.0
+    }
+  },
+  "sweeps/darker/fill_light_intensity=0.35.png": {
+    "surface_lightness.lstar": {
+      "css": 24.2716,
+      "diff": 1.3136,
+      "ok": true,
+      "render": 25.5851,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 22.6144,
+      "diff": 1.1509,
+      "ok": true,
+      "render": 23.7653,
+      "tol": 3.0
+    }
+  },
+  "sweeps/darker/fill_light_intensity=0.7.png": {
+    "surface_lightness.lstar": {
+      "css": 27.6815,
+      "diff": 1.1217,
+      "ok": true,
+      "render": 28.8032,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 25.6209,
+      "diff": 1.0021,
+      "ok": true,
+      "render": 26.623,
+      "tol": 3.0
+    }
+  },
+  "sweeps/darker/fill_light_intensity=0.png": {
+    "surface_lightness.lstar": {
+      "css": 20.9409,
+      "diff": 0.8356,
+      "ok": true,
+      "render": 21.7765,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 19.7386,
+      "diff": 0.7156,
+      "ok": true,
+      "render": 20.4542,
+      "tol": 3.0
+    }
+  },
+  "sweeps/darker/key_light_intensity=0.1.png": {
+    "surface_lightness.lstar": {
+      "css": 18.1591,
+      "diff": 0.6082,
+      "ok": true,
+      "render": 18.7673,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 17.3856,
+      "diff": 0.5105,
+      "ok": true,
+      "render": 17.8961,
+      "tol": 3.0
+    }
+  },
+  "sweeps/darker/key_light_intensity=0.3.png": {
+    "surface_lightness.lstar": {
+      "css": 20.7878,
+      "diff": 1.0078,
+      "ok": true,
+      "render": 21.7956,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 19.6078,
+      "diff": 0.8627,
+      "ok": true,
+      "render": 20.4706,
+      "tol": 3.0
+    }
+  },
+  "sweeps/darker/key_light_intensity=0.5.png": {
+    "surface_lightness.lstar": {
+      "css": 23.0687,
+      "diff": 1.3391,
+      "ok": true,
+      "render": 24.4078,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 21.5686,
+      "diff": 1.1647,
+      "ok": true,
+      "render": 22.7333,
+      "tol": 3.0
+    }
+  },
+  "sweeps/darker/key_light_intensity=0.7.png": {
+    "surface_lightness.lstar": {
+      "css": 25.3168,
+      "diff": 1.4017,
+      "ok": true,
+      "render": 26.7185,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 23.5294,
+      "diff": 1.2363,
+      "ok": true,
+      "render": 24.7657,
+      "tol": 3.0
+    }
+  },
+  "sweeps/darker/key_light_intensity=0.9.png": {
+    "surface_lightness.lstar": {
+      "css": 27.6815,
+      "diff": 1.1217,
+      "ok": true,
+      "render": 28.8032,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 25.6209,
+      "diff": 1.0021,
+      "ok": true,
+      "render": 26.623,
+      "tol": 3.0
+    }
+  },
+  "sweeps/darker/key_light_intensity=1.png": {
+    "surface_lightness.lstar": {
+      "css": 28.706,
+      "diff": 1.0706,
+      "ok": true,
+      "render": 29.7766,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 26.5359,
+      "diff": 0.9618,
+      "ok": true,
+      "render": 27.4978,
+      "tol": 3.0
     }
   },
   "sweeps/elevation/elevation=0.png": {

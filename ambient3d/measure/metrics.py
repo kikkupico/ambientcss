@@ -128,6 +128,38 @@ def edge_bands(img, meta):
     return out
 
 
+def surface_gradient(img, meta):
+    """L profile along the curvature axis of a curved-surface plate,
+    sampled at the CSS gradient stop positions (0/35/50/65/100%).
+    Values are far-edge-positive: stops run along +axis (screen down for
+    concave/convex, screen right for concave-h)."""
+    f = Frame(img, meta)
+    axis = "x" if f.amb["surface"] == "concave-h" else "y"
+    hw, hd = f.plate_w / 2, f.plate_d / 2
+    span = hw if axis == "x" else hd
+    lat = (hd if axis == "x" else hw) * 0.6
+
+    if axis == "x":
+        band = f.region(-hw, hw, -lat, lat).mean(axis=0)
+    else:
+        band = f.region(-lat, lat, -hd, hd).mean(axis=1)
+
+    n = len(band)
+    inset = int(round(1.0 * f.s))          # skip silhouette AA
+    stops = {}
+    for pos in (0.0, 0.35, 0.5, 0.65, 1.0):
+        c = inset + (n - 1 - 2 * inset) * pos
+        lo, hi = int(round(c - f.s)), int(round(c + f.s)) + 1
+        v = float(band[max(0, lo):hi].mean())
+        stops[f"{pos:g}"] = v
+    return {
+        "stop_srgb_pct": {k: round(v * 100, 3) for k, v in stops.items()},
+        "delta_end_srgb": (stops["1"] - stops["0"]) / 2,
+        "delta_mid_srgb": (stops["0.65"] - stops["0.35"]) / 2,
+        "center_srgb_pct": round(stops["0.5"] * 100, 3),
+    }
+
+
 def drop_shadow(img, meta):
     """Drop-shadow characterization from the crescent outside the plate.
 
@@ -191,4 +223,5 @@ EXTRACTORS = {
     "surface_lightness": surface_lightness,
     "edge_bands": edge_bands,
     "drop_shadow": drop_shadow,
+    "surface_gradient": surface_gradient,
 }
