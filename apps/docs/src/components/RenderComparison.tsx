@@ -34,12 +34,20 @@ export function RenderComparison({
   slug,
   classes,
   size = [80, 80],
-  subjectStyle
+  subjectStyle,
+  dir = "renders",
+  children
 }: {
   slug: string;
-  classes: string;
+  classes?: string;
   size?: [number, number];
   subjectStyle?: React.CSSProperties;
+  /** image directory under /img: "renders" (effect calibration frames)
+   *  or "components" (component counterpart shots) */
+  dir?: "renders" | "components";
+  /** live subject: rendered instead of the classes div when given
+   *  (component comparisons pass the live React component) */
+  children?: React.ReactNode;
 }) {
   return (
     <figure
@@ -53,16 +61,18 @@ export function RenderComparison({
     >
       <div style={{ textAlign: "center" }}>
         <div className="amb-surface" style={stageStyle}>
-          <div
-            className={classes}
-            style={{ width: size[0], height: size[1], ...subjectStyle }}
-          />
+          {children ?? (
+            <div
+              className={classes}
+              style={{ width: size[0], height: size[1], ...subjectStyle }}
+            />
+          )}
         </div>
         <figcaption style={captionStyle}>Live CSS</figcaption>
       </div>
       <div style={{ textAlign: "center" }}>
         <img
-          src={useBaseUrl(`/img/renders/${slug}.png`)}
+          src={useBaseUrl(`/img/${dir}/${slug}.png`)}
           width={256}
           height={256}
           alt={`${slug} ground-truth render`}

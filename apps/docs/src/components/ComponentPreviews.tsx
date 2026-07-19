@@ -143,3 +143,31 @@ export function CompositionPreview() {
     </DemoShell>
   );
 }
+
+/* Neutral demos for the grounded-counterpart comparisons: no DemoShell
+   theme — the live stage must sit under the same default lighting the
+   calibration renders use. Values mirror the referent shots
+   (ambient3d/ground_components.py). */
+export function GroundedButtonDemo() {
+  return <AmbientButton>OK</AmbientButton>;
+}
+
+export function GroundedKnobDemo() {
+  const [v, setV] = useState(33);
+  return <AmbientKnob aria-label="Knob" value={v} min={0} max={100} onChange={setV} />;
+}
+
+export function GroundedSwitchDemo() {
+  const [on, setOn] = useState(false);
+  return <AmbientSwitch aria-label="Switch" checked={on} onCheckedChange={setOn} />;
+}
+
+export function GroundedFaderDemo() {
+  const [v, setV] = useState(50);
+  return <AmbientFader aria-label="Fader" value={v} onChange={setV} />;
+}
+
+export function GroundedSliderDemo() {
+  const [v, setV] = useState(50);
+  return <AmbientSlider aria-label="Slider" value={v} onChange={setV} />;
+}

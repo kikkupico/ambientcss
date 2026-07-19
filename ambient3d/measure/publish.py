@@ -41,6 +41,24 @@ def main():
         print(f"PUBLISHED {docs['slug']}.png")
     print(f"{count} render(s) -> {DEST}")
 
+    # component counterpart shots (ground_components.py) -> docs
+    comp_src = os.path.join(ROOT, "renders", "components")
+    comp_dest = os.path.join(REPO, "apps", "docs", "static", "img",
+                             "components")
+    if os.path.isdir(comp_src):
+        os.makedirs(comp_dest, exist_ok=True)
+        n = 0
+        for fname in sorted(os.listdir(comp_src)):
+            if not fname.endswith(".png"):
+                continue
+            dst = os.path.join(comp_dest, fname)
+            shutil.copyfile(os.path.join(comp_src, fname), dst)
+            if have_oxipng:
+                subprocess.run(["oxipng", "-q", "-o", "2", dst], check=False)
+            n += 1
+            print(f"PUBLISHED components/{fname}")
+        print(f"{n} component render(s) -> {comp_dest}")
+
 
 if __name__ == "__main__":
     main()

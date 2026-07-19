@@ -191,10 +191,13 @@ def _reference_patches(a, plate_w, plate_d):
                      material=calib_material(f"Ref{name.capitalize()}", albedo))
 
 
-def setup_calibration_rig(a, plate_size=(80.0, 80.0), resolution=None):
+def setup_calibration_rig(a, plate_size=(80.0, 80.0), resolution=None,
+                          patches=True):
     """Ground plane, reference patches, flat-on ortho camera and amb
     lighting. Call on a reset scene; add the subject afterwards (or before —
-    order does not matter). Returns the ground object."""
+    order does not matter). Returns the ground object. `patches=False`
+    drops the white/black reference patches (component grounding shots,
+    which are published imagery rather than measured frames)."""
     scene = bpy.context.scene
 
     ground_mat = calib_material("GroundMat", GROUND_ALBEDO)
@@ -204,7 +207,8 @@ def setup_calibration_rig(a, plate_size=(80.0, 80.0), resolution=None):
     ground = prism_object("Ground", [(-g, -g), (g, -g), (g, g), (-g, g)],
                           -12.0, 0.0, material=ground_mat)
 
-    _reference_patches(a, plate_size[0], plate_size[1])
+    if patches:
+        _reference_patches(a, plate_size[0], plate_size[1])
 
     cam_data = bpy.data.cameras.new("CalibCam")
     cam_data.type = "ORTHO"

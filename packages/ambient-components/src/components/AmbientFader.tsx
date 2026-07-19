@@ -109,14 +109,10 @@ export function AmbientFader({
         onKeyDown={onKeyDown}
       >
         <div
-          className={cn("amb-fader-thumb ambient amb-fillet amb-elevation-1 ambx-fader-thumb", material !== "glass" && "amb-surface-concave", material && `amb-mat-${material}`)}
+          className={cn("amb-fader-thumb ambient amb-fillet ambx-fader-thumb", material !== "glass" && "amb-surface-concave", material && `amb-mat-${material}`)}
           style={{ top: `${100 - percent}%` }}
         >
-          <div className="amb-fader-grip">
-            <span className="amb-fader-dot" />
-            <span className="amb-fader-dot" />
-            <span className="amb-fader-dot" />
-          </div>
+          <span className="amb-fader-gripline" />
         </div>
       </div>
       {label ? (

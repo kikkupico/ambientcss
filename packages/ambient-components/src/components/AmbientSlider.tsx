@@ -109,15 +109,9 @@ export function AmbientSlider({
         onKeyDown={onKeyDown}
       >
         <div
-          className={cn("amb-slider-thumb ambient amb-fillet amb-elevation-1 ambx-slider-thumb", material !== "glass" && "amb-surface-concave-h", material && `amb-mat-${material}`)}
+          className={cn("amb-slider-thumb ambient amb-fillet ambx-slider-thumb", material !== "glass" && "amb-surface-convex", material && `amb-mat-${material}`)}
           style={{ left: `${percent}%` }}
-        >
-          <div className="amb-slider-grip amb-groove">
-            <span className="amb-fader-dot" />
-            <span className="amb-fader-dot" />
-            <span className="amb-fader-dot" />
-          </div>
-        </div>
+        />
       </div>
       {label ? (
         <span id={id} className="ambx-label">

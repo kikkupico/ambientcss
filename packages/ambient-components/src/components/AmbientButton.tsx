@@ -9,14 +9,17 @@ export function AmbientButton({ className, children, material = "matte", ...prop
   return (
     <button
       type="button"
-      className={cn(
-        "ambient amb-button amb-chamfer amb-elevation-1 ambx-button amb-heading-3",
-        material === "matte" ? "amb-mat-matte" : material === "shiny" ? "amb-mat-shiny" : "amb-mat-glass",
-        className
-      )}
+      className={cn("amb-button amb-groove ambx-button", className)}
       {...props}
     >
-      {children}
+      <span
+        className={cn(
+          "amb-button-cap ambient amb-chamfer amb-surface amb-heading-3",
+          material === "matte" ? "amb-mat-matte" : material === "shiny" ? "amb-mat-shiny" : "amb-mat-glass"
+        )}
+      >
+        {children}
+      </span>
     </button>
   );
 }

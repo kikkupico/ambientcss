@@ -35,49 +35,99 @@
   letter-spacing: var(--ambx-type-tracking);
 }
 
+/* Button: a chamfered key cap seated in a clearance well — the referent
+   is components/button.py's "flush" style (cap seated into a hole with a
+   shadow gap ring around it). The button element IS the well: a shallow
+   groove (seat depth ~1.2mm = thickness 0.27) whose lume interior shows
+   as the gap ring around the cap. Pressing sinks the cap by the
+   referent's 0.7mm travel (thickness 1 -> 0.84): the chamfer bands and
+   the swept shadow shrink with it for free. */
 .amb-button {
   cursor: pointer;
-  border: medium solid var(--amb-lume);
-  background-color: inherit;
-  padding: calc(var(--ambx-grid) * 2);
+  border: none;
+  padding: var(--ambx-grid-half);       /* the clearance gap ring */
+  --amb-thickness: 0.27;                 /* seat depth of the well */
+  background-color: var(--amb-lume);
+  border-radius: calc(var(--ambx-grid) * 3 + var(--ambx-grid-half));
+  min-width: calc(var(--ambx-grid) * 16);
+}
+
+.amb-button-cap {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  padding: calc(var(--ambx-grid) * 1.5) calc(var(--ambx-grid) * 2);
   border-radius: calc(var(--ambx-grid) * 3);
   text-transform: uppercase;
-  min-width: calc(var(--ambx-grid) * 16);
   font-weight: 600;
-  color: var(--amb-lume);
+  color: var(--amb-label);
 }
 
 .amb-button:focus {
   outline-offset: var(--ambx-grid);
 }
 
-.amb-button:hover,
-.amb-knob:hover {
-  border-color: var(--amb-highlight-color);
+.amb-button:hover .amb-button-cap {
+  color: var(--amb-highlight-color);
 }
 
-.amb-button:active {
-  --amb-elevation: 0;
+.amb-button:active .amb-button-cap {
+  --amb-thickness: 0.84;
 }
 
+/* Knob: a knob-scale body (thickness 2 = the referent knob.py's 9mm
+   height) resting on the panel. The rotating face carries the knurl — a
+   repeating-conic rib pattern, physically the referent's ribs catching
+   key light on one flank and shading on the other — under a smooth
+   opaque top disc (the OP-1-style cap), with an accent indicator dot.
+   The whole face rotates with the value, so the ribs move under the
+   fingers like the real thing. */
 .amb-knob {
   border-radius: 50%;
   height: calc(var(--ambx-grid) * 16);
   width: calc(var(--ambx-grid) * 16);
-  border: medium solid var(--amb-lume);
 }
 
-.amb-knob-indicator {
+.amb-knob-face {
   position: absolute;
-  top: 6px;
+  inset: 0;
+  border-radius: 50%;
+  background-image:
+    radial-gradient(
+      circle,
+      hsl(
+        var(--amb-light-hue)
+        var(--amb-light-saturation)
+        calc(
+          var(--amb-key-light-intensity) * 31.5% +
+            var(--amb-fill-light-intensity) * 26.4% + 43.6%
+        )
+      ) 0 61%,
+      transparent 62%
+    ),
+    repeating-conic-gradient(
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% /
+        calc(var(--amb-key-light-intensity) * 0.3)) 0deg 4deg,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% /
+        calc((var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
+          * 0.3 + 0.14)) 5deg 9deg,
+      transparent 10deg
+    );
+}
+
+.amb-knob-indicator-dot {
+  position: absolute;
+  top: 16%;
   left: 50%;
   transform: translateX(-50%);
+  width: calc(var(--ambx-grid) * 2);
+  height: calc(var(--ambx-grid) * 2);
+  border-radius: 50%;
+  background: var(--amb-highlight-color);
 }
 
-.amb-knob-grip {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+.amb-knob:hover .amb-knob-indicator-dot {
+  background: color-mix(in oklab, var(--amb-highlight-color), white 25%);
 }
 
 /* Tracks are grounded grooves (.amb-groove supplies the recess: lit-wall
@@ -91,6 +141,9 @@
   background-color: var(--amb-lume);
 }
 
+/* Fader thumb: the referent (fader.py) is a pill cap on a stem — 7mm
+   tall (thickness 1.5) riding 2.2mm above the plate (elevation 0.28) —
+   with a single grip line across the top. */
 .amb-fader-thumb {
   position: absolute;
   width: calc(var(--ambx-grid) * 6);
@@ -98,57 +151,41 @@
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  border-radius: calc(var(--ambx-grid) * 3);
+  border-radius: calc(var(--ambx-grid) * 2);
   display: grid;
   place-items: center;
+  --amb-thickness: 1.5;
+  --amb-elevation: 0.28;
 }
 
-.amb-fader-grip {
-  display: flex;
-  gap: 2px;
+.amb-fader-gripline {
+  width: 70%;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--amb-lume);
 }
 
-.amb-fader-dot {
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle at 30% 30%,
-    color-mix(in oklab, var(--amb-lume), white 30%) 0%,
-    var(--amb-lume) 55%,
-    color-mix(in oklab, var(--amb-lume), black 35%) 100%
-  );
-}
-
+/* Slider: the referent (slider.py) is a shallow concave channel (1mm
+   deep = thickness 0.22), not a through-slot, with a domed disc thumb
+   gliding over it. */
 .amb-slider {
   position: relative;
-  height: var(--ambx-grid);
+  height: calc(var(--ambx-grid) * 1.5);
   width: calc(var(--ambx-grid) * 30);
   border-radius: var(--ambx-grid);
   background-color: var(--amb-lume);
+  --amb-thickness: 0.22;
 }
 
 .amb-slider-thumb {
   position: absolute;
-  width: calc(var(--ambx-grid) * 9);
+  width: calc(var(--ambx-grid) * 6);
   height: calc(var(--ambx-grid) * 6);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  border-radius: calc(var(--ambx-grid) * 3);
-  display: grid;
-  place-items: center;
-}
-
-.amb-slider-grip {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  /* the grip well is a shallow groove (half a thickness level) rather
-     than hand-tuned inset shadows — same grounded recess model as the
-     track, at dot scale */
-  --amb-thickness: 0.5;
-  border-radius: var(--ambx-grid-quarter);
+  border-radius: 50%;
+  --amb-thickness: 0.7;
 }
 
 .amb-led {
@@ -169,14 +206,63 @@
   box-shadow: none;
 }
 
+/* Switch: a slide switch like the referent (switch.py) — a pill riding
+   in a dark stadium recess (well 1.5mm deep = thickness 0.33; the pill
+   stands 2.6mm above the recess floor = thickness 0.58), with an
+   optional LED above. The pill slides, nothing presses. */
 .amb-switch {
-  position: relative;
-  width: calc(var(--ambx-grid) * 6);
-  height: calc(var(--ambx-grid) * 6);
-  border-radius: 50%;
   cursor: pointer;
-  border: medium solid var(--amb-lume);
+  border: none;
+  padding: 0;
+  background: none;
+  display: inline-grid;
+  justify-items: center;
+  gap: var(--ambx-grid);
   margin: 0;
+}
+
+.amb-switch-track {
+  position: relative;
+  display: block;
+  width: var(--ambx-switch-w);
+  height: var(--ambx-switch-h);
+  border-radius: calc(var(--ambx-switch-h) / 2);
+  background-color: var(--amb-lume);
+  --amb-thickness: 0.33;
+}
+
+.amb-switch-pill {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: calc(var(--ambx-switch-w) * 0.52);
+  height: calc(var(--ambx-switch-h) * 0.78);
+  border-radius: calc(var(--ambx-switch-h) * 0.39);
+  transform: translate(calc(var(--ambx-switch-h) * 0.11), -50%);
+  transition: transform 140ms ease;
+  --amb-thickness: 0.58;
+}
+
+.amb-switch-on .amb-switch-pill {
+  transform: translate(
+    calc(var(--ambx-switch-w) - 100% - var(--ambx-switch-h) * 0.11),
+    -50%
+  );
+}
+
+.amb-switch:hover .amb-switch-pill {
+  background-color: color-mix(
+    in oklab,
+    hsl(
+      var(--amb-light-hue)
+      var(--amb-light-saturation)
+      calc(
+        var(--amb-key-light-intensity) * 31.5% +
+          var(--amb-fill-light-intensity) * 26.4% + 43.6%
+      )
+    ),
+    var(--amb-highlight-color) 12%
+  );
 }
 
 .ambx-panel {
@@ -190,29 +276,23 @@
 }
 
 .ambx-switch {
-  --ambx-switch-size: calc(var(--ambx-grid) * 6);
-  width: var(--ambx-switch-size);
-  height: var(--ambx-switch-size);
-  display: inline-grid;
-  place-items: center;
-  padding: 0;
+  --ambx-switch-w: calc(var(--ambx-grid) * 12);
+  --ambx-switch-h: calc(var(--ambx-grid) * 6);
 }
 
 .ambx-switch-sm {
-  --ambx-switch-size: calc(var(--ambx-grid) * 5);
+  --ambx-switch-w: calc(var(--ambx-grid) * 10);
+  --ambx-switch-h: calc(var(--ambx-grid) * 5);
 }
 
 .ambx-switch-md {
-  --ambx-switch-size: calc(var(--ambx-grid) * 6);
+  --ambx-switch-w: calc(var(--ambx-grid) * 12);
+  --ambx-switch-h: calc(var(--ambx-grid) * 6);
 }
 
 .ambx-switch-lg {
-  --ambx-switch-size: calc(var(--ambx-grid) * 8);
-}
-
-.amb-switch-on {
-  box-shadow:
-    inset 0 0 0 var(--ambx-grid-quarter) rgb(255 255 255 / 0.25);
+  --ambx-switch-w: calc(var(--ambx-grid) * 16);
+  --ambx-switch-h: calc(var(--ambx-grid) * 8);
 }
 
 .ambx-stack {

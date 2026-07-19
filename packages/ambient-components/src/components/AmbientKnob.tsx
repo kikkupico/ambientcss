@@ -102,7 +102,7 @@ export function AmbientKnob({
     <div className={cn("ambx-stack", className)} {...props}>
       <div
         ref={knobRef}
-        className={cn("ambient amb-knob amb-chamfer amb-elevation-2 amb-surface ambx-knob", material && `amb-mat-${material}`)}
+        className={cn("ambient amb-knob amb-chamfer amb-thickness-2 amb-surface ambx-knob", material && `amb-mat-${material}`)}
         role="slider"
         aria-label={label}
         aria-valuemin={min}
@@ -127,14 +127,11 @@ export function AmbientKnob({
         }}
         onKeyDown={onKeyDown}
       >
-        <div className="ambx-knob-rotation" style={{ transform: `rotate(${rotation}deg)` }}>
-          <div className="amb-knob-indicator">
-            <div className="amb-knob-grip">
-              <span className="amb-fader-dot" />
-              <span className="amb-fader-dot" />
-              <span className="amb-fader-dot" />
-            </div>
-          </div>
+        <div
+          className="ambx-knob-rotation amb-knob-face"
+          style={{ transform: `rotate(${rotation}deg)` }}
+        >
+          <span className="amb-knob-indicator-dot" />
         </div>
       </div>
       {label ? (

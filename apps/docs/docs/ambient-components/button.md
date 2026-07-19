@@ -2,13 +2,23 @@
 title: AmbientButton
 ---
 
-import { ButtonPreview } from "@site/src/components/ComponentPreviews";
+import { ButtonPreview, GroundedButtonDemo } from "@site/src/components/ComponentPreviews";
+import { RenderComparison } from "@site/src/components/RenderComparison";
 
 `AmbientButton` wraps a native `<button>` with ambient styling.
 
 ## Interactive preview
 
 <ButtonPreview />
+
+## Grounded counterpart
+
+The button is modeled on its 3D referent (`ambient3d/components/button.py`):
+a chamfered key cap seated in a clearance well, the well's gap ring showing
+around it. Pressing sinks the cap by the referent's 0.7mm travel — the
+chamfer bands and the swept shadow shrink with it.
+
+<RenderComparison slug="button" dir="components"><GroundedButtonDemo /></RenderComparison>
 
 ## Props
 
