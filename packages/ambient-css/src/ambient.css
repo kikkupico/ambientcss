@@ -301,12 +301,21 @@
   --_env-top-a: calc(var(--_ly-up) * var(--amb-key-light-intensity) + var(--_ly-down) * (1 - var(--amb-fill-light-intensity)));
   --_env-bot-a: calc(var(--_ly-up) * (1 - var(--amb-fill-light-intensity)) + var(--_ly-down) * var(--amb-key-light-intensity));
   background-image:
-    /* Specular highlight — narrow band at the lit edge, driven by key light */
+    /* Specular, grounded on a glossy dome referent
+       (ambient3d/derived/notes/shiny.md): TWO features. A grazing
+       Fresnel RIM at the lit edge (alpha = 0.13*Ik + 0.09) — the old
+       edge band was this rim all along — and the key light's MIRROR
+       band at 29% from the lit edge (physics: sin of half the light
+       zenith), ~11% wide, clipping toward white almost independently of
+       key. Band geometry is gated against the render; amplitudes are
+       base-dependent and residual-only. */
     linear-gradient(
       var(--_shiny-angle),
-      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / var(--_spec-peak)) 0%,
-      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--_spec-peak) * 0.08)) 8%,
-      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 13%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--amb-key-light-intensity) * 0.13 + 0.09)) 0%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 10%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 23%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--_spec-peak) * 0.5)) 29%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 35%,
       hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 100%
     ),
     /* Cylindrical dome env reflection — horizon at 50%, tapers to neutral at both edges */
@@ -464,7 +473,10 @@
 .amb-rounded-full { border-radius: 9999px; }
 
 .amb-glow {
-  box-shadow: 0 0 4px var(--amb-lume);
+  /* Halo radius grounded on the emissive-plate bloom (5.5px = 2 sigma of
+     the measured falloff); the lume color's bright/dark switching is a
+     deliberate design semantic the physical white halo does not gate. */
+  box-shadow: 0 0 5.5px var(--amb-lume);
 }
 
 /* --------------------------------------------------------------------------

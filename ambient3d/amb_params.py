@@ -63,7 +63,9 @@ def material_for(a, name="PlateMat", albedo=None):
         from skeuo_kit import hex_to_linear
         bsdf.inputs["Emission Color"].default_value = (
             *hex_to_linear(a["emit"]), 1.0)
-        bsdf.inputs["Emission Strength"].default_value = 4.0
+        # just over display white: reads as a lit LED face and trips the
+        # bloom threshold without swamping the frame
+        bsdf.inputs["Emission Strength"].default_value = 1.5
         return mat
     if kind == "matte":
         return calib_material(name, albedo, rough=1.0)
@@ -164,6 +166,29 @@ def setup_calibration_rig(a, plate_size=(80.0, 80.0), resolution=None):
     scene.render.resolution_x = res
     scene.render.resolution_y = res
     return ground
+
+
+def enable_bloom(threshold=1.0, size=0.03):
+    """Compositor Fog Glow for emissive scenes only — Cycles emission does
+    not bleed on its own. Parameters are fixed so the halo is
+    reproducible; recorded here, not in the manifest. Uses the Blender 5
+    node-group compositor (glare options are input sockets there)."""
+    scene = bpy.context.scene
+    tree = bpy.data.node_groups.new("AmbBloom", "CompositorNodeTree")
+    tree.interface.new_socket("Image", in_out="OUTPUT",
+                              socket_type="NodeSocketColor")
+    rl = tree.nodes.new("CompositorNodeRLayers")
+    glare = tree.nodes.new("CompositorNodeGlare")
+    for socket, value in (("Type", "Fog Glow"), ("Quality", "High"),
+                          ("Threshold", threshold), ("Size", size)):
+        try:
+            glare.inputs[socket].default_value = value
+        except (KeyError, TypeError):
+            pass
+    out = tree.nodes.new("NodeGroupOutput")
+    tree.links.new(rl.outputs["Image"], glare.inputs["Image"])
+    tree.links.new(glare.outputs["Image"], out.inputs["Image"])
+    scene.compositing_node_group = tree
 
 
 def finalize_calibration_render(samples=512):

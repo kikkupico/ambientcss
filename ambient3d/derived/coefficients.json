@@ -50,6 +50,14 @@
       "2": 2.625
     }
   },
+  "glow": {
+    "css_blur_px": 5.56,
+    "g0_alpha": 0.719,
+    "ga_alpha_per_key": 0.343,
+    "model": "css_blur = 2 * sigma; edge_alpha = ga * Ik + g0",
+    "n_samples": 4,
+    "r2_alpha": 0.7581
+  },
   "shadow": {
     "A_offset_px_per_mm": 0.8632,
     "B_css_blur_px_per_mm": 0.5995,
@@ -61,6 +69,20 @@
     "n_edges": 70,
     "r2_alpha": 0.7361,
     "r2_reach": 0.988
+  },
+  "shiny": {
+    "fwhm_frac": 0.113,
+    "model": "two specular features: grazing Fresnel RIM at the lit edge, rim = rc * Ik + r0; key MIRROR band centered at pos_frac, fwhm_frac wide, peak = s * Ik + s0 (sRGB)",
+    "n_band_samples": 5,
+    "n_rim_samples": 5,
+    "pos_frac": 0.294,
+    "pos_frac_std": 0.05,
+    "r0_rim": 0.062,
+    "r2_band": 0.0741,
+    "r2_rim": 0.7476,
+    "rc_rim_per_key": 0.09,
+    "s0_peak": 0.302,
+    "s_peak_per_key": 0.046
   },
   "surface": {
     "f_pct": 26.38,

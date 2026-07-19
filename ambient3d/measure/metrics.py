@@ -219,9 +219,133 @@ def drop_shadow(img, meta):
     return out
 
 
+def shiny_features(excess):
+    """Two-feature decomposition of a baseline-subtracted glossy profile
+    whose index 0 is the LIT edge: the grazing Fresnel RIM (searched
+    within the first 12%) and the key light's MIRROR band (searched in
+    the 20..55% window where the mirror geometry puts it). Shared by the
+    fit and the compare gate."""
+    excess = np.asarray(excess)
+    n = len(excess)
+    from_lit = np.arange(n) / (n - 1)
+
+    rim_mask = from_lit <= 0.12
+    rim_peak = float(excess[rim_mask].max()) if rim_mask.any() else 0.0
+
+    band_mask = (from_lit >= 0.20) & (from_lit <= 0.55)
+    masked = np.where(band_mask, excess, -np.inf)
+    i = int(np.argmax(masked))
+    peak = float(excess[i])
+    above = excess >= peak / 2
+    lo = i
+    while lo > 0 and above[lo - 1] and band_mask[lo - 1]:
+        lo -= 1
+    hi = i
+    while hi < n - 1 and above[hi + 1] and band_mask[hi + 1]:
+        hi += 1
+    return {
+        "rim_peak_srgb": round(rim_peak, 4),
+        "band_pos_frac": round(float(from_lit[i]), 4),
+        "band_fwhm_frac": round((hi - lo + 1) / (n - 1), 4),
+        "band_peak_srgb": round(peak, 4),
+    }
+
+
+def cyl_profile(img, meta):
+    """Lightness profile through the dome center ALONG THE LIGHT
+    DIRECTION (the axis the CSS shiny gradient runs on), plus a
+    baseline-relative specular-feature summary. The baseline is a wide
+    running median, applied identically to renders and CSS screenshots so
+    the two are comparable; the fit and gate additionally use
+    matte-reference subtraction on the render side."""
+    f = Frame(img, meta)
+    hw = f.plate_w / 2
+    lx, ly = f.amb["light_x"], f.amb["light_y"]
+    if lx == 0 and ly == 0:
+        lx, ly = -1.0, -1.0
+    norm = np.hypot(lx, ly)
+    ux, uy = lx / norm, ly / norm    # from center toward the lit edge
+
+    n = 65
+    half = f.frame_mm / 2
+    ts = np.linspace(-0.98, 0.98, n)
+    rows = (uy * ts * hw + half) * f.s
+    cols = (ux * ts * hw + half) * f.s
+    r0 = np.clip(rows.astype(int), 0, f.img.shape[0] - 2)
+    c0 = np.clip(cols.astype(int), 0, f.img.shape[1] - 2)
+    fr, fc = rows - r0, cols - c0
+    prof = ((1 - fr) * (1 - fc) * f.img[r0, c0] +
+            (1 - fr) * fc * f.img[r0, c0 + 1] +
+            fr * (1 - fc) * f.img[r0 + 1, c0] +
+            fr * fc * f.img[r0 + 1, c0 + 1])
+    # index 0 = lit end: ts negative side is toward the light
+    prof = prof[::-1]
+
+    win = max(3, n // 4)
+    pad = np.pad(prof, win // 2, mode="edge")
+    baseline = np.array([np.median(pad[i:i + win]) for i in range(n)])
+
+    out = shiny_features(prof - baseline)
+    out["profile_srgb"] = [round(float(v), 4) for v in prof]
+    # saturated profiles cannot locate the band; the gate treats them
+    # as residual-only
+    out["clipped"] = bool(prof.max() >= 0.995)
+    return out
+
+
+def glow(img, meta):
+    """Emissive halo, measured on the LIT edges (the shadow side is
+    contaminated by the slab's own contact shadow): outward brightening
+    profile -> edge alpha, half-max radius and falloff sigma."""
+    f = Frame(img, meta)
+    hw, hd = f.plate_w / 2, f.plate_d / 2
+    reach = f.frame_mm / 2 - max(hw, hd) - 2.0
+    lat = min(hw, hd) * 0.7
+    lx, ly = f.amb["light_x"], f.amb["light_y"]
+
+    profiles = []
+    if lx < 0:
+        profiles.append(f.region(-hw - reach, -hw, -lat, lat)
+                        .mean(axis=0)[::-1])
+    elif lx > 0:
+        profiles.append(f.region(hw, hw + reach, -lat, lat).mean(axis=0))
+    if ly < 0:
+        profiles.append(f.region(-lat, lat, -hd - reach, -hd)
+                        .mean(axis=1)[::-1])
+    elif ly > 0:
+        profiles.append(f.region(-lat, lat, hd, hd + reach).mean(axis=1))
+
+    out = {"edge_alpha": 0.0, "halfmax_mm": 0.0, "sigma_mm": 0.0}
+    for prof in profiles:
+        skip = max(1, int(round(0.5 * f.s)))
+        p = prof[skip:]
+        v_far = float(p[int(len(p) * 0.7):].mean())
+        if v_far >= 0.999:
+            continue
+        alpha = (p - v_far) / (1.0 - v_far)
+        peak = float(alpha.max())
+        if peak < 0.02:
+            continue
+
+        def outermost(level):
+            above = np.nonzero(alpha >= level)[0]
+            return (above[-1] + skip) / f.s if len(above) else 0.0
+
+        out["edge_alpha"] += float(alpha[0])
+        out["halfmax_mm"] += outermost(peak / 2)
+        out["sigma_mm"] += max(0.0, (outermost(peak * 0.25) -
+                                     outermost(peak * 0.75)) / 1.349)
+    if profiles:
+        for k in out:
+            out[k] = round(out[k] / len(profiles), 4)
+    return out
+
+
 EXTRACTORS = {
     "surface_lightness": surface_lightness,
     "edge_bands": edge_bands,
     "drop_shadow": drop_shadow,
     "surface_gradient": surface_gradient,
+    "cyl_profile": cyl_profile,
+    "glow": glow,
 }

@@ -20,7 +20,7 @@ sys.path.insert(0, ROOT)
 
 from amb_model import amb, manifest_jobs
 from measure.fit import lit_edges
-from measure.metrics import EXTRACTORS, load
+from measure.metrics import EXTRACTORS, load, shiny_features
 
 HARNESS_OUT = os.path.join(ROOT, "..", "tools", "css-harness", "out")
 
@@ -37,6 +37,9 @@ TOLERANCES = {
     "peak_alpha": 0.06,
     "v_ref": 0.04,          # unshadowed ground value
     "0": 3.0, "0.35": 3.0, "0.5": 3.0, "0.65": 3.0, "1": 3.0,  # stop %
+    "band_pos_frac": 0.1,   # specular band center, fraction of width
+    "band_fwhm_frac": 0.1,
+    "band_peak_srgb": 0.06,
     "delta_end_srgb": 0.022,   # render keeps the ~1.4% ambient plate
     "delta_mid_srgb": 0.022,   # gradient the CSS doesn't paint
     "center_srgb_pct": 3.0,
@@ -95,6 +98,32 @@ def main():
         for metric in spec["measure"]:
             truth = flatten(EXTRACTORS[metric](truth_img, meta))
             got = flatten(EXTRACTORS[metric](css_img, meta))
+            if metric == "cyl_profile":
+                # the render's band must be measured against the matte
+                # reference (diffuse curvature swamps the running-median
+                # baseline when the specular is weak); the CSS side has no
+                # curvature, so its median baseline stands
+                ref_rel = ("calib/mat_shiny_matte_ref.png"
+                           if rel.startswith("calib/")
+                           else rel.replace("sweeps/shiny/",
+                                            "sweeps/shiny_ref/"))
+                ref_png = os.path.join(args.renders_dir, ref_rel)
+                if not os.path.exists(ref_png):
+                    continue
+                import numpy as np
+                ref = EXTRACTORS[metric](load(ref_png), meta)
+                excess = (np.array(truth["profile_srgb"]) -
+                          np.array(ref["profile_srgb"]))
+                truth.update(shiny_features(excess))
+                # peak/rim amplitudes are base-dependent (dark dome vs
+                # bright CSS surface compress differently in sRGB):
+                # geometry (position, width) gates; amplitudes report
+                for amp in ("band_peak_srgb", "rim_peak_srgb"):
+                    frame_report[f"{metric}.{amp}"] = {
+                        "render": truth.get(amp), "css": got.get(amp),
+                        "residual": True,
+                    }
+                    truth.pop(amp, None)
             for key, tv in truth.items():
                 leaf = key.rsplit(".", 1)[-1]
                 if leaf in SKIP_KEYS:
@@ -105,6 +134,22 @@ def main():
                 # shadow — deeper alpha, tighter perpendicular penumbra —
                 # anisotropy that a single isotropic box-shadow cannot
                 # express, so axis-light frames are residual-only.)
+                # glow is residual-only: the CSS lume color deliberately
+                # darkens in bright scenes while the physical halo is
+                # white — a design semantic, not a defect to gate.
+                if metric == "cyl_profile" and truth.get("clipped"):
+                    frame_report[f"{metric}.{key}"] = {
+                        "render": round(float(tv), 4) if not isinstance(tv, list) else None,
+                        "css": round(float(got[key]), 4) if not isinstance(got[key], list) else None,
+                        "residual": True,
+                    }
+                    continue
+                if metric == "glow":
+                    frame_report[f"{metric}.{key}"] = {
+                        "render": round(tv, 4), "css": round(got[key], 4),
+                        "residual": True,
+                    }
+                    continue
                 axis_light = (a["light_x"] == 0) != (a["light_y"] == 0)
                 if metric == "drop_shadow" and axis_light:
                     frame_report[f"{metric}.{key}"] = {

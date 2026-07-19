@@ -321,11 +321,94 @@ def fit_shadow(m):
     }
 
 
+# ------------------------------------------------------------ shiny/glow ---
+
+def fit_shiny(m):
+    """Specular band on the glossy half-cylinder, matte reference
+    subtracted per matching frame: band center position and width as
+    fractions from the lit edge, and peak excess affine in key
+    intensity. Grounds the .amb-mat-shiny band geometry."""
+    pos, wid, peaks, rims = [], [], [], []
+    for rel, entry in m.items():
+        if not (rel.startswith("sweeps/shiny/") or
+                rel == "calib/mat_shiny_default.png"):
+            continue
+        ref_rel = (rel.replace("sweeps/shiny/", "sweeps/shiny_ref/")
+                   if rel.startswith("sweeps/")
+                   else "calib/mat_shiny_matte_ref.png")
+        if ref_rel not in m:
+            continue
+        a = entry["amb"]
+        from measure.metrics import shiny_features
+
+        prof = np.array(entry["metrics"]["cyl_profile"]["profile_srgb"])
+        ref = np.array(m[ref_rel]["metrics"]["cyl_profile"]["profile_srgb"])
+        if prof.max() >= 0.995:
+            continue        # saturated: band unlocatable
+        feat = shiny_features(prof - ref)
+        ik = a["key_light_intensity"]
+        rims.append((ik, feat["rim_peak_srgb"]))
+        if feat["band_peak_srgb"] >= 0.02:
+            pos.append(feat["band_pos_frac"])
+            wid.append(feat["band_fwhm_frac"])
+            peaks.append((ik, feat["band_peak_srgb"]))
+
+    px = np.array([v[0] for v in peaks]); py = np.array([v[1] for v in peaks])
+    (s, s0), *_ = np.linalg.lstsq(np.stack([px, np.ones_like(px)], axis=1),
+                                  py, rcond=None)
+    rx = np.array([v[0] for v in rims]); ry = np.array([v[1] for v in rims])
+    (rc, r0), *_ = np.linalg.lstsq(np.stack([rx, np.ones_like(rx)], axis=1),
+                                   ry, rcond=None)
+    return {
+        "model": ("two specular features: grazing Fresnel RIM at the lit "
+                  "edge, rim = rc * Ik + r0; key MIRROR band centered at "
+                  "pos_frac, fwhm_frac wide, peak = s * Ik + s0 (sRGB)"),
+        "pos_frac": round(float(np.mean(pos)), 3),
+        "pos_frac_std": round(float(np.std(pos)), 3),
+        "fwhm_frac": round(float(np.mean(wid)), 3),
+        "s_peak_per_key": round(float(s), 3),
+        "s0_peak": round(float(s0), 3),
+        "rc_rim_per_key": round(float(rc), 3),
+        "r0_rim": round(float(r0), 3),
+        "r2_band": round(r2(py, s * px + s0), 4),
+        "r2_rim": round(r2(ry, rc * rx + r0), 4),
+        "n_band_samples": len(pos),
+        "n_rim_samples": len(rims),
+    }
+
+
+def fit_glow(m):
+    """Emissive halo: CSS blur = 2 * sigma; edge alpha affine in key
+    intensity (the halo pops as the room dims)."""
+    sig, alphas = [], []
+    for rel, entry in m.items():
+        if not (rel.startswith("sweeps/emit/") or
+                rel == "calib/emit_default.png"):
+            continue
+        g = entry["metrics"]["glow"]
+        if g["edge_alpha"] <= 0:
+            continue
+        sig.append(g["sigma_mm"])
+        alphas.append((entry["amb"]["key_light_intensity"], g["edge_alpha"]))
+    ax = np.array([v[0] for v in alphas]); ay = np.array([v[1] for v in alphas])
+    (ga, g0), *_ = np.linalg.lstsq(np.stack([ax, np.ones_like(ax)], axis=1),
+                                   ay, rcond=None)
+    return {
+        "model": "css_blur = 2 * sigma; edge_alpha = ga * Ik + g0",
+        "css_blur_px": round(2 * float(np.mean(sig)), 3),
+        "ga_alpha_per_key": round(float(ga), 3),
+        "g0_alpha": round(float(g0), 3),
+        "r2_alpha": round(r2(ay, ga * ax + g0), 4),
+        "n_samples": len(sig),
+    }
+
+
 # ------------------------------------------------------------------- main ---
 
 FITTERS = {"surface": fit_surface, "chamfer": fit_chamfer,
            "fillet": fit_fillet, "shadow": fit_shadow,
-           "curved": fit_curved, "darker": fit_darker}
+           "curved": fit_curved, "darker": fit_darker,
+           "shiny": fit_shiny, "glow": fit_glow}
 
 
 def write_note(effect, coeffs):

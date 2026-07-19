@@ -68,7 +68,7 @@ for (const { rel, amb, spec } of jobs()) {
   </style></head><body class="amb-surface" style="${inlineVars(amb)}">
     <!-- the physical ground and plate share the same albedo, so the body
          takes .amb-surface and always tracks the shipped formula -->
-    <div id="subject" class="${spec.css.classes.join(" ")}"></div>
+    <div id="subject" class="${spec.css.classes.join(" ")}" style="${spec.css.style ?? ""}"></div>
   </body></html>`;
   await page.setContent(html, { waitUntil: "networkidle" });
   const out = path.join(here, "out", rel);

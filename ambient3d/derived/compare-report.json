@@ -227,6 +227,23 @@
       "tol": 0.04
     }
   },
+  "calib/emit_default.png": {
+    "glow.edge_alpha": {
+      "css": 0.0,
+      "render": 1.0,
+      "residual": true
+    },
+    "glow.halfmax_mm": {
+      "css": 0.0,
+      "render": 5.25,
+      "residual": true
+    },
+    "glow.sigma_mm": {
+      "css": 0.0,
+      "render": 2.5945,
+      "residual": true
+    }
+  },
   "calib/fillet_default.png": {
     "edge_bands.bottom.baseline_srgb": {
       "css": 0.9007,
@@ -339,6 +356,38 @@
       "ok": true,
       "render": 1.25,
       "tol": 0.6
+    }
+  },
+  "calib/mat_shiny_default.png": {
+    "cyl_profile.band_fwhm_frac": {
+      "css": 0.0312,
+      "render": 0.0938,
+      "residual": true
+    },
+    "cyl_profile.band_peak_srgb": {
+      "css": 0.0197,
+      "render": 0.4581,
+      "residual": true
+    },
+    "cyl_profile.band_pos_frac": {
+      "css": 0.2031,
+      "render": 0.2812,
+      "residual": true
+    },
+    "cyl_profile.clipped": {
+      "css": 0.0,
+      "render": 1.0,
+      "residual": true
+    },
+    "cyl_profile.profile_srgb": {
+      "css": null,
+      "render": null,
+      "residual": true
+    },
+    "cyl_profile.rim_peak_srgb": {
+      "css": 0.0021,
+      "render": 0.1111,
+      "residual": true
     }
   },
   "calib/surface_concave_default.png": {
@@ -5468,6 +5517,57 @@
       "tol": 0.04
     }
   },
+  "sweeps/emit/key_light_intensity=0.1.png": {
+    "glow.edge_alpha": {
+      "css": 0.0,
+      "render": 0.6983,
+      "residual": true
+    },
+    "glow.halfmax_mm": {
+      "css": 0.0,
+      "render": 3.25,
+      "residual": true
+    },
+    "glow.sigma_mm": {
+      "css": 0.0,
+      "render": 3.1505,
+      "residual": true
+    }
+  },
+  "sweeps/emit/key_light_intensity=0.5.png": {
+    "glow.edge_alpha": {
+      "css": 0.0,
+      "render": 0.9998,
+      "residual": true
+    },
+    "glow.halfmax_mm": {
+      "css": 0.0,
+      "render": 3.0,
+      "residual": true
+    },
+    "glow.sigma_mm": {
+      "css": 0.0,
+      "render": 2.7798,
+      "residual": true
+    }
+  },
+  "sweeps/emit/key_light_intensity=0.9.png": {
+    "glow.edge_alpha": {
+      "css": 0.0,
+      "render": 1.0,
+      "residual": true
+    },
+    "glow.halfmax_mm": {
+      "css": 0.0,
+      "render": 5.25,
+      "residual": true
+    },
+    "glow.sigma_mm": {
+      "css": 0.0,
+      "render": 2.5945,
+      "residual": true
+    }
+  },
   "sweeps/fillet/fill_light_intensity=0.3.png": {
     "edge_bands.bottom.baseline_srgb": {
       "css": 0.7908,
@@ -7226,6 +7326,232 @@
       "ok": true,
       "render": 1.0,
       "tol": 0.6
+    }
+  },
+  "sweeps/shiny/fill_light_intensity=0.3.png": {
+    "cyl_profile.band_fwhm_frac": {
+      "css": 0.0312,
+      "render": 0.0938,
+      "residual": true
+    },
+    "cyl_profile.band_peak_srgb": {
+      "css": 0.0488,
+      "render": 0.502,
+      "residual": true
+    },
+    "cyl_profile.band_pos_frac": {
+      "css": 0.2031,
+      "render": 0.2812,
+      "residual": true
+    },
+    "cyl_profile.clipped": {
+      "css": 0.0,
+      "render": 1.0,
+      "residual": true
+    },
+    "cyl_profile.profile_srgb": {
+      "css": null,
+      "render": null,
+      "residual": true
+    },
+    "cyl_profile.rim_peak_srgb": {
+      "css": 0.0028,
+      "render": 0.0965,
+      "residual": true
+    }
+  },
+  "sweeps/shiny/key_light_intensity=0.3.png": {
+    "cyl_profile.band_fwhm_frac": {
+      "css": 0.0312,
+      "diff": 0.0626,
+      "ok": true,
+      "render": 0.0938,
+      "tol": 0.1
+    },
+    "cyl_profile.band_peak_srgb": {
+      "css": 0.0254,
+      "render": 0.2784,
+      "residual": true
+    },
+    "cyl_profile.band_pos_frac": {
+      "css": 0.2031,
+      "diff": 0.0313,
+      "ok": true,
+      "render": 0.2344,
+      "tol": 0.1
+    },
+    "cyl_profile.rim_peak_srgb": {
+      "css": 0.0016,
+      "render": 0.0954,
+      "residual": true
+    }
+  },
+  "sweeps/shiny/key_light_intensity=0.6.png": {
+    "cyl_profile.band_fwhm_frac": {
+      "css": 0.0469,
+      "diff": 0.0469,
+      "ok": true,
+      "render": 0.0938,
+      "tol": 0.1
+    },
+    "cyl_profile.band_peak_srgb": {
+      "css": 0.034,
+      "render": 0.4058,
+      "residual": true
+    },
+    "cyl_profile.band_pos_frac": {
+      "css": 0.2031,
+      "diff": 0.0313,
+      "ok": true,
+      "render": 0.2344,
+      "tol": 0.1
+    },
+    "cyl_profile.rim_peak_srgb": {
+      "css": 0.0015,
+      "render": 0.1031,
+      "residual": true
+    }
+  },
+  "sweeps/shiny/key_light_intensity=0.9.png": {
+    "cyl_profile.band_fwhm_frac": {
+      "css": 0.0312,
+      "render": 0.0938,
+      "residual": true
+    },
+    "cyl_profile.band_peak_srgb": {
+      "css": 0.0197,
+      "render": 0.4581,
+      "residual": true
+    },
+    "cyl_profile.band_pos_frac": {
+      "css": 0.2031,
+      "render": 0.2812,
+      "residual": true
+    },
+    "cyl_profile.clipped": {
+      "css": 0.0,
+      "render": 1.0,
+      "residual": true
+    },
+    "cyl_profile.profile_srgb": {
+      "css": null,
+      "render": null,
+      "residual": true
+    },
+    "cyl_profile.rim_peak_srgb": {
+      "css": 0.0021,
+      "render": 0.1111,
+      "residual": true
+    }
+  },
+  "sweeps/shiny/light=-1,-1.png": {
+    "cyl_profile.band_fwhm_frac": {
+      "css": 0.0312,
+      "render": 0.0938,
+      "residual": true
+    },
+    "cyl_profile.band_peak_srgb": {
+      "css": 0.0197,
+      "render": 0.4581,
+      "residual": true
+    },
+    "cyl_profile.band_pos_frac": {
+      "css": 0.2031,
+      "render": 0.2812,
+      "residual": true
+    },
+    "cyl_profile.clipped": {
+      "css": 0.0,
+      "render": 1.0,
+      "residual": true
+    },
+    "cyl_profile.profile_srgb": {
+      "css": null,
+      "render": null,
+      "residual": true
+    },
+    "cyl_profile.rim_peak_srgb": {
+      "css": 0.0021,
+      "render": 0.1111,
+      "residual": true
+    }
+  },
+  "sweeps/shiny/light=-1,0.png": {
+    "cyl_profile.band_fwhm_frac": {
+      "css": 0.0625,
+      "diff": 0.0625,
+      "ok": true,
+      "render": 0.125,
+      "tol": 0.1
+    },
+    "cyl_profile.band_peak_srgb": {
+      "css": 0.0443,
+      "render": 0.3321,
+      "residual": true
+    },
+    "cyl_profile.band_pos_frac": {
+      "css": 0.2812,
+      "diff": 0.0626,
+      "ok": true,
+      "render": 0.3438,
+      "tol": 0.1
+    },
+    "cyl_profile.rim_peak_srgb": {
+      "css": 0.0,
+      "render": 0.1344,
+      "residual": true
+    }
+  },
+  "sweeps/shiny/light=0,-1.png": {
+    "cyl_profile.band_fwhm_frac": {
+      "css": 0.0625,
+      "diff": 0.0625,
+      "ok": true,
+      "render": 0.125,
+      "tol": 0.1
+    },
+    "cyl_profile.band_peak_srgb": {
+      "css": 0.028,
+      "render": 0.3308,
+      "residual": true
+    },
+    "cyl_profile.band_pos_frac": {
+      "css": 0.2812,
+      "diff": 0.0626,
+      "ok": true,
+      "render": 0.3438,
+      "tol": 0.1
+    },
+    "cyl_profile.rim_peak_srgb": {
+      "css": 0.0,
+      "render": 0.136,
+      "residual": true
+    }
+  },
+  "sweeps/shiny/light=1,0.png": {
+    "cyl_profile.band_fwhm_frac": {
+      "css": 0.0625,
+      "diff": 0.0625,
+      "ok": true,
+      "render": 0.125,
+      "tol": 0.1
+    },
+    "cyl_profile.band_peak_srgb": {
+      "css": 0.0397,
+      "render": 0.331,
+      "residual": true
+    },
+    "cyl_profile.band_pos_frac": {
+      "css": 0.2812,
+      "diff": 0.0313,
+      "ok": true,
+      "render": 0.3125,
+      "tol": 0.1
+    },
+    "cyl_profile.rim_peak_srgb": {
+      "css": 0.0,
+      "render": 0.1642,
+      "residual": true
     }
   },
   "sweeps/surface/fill_light_intensity=0.35.png": {

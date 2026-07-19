@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import skeuo_kit as kit
 import amb_params as ap
 from amb_model import manifest_jobs
-from components.plate import build_plate
+from components.plate import build_dome, build_plate
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -51,8 +51,14 @@ def render_job(rel, amb_over, spec, manifest, args):
             location=(0, 0, ap.elevation_mm(a)),
             material=ap.material_for(a),
         )
+    elif spec["builder"] == "dome":
+        build_dome(radius=plate_cfg.get("radius", 20.0),
+                   material=ap.material_for(a))
     else:
         raise ValueError(f"unknown builder '{spec['builder']}'")
+
+    if a["emit"]:
+        ap.enable_bloom()
 
     png = os.path.join(args.out_dir, rel)
     os.makedirs(os.path.dirname(png), exist_ok=True)

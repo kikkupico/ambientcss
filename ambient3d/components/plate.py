@@ -66,6 +66,33 @@ def _curved_plate(name, width, depth, thickness, surface, sagitta,
     return obj
 
 
+def build_dome(name="Dome", radius=20.0, location=(0, 0, 0), material=None,
+               segs=96, rings=48):
+    """Hemisphere on the ground. The calibration referent for
+    .amb-mat-shiny: its normals span every direction, so the flat-on
+    camera sees the key light's real mirror band for ANY light azimuth —
+    a cylinder only redirects one axis, and a flat plate none."""
+    import math
+
+    bm = bmesh.new()
+    apex = bm.verts.new((0.0, 0.0, radius))
+    ringverts = []
+    for j in range(1, rings + 1):
+        phi = (j / rings) * (math.pi / 2)   # 0 = apex, pi/2 = ground
+        r, z = radius * math.sin(phi), radius * math.cos(phi)
+        ringverts.append([bm.verts.new((r * math.cos(2 * math.pi * i / segs),
+                                        r * math.sin(2 * math.pi * i / segs),
+                                        z))
+                          for i in range(segs)])
+    for i in range(segs):
+        bm.faces.new((apex, ringverts[0][i], ringverts[0][(i + 1) % segs]))
+    for a, b in zip(ringverts, ringverts[1:]):
+        for i in range(segs):
+            bm.faces.new((a[i], b[i], b[(i + 1) % segs], a[(i + 1) % segs]))
+    bm.faces.new(list(reversed(ringverts[-1])))
+    return _finish(bm, name, location, material, smooth=True)
+
+
 def build_plate(name="Plate", width=80.0, depth=80.0, thickness=6.0,
                 chamfer=0.0, fillet=0.0, surface="flat", sagitta=0.0,
                 location=(0, 0, 0), material=None):
