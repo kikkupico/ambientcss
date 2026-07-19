@@ -12,9 +12,12 @@ thickness-based bodies instead of resting elevation:
   referent's 0.7mm travel; the chamfer bands and swept shadow shrink
   with it.
 - **AmbientKnob**: knob-scale body (thickness 2 = the referent's 9mm)
-  resting on the panel, knurled rim (repeating-conic ribs) under a
-  smooth top disc, accent indicator dot; the whole face rotates with the
-  value.
+  resting on the panel. The rotating face is clipped to a true
+  straight-knurl silhouette (36 trapezoid teeth via an inline SVG
+  clipPath in objectBoundingBox units, so it scales with the grid) with
+  phase-aligned per-tooth flank shading, under a smooth top disc and an
+  accent indicator dot; teeth and all rotate with the value. The
+  circular body beneath keeps the drop shadow smooth.
 - **AmbientSwitch**: now a slide switch — a pill riding in a recessed
   stadium `.amb-groove` track, optional LED above. Same props and ARIA.
 - **AmbientFader**: pill thumb with a grip line (thickness 1.5, riding

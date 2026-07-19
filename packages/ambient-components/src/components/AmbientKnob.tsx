@@ -16,6 +16,35 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
 
+/* Straight-knurled silhouette for the rotating face: 36 trapezoid teeth
+   (the referent's rib count; ambient3d/ground_components.py) between the
+   outer radius and the tooth-root radius, in objectBoundingBox units so
+   the clip scales with the component. The circular body underneath keeps
+   the smooth drop shadow. */
+const KNURL_TEETH = 36;
+const KNURL_PATH = (() => {
+  const outer = 0.5;
+  const root = 0.468;
+  const pitch = (Math.PI * 2) / KNURL_TEETH;
+  const pts: string[] = [];
+  for (let i = 0; i < KNURL_TEETH; i++) {
+    const a = i * pitch;
+    const tooth: Array<[number, number]> = [
+      [0, root],
+      [0.12, outer],
+      [0.5, outer],
+      [0.62, root]
+    ];
+    for (const [frac, radius] of tooth) {
+      const t = a + frac * pitch;
+      pts.push(
+        `${(0.5 + radius * Math.cos(t)).toFixed(4)} ${(0.5 + radius * Math.sin(t)).toFixed(4)}`
+      );
+    }
+  }
+  return `M${pts.join(" L")} Z`;
+})();
+
 export function AmbientKnob({
   value,
   min = 0,
@@ -28,6 +57,7 @@ export function AmbientKnob({
   ...props
 }: AmbientKnobProps) {
   const id = useId();
+  const clipId = `amb-knurl-${id.replace(/:/g, "")}`;
   const draggingRef = useRef(false);
   const knobRef = useRef<HTMLDivElement>(null);
   const safeStep = step > 0 ? step : 1;
@@ -102,7 +132,7 @@ export function AmbientKnob({
     <div className={cn("ambx-stack", className)} {...props}>
       <div
         ref={knobRef}
-        className={cn("ambient amb-knob amb-chamfer amb-thickness-2 amb-surface ambx-knob", material && `amb-mat-${material}`)}
+        className="amb-knob ambx-knob"
         role="slider"
         aria-label={label}
         aria-valuemin={min}
@@ -127,9 +157,17 @@ export function AmbientKnob({
         }}
         onKeyDown={onKeyDown}
       >
+        <svg width={0} height={0} style={{ position: "absolute" }} aria-hidden focusable={false}>
+          <defs>
+            <clipPath id={clipId} clipPathUnits="objectBoundingBox">
+              <path d={KNURL_PATH} />
+            </clipPath>
+          </defs>
+        </svg>
+        <span className="amb-knob-body ambient amb-thickness-2 amb-surface" />
         <div
-          className="ambx-knob-rotation amb-knob-face"
-          style={{ transform: `rotate(${rotation}deg)` }}
+          className={cn("ambx-knob-rotation amb-knob-face", material && `amb-mat-${material}`)}
+          style={{ transform: `rotate(${rotation}deg)`, clipPath: `url(#${clipId})` }}
         >
           <span className="amb-knob-indicator-dot" />
         </div>

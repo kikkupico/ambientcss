@@ -88,10 +88,33 @@
   width: calc(var(--ambx-grid) * 16);
 }
 
+/* The body is the smooth circle at the tooth-root radius: it carries
+   the ambient drop shadow (kept circular — the teeth are too fine to
+   read in a penumbra) while the clipped face above it supplies the
+   knurled silhouette. */
+.amb-knob-body {
+  position: absolute;
+  inset: calc(var(--ambx-grid) / 2);
+  border-radius: 50%;
+}
+
+/* The rotating face: clipped to the straight-knurl silhouette (the
+   inline SVG clipPath in AmbientKnob), opaque at the knob's surface
+   color, with per-tooth flank shading — a lit leading flank and a
+   shaded trailing flank every 10deg, phase-aligned with the clip's
+   teeth (conic 0 is rotated to the +x axis where the tooth path
+   starts) — under the smooth top disc. */
 .amb-knob-face {
   position: absolute;
   inset: 0;
-  border-radius: 50%;
+  background-color: hsl(
+    var(--amb-light-hue)
+    var(--amb-light-saturation)
+    calc(
+      var(--amb-key-light-intensity) * 31.5% +
+        var(--amb-fill-light-intensity) * 26.4% + 43.6%
+    )
+  );
   background-image:
     radial-gradient(
       circle,
@@ -102,16 +125,18 @@
           var(--amb-key-light-intensity) * 31.5% +
             var(--amb-fill-light-intensity) * 26.4% + 43.6%
         )
-      ) 0 61%,
-      transparent 62%
+      ) 0 60%,
+      transparent 61%
     ),
     repeating-conic-gradient(
+      from 90deg,
       hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% /
-        calc(var(--amb-key-light-intensity) * 0.3)) 0deg 4deg,
+        calc(var(--amb-key-light-intensity) * 0.35)) 0deg 1.4deg,
+      transparent 2.2deg 4.6deg,
       hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% /
         calc((var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
-          * 0.3 + 0.14)) 5deg 9deg,
-      transparent 10deg
+          * 0.3 + 0.16)) 5deg 6.4deg,
+      transparent 7.2deg 10deg
     );
 }
 
