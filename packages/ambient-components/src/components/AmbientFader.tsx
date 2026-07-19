@@ -91,7 +91,7 @@ export function AmbientFader({
   return (
     <div className={cn("ambx-stack", className)} {...props}>
       <div
-        className="amb-fader ambx-fader"
+        className="amb-fader amb-groove ambx-fader"
         ref={trackRef}
         role="slider"
         aria-label={label}

@@ -6,6 +6,12 @@ import { SliderFaderPreview } from "@site/src/components/ComponentPreviews";
 
 `AmbientSlider` and `AmbientFader` share the same value model and props.
 
+Both are composed from grounded primitives: the track is an `.amb-groove`
+recess (the lit wall casts a crisp shadow band into it, the far wall
+bounces the key back — see the [grounded reference](/ambient-css/grounded#groove))
+with a lume interior that reads dark under bright light and glows as the
+room dims; the thumb is an `ambient amb-fillet amb-elevation-1` body.
+
 ## Interactive preview
 
 <SliderFaderPreview />

@@ -44,19 +44,36 @@ width unit, softer than the chamfer.
 
 ## Elevation
 
-`.amb-elevation-1` on a paper-thin sheet — only the drop shadow reveals it.
-The shadow is cast by the top silhouette; blur grows and alpha washes out
-with height as light spills underneath.
+`.amb-elevation-1` on a paper-thin sheet — at rest the sheet sits embedded
+in the surface like a decal (nothing renders); only elevation reveals it,
+through the drop shadow cast by its top silhouette. Blur grows and alpha
+washes out with height as light spills underneath.
 
 <RenderComparison slug="elevation" classes="ambient amb-elevation-1 amb-thickness-0 amb-surface" size={[40, 40]} />
 
 ## Thickness
 
-`.amb-thickness-1` at rest — a button-scale slab. Its walls block the fill
-light, so the contact shadow stays dark and crisp: the same physical model
-as elevation, at silhouette height `8px·elevation + 4.5px·thickness`.
+`.amb-thickness-1` at rest — a button-scale slab. Its shadow is the
+silhouette projection *swept* from the body's bottom to its top: a crisp
+chevron hugging the two shadow-side edges with a mitred corner, not an
+offset square. Two stacked box-shadow layers approximate the sweep (the
+top-silhouette layer at `8px·elevation + 4.5px·thickness`, plus a
+thickness-gated mid-height layer that fills the sweep toward the lit
+corners); new corner and contact-hug metrics gate the shape.
 
 <RenderComparison slug="thickness" classes="ambient amb-thickness-1 amb-surface" size={[40, 40]} />
+
+## Groove
+
+`.amb-groove` — negative space: a recessed slot whose depth reuses the
+thickness vocabulary. The floor stays surprisingly bright (the studio's
+overhead fill reaches in, and the walls bounce light back); the lit-side
+wall casts a crisp shadow band onto the floor, and the far wall catches
+the key and bounces it back as a soft brightening — the physical origin
+of the classic inset highlight. Component tracks compose this with the
+lume material.
+
+<RenderComparison slug="groove" classes="amb-groove" size={[60, 24]} />
 
 ## Curved surfaces
 
@@ -73,9 +90,15 @@ base, with the end-stop delta affine in light contrast.
 
 ## Shiny
 
-`.amb-mat-shiny` — grounded on a glossy dome referent. The specular has two
-physical features: a grazing Fresnel rim at the lit edge, and the key
-light's mirror band at 29% in from it (the sine of half the light zenith).
+`.amb-mat-shiny` — grounded on a glossy dome referent under the *white
+studio* environment every render is lit by: an overhead softbox easing to
+neutral walls and a dimmer floor (a product-photography setup, normalized
+so matte surfaces receive exactly the fill irradiance the flat world
+gave). The specular has two physical features — a grazing Fresnel rim at
+the lit edge and the key light's mirror band at 30% in from it (the sine
+of half the light zenith) — plus the studio reflection: a softbox veil at
+the top and a gentle floor grade at the bottom, riding the fill light and
+never flipping with the key.
 
 <RenderComparison slug="mat-shiny" classes="amb-mat-shiny amb-surface" size={[40, 40]} />
 

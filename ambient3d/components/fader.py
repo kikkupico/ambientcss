@@ -31,7 +31,10 @@ def build_fader(
     disc_h=2.6,
     ticks=0,              # printed scale dots alongside the slot
     value=0.5,            # 0..1 along the slot
-    well_depth=1.2,       # visual depth of the dark cavity below the slot
+    well_depth=None,      # depth of the cavity below the slot; defaults to
+                          # the .amb-groove recess unit (amb_model
+                          # THICKNESS_MM_PER_LEVEL * 1), capped by base_h,
+                          # so the component and the primitive agree
     plate_material=None,
     cap_material=None,
     accent_material=None,
@@ -39,6 +42,10 @@ def build_fader(
     tick_material=None,
     location=(0.0, 0.0, 0.0),
 ):
+    if well_depth is None:
+        from amb_model import THICKNESS_MM_PER_LEVEL
+        well_depth = min(base_h - 0.5, THICKNESS_MM_PER_LEVEL)
+
     plate = base_tile(name + "_Plate", base_w, base_d, base_h,
                       material=plate_material, location=location)
 

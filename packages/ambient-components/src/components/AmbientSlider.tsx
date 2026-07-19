@@ -91,7 +91,7 @@ export function AmbientSlider({
   return (
     <div className={cn("ambx-stack", className)} {...props}>
       <div
-        className="amb-slider ambx-slider"
+        className="amb-slider amb-groove ambx-slider"
         ref={trackRef}
         role="slider"
         aria-label={label}
@@ -112,7 +112,7 @@ export function AmbientSlider({
           className={cn("amb-slider-thumb ambient amb-fillet amb-elevation-1 ambx-slider-thumb", material !== "glass" && "amb-surface-concave-h", material && `amb-mat-${material}`)}
           style={{ left: `${percent}%` }}
         >
-          <div className="amb-slider-grip">
+          <div className="amb-slider-grip amb-groove">
             <span className="amb-fader-dot" />
             <span className="amb-fader-dot" />
             <span className="amb-fader-dot" />
