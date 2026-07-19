@@ -48,7 +48,7 @@ def render_job(rel, amb_over, spec, manifest, args):
             chamfer=chamfer_mm, fillet=fillet_mm,
             surface=a["surface"],
             sagitta=ap.SAGITTA_MM if a["surface"] != "flat" else 0.0,
-            location=(0, 0, ap.elevation_mm(a)),
+            location=(0, 0, ap.plate_z(a)),
             material=ap.material_for(a),
         )
     elif spec["builder"] == "dome":

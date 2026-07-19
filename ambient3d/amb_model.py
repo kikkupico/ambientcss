@@ -57,13 +57,17 @@ CHAMFER_MM_PER_WIDTH = 1.0
 FILLET_MM_PER_WIDTH = 2.0
 ELEVATION_MM_PER_LEVEL = 8.0
 
-# Thickness levels: 0 = paper-thin sheet (imperceptible at rest: ground
-# albedo, no walls, sub-pixel shadow; only elevation reveals it),
-# 1 = button-scale slab, 2 = knob-scale. The drop shadow is cast by the
-# top silhouette at h = elevation_mm + thickness_mm, so elevation and
-# thickness feed one unified shadow model. Edge treatments require t >= 1.
+# Thickness levels: 0 = paper-thin sheet (imperceptible at rest: embedded
+# flush in the ground like a decal, no walls, no shadow; only elevation
+# reveals it), 1 = button-scale slab, 2 = knob-scale. The drop shadow is
+# cast by the top silhouette — h = elevation_mm for a sheet (its top face
+# rides at exactly the elevation height), elevation_mm + thickness_mm for
+# slabs — so elevation and thickness feed one unified shadow model. Edge
+# treatments require t >= 1.
 THICKNESS_MM_PER_LEVEL = 4.5
 SHEET_MM = 0.15           # physical stand-in for thickness 0
+SHEET_PROUD_MM = 0.02     # how far an embedded sheet sits above the ground
+                          # (0.08 px: invisible, but never coplanar)
 SAGITTA_MM = 4.0          # dish/dome depth of the curved surface variants
                           # (deep enough that its shading dominates the
                           # residual plate-wide irradiance gradient)
@@ -131,9 +135,18 @@ def elevation_mm(a):
     return a["elevation"] * ELEVATION_MM_PER_LEVEL
 
 
+def plate_z(a):
+    """Z of the plate's base. A sheet (t < 1) rests embedded like a decal —
+    its top face a sub-pixel hair above the ground (exactly flush would
+    z-fight the coplanar ground face) — and rises out with elevation; a
+    slab sits on the ground."""
+    z = elevation_mm(a)
+    return z - SHEET_MM + SHEET_PROUD_MM if a["thickness"] < 1 else z
+
+
 def silhouette_mm(a):
     """Height of the shadow-casting top silhouette above the ground."""
-    return elevation_mm(a) + thickness_mm(a)
+    return plate_z(a) + thickness_mm(a)
 
 
 def reference_layout(a, plate_w, plate_d):

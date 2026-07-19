@@ -30,8 +30,9 @@ from amb_model import (  # noqa: F401  (re-exported for callers)
     PX_PER_MM, FRAME_MM, CAM_Z, LIGHT_R, LIGHT_Z, LIGHT_SIZE,
     GROUND_MM, GROUND_ALBEDO, E0, S0, key_energy, SAGITTA_MM, DARKER_ALBEDO,
     CHAMFER_MM_PER_WIDTH, FILLET_MM_PER_WIDTH, ELEVATION_MM_PER_LEVEL,
-    THICKNESS_MM_PER_LEVEL, SHEET_MM,
-    AMB_DEFAULTS, amb, edge_mm, elevation_mm, thickness_mm, silhouette_mm,
+    THICKNESS_MM_PER_LEVEL, SHEET_MM, SHEET_PROUD_MM,
+    AMB_DEFAULTS, amb, edge_mm, elevation_mm, plate_z, thickness_mm,
+    silhouette_mm,
 )
 
 
