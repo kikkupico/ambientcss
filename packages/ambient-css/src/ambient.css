@@ -115,6 +115,14 @@
   --amb-thickness: 1;
 }
 
+/* A groove is a recess CUT into material, so like the edge treatments it
+   defaults the thickness (here: recess depth) to 1; the .amb-thickness-*
+   classes are declared after and win when combined. Visual styling lives
+   in the .amb-groove rule further down. */
+.amb-groove {
+  --amb-thickness: 1;
+}
+
 /* --------------------------------------------------------------------------
    THICKNESS LEVELS
 
@@ -156,17 +164,19 @@
      than the body is thick (negative widths cap symmetrically). */
   --_amb-chamfer-w: max(-1 * var(--amb-thickness), min(var(--amb-chamfer-width), var(--amb-thickness)));
   --_amb-fillet-w: max(-1 * var(--amb-thickness), min(var(--amb-fillet-width), var(--amb-thickness)));
-  /* Drop shadow, grounded (ambient3d/derived/notes/shadow.md): cast by
-     the top silhouette at h = 8px*elevation + 4.5px*thickness, so both
-     variables displace and blur it (offset 0.86px/mm, blur 0.60px/mm,
-     R^2 0.99). Spread is a small constant, not proportional. Alpha decays
-     with elevation only — light washes under an elevated sheet, but a
-     resting slab's walls keep the contact shadow dark; the max/min gate
-     zeroes it for a sheet at rest. Alpha coefficients are compensated for CSS
-     blur dilution (the blur flattens the painted peak, the render's core
-     stays dark), fitted through the screenshot harness. Residual:
-     axis-aligned lights read ~0.13 deeper than diagonal, inexpressible
-     in one alpha. */
+  /* Drop shadow, grounded (ambient3d/derived/notes/shadow.md): the umbra
+     is the silhouette projection SWEPT from the body's bottom (elevation)
+     to its top (elevation + thickness) — at rest a crisp chevron hugging
+     the shadow-side edges with a mitred corner; elevated, a detached
+     blurred square. Two stacked layers approximate the sweep: the FAR
+     layer at the top silhouette h = 8px*elevation + 4.5px*thickness
+     (offset 0.85px/mm, blur 0.60px/mm, R^2 0.99, constant spread), and a
+     thickness-gated MID layer at the body's mid-height that fills the
+     sweep toward the lit corners and shapes the miter. Overlaps
+     composite multiplicatively, so the per-layer alphas are balanced
+     against the render's peak and contact-hug measurements (the max/min
+     gates zero both for a sheet at rest). Residual: axis-aligned lights
+     read deeper than diagonal, inexpressible in one alpha. */
   box-shadow: hsl(
         var(--amb-light-hue)
         var(--amb-light-saturation)
@@ -175,21 +185,39 @@
             max(0, min(var(--amb-elevation) + var(--amb-thickness), 1)) *
               (
                 (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
-                  * 0.17 + var(--amb-elevation) * -0.02 +
-                  var(--amb-thickness) * 0.05 + 0.28
+                  * 0.13 + var(--amb-elevation) * -0.077 + 0.368
               )
           )
       )
       calc(
         var(--amb-light-x) *
-          (var(--amb-elevation) * 6.9px + var(--amb-thickness) * 3.9px) * -1
+          (var(--amb-elevation) * 6.8px + var(--amb-thickness) * 3.8px) * -1
       )
       calc(
         var(--amb-light-y) *
-          (var(--amb-elevation) * 6.9px + var(--amb-thickness) * 3.9px) * -1
+          (var(--amb-elevation) * 6.8px + var(--amb-thickness) * 3.8px) * -1
       )
       calc(var(--amb-elevation) * 4.8px + var(--amb-thickness) * 2.7px)
       0.8px,
+    hsl(
+        var(--amb-light-hue)
+        var(--amb-light-saturation)
+        0%
+        / calc(
+            max(0, min(var(--amb-thickness), 1)) *
+              (var(--amb-thickness) * 0.037 + 0.013)
+          )
+      )
+      calc(
+        var(--amb-light-x) *
+          (var(--amb-elevation) * 6.8px + var(--amb-thickness) * 1.9px) * -1
+      )
+      calc(
+        var(--amb-light-y) *
+          (var(--amb-elevation) * 6.8px + var(--amb-thickness) * 1.9px) * -1
+      )
+      calc(var(--amb-elevation) * 4.8px + var(--amb-thickness) * 1.35px)
+      0px,
     /* Chamfer bands, grounded (ambient3d/derived/notes/chamfer.md): both
        alphas are affine and the highlight rides the fill light too — a
        45deg face keeps a residual band even when key equals fill, which
@@ -205,8 +233,8 @@
         / calc(
             var(--amb-chamfer) * max(0, min(var(--amb-thickness), 1)) *
               (
-                var(--amb-key-light-intensity) * 1.48 +
-                  var(--amb-fill-light-intensity) * 0.79 - 0.89
+                var(--amb-key-light-intensity) * 1.57 +
+                  var(--amb-fill-light-intensity) * 0.85 - 1.03
               )
           )
       ),
@@ -220,17 +248,17 @@
             var(--amb-chamfer) * max(0, min(var(--amb-thickness), 1)) *
               (
                 (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
-                  * 0.21 + 0.22
+                  * 0.19 + 0.24
               )
           )
       ),
     /* Fillet bands, grounded (ambient3d/derived/notes/fillet.md): same
        affine structure as the chamfer, softer and slightly wider — the
-       round-over's highlight concentrates at 1.5px per width unit.
-       hl R^2 0.98, sh R^2 0.98; the shadow alpha is compensated for the
+       round-over's highlight concentrates at 1.4px per width unit.
+       hl R^2 0.97, sh R^2 0.96; the shadow alpha is compensated for the
        2px blur's dilution of the painted band. */
-    inset calc(var(--amb-light-x) * var(--_amb-fillet-w) * -1.5px)
-      calc(var(--amb-light-y) * var(--_amb-fillet-w) * -1.5px) 2px 0px
+    inset calc(var(--amb-light-x) * var(--_amb-fillet-w) * -1.4px)
+      calc(var(--amb-light-y) * var(--_amb-fillet-w) * -1.4px) 2px 0px
       hsl(
         var(--amb-light-hue)
         var(--amb-light-saturation)
@@ -238,13 +266,13 @@
         / calc(
             var(--amb-fillet) * max(0, min(var(--amb-thickness), 1)) *
               (
-                var(--amb-key-light-intensity) * 1.39 +
-                  var(--amb-fill-light-intensity) * 0.83 - 0.91
+                var(--amb-key-light-intensity) * 1.44 +
+                  var(--amb-fill-light-intensity) * 0.85 - 0.99
               )
           )
       ),
-    inset calc(var(--amb-light-x) * var(--_amb-fillet-w) * 1.5px)
-      calc(var(--amb-light-y) * var(--_amb-fillet-w) * 1.5px) 2px 0px
+    inset calc(var(--amb-light-x) * var(--_amb-fillet-w) * 1.4px)
+      calc(var(--amb-light-y) * var(--_amb-fillet-w) * 1.4px) 2px 0px
       hsl(
         var(--amb-light-hue)
         var(--amb-light-saturation)
@@ -253,7 +281,7 @@
             var(--amb-fillet) * max(0, min(var(--amb-thickness), 1)) *
               (
                 (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
-                  * 0.26 + 0.28
+                  * 0.23 + 0.3
               )
           )
       );
@@ -293,6 +321,68 @@
 }
 
 /* --------------------------------------------------------------------------
+   GROOVE (recessed slot)
+   -------------------------------------------------------------------------- */
+
+.amb-groove {
+  /* Grounded on a recess cut into the reference ground
+     (ambient3d/derived/notes/groove.md). A groove is negative space: the
+     recess depth reuses the thickness vocabulary (4.5 physical mm per
+     level; a recess implies material to cut into, so the class defaults
+     to depth 1 — .amb-thickness-* combine to deepen or, at 0, flatten it
+     away). Three grounded features: the floor is affine in both light
+     intensities like every surface (R^2 0.99 — under the studio fill it
+     sits within a hair of the open ground: the overhead softbox reaches
+     in, and the walls bounce light back); the lit-side walls cast a
+     crisp shadow band onto the floor (reach 0.80 px per recess mm per
+     light component, alpha affine in contrast, R^2 0.95); and the far
+     walls catch the key and bounce it onto the floor beside them as a
+     soft brightening — the physical origin of the classic inset
+     highlight. The interior composes with --amb-lume or
+     .amb-surface-darker for track styling. */
+  background-color: hsl(
+    var(--amb-light-hue)
+    var(--amb-light-saturation)
+    calc(
+      var(--amb-key-light-intensity) * 30.2% +
+        var(--amb-fill-light-intensity) * 23.2% + 47.6%
+    )
+  );
+  box-shadow:
+    inset calc(var(--amb-light-x) * var(--amb-thickness) * -3.6px)
+      calc(var(--amb-light-y) * var(--amb-thickness) * -3.6px)
+      calc(var(--amb-thickness) * 2.7px) 0px
+      hsl(
+        var(--amb-light-hue)
+        var(--amb-light-saturation)
+        0%
+        / calc(
+            max(0, min(var(--amb-thickness), 1)) *
+              (
+                (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
+                  * 0.24 + 0.31
+              )
+          )
+      ),
+    inset calc(var(--amb-light-x) * var(--amb-thickness) * 2.7px)
+      calc(var(--amb-light-y) * var(--amb-thickness) * 2.7px)
+      calc(var(--amb-thickness) * 5.1px) 0px
+      hsl(
+        var(--amb-light-hue)
+        var(--amb-light-saturation)
+        100%
+        / calc(
+            max(0, min(var(--amb-thickness), 1)) *
+              max(0, min(
+                var(--amb-key-light-intensity) * 1.5 +
+                  var(--amb-fill-light-intensity) * 0.72 - 0.96,
+                1
+              ))
+          )
+      );
+}
+
+/* --------------------------------------------------------------------------
    MATERIALS
    -------------------------------------------------------------------------- */
 
@@ -306,40 +396,37 @@
   --amb-mat-opacity: 1;
   --_shiny-angle: calc(atan2(var(--amb-light-y), var(--amb-light-x)) + 270deg);
   --_spec-peak: var(--amb-key-light-intensity);
-  /* Cylindrical dome env: light-y determines which half of the dome is lit */
-  --_ly-up: max(0, calc(var(--amb-light-y) * -1));
-  --_ly-down: max(0, var(--amb-light-y));
-  --_env-top-l: calc(70% * var(--_ly-up) + 5% * var(--_ly-down));
-  --_env-bot-l: calc(5% * var(--_ly-up) + 70% * var(--_ly-down));
-  --_env-top-a: calc(var(--_ly-up) * var(--amb-key-light-intensity) + var(--_ly-down) * (1 - var(--amb-fill-light-intensity)));
-  --_env-bot-a: calc(var(--_ly-up) * (1 - var(--amb-fill-light-intensity)) + var(--_ly-down) * var(--amb-key-light-intensity));
   background-image:
     /* Specular, grounded on a glossy dome referent
        (ambient3d/derived/notes/shiny.md): TWO features. A grazing
-       Fresnel RIM at the lit edge (alpha = 0.13*Ik + 0.09) — the old
+       Fresnel RIM at the lit edge (alpha = 0.09*Ik + 0.07) — the old
        edge band was this rim all along — and the key light's MIRROR
-       band at 29% from the lit edge (physics: sin of half the light
+       band at 30% from the lit edge (physics: sin of half the light
        zenith), ~11% wide, clipping toward white almost independently of
        key. Band geometry is gated against the render; amplitudes are
        base-dependent and residual-only. */
     linear-gradient(
       var(--_shiny-angle),
-      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--amb-key-light-intensity) * 0.13 + 0.09)) 0%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--amb-key-light-intensity) * 0.09 + 0.07)) 0%,
       hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 10%,
-      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 23%,
-      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--_spec-peak) * 0.5)) 29%,
-      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 35%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 24%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--_spec-peak) * 0.04 + 0.31)) 30%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 36%,
       hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 100%
     ),
-    /* Cylindrical dome env reflection — horizon at 50%, tapers to neutral at both edges */
+    /* Studio environment reflection (the same 'white studio' world the
+       renders are lit by, amb_model.studio_*): the overhead softbox
+       veils the top, the walls stay neutral, the floor grades the bottom
+       gently darker. The reflection rides the FILL — a dim room kills
+       it — and never flips with the key light: the softbox is part of
+       the room, not the key. */
     linear-gradient(
       to bottom,
-      hsl(var(--amb-light-hue) var(--amb-light-saturation) 50% / 0) 0%,
-      hsl(var(--amb-light-hue) var(--amb-light-saturation) var(--_env-top-l) / var(--_env-top-a)) 50%,
-      hsl(var(--amb-light-hue) var(--amb-light-saturation) var(--_env-bot-l) / var(--_env-bot-a)) 50%,
-      hsl(var(--amb-light-hue) var(--amb-light-saturation) 50% / 0) 100%
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--amb-fill-light-intensity) * 0.22)) 0%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 45%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% / 0) 60%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% / calc(var(--amb-fill-light-intensity) * 0.10)) 100%
     );
-  background-blend-mode: screen, overlay;
   filter: brightness(1.04) contrast(1.01);
 }
 
@@ -394,7 +481,7 @@
     var(--_concave-y) *
       (
         (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
-          * 3.2% + 3.8%
+          * 3.16% + 3.78%
       )
   );
   background: linear-gradient(
@@ -416,7 +503,7 @@
     var(--_concave-h-x) *
       (
         (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
-          * 3.2% + 3.8%
+          * 3.16% + 3.78%
       )
   );
   background: linear-gradient(
@@ -439,7 +526,7 @@
     var(--_convex-y) *
       (
         (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
-          * 3.2% + 3.8%
+          * 3.16% + 3.78%
       )
   );
   background: linear-gradient(
@@ -486,10 +573,10 @@
 .amb-rounded-full { border-radius: 9999px; }
 
 .amb-glow {
-  /* Halo radius grounded on the emissive-plate bloom (5.5px = 2 sigma of
+  /* Halo radius grounded on the emissive-plate bloom (6.2px = 2 sigma of
      the measured falloff); the lume color's bright/dark switching is a
      deliberate design semantic the physical white halo does not gate. */
-  box-shadow: 0 0 5.5px var(--amb-lume);
+  box-shadow: 0 0 6.2px var(--amb-lume);
 }
 
 /* --------------------------------------------------------------------------

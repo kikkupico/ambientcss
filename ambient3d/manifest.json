@@ -300,6 +300,36 @@
       ]
     },
     {
+      "id": "groove_default",
+      "kind": "effect",
+      "builder": "groove",
+      "amb": {
+        "thickness": 1
+      },
+      "geometry": {
+        "size": [
+          60,
+          24
+        ]
+      },
+      "css": {
+        "classes": [
+          "amb-groove"
+        ],
+        "size": [
+          60,
+          24
+        ]
+      },
+      "measure": [
+        "groove"
+      ],
+      "docs": {
+        "publish": true,
+        "slug": "groove"
+      }
+    },
+    {
       "id": "emit_default",
       "kind": "effect",
       "builder": "plate",
@@ -1071,6 +1101,95 @@
           "vary": {
             "fill_light_intensity": [
               0.3
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "groove",
+      "builder": "groove",
+      "amb": {
+        "thickness": 1
+      },
+      "geometry": {
+        "size": [
+          60,
+          24
+        ]
+      },
+      "css": {
+        "classes": [
+          "amb-groove"
+        ],
+        "size": [
+          60,
+          24
+        ]
+      },
+      "measure": [
+        "groove"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "light": [
+              [
+                -1,
+                -1
+              ],
+              [
+                1,
+                -1
+              ],
+              [
+                -1,
+                1
+              ],
+              [
+                1,
+                1
+              ],
+              [
+                0,
+                -1
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                0
+              ],
+              [
+                1,
+                0
+              ]
+            ]
+          }
+        },
+        {
+          "vary": {
+            "key_light_intensity": [
+              0.3,
+              0.6,
+              0.9
+            ]
+          }
+        },
+        {
+          "vary": {
+            "fill_light_intensity": [
+              0.3,
+              0.7
+            ]
+          }
+        },
+        {
+          "vary": {
+            "thickness": [
+              2
             ]
           }
         }

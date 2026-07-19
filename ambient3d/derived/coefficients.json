@@ -3,13 +3,13 @@
     "model": "hl_alpha = p * Ik + pf * If + p0; sh_alpha = q * (Ik - If) + q0; offset_px = w * width",
     "n_highlight_samples": 30,
     "n_shadow_samples": 30,
-    "p0_highlight": -0.889,
-    "p_highlight_per_key": 1.478,
-    "pf_highlight_per_fill": 0.788,
-    "q0_shadow": 0.215,
-    "q_shadow_per_contrast": 0.203,
-    "r2_highlight": 0.9866,
-    "r2_shadow": 0.978,
+    "p0_highlight": -1.032,
+    "p_highlight_per_key": 1.571,
+    "pf_highlight_per_fill": 0.851,
+    "q0_shadow": 0.237,
+    "q_shadow_per_contrast": 0.191,
+    "r2_highlight": 0.9776,
+    "r2_shadow": 0.9739,
     "w_px_per_width": 1.0,
     "width_mm_by_chamfer_width": {
       "1": 0.75,
@@ -17,80 +17,108 @@
     }
   },
   "curved": {
-    "G_ambient_pct": 1.39,
-    "K0_pct": 3.77,
+    "G_ambient_pct": 1.4,
+    "K0_pct": 3.78,
     "K_per_contrast_pct": 3.16,
     "mid_ratio": 0.33,
     "model": "delta_end = K * (Ik - If) + K0 (sRGB, signed by the light component along the gradient axis; convex flipped); delta_mid = mid_ratio * delta_end; ambient plate gradient G separated out, not part of the CSS",
     "n_samples": 23,
-    "r2_end": 0.9395
+    "r2_end": 0.9397
   },
   "darker": {
-    "f_pct": 8.77,
+    "f_pct": 8.76,
     "floor_pct": 11.03,
     "k_pct": 10.56,
     "max_resid_pct": 0.325,
     "model": "L% = k * key_intensity + f * fill_intensity + floor",
-    "r2": 0.99646
+    "r2": 0.99649
   },
   "fillet": {
     "model": "hl_alpha = p * Ik + pf * If + p0; sh_alpha = q * (Ik - If) + q0; offset_px = w * width",
     "n_highlight_samples": 30,
     "n_shadow_samples": 30,
-    "p0_highlight": -0.913,
-    "p_highlight_per_key": 1.386,
-    "pf_highlight_per_fill": 0.827,
-    "q0_shadow": 0.191,
-    "q_shadow_per_contrast": 0.177,
-    "r2_highlight": 0.9806,
-    "r2_shadow": 0.9802,
-    "w_px_per_width": 1.5,
+    "p0_highlight": -0.991,
+    "p_highlight_per_key": 1.435,
+    "pf_highlight_per_fill": 0.845,
+    "q0_shadow": 0.21,
+    "q_shadow_per_contrast": 0.166,
+    "r2_highlight": 0.9735,
+    "r2_shadow": 0.9603,
+    "w_px_per_width": 1.313,
     "width_mm_by_chamfer_width": {
       "1": 1.125,
-      "2": 2.625
+      "2": 2.438
     }
   },
   "glow": {
-    "css_blur_px": 5.56,
-    "g0_alpha": 0.719,
-    "ga_alpha_per_key": 0.343,
+    "css_blur_px": 6.208,
+    "g0_alpha": 0.72,
+    "ga_alpha_per_key": 0.342,
     "model": "css_blur = 2 * sigma; edge_alpha = ga * Ik + g0",
     "n_samples": 4,
-    "r2_alpha": 0.7581
+    "r2_alpha": 0.7576
+  },
+  "groove": {
+    "Bb_css_blur_per_mm": 1.1239,
+    "Bs_css_blur_per_mm": 0.5924,
+    "Wb0_reach_mm": -0.682,
+    "Wb_reach_per_mm": 0.7146,
+    "Ws_reach_per_mm": 0.7969,
+    "b0_alpha": -1.44,
+    "ba_alpha_per_key": 2.019,
+    "bf_alpha_per_fill": 0.795,
+    "g0_pct": 47.57,
+    "gf_pct": 23.15,
+    "gk_pct": 30.15,
+    "model": "floor L% = gk * Ik + gf * If + g0; recess = 4.5mm * thickness; wall shadow: reach = Ws * recess per light component, css_blur = Bs * recess, alpha = sa * (Ik - If) + sa0; far-wall bounce (white overlay): reach = Wb * recess + Wb0, css_blur = Bb * recess, alpha = ba * Ik + bf * If + b0, clamped to [0, 1]",
+    "n_bounce_bands": 24,
+    "n_floor": 15,
+    "n_shadow_bands": 26,
+    "r2_bounce_alpha": 0.8549,
+    "r2_floor": 0.9884,
+    "r2_shadow_alpha": 0.9528,
+    "sa0_alpha": 0.308,
+    "sa_alpha_per_contrast": 0.238
   },
   "shadow": {
-    "A_offset_px_per_mm": 0.8632,
-    "B_css_blur_px_per_mm": 0.5995,
-    "C_spread_px": 0.839,
-    "D0_alpha": 0.334,
-    "D_alpha_per_contrast": 0.142,
-    "De_alpha_per_level": -0.0674,
-    "model": "h = 8*elevation + 4.5*thickness; offset_px = A * h per light component; css_blur = 2 * sigma = B * h; spread = C const; alpha = D * (Ik - If) + De * elevation + D0",
+    "A_offset_px_per_mm": 0.8526,
+    "B_css_blur_px_per_mm": 0.5981,
+    "C_spread_px": 0.822,
+    "D0_alpha": 0.368,
+    "D_alpha_per_contrast": 0.13,
+    "De_alpha_per_level": -0.0772,
+    "Dt_alpha_per_level": -0.0333,
+    "E_mid_alpha_per_contrast": 0.002,
+    "F_mid_alpha_per_thickness": 0.0364,
+    "G_mid_alpha": 0.012,
+    "model": "far: h = 8*elevation + 4.5*thickness, offset = A*h, blur = B*h, spread = C, alpha = D*(Ik-If) + De*elevation + Dt*thickness + D0; mid (thickness-gated): hm = 8*elevation + 2.25*thickness, offset = A*hm, blur = B*hm, alpha = E*(Ik-If) + F*thickness + G; layers composite multiplicatively",
+    "n_balanced_frames": 9,
     "n_edges": 70,
-    "r2_alpha": 0.7361,
-    "r2_reach": 0.988
+    "r2_alpha_far": 0.6737,
+    "r2_alpha_mid": 0.107,
+    "r2_reach": 0.985
   },
   "shiny": {
     "fwhm_frac": 0.113,
     "model": "two specular features: grazing Fresnel RIM at the lit edge, rim = rc * Ik + r0; key MIRROR band centered at pos_frac, fwhm_frac wide, peak = s * Ik + s0 (sRGB)",
     "n_band_samples": 5,
     "n_rim_samples": 5,
-    "pos_frac": 0.294,
-    "pos_frac_std": 0.05,
-    "r0_rim": 0.062,
-    "r2_band": 0.0741,
-    "r2_rim": 0.7476,
-    "rc_rim_per_key": 0.09,
-    "s0_peak": 0.302,
-    "s_peak_per_key": 0.046
+    "pos_frac": 0.3,
+    "pos_frac_std": 0.054,
+    "r0_rim": 0.068,
+    "r2_band": 0.0622,
+    "r2_rim": 0.7366,
+    "rc_rim_per_key": 0.088,
+    "s0_peak": 0.306,
+    "s_peak_per_key": 0.042
   },
   "surface": {
     "f_pct": 26.38,
     "floor_pct": 43.56,
     "k_pct": 31.46,
-    "max_resid_pct": 1.116,
+    "max_resid_pct": 1.115,
     "model": "L% = k * key_intensity + f * fill_intensity + floor",
-    "r2": 0.99599,
+    "r2": 0.996,
     "samples": [
       [
         0.1,
@@ -145,17 +173,17 @@
       [
         0.9,
         0.7,
-        90.01
+        90.02
       ],
       [
         0.9,
         0.7,
-        90.01
+        90.02
       ],
       [
         1.0,
         0.7,
-        92.61
+        92.62
       ]
     ]
   }

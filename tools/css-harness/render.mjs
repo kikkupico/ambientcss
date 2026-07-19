@@ -67,8 +67,12 @@ for (const { rel, amb, spec } of jobs()) {
     #subject { width: ${w}px; height: ${h}px; }
   </style></head><body class="amb-surface" style="${inlineVars(amb)}">
     <!-- the physical ground and plate share the same albedo, so the body
-         takes .amb-surface and always tracks the shipped formula -->
-    <div id="subject" class="${spec.css.classes.join(" ")}" style="${spec.css.style ?? ""}"></div>
+         takes .amb-surface and always tracks the shipped formula. The
+         subject repeats the frame's inline vars: classes may carry their
+         own var defaults (edge classes default a thickness), and the
+         harness gates the formulas at the *rendered* parameters, which
+         must win over those defaults -->
+    <div id="subject" class="${spec.css.classes.join(" ")}" style="${inlineVars(amb)} ${spec.css.style ?? ""}"></div>
   </body></html>`;
   await page.setContent(html, { waitUntil: "networkidle" });
   const out = path.join(here, "out", rel);

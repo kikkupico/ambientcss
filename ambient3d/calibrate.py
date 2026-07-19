@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import skeuo_kit as kit
 import amb_params as ap
 from amb_model import manifest_jobs
-from components.plate import build_dome, build_plate
+from components.plate import build_dome, build_groove, build_plate
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -38,7 +38,7 @@ def render_job(rel, amb_over, spec, manifest, args):
     a = ap.amb(**{k.replace("-", "_"): v for k, v in amb_over.items()})
     kit.reset_scene()
     plate_cfg = spec.get("geometry") or manifest["plate"]
-    ap.setup_calibration_rig(a, plate_size=tuple(plate_cfg["size"]))
+    ground = ap.setup_calibration_rig(a, plate_size=tuple(plate_cfg["size"]))
 
     if spec["builder"] == "plate":
         chamfer_mm, fillet_mm = ap.edge_mm(a)
@@ -54,6 +54,10 @@ def render_job(rel, amb_over, spec, manifest, args):
     elif spec["builder"] == "dome":
         build_dome(radius=plate_cfg.get("radius", 20.0),
                    material=ap.material_for(a))
+    elif spec["builder"] == "groove":
+        build_groove(ground, width=plate_cfg["size"][0],
+                     depth=plate_cfg["size"][1],
+                     recess=ap.thickness_mm(a))
     else:
         raise ValueError(f"unknown builder '{spec['builder']}'")
 

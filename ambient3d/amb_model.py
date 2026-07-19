@@ -36,6 +36,47 @@ GROUND_ALBEDO = 0.82      # linear reflectance of the reference ground
 E0 = 22_150_000.0         # key area-light energy at key_light_intensity = 1
 S0 = 0.55                 # world strength at fill_light_intensity = 1
 
+# The "white studio" fill world (product-photography setup): a broad
+# overhead softbox plateau easing to neutral walls at the horizon, dimmer
+# below it. Radiance is a function of the ray direction's z (cos zenith):
+#   z >= CAP_COS          : TOP            (the softbox)
+#   0 <= z < CAP_COS      : 1 -> TOP       (smoothstep on z / CAP_COS)
+#   -EASE < z < 0         : BELOW -> 1     (smoothstep, seamless cyclorama)
+#   z <= -EASE            : BELOW
+# The profile is scaled by studio_norm() so an up-facing surface receives
+# exactly the irradiance of the uniform world it replaced (pi * S0 * If):
+# the S0/E0 anchors and the surface-lightness calibration keep their
+# meaning; only the *distribution* of the fill changes.
+STUDIO_CAP_COS = 0.766    # cos 40 deg: softbox plateau half-angle
+STUDIO_TOP = 3.5          # softbox radiance relative to the horizon walls
+STUDIO_BELOW = 0.7        # below-horizon radiance (grazing reflections)
+STUDIO_EASE = 0.15        # below-horizon easing width in z
+
+
+def _smoothstep(u):
+    u = 0.0 if u < 0.0 else (1.0 if u > 1.0 else u)
+    return u * u * (3.0 - 2.0 * u)
+
+
+def studio_profile(z):
+    """Unnormalized studio radiance for a world ray with direction-z `z`.
+    Mirrored exactly by the Map Range (Smooth Step) world nodes in
+    amb_params.studio_world — keep the two in sync."""
+    if z >= 0.0:
+        return 1.0 + (STUDIO_TOP - 1.0) * _smoothstep(z / STUDIO_CAP_COS)
+    return STUDIO_BELOW + (1.0 - STUDIO_BELOW) * _smoothstep(1.0 + z / STUDIO_EASE)
+
+
+def studio_norm(steps=4096):
+    """Scale k for studio_profile such that the cosine-weighted irradiance
+    on an up-facing surface equals the uniform world's: solve
+    2 * integral_0^1 k * profile(z) * z dz = 1."""
+    total = 0.0
+    for i in range(steps):
+        z = (i + 0.5) / steps
+        total += studio_profile(z) * z
+    return 1.0 / (2.0 * total / steps)
+
 
 def key_energy(a):
     """Key light energy, compensated so plate irradiance depends only on

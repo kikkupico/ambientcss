@@ -216,6 +216,77 @@ def drop_shadow(img, meta):
                     / 1.349)
         out[name] = {"hm_mm": float(hm), "sigma_mm": float(sigma),
                      "peak_alpha": peak, "v_ref": v_ref}
+
+    out.update(_shadow_shape(f, v_ref))
+    return out
+
+
+def _shadow_shape(f, v_ref):
+    """Chevron diagnostics for the swept-silhouette shadow model.
+
+    corner: outward alpha profile along the shadow diagonal past the
+    shadow-side corner — the 45-degree miter the single-offset box-shadow
+    cannot produce (only present for lights with two nonzero components).
+    hug: for each shadowed edge, contact-zone alpha (0.5..1.5 mm out) in
+    thirds along the edge, ordered lit-corner-first — the swept shadow
+    keeps the near-lit third dark, the single-offset model leaves a gap.
+    """
+    lx, ly = f.amb["light_x"], f.amb["light_y"]
+    hw, hd = f.plate_w / 2, f.plate_d / 2
+    out = {}
+
+    if lx != 0 and ly != 0:
+        # shadow-side corner and the outward shadow direction (-light)
+        cx, cy = -np.sign(lx) * hw, -np.sign(ly) * hd
+        ux, uy = -lx / np.hypot(lx, ly), -ly / np.hypot(lx, ly)
+        reach = f.frame_mm / 2 - max(hw, hd) - 2.0
+        vals = []
+        for i in range(int(reach * f.s)):
+            d = (i + 0.5) / f.s
+            sx, sy = cx + ux * d, cy + uy * d
+            vals.append(float(f.region(sx - 0.75, sx + 0.75,
+                                       sy - 0.75, sy + 0.75).mean()))
+        alpha = 1.0 - np.array(vals) / v_ref
+        peak = float(alpha.max()) if len(alpha) else 0.0
+        # threshold above the plate-wide irradiance ripple: a shadowless
+        # frame must report zeros, not the ripple's half-max position
+        if peak >= 0.05:
+            above = np.nonzero(alpha >= peak / 2)[0]
+            hm = (above[-1] + 0.5) / f.s if len(above) else 0.0
+            out["corner"] = {"alpha": peak, "hm": float(hm)}
+        else:
+            out["corner"] = {"alpha": 0.0, "hm": 0.0}
+
+    # contact strips: 0.5..1.5 mm outside each shadowed edge
+    strips = {
+        "right": lambda t0, t1: f.region(hw + 0.5, hw + 1.5, t0, t1),
+        "left": lambda t0, t1: f.region(-hw - 1.5, -hw - 0.5, t0, t1),
+        "bottom": lambda t0, t1: f.region(t0, t1, hd + 0.5, hd + 1.5),
+        "top": lambda t0, t1: f.region(t0, t1, -hd - 1.5, -hd - 0.5),
+    }
+    shadowed = {"right": -lx, "left": lx, "bottom": -ly, "top": ly}
+    hug = {}
+    for name, comp in shadowed.items():
+        if comp <= 0:
+            continue
+        horiz = name in ("bottom", "top")
+        span = hw if horiz else hd
+        perp = lx if horiz else ly      # component along the edge
+        thirds = []
+        for i in range(3):
+            t0 = -span + 2 * span * i / 3
+            t1 = -span + 2 * span * (i + 1) / 3
+            thirds.append(1.0 - float(strips[name](t0, t1).mean()) / v_ref)
+        # order lit-corner-first: the lit corner sits where the light's
+        # along-edge component points from (perp < 0 -> low end, already
+        # first; perp > 0 -> high end, so reverse)
+        if perp > 0:
+            thirds.reverse()
+        hug[name] = {"lit_third": round(thirds[0], 4),
+                     "mid_third": round(thirds[1], 4),
+                     "far_third": round(thirds[2], 4)}
+    if hug:
+        out["hug"] = hug
     return out
 
 
@@ -341,6 +412,82 @@ def glow(img, meta):
     return out
 
 
+def groove(img, meta):
+    """Recess (groove) characterization, viewed flat-on: only the floor is
+    visible. Reports the floor's clear lightness (fill occlusion leaves it
+    darker than the open ground even where no wall shadow falls) and, per
+    lit-side interior edge, the wall's cast shadow band on the floor:
+    inward alpha profile against the clear-floor value, half-max reach and
+    falloff sigma. The clear-floor sample is the center strip, past the
+    lit walls' shadow reach and clear of the far walls' bounce band."""
+    f = Frame(img, meta)
+    hw, hd = f.plate_w / 2, f.plate_d / 2   # the groove opening
+    lx, ly = f.amb["light_x"], f.amb["light_y"]
+
+    layout = reference_layout(f.amb, f.plate_w, f.plate_d)
+    refs = [float(f.region(cx - 3, cx + 3, cy - 3, cy + 3).mean())
+            for cx, cy in (layout["ref_a"], layout["ref_b"])]
+    v_ref = float(np.mean(refs))
+
+    # clear floor: the center strip — past the lit walls' shadow reach and
+    # clear of the far walls' bounce band
+    floor = float(f.region(-8, 8, -2.5, 2.5).mean())
+
+    # toward-light walls shadow the floor (positive alpha); the far walls
+    # catch the key and bounce it onto the floor beside them (negative
+    # alpha = brightening) — the physical inset-highlight
+    toward = {"left": -lx, "top": -ly, "right": lx, "bottom": ly}
+    edges = {}
+    for name, comp in toward.items():
+        if comp == 0:
+            continue                    # perpendicular wall: no band
+        depth = 10.0
+        if name in ("left", "right"):
+            # narrow lateral window: the top/bottom walls' own bands span
+            # the full groove width and would contaminate a wider average
+            lat = hd * 0.25
+            if name == "left":
+                prof = f.region(-hw, -hw + depth, -lat, lat).mean(axis=0)
+            else:
+                prof = f.region(hw - depth, hw, -lat, lat).mean(axis=0)[::-1]
+        else:
+            lat = hw * 0.6
+            if name == "top":
+                prof = f.region(-lat, lat, -hd, -hd + depth).mean(axis=1)
+            else:
+                prof = f.region(-lat, lat, hd - depth, hd).mean(axis=1)[::-1]
+
+        skip = max(1, int(round(0.5 * f.s)))    # rim AA
+        alpha = 1.0 - prof[skip:] / floor       # signed: + shadow, - bounce
+        idx = int(np.argmax(np.abs(alpha)))
+        peak = float(alpha[idx])
+        if abs(peak) < 0.04:
+            edges[name] = {"hm_mm": 0.0, "sigma_mm": 0.0, "peak_alpha": 0.0,
+                           "kind": "shadow" if comp > 0 else "bounce"}
+            continue
+
+        mag = np.abs(alpha)
+
+        def outermost(level):
+            above = np.nonzero(mag >= level)[0]
+            return (above[-1] + skip) / f.s if len(above) else 0.0
+
+        hm = outermost(abs(peak) / 2)
+        sigma = max(0.0, (outermost(abs(peak) * 0.25) -
+                          outermost(abs(peak) * 0.75)) / 1.349)
+        edges[name] = {"hm_mm": float(hm), "sigma_mm": float(sigma),
+                       "peak_alpha": peak,
+                       "kind": "shadow" if comp > 0 else "bounce"}
+
+    return {
+        "v_ref": v_ref,
+        "floor_srgb_pct": floor * 100.0,
+        "floor_lstar": float(srgb_to_lstar(floor)),
+        "floor_over_ref": floor / v_ref if v_ref else 0.0,
+        "edges": edges,
+    }
+
+
 EXTRACTORS = {
     "surface_lightness": surface_lightness,
     "edge_bands": edge_bands,
@@ -348,4 +495,5 @@ EXTRACTORS = {
     "surface_gradient": surface_gradient,
     "cyl_profile": cyl_profile,
     "glow": glow,
+    "groove": groove,
 }

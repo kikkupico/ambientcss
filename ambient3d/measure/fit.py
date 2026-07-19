@@ -253,24 +253,37 @@ def shadow_components(a):
 
 
 def fit_shadow(m):
-    """Unified drop-shadow model over the silhouette height
-    h = 8 * elevation + 4.5 * thickness (mm = CSS px): a thick slab at
-    rest casts the same family of shadow as a thin sheet elevated.
-    Shapes of the .ambient drop-shadow layer:
-    per-axis offset = A * h (px, opposite the light component)
-    blur            = B * h (CSS blur radius = 2 * Gaussian sigma)
-    spread          = C (constant: penumbra keeps the half-max pinned
-                         a fixed distance past the silhouette boundary)
-    alpha           = D * (Ik - If) + De * elevation + D0
-    Alpha decays with ELEVATION only: an elevated sheet lets fill light
-    wash under it, but a resting slab's walls block that light, so
-    thickness pins the contact shadow at full depth (measured: alpha
-    ~0.36 for t1 and t2 at rest alike). Residual: axis-aligned lights
-    concentrate the displacement on one axis and read ~0.13 deeper than
-    diagonal ones — inexpressible in a single shadow alpha."""
+    """Swept-silhouette drop shadow, TWO stacked box-shadow layers.
+
+    The umbra is the silhouette projection swept from the body's bottom
+    (elevation) to its top (elevation + thickness). At rest that is the
+    chevron hugging the shadow-side edges with a mitred corner; elevated,
+    it detaches into the blurred offset square. The CSS approximates the
+    sweep with two layers:
+
+    far (top silhouette, h = 8*elevation + 4.5*thickness):
+      per-axis offset = A * h; blur = B * h; spread = C const;
+      alpha_far = D * (Ik - If) + De * elevation + D0
+    mid (body mid-height, hm = 8*elevation + 2.25*thickness, gated on
+    thickness — a sheet has no body and keeps a single layer):
+      per-axis offset = A * hm; blur = B * hm; no spread;
+      alpha_mid = E * (Ik - If) + F * thickness + G
+
+    Stacked translated squares cannot reproduce the sweep's uniform
+    alpha (overlaps compound), so per slab frame the two alphas are
+    BALANCED: the deep-zone composite 1-(1-af)(1-am) tracks the measured
+    peak while the lit-corner contact (hug lit third, per-layer lateral
+    coverage c = 1 - offset/third_len, af*cf + am*cm - af*am*cf) tracks
+    the render's hug — errors weighted by the compare gate's tolerances.
+    Sheets have no body: their far alpha is the measured peak directly,
+    which is why alpha_far carries a thickness term. Residual:
+    axis-aligned lights concentrate the displacement on one axis and
+    read deeper than diagonal ones — inexpressible in a single shadow
+    alpha."""
     import amb_model
 
-    rows, hms, sigmas, alphas = [], [], [], []
+    rows, hms, sigmas = [], [], []
+    far_rows, mid_rows = [], []
     for rel, entry in m.items():
         if not (rel.startswith(("sweeps/elevation/", "sweeps/thickness/")) or
                 rel in ("calib/elevation_default.png",
@@ -288,37 +301,166 @@ def fit_shadow(m):
         signed = {"left": lx, "right": -lx, "top": ly, "bottom": -ly}
         peak_frame = 0.0
         for edge, d in entry["metrics"]["drop_shadow"].items():
-            if signed[edge] < 0:
+            if edge in ("corner", "hug") or signed[edge] < 0:
                 continue
             rows.append([h * signed[edge], 1.0])
             hms.append(d["hm_mm"])
             if signed[edge] == max(signed.values()) and d["sigma_mm"] > 0:
                 sigmas.append((h, d["sigma_mm"]))
             peak_frame = max(peak_frame, d["peak_alpha"])
-        alphas.append((a["key_light_intensity"] - a["fill_light_intensity"],
-                       a["elevation"], peak_frame))
+        contrast = (a["key_light_intensity"] - a["fill_light_intensity"])
+        e, t = a["elevation"], a["thickness"]
+        if t < 1:
+            far_rows.append((contrast, e, t, peak_frame))
+        elif abs(lx) == 1 and abs(ly) == 1:
+            hug = entry["metrics"]["drop_shadow"].get("hug") or {}
+            lit = (float(np.mean([v["lit_third"] for v in hug.values()]))
+                   if hug else None)
+            mid_rows.append((contrast, e, t, peak_frame, lit))
 
     R = np.array(rows); H = np.array(hms)
     (A, C), *_ = np.linalg.lstsq(R, H, rcond=None)
     se = np.array([s[0] for s in sigmas]); sv = np.array([s[1] for s in sigmas])
     B_sigma = float((se * sv).sum() / (se * se).sum())
-    aX = np.array([[v[0], v[1], 1.0] for v in alphas])
-    ay = np.array([v[2] for v in alphas])
-    (D, De, D0), *_ = np.linalg.lstsq(aX, ay, rcond=None)
+
+    # balance the two alphas per slab frame (grid search; errors weighted
+    # by the compare tolerances: peak 0.06, hug 0.08, plus a light pull
+    # of the far-only zone toward the measured flat profile)
+    far_fit, mid_fit = list(far_rows), []
+    grid = np.arange(0.0, 0.601, 0.005)
+    third = 40.0 / 3                # shadow scenes render the 40 mm plate
+    for contrast, e, t, peak, lit in mid_rows:
+        cf = max(0.0, 1.0 - float(A) * (8 * e + 4.5 * t) / third)
+        cm = max(0.0, 1.0 - float(A) * (8 * e + 2.25 * t) / third)
+        af_g, am_g = np.meshgrid(grid, grid, indexing="ij")
+        deep = 1.0 - (1.0 - af_g) * (1.0 - am_g)
+        err = ((deep - peak) / 0.06) ** 2 + 0.3 * ((af_g - peak) / 0.06) ** 2
+        if lit is not None:
+            hug_css = af_g * cf + am_g * cm - af_g * am_g * cf
+            err = err + ((hug_css - lit) / 0.08) ** 2
+        i, j = np.unravel_index(np.argmin(err), err.shape)
+        far_fit.append((contrast, e, t, float(grid[i])))
+        mid_fit.append((contrast, t, float(grid[j])))
+
+    fX = np.array([[v[0], v[1], v[2], 1.0] for v in far_fit])
+    fy = np.array([v[3] for v in far_fit])
+    (D, De, Dt, D0), *_ = np.linalg.lstsq(fX, fy, rcond=None)
+    mX = np.array([[v[0], v[1], 1.0] for v in mid_fit])
+    my = np.array([v[2] for v in mid_fit])
+    (E, F, G), *_ = np.linalg.lstsq(mX, my, rcond=None)
+
     return {
-        "model": ("h = 8*elevation + 4.5*thickness; "
-                  "offset_px = A * h per light component; "
-                  "css_blur = 2 * sigma = B * h; spread = C const; "
-                  "alpha = D * (Ik - If) + De * elevation + D0"),
+        "model": ("far: h = 8*elevation + 4.5*thickness, offset = A*h, "
+                  "blur = B*h, spread = C, "
+                  "alpha = D*(Ik-If) + De*elevation + Dt*thickness + D0; "
+                  "mid (thickness-gated): hm = 8*elevation + "
+                  "2.25*thickness, offset = A*hm, blur = B*hm, "
+                  "alpha = E*(Ik-If) + F*thickness + G; "
+                  "layers composite multiplicatively"),
         "A_offset_px_per_mm": round(float(A), 4),
         "B_css_blur_px_per_mm": round(2 * B_sigma, 4),
         "C_spread_px": round(float(C), 3),
         "D_alpha_per_contrast": round(float(D), 3),
         "De_alpha_per_level": round(float(De), 4),
+        "Dt_alpha_per_level": round(float(Dt), 4),
         "D0_alpha": round(float(D0), 3),
+        "E_mid_alpha_per_contrast": round(float(E), 3),
+        "F_mid_alpha_per_thickness": round(float(F), 4),
+        "G_mid_alpha": round(float(G), 3),
         "r2_reach": round(r2(H, R @ [A, C]), 4),
-        "r2_alpha": round(r2(ay, aX @ [D, De, D0]), 4),
+        "r2_alpha_far": round(r2(fy, fX @ [D, De, Dt, D0]), 4),
+        "r2_alpha_mid": round(r2(my, mX @ [E, F, G]), 4),
         "n_edges": len(rows),
+        "n_balanced_frames": len(mid_fit),
+    }
+
+
+# ---------------------------------------------------------------- groove ---
+
+def fit_groove(m):
+    """Recessed groove (shape of the .amb-groove class): the floor is
+    affine in both light intensities like every surface; the lit walls
+    cast a crisp shadow band whose reach scales with the recess depth
+    (thickness levels, 4.5 mm each) exactly like the drop shadow's
+    projection; the far walls bounce the key onto the floor beside them
+    as a soft brightening — the physical inset-highlight."""
+    import amb_model
+
+    floor_rows, sh_alpha, sh_reach, sh_sigma = [], [], [], []
+    bn_alpha, bn_reach, bn_sigma = [], [], []
+    for rel, entry in m.items():
+        if not (rel.startswith("sweeps/groove/") or
+                rel == "calib/groove_default.png"):
+            continue
+        a = entry["amb"]
+        g = entry["metrics"]["groove"]
+        ik, if_ = a["key_light_intensity"], a["fill_light_intensity"]
+        floor_rows.append((ik, if_, g["floor_srgb_pct"]))
+        recess = amb_model.thickness_mm(a)
+        floor_v = g["floor_srgb_pct"] / 100.0
+        for d in g["edges"].values():
+            if d["peak_alpha"] == 0.0:
+                continue
+            if d["kind"] == "shadow":
+                sh_alpha.append((ik - if_, d["peak_alpha"]))
+                sh_reach.append((recess, d["hm_mm"]))
+                sh_sigma.append((recess, d["sigma_mm"]))
+            else:
+                # the profile alpha (1 - v/floor) of a WHITE overlay of
+                # opacity a is -a * (1 - floor) / floor: convert to the
+                # overlay alpha the CSS paints with
+                a_css = -d["peak_alpha"] * floor_v / (1.0 - floor_v)
+                bn_alpha.append((ik, if_, min(1.0, a_css)))
+                bn_reach.append((recess, d["hm_mm"]))
+                bn_sigma.append((recess, d["sigma_mm"]))
+
+    A = np.array([[p[0], p[1], 1.0] for p in floor_rows])
+    L = np.array([p[2] for p in floor_rows])
+    (gk, gf, g0), *_ = np.linalg.lstsq(A, L, rcond=None)
+
+    def line1(pairs):
+        x = np.array([p[0] for p in pairs]); y = np.array([p[1] for p in pairs])
+        (a1, a0), *_ = np.linalg.lstsq(
+            np.stack([x, np.ones_like(x)], axis=1), y, rcond=None)
+        return float(a1), float(a0), r2(y, a1 * x + a0)
+
+    def slope(pairs):
+        x = np.array([p[0] for p in pairs]); y = np.array([p[1] for p in pairs])
+        return float((x * y).sum() / (x * x).sum())
+
+    sa, sa0, sa_r2 = line1(sh_alpha)
+    bX = np.array([[p[0], p[1], 1.0] for p in bn_alpha])
+    by = np.array([p[2] for p in bn_alpha])
+    (ba, bf, b0), *_ = np.linalg.lstsq(bX, by, rcond=None)
+    br, br0, _ = line1(bn_reach)
+    return {
+        "model": ("floor L% = gk * Ik + gf * If + g0; recess = 4.5mm * "
+                  "thickness; wall shadow: reach = Ws * recess per light "
+                  "component, css_blur = Bs * recess, alpha = "
+                  "sa * (Ik - If) + sa0; far-wall bounce (white overlay): "
+                  "reach = Wb * recess + Wb0, css_blur = Bb * recess, "
+                  "alpha = ba * Ik + bf * If + b0, clamped to [0, 1]"),
+        "gk_pct": round(float(gk), 2),
+        "gf_pct": round(float(gf), 2),
+        "g0_pct": round(float(g0), 2),
+        "r2_floor": round(r2(L, A @ [gk, gf, g0]), 4),
+        "Ws_reach_per_mm": round(slope(sh_reach), 4),
+        "Bs_css_blur_per_mm": round(2 * float(np.mean(
+            [s[1] / s[0] for s in sh_sigma])), 4),
+        "sa_alpha_per_contrast": round(sa, 3),
+        "sa0_alpha": round(sa0, 3),
+        "r2_shadow_alpha": round(sa_r2, 4),
+        "Wb_reach_per_mm": round(br, 4),
+        "Wb0_reach_mm": round(br0, 3),
+        "Bb_css_blur_per_mm": round(2 * float(np.mean(
+            [s[1] / s[0] for s in bn_sigma])), 4),
+        "ba_alpha_per_key": round(float(ba), 3),
+        "bf_alpha_per_fill": round(float(bf), 3),
+        "b0_alpha": round(float(b0), 3),
+        "r2_bounce_alpha": round(r2(by, bX @ [ba, bf, b0]), 4),
+        "n_floor": len(floor_rows),
+        "n_shadow_bands": len(sh_alpha),
+        "n_bounce_bands": len(bn_alpha),
     }
 
 
@@ -409,7 +551,8 @@ def fit_glow(m):
 FITTERS = {"surface": fit_surface, "chamfer": fit_chamfer,
            "fillet": fit_fillet, "shadow": fit_shadow,
            "curved": fit_curved, "darker": fit_darker,
-           "shiny": fit_shiny, "glow": fit_glow}
+           "shiny": fit_shiny, "glow": fit_glow,
+           "groove": fit_groove}
 
 
 def write_note(effect, coeffs):

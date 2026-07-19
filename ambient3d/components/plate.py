@@ -93,6 +93,20 @@ def build_dome(name="Dome", radius=20.0, location=(0, 0, 0), material=None,
     return _finish(bm, name, location, material, smooth=True)
 
 
+def build_groove(ground, width=60.0, depth=12.0, recess=4.5):
+    """Rectangular recess cut into the ground plane: the calibration
+    referent for .amb-groove. The CSS element is the groove *opening*
+    (width x depth in plan), recessed `recess` mm; walls and floor keep
+    the ground material, so at recess 0 nothing would render — the whole
+    effect is occlusion and the walls' cast shadow, the inverse of a
+    plate's drop shadow."""
+    from ._common import boolean_cut, prism_object
+
+    cutter = prism_object("GrooveCut", _rect(width, depth), -recess, 1.0)
+    boolean_cut(ground, cutter)
+    return ground
+
+
 def build_plate(name="Plate", width=80.0, depth=80.0, thickness=6.0,
                 chamfer=0.0, fillet=0.0, surface="flat", sagitta=0.0,
                 location=(0, 0, 0), material=None):

@@ -16,8 +16,11 @@ never the other way around):
   (LIGHT_R * light_x, -LIGHT_R * light_y, LIGHT_Z), tracked at the origin,
   energy E0 * key_light_intensity. Components deliberately unnormalized so
   per-axis behavior matches the per-axis CSS formulas.
-  Fill light: uniform world background of strength S0 * fill_light_intensity
-  (this is what CSS fill is: a directionless lift that softens shadows).
+  Fill light: the 'white studio' world (studio_world) — an overhead-softbox
+  radiance profile normalized so an up-facing surface receives the same
+  irradiance as a uniform background of strength S0 * fill_light_intensity
+  (the CSS fill: a lift that softens shadows; the studio look lives in the
+  reflections).
 """
 
 import bpy
@@ -90,17 +93,68 @@ def material_for(a, name="PlateMat", albedo=None):
 
 # --------------------------------------------------------------- lighting ---
 
+def studio_world(a):
+    """The 'white studio' fill world (see amb_model studio constants): a
+    directional radiance profile over the world ray's z — overhead softbox
+    plateau, neutral walls at the horizon, dimmer floor — normalized by
+    studio_norm() so an up-facing surface receives exactly the irradiance
+    of the uniform world this replaces (S0 * fill). The node graph mirrors
+    amb_model.studio_profile: two Smooth Step Map Ranges (above / below the
+    horizon) switched at z = 0."""
+    from amb_model import (STUDIO_CAP_COS, STUDIO_TOP, STUDIO_BELOW,
+                           STUDIO_EASE, studio_norm)
+
+    world = bpy.data.worlds.new("AmbStudio")
+    world.use_nodes = True
+    nt = world.node_tree
+    bg = nt.nodes["Background"]
+    bg.inputs["Strength"].default_value = S0 * a["fill_light_intensity"]
+
+    texco = nt.nodes.new("ShaderNodeTexCoord")
+    sep = nt.nodes.new("ShaderNodeSeparateXYZ")
+    nt.links.new(texco.outputs["Generated"], sep.inputs["Vector"])
+    z = sep.outputs["Z"]
+
+    def map_range(lo, hi, out_lo, out_hi):
+        mr = nt.nodes.new("ShaderNodeMapRange")
+        mr.interpolation_type = "SMOOTHSTEP"
+        mr.clamp = True
+        mr.inputs["From Min"].default_value = lo
+        mr.inputs["From Max"].default_value = hi
+        mr.inputs["To Min"].default_value = out_lo
+        mr.inputs["To Max"].default_value = out_hi
+        nt.links.new(z, mr.inputs["Value"])
+        return mr
+
+    above = map_range(0.0, STUDIO_CAP_COS, 1.0, STUDIO_TOP)
+    below = map_range(-STUDIO_EASE, 0.0, STUDIO_BELOW, 1.0)
+
+    gate = nt.nodes.new("ShaderNodeMath")
+    gate.operation = "GREATER_THAN"
+    nt.links.new(z, gate.inputs[0])
+    gate.inputs[1].default_value = 0.0
+
+    mix = nt.nodes.new("ShaderNodeMix")
+    mix.data_type = "FLOAT"
+    nt.links.new(gate.outputs["Value"], mix.inputs["Factor"])
+    nt.links.new(below.outputs["Result"], mix.inputs["A"])
+    nt.links.new(above.outputs["Result"], mix.inputs["B"])
+
+    scale = nt.nodes.new("ShaderNodeMath")
+    scale.operation = "MULTIPLY"
+    nt.links.new(mix.outputs["Result"], scale.inputs[0])
+    scale.inputs[1].default_value = studio_norm()
+
+    nt.links.new(scale.outputs["Value"], bg.inputs["Color"])
+    return world
+
+
 def apply_lighting(a, target=(0.0, 0.0, 0.0)):
-    """Key area light positioned from light-x/y + uniform world fill.
+    """Key area light positioned from light-x/y + the studio fill world.
     Replaces any studio lights; returns the key light object."""
     scene = bpy.context.scene
 
-    world = bpy.data.worlds.new("AmbFill")
-    world.use_nodes = True
-    bg = world.node_tree.nodes["Background"]
-    bg.inputs["Color"].default_value = (1.0, 1.0, 1.0, 1.0)
-    bg.inputs["Strength"].default_value = S0 * a["fill_light_intensity"]
-    scene.world = world
+    scene.world = studio_world(a)
 
     empty = bpy.data.objects.new("AmbLightTarget", None)
     empty.location = target
@@ -145,8 +199,10 @@ def setup_calibration_rig(a, plate_size=(80.0, 80.0), resolution=None):
 
     ground_mat = calib_material("GroundMat", GROUND_ALBEDO)
     g = GROUND_MM / 2
+    # 12 mm of body below the surface: enough material for a knob-scale
+    # groove recess to cut into (the slab is opaque either way)
     ground = prism_object("Ground", [(-g, -g), (g, -g), (g, g), (-g, g)],
-                          -2.0, 0.0, material=ground_mat)
+                          -12.0, 0.0, material=ground_mat)
 
     _reference_patches(a, plate_size[0], plate_size[1])
 
