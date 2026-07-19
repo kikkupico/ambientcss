@@ -57,6 +57,14 @@ CHAMFER_MM_PER_WIDTH = 1.0
 FILLET_MM_PER_WIDTH = 2.0
 ELEVATION_MM_PER_LEVEL = 8.0
 
+# Thickness levels: 0 = paper-thin sheet (imperceptible at rest: ground
+# albedo, no walls, sub-pixel shadow; only elevation reveals it),
+# 1 = button-scale slab, 2 = knob-scale. The drop shadow is cast by the
+# top silhouette at h = elevation_mm + thickness_mm, so elevation and
+# thickness feed one unified shadow model. Edge treatments require t >= 1.
+THICKNESS_MM_PER_LEVEL = 4.5
+SHEET_MM = 0.15           # physical stand-in for thickness 0
+
 # Defaults mirror the :root block of packages/ambient-css/src/ambient.css.
 AMB_DEFAULTS = {
     "light_x": -1.0,
@@ -64,6 +72,7 @@ AMB_DEFAULTS = {
     "key_light_intensity": 0.9,
     "fill_light_intensity": 0.7,
     "elevation": 0.0,
+    "thickness": 0.0,
     "chamfer": 0.0,
     "chamfer_width": 1.0,
     "fillet": 0.0,
@@ -86,15 +95,64 @@ def amb(**overrides):
     return merged
 
 
+def thickness_mm(a):
+    t = a["thickness"]
+    return SHEET_MM if t < 1 else t * THICKNESS_MM_PER_LEVEL
+
+
 def edge_mm(a):
-    """(chamfer_mm, fillet_mm) for the plate's top edge."""
-    chamfer = a["chamfer"] * a["chamfer_width"] * CHAMFER_MM_PER_WIDTH
-    fillet = a["fillet"] * a["fillet_width"] * FILLET_MM_PER_WIDTH
-    return chamfer, fillet
+    """(chamfer_mm, fillet_mm) for the plate's top edge. A sheet (t < 1)
+    has no material to cut, so edge treatments require thickness >= 1;
+    the cut is also capped so it never exceeds the slab."""
+    if a["thickness"] < 1:
+        return 0.0, 0.0
+    cap = thickness_mm(a) - 0.5
+    chamfer = min(cap, a["chamfer"] * a["chamfer_width"] * CHAMFER_MM_PER_WIDTH)
+    fillet = min(cap, a["fillet"] * a["fillet_width"] * FILLET_MM_PER_WIDTH)
+    return max(0.0, chamfer), max(0.0, fillet)
 
 
 def elevation_mm(a):
     return a["elevation"] * ELEVATION_MM_PER_LEVEL
+
+
+def silhouette_mm(a):
+    """Height of the shadow-casting top silhouette above the ground."""
+    return elevation_mm(a) + thickness_mm(a)
+
+
+def reference_layout(a, plate_w, plate_d):
+    """Screen-mm centers for the white patch, black trap and the two 8x8
+    unshadowed-ground reference samples, placed in the two frame regions
+    perpendicular to the light axis — the only zones untouched by the
+    lit-edge bloom, the drop shadow, and the edge-profile bands. Shared by
+    the Blender rig (builds the patches) and the measurement pipeline
+    (samples the refs), so they can never disagree on geometry."""
+    lx, ly = a["light_x"], a["light_y"]
+    if lx == 0 and ly == 0:
+        lx, ly = -1.0, -1.0
+    perp = (-ly, lx)
+
+    def cheb(v):
+        m = max(abs(v[0]), abs(v[1]))
+        return (v[0] / m, v[1] / m)
+
+    lat_ext = 0.7 * min(plate_w, plate_d) / 2  # profile lateral half-extent
+    out = {}
+    for patch, ref, c in (("white", "ref_a", cheb(perp)),
+                          ("black", "ref_b", cheb((-perp[0], -perp[1])))):
+        base = (52.0 * c[0], 52.0 * c[1])
+        if c[0] == 0 or c[1] == 0:
+            # edge-midpoint strip: shift tangentially past the profile band
+            t = (1.0, 0.0) if c[0] == 0 else (0.0, 1.0)
+            s = lat_ext + 8.0
+        else:
+            # diagonal corner pocket: split along the pocket diagonal
+            t = (-c[1], c[0])
+            s = 6.0
+        out[patch] = (base[0] + s * t[0], base[1] + s * t[1])
+        out[ref] = (base[0] - s * t[0], base[1] - s * t[1])
+    return out
 
 
 def expand_overrides(overrides):

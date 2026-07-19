@@ -68,33 +68,59 @@
    EDGE TREATMENTS
    -------------------------------------------------------------------------- */
 
+/* An edge treatment implies physical material to cut, so these classes
+   default the element to thickness 1 (button-scale). The .amb-thickness-*
+   classes are declared after these and therefore win when combined. */
+
 .amb-chamfer {
   --amb-chamfer: 1;
+  --amb-thickness: 1;
 }
 
 .amb-chamfer-2 {
   --amb-chamfer: 1;
   --amb-chamfer-width: 2;
+  --amb-thickness: 1;
 }
 
 .amb-chamfer-minus-1 {
   --amb-chamfer: 1;
   --amb-chamfer-width: -1;
+  --amb-thickness: 1;
 }
 
 .amb-fillet {
   --amb-fillet: 1;
+  --amb-thickness: 1;
 }
 
 .amb-fillet-2 {
   --amb-fillet: 1;
   --amb-fillet-width: 2;
+  --amb-thickness: 1;
 }
 
 .amb-fillet-minus-1 {
   --amb-fillet: 1;
   --amb-fillet-width: -1;
+  --amb-thickness: 1;
 }
+
+/* --------------------------------------------------------------------------
+   THICKNESS LEVELS
+
+   Physical body height of the element (grounded in the ambient3d rig):
+   0 = paper-thin sheet — imperceptible at rest on a matching surface (no
+   edge bands, no shadow); only elevation reveals it. 1 = button-scale
+   slab (4.5 physical mm). 2 = knob-scale (9 mm). Thickness contributes
+   to the drop shadow like elevation does (the shadow is cast by the top
+   silhouette at h = 8px * elevation + 4.5px * thickness) and gates the
+   edge treatments, which need material to cut into.
+   -------------------------------------------------------------------------- */
+
+.amb-thickness-0 { --amb-thickness: 0; }
+.amb-thickness-1 { --amb-thickness: 1; }
+.amb-thickness-2 { --amb-thickness: 2; }
 
 /* --------------------------------------------------------------------------
    ELEVATION LEVELS
@@ -109,7 +135,7 @@
    CORE AMBIENT CLASS
 
    Applies physically-based lighting via box-shadow:
-   1. Drop shadow - offset by light direction, scaled by elevation
+   1. Drop shadow - offset by light direction, scaled by elevation + thickness
    2. Chamfer highlight - inner lit edge (white on light side)
    3. Chamfer shadow - inner dark edge (black on shadow side)
    4. Fillet highlight - softer inner edge (light side)
@@ -117,15 +143,40 @@
    -------------------------------------------------------------------------- */
 
 .ambient {
+  /* Drop shadow, grounded (ambient3d/derived/notes/shadow.md): cast by
+     the top silhouette at h = 8px*elevation + 4.5px*thickness, so both
+     variables displace and blur it (offset 0.86px/mm, blur 0.60px/mm,
+     R^2 0.99). Spread is a small constant, not proportional. Alpha decays
+     with elevation only — light washes under an elevated sheet, but a
+     resting slab's walls keep the contact shadow dark; the clamp() zeroes
+     it for a sheet at rest. Alpha coefficients are compensated for CSS
+     blur dilution (the blur flattens the painted peak, the render's core
+     stays dark), fitted through the screenshot harness. Residual:
+     axis-aligned lights read ~0.13 deeper than diagonal, inexpressible
+     in one alpha. */
   box-shadow: hsl(
         var(--amb-light-hue)
         var(--amb-light-saturation)
         0%
-        / calc((var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)))
+        / calc(
+            clamp(0, var(--amb-elevation) + var(--amb-thickness), 1) *
+              (
+                (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
+                  * 0.17 + var(--amb-elevation) * -0.02 +
+                  var(--amb-thickness) * 0.05 + 0.28
+              )
+          )
       )
-      calc(var(--amb-light-x) * var(--amb-elevation) * -8px)
-      calc(var(--amb-light-y) * var(--amb-elevation) * -8px)
-      calc(var(--amb-elevation) * 8px) calc(var(--amb-elevation) * -4px),
+      calc(
+        var(--amb-light-x) *
+          (var(--amb-elevation) * 6.9px + var(--amb-thickness) * 3.9px) * -1
+      )
+      calc(
+        var(--amb-light-y) *
+          (var(--amb-elevation) * 6.9px + var(--amb-thickness) * 3.9px) * -1
+      )
+      calc(var(--amb-elevation) * 4.8px + var(--amb-thickness) * 2.7px)
+      0.8px,
     /* Chamfer bands, grounded (ambient3d/derived/notes/chamfer.md): both
        alphas are affine and the highlight rides the fill light too — a
        45deg face keeps a residual band even when key equals fill, which
@@ -139,7 +190,7 @@
         var(--amb-light-saturation)
         100%
         / calc(
-            var(--amb-chamfer) *
+            var(--amb-chamfer) * clamp(0, var(--amb-thickness), 1) *
               (
                 var(--amb-key-light-intensity) * 1.48 +
                   var(--amb-fill-light-intensity) * 0.79 - 0.89
@@ -153,31 +204,43 @@
         var(--amb-light-saturation)
         0%
         / calc(
-            var(--amb-chamfer) *
+            var(--amb-chamfer) * clamp(0, var(--amb-thickness), 1) *
               (
                 (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
                   * 0.21 + 0.22
               )
           )
       ),
-    inset calc(var(--amb-light-x) * var(--amb-fillet-width) * -2px)
-      calc(var(--amb-light-y) * var(--amb-fillet-width) * -2px) 2px 0px
+    /* Fillet bands, grounded (ambient3d/derived/notes/fillet.md): same
+       affine structure as the chamfer, softer and slightly wider — the
+       round-over's highlight concentrates at 1.5px per width unit.
+       hl R^2 0.98, sh R^2 0.98; the shadow alpha is compensated for the
+       2px blur's dilution of the painted band. */
+    inset calc(var(--amb-light-x) * var(--amb-fillet-width) * -1.5px)
+      calc(var(--amb-light-y) * var(--amb-fillet-width) * -1.5px) 2px 0px
       hsl(
         var(--amb-light-hue)
         var(--amb-light-saturation)
         100%
-        / calc(var(--amb-fillet) * var(--amb-key-light-intensity))
+        / calc(
+            var(--amb-fillet) * clamp(0, var(--amb-thickness), 1) *
+              (
+                var(--amb-key-light-intensity) * 1.39 +
+                  var(--amb-fill-light-intensity) * 0.83 - 0.91
+              )
+          )
       ),
-    inset calc(var(--amb-light-x) * var(--amb-fillet-width) * 2px)
-      calc(var(--amb-light-y) * var(--amb-fillet-width) * 2px) 2px 0px
+    inset calc(var(--amb-light-x) * var(--amb-fillet-width) * 1.5px)
+      calc(var(--amb-light-y) * var(--amb-fillet-width) * 1.5px) 2px 0px
       hsl(
         var(--amb-light-hue)
         var(--amb-light-saturation)
         0%
         / calc(
-            var(--amb-fillet) *
-              calc(
-                var(--amb-key-light-intensity) - var(--amb-fill-light-intensity)
+            var(--amb-fillet) * clamp(0, var(--amb-thickness), 1) *
+              (
+                (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
+                  * 0.26 + 0.28
               )
           )
       );

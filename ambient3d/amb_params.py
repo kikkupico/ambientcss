@@ -30,7 +30,8 @@ from amb_model import (  # noqa: F401  (re-exported for callers)
     PX_PER_MM, FRAME_MM, CAM_Z, LIGHT_R, LIGHT_Z, LIGHT_SIZE,
     GROUND_MM, GROUND_ALBEDO, E0, S0, key_energy,
     CHAMFER_MM_PER_WIDTH, FILLET_MM_PER_WIDTH, ELEVATION_MM_PER_LEVEL,
-    AMB_DEFAULTS, amb, edge_mm, elevation_mm,
+    THICKNESS_MM_PER_LEVEL, SHEET_MM,
+    AMB_DEFAULTS, amb, edge_mm, elevation_mm, thickness_mm, silhouette_mm,
 )
 
 
@@ -115,34 +116,23 @@ def apply_lighting(a, target=(0.0, 0.0, 0.0)):
 
 # ---------------------------------------------------------------- the rig ---
 
-def _reference_patches(a, ground_mat):
-    """White tile and black light-trap in the frame margin, placed on the
-    light side of the frame so plate shadows can never reach them. Measured
-    values are anchored against these to neutralize exposure drift."""
-    lx, ly = a["light_x"], a["light_y"]
-    # unit-ish direction toward the light in screen coords; default top-left
-    if lx == 0 and ly == 0:
-        lx, ly = -1.0, -1.0
-    norm = max(abs(lx), abs(ly))
-    cx, cy = 52.0 * lx / norm, 52.0 * ly / norm  # screen mm, corner-ish
-    by = -cy  # blender Y
+def _reference_patches(a, plate_w, plate_d):
+    """White tile and black trap at the light-perpendicular anchors from
+    amb_model.reference_layout — clear of bloom, shadow and the profile
+    bands for every light direction and plate size. Measured values are
+    anchored against these to neutralize exposure drift."""
+    from amb_model import reference_layout
 
-    white = calib_material("RefWhite", 1.0)
-    patch = prism_object("RefWhite", [(-5, -5), (5, -5), (5, 5), (-5, 5)],
-                         0.0, 0.2, location=(cx, by, 0.0), material=white)
-
-    # black trap: open-topped box, interior traps light
-    black = calib_material("RefBlack", 0.0)
-    trap_pts = [(-5, -5), (5, -5), (5, 5), (-5, 5)]
-    trap = prism_object("RefBlack", trap_pts, 0.0, 0.2,
-                        location=(cx - (12 if abs(lx) >= abs(ly) else 0),
-                                  by + (0 if abs(lx) >= abs(ly) else -12),
-                                  0.0),
-                        material=black)
-    return patch, trap
+    layout = reference_layout(a, plate_w, plate_d)
+    pts = [(-4, -4), (4, -4), (4, 4), (-4, 4)]
+    for name, albedo in (("white", 1.0), ("black", 0.0)):
+        sx, sy = layout[name]
+        prism_object(f"Ref{name.capitalize()}", pts, 0.0, 0.2,
+                     location=(sx, -sy, 0.0),  # screen mm -> blender Y flip
+                     material=calib_material(f"Ref{name.capitalize()}", albedo))
 
 
-def setup_calibration_rig(a, resolution=None):
+def setup_calibration_rig(a, plate_size=(80.0, 80.0), resolution=None):
     """Ground plane, reference patches, flat-on ortho camera and amb
     lighting. Call on a reset scene; add the subject afterwards (or before —
     order does not matter). Returns the ground object."""
@@ -153,7 +143,7 @@ def setup_calibration_rig(a, resolution=None):
     ground = prism_object("Ground", [(-g, -g), (g, -g), (g, g), (-g, g)],
                           -2.0, 0.0, material=ground_mat)
 
-    _reference_patches(a, ground_mat)
+    _reference_patches(a, plate_size[0], plate_size[1])
 
     cam_data = bpy.data.cameras.new("CalibCam")
     cam_data.type = "ORTHO"
@@ -201,6 +191,7 @@ def add_argparse_group(parser):
     group.add_argument("--amb-key-light-intensity", type=float, default=None)
     group.add_argument("--amb-fill-light-intensity", type=float, default=None)
     group.add_argument("--amb-elevation", type=float, default=None)
+    group.add_argument("--amb-thickness", type=float, default=None)
     group.add_argument("--amb-chamfer", type=float, default=None)
     group.add_argument("--amb-chamfer-width", type=float, default=None)
     group.add_argument("--amb-fillet", type=float, default=None)

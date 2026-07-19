@@ -1,7 +1,7 @@
 {
   "pxPerMm": 4,
   "frameMm": 128,
-  "plate": { "size": [80, 80], "thickness": 6 },
+  "plate": { "size": [80, 80] },
   "scenes": [
     {
       "id": "surface_default",
@@ -16,10 +16,39 @@
       "id": "chamfer_default",
       "kind": "effect",
       "builder": "plate",
-      "amb": { "chamfer": 1 },
+      "amb": { "chamfer": 1, "thickness": 1 },
       "css": { "classes": ["ambient", "amb-chamfer", "amb-surface"], "size": [80, 80] },
       "measure": ["edge_bands"],
       "docs": { "publish": true, "slug": "chamfer" }
+    },
+    {
+      "id": "fillet_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": { "fillet": 1, "thickness": 1 },
+      "css": { "classes": ["ambient", "amb-fillet", "amb-surface"], "size": [80, 80] },
+      "measure": ["edge_bands"],
+      "docs": { "publish": true, "slug": "fillet" }
+    },
+    {
+      "id": "elevation_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": { "elevation": 1 },
+      "geometry": { "size": [40, 40] },
+      "css": { "classes": ["ambient", "amb-elevation-1", "amb-thickness-0", "amb-surface"], "size": [40, 40] },
+      "measure": ["drop_shadow"],
+      "docs": { "publish": true, "slug": "elevation" }
+    },
+    {
+      "id": "thickness_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": { "thickness": 1 },
+      "geometry": { "size": [40, 40] },
+      "css": { "classes": ["ambient", "amb-thickness-1", "amb-surface"], "size": [40, 40] },
+      "measure": ["drop_shadow"],
+      "docs": { "publish": true, "slug": "thickness" }
     }
   ],
   "sweeps": [
@@ -37,7 +66,7 @@
     {
       "id": "chamfer",
       "builder": "plate",
-      "amb": { "chamfer": 1 },
+      "amb": { "chamfer": 1, "thickness": 1 },
       "css": { "classes": ["ambient", "amb-chamfer", "amb-surface"], "size": [80, 80] },
       "measure": ["edge_bands"],
       "axes": [
@@ -45,6 +74,46 @@
         { "vary": { "chamfer_width": [2] } },
         { "vary": { "key_light_intensity": [0.3, 0.5, 0.7, 0.9] } },
         { "vary": { "fill_light_intensity": [0.3, 0.5, 0.7] } }
+      ]
+    },
+    {
+      "id": "fillet",
+      "builder": "plate",
+      "amb": { "fillet": 1, "thickness": 1 },
+      "css": { "classes": ["ambient", "amb-fillet", "amb-surface"], "size": [80, 80] },
+      "measure": ["edge_bands"],
+      "axes": [
+        { "vary": { "light": [[-1, -1], [1, -1], [-1, 1], [1, 1], [0, -1], [0, 1], [-1, 0], [1, 0]] } },
+        { "vary": { "fillet_width": [2] } },
+        { "vary": { "key_light_intensity": [0.3, 0.5, 0.7, 0.9] } },
+        { "vary": { "fill_light_intensity": [0.3, 0.5, 0.7] } }
+      ]
+    },
+    {
+      "id": "elevation",
+      "builder": "plate",
+      "amb": { "elevation": 2 },
+      "geometry": { "size": [40, 40] },
+      "css": { "classes": ["ambient", "amb-surface"], "size": [40, 40] },
+      "measure": ["drop_shadow"],
+      "axes": [
+        { "vary": { "elevation": [0, 1, 2, 3] } },
+        { "vary": { "thickness": [1, 2] } },
+        { "vary": { "light": [[-1, -1], [1, -1], [-1, 1], [1, 1], [0, -1], [0, 1], [-1, 0], [1, 0]] } },
+        { "vary": { "key_light_intensity": [0.3, 0.6, 0.9] } },
+        { "vary": { "fill_light_intensity": [0.3, 0.5, 0.7] } }
+      ]
+    },
+    {
+      "id": "thickness",
+      "builder": "plate",
+      "amb": { "elevation": 0, "thickness": 1 },
+      "geometry": { "size": [40, 40] },
+      "css": { "classes": ["ambient", "amb-surface"], "size": [40, 40] },
+      "measure": ["drop_shadow"],
+      "axes": [
+        { "vary": { "thickness": [0, 1, 2] } },
+        { "vary": { "light": [[-1, -1], [1, -1], [-1, 1], [1, 1], [0, -1], [0, 1], [-1, 0], [1, 0]] } }
       ]
     }
   ]

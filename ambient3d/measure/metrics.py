@@ -15,6 +15,8 @@ space a browser composits in.
 import numpy as np
 from PIL import Image
 
+from amb_model import reference_layout
+
 
 def load(path):
     """PNG -> float (H, W) luminance-ish array in 0..1 (mean of RGB;
@@ -126,7 +128,67 @@ def edge_bands(img, meta):
     return out
 
 
+def drop_shadow(img, meta):
+    """Drop-shadow characterization from the crescent outside the plate.
+
+    For each edge, an outward shadow-alpha profile a(d) = 1 - v(d)/v_ref
+    (sRGB compositing of a black shadow over the ground). Reported per
+    edge: hm_mm, the outermost half-max crossing (for a Gaussian-blurred
+    boundary the half-max sits AT the boundary, so hm = per-axis offset +
+    spread on shadowed edges and = spread on perpendicular ones),
+    sigma_mm from the 25..75% falloff (IQR = 1.349 sigma), and peak alpha.
+    """
+    f = Frame(img, meta)
+    hw, hd = f.plate_w / 2, f.plate_d / 2
+    half = f.frame_mm / 2
+    reach = half - max(hw, hd) - 2.0   # outward profile depth, mm
+    lat = min(hw, hd) * 0.7            # lateral averaging half-extent
+
+    # Unshadowed ground reference: the two light-perpendicular sample
+    # zones from reference_layout — the lit side blooms (side-wall
+    # bounce) and the far side is shadowed, but these are clear of both,
+    # of the patches, and of the edge-profile bands.
+    layout = reference_layout(f.amb, f.plate_w, f.plate_d)
+    refs = [float(f.region(cx - 3, cx + 3, cy - 3, cy + 3).mean())
+            for cx, cy in (layout["ref_a"], layout["ref_b"])]
+    v_ref = float(np.mean(refs))
+
+    edges = {
+        "left":   (f.region(-hw - reach, -hw, -lat, lat).mean(axis=0), True),
+        "right":  (f.region(hw, hw + reach, -lat, lat).mean(axis=0), False),
+        "top":    (f.region(-lat, lat, -hd - reach, -hd).mean(axis=1), True),
+        "bottom": (f.region(-lat, lat, hd, hd + reach).mean(axis=1), False),
+    }
+
+    out = {}
+    for name, (profile, flip) in edges.items():
+        if flip:
+            profile = profile[::-1]     # index 0 = at the plate edge
+        skip = max(1, int(round(0.5 * f.s)))
+        prof = profile[skip:]
+        alpha = 1.0 - prof / v_ref
+
+        peak = float(alpha.max())
+        if peak < 0.02:
+            out[name] = {"hm_mm": 0.0, "sigma_mm": 0.0, "peak_alpha": 0.0,
+                         "v_ref": v_ref}
+            continue
+
+        def outermost(level):
+            above = np.nonzero(alpha >= level)[0]
+            return (above[-1] + skip) / f.s if len(above) else 0.0
+
+        hm = outermost(peak / 2)
+        # falloff width between 75% and 25% of peak -> Gaussian sigma
+        sigma = max(0.0, (outermost(peak * 0.25) - outermost(peak * 0.75))
+                    / 1.349)
+        out[name] = {"hm_mm": float(hm), "sigma_mm": float(sigma),
+                     "peak_alpha": peak, "v_ref": v_ref}
+    return out
+
+
 EXTRACTORS = {
     "surface_lightness": surface_lightness,
     "edge_bands": edge_bands,
+    "drop_shadow": drop_shadow,
 }

@@ -32,6 +32,10 @@ TOLERANCES = {
     "mean_delta_srgb": 0.05,
     "width_mm": 0.6,        # band width, mm (~CSS px)
     "baseline_srgb": 0.04,
+    "hm_mm": 1.5,           # drop-shadow half-max reach, mm
+    "sigma_mm": 1.2,        # drop-shadow falloff sigma, mm
+    "peak_alpha": 0.06,
+    "v_ref": 0.04,          # unshadowed ground value
 }
 SKIP_KEYS = {"noise"}
 
@@ -90,6 +94,19 @@ def main():
             for key, tv in truth.items():
                 leaf = key.rsplit(".", 1)[-1]
                 if leaf in SKIP_KEYS:
+                    continue
+                # (drop_shadow gates all four edges: blur+spread reach
+                # every edge in the CSS model too. But under an
+                # axis-aligned light the render concentrates the whole
+                # shadow — deeper alpha, tighter perpendicular penumbra —
+                # anisotropy that a single isotropic box-shadow cannot
+                # express, so axis-light frames are residual-only.)
+                axis_light = (a["light_x"] == 0) != (a["light_y"] == 0)
+                if metric == "drop_shadow" and axis_light:
+                    frame_report[f"{metric}.{key}"] = {
+                        "render": round(tv, 4), "css": round(got[key], 4),
+                        "residual": True,
+                    }
                     continue
                 if metric == "edge_bands" and \
                         key.split(".", 1)[0] not in gated_edges:

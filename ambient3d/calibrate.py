@@ -37,14 +37,14 @@ def parse_args():
 def render_job(rel, amb_over, spec, manifest, args):
     a = ap.amb(**{k.replace("-", "_"): v for k, v in amb_over.items()})
     kit.reset_scene()
-    ap.setup_calibration_rig(a)
+    plate_cfg = spec.get("geometry") or manifest["plate"]
+    ap.setup_calibration_rig(a, plate_size=tuple(plate_cfg["size"]))
 
     if spec["builder"] == "plate":
-        plate_cfg = spec.get("geometry") or manifest["plate"]
         chamfer_mm, fillet_mm = ap.edge_mm(a)
         build_plate(
             width=plate_cfg["size"][0], depth=plate_cfg["size"][1],
-            thickness=plate_cfg["thickness"],
+            thickness=ap.thickness_mm(a),
             chamfer=chamfer_mm, fillet=fillet_mm,
             location=(0, 0, ap.elevation_mm(a)),
             material=ap.material_for(a),

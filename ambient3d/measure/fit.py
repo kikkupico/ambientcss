@@ -103,18 +103,27 @@ def band_alphas(entry):
 
 
 def fit_chamfer(m):
-    """Models (shape of the .ambient chamfer layers, affine: a tilted face
-    keeps a residual band even at Ik = If, which the render exposes):
+    return _fit_edge_effect(m, "chamfer")
+
+
+def fit_fillet(m):
+    return _fit_edge_effect(m, "fillet")
+
+
+def _fit_edge_effect(m, effect):
+    """Models (shape of the .ambient chamfer/fillet layers, affine: a
+    curved or tilted face keeps a residual band even at Ik = If, and the
+    highlight rides the fill light too — the render exposes both):
     highlight alpha = p * key_light_intensity + pf * fill_light_intensity + p0
     shadow alpha    = q * (key_light_intensity - fill_light_intensity) + q0
-    band offset     = w px per chamfer_width unit."""
+    band offset     = w px per width unit."""
     hl, sh, widths = [], [], {}
     for rel, entry in m.items():
-        if not (rel.startswith("sweeps/chamfer/") or
-                rel == "calib/chamfer_default.png"):
+        if not (rel.startswith(f"sweeps/{effect}/") or
+                rel == f"calib/{effect}_default.png"):
             continue
         for kind, alpha, width_mm, a in band_alphas(entry):
-            cw = a["chamfer_width"]
+            cw = a[f"{effect}_width"]
             widths.setdefault(cw, []).append(width_mm)
             if kind == "hl":
                 hl.append((a["key_light_intensity"],
@@ -134,14 +143,14 @@ def fit_chamfer(m):
                    for cw, ws in sorted(widths.items())}
     cws = np.array([float(k) for k in width_table])
     wms = np.array(list(width_table.values()))
-    # geometric band grows 1 mm per chamfer_width unit; the half-max
+    # the geometric band grows linearly per width unit; the half-max
     # measurement clips a constant ~0.25 mm of AA — fit the slope only
     w_px = float(np.polyfit(cws, wms, 1)[0]) if len(cws) > 1 else 1.0
 
     return {
         "model": ("hl_alpha = p * Ik + pf * If + p0; "
                   "sh_alpha = q * (Ik - If) + q0; "
-                  "offset_px = w * chamfer_width"),
+                  "offset_px = w * width"),
         "p_highlight_per_key": round(p, 3),
         "pf_highlight_per_fill": round(pf, 3),
         "p0_highlight": round(p0, 3),
@@ -156,9 +165,90 @@ def fit_chamfer(m):
     }
 
 
+# -------------------------------------------------------------- elevation ---
+
+def shadow_components(a):
+    """Per-edge fraction of the drop-shadow displacement pointing at that
+    edge: the CSS offset is (-lx, -ly) * elevation * A."""
+    lx, ly = a["light_x"], a["light_y"]
+    return {"left": max(0.0, lx), "right": max(0.0, -lx),
+            "top": max(0.0, ly), "bottom": max(0.0, -ly)}
+
+
+def fit_shadow(m):
+    """Unified drop-shadow model over the silhouette height
+    h = 8 * elevation + 4.5 * thickness (mm = CSS px): a thick slab at
+    rest casts the same family of shadow as a thin sheet elevated.
+    Shapes of the .ambient drop-shadow layer:
+    per-axis offset = A * h (px, opposite the light component)
+    blur            = B * h (CSS blur radius = 2 * Gaussian sigma)
+    spread          = C (constant: penumbra keeps the half-max pinned
+                         a fixed distance past the silhouette boundary)
+    alpha           = D * (Ik - If) + De * elevation + D0
+    Alpha decays with ELEVATION only: an elevated sheet lets fill light
+    wash under it, but a resting slab's walls block that light, so
+    thickness pins the contact shadow at full depth (measured: alpha
+    ~0.36 for t1 and t2 at rest alike). Residual: axis-aligned lights
+    concentrate the displacement on one axis and read ~0.13 deeper than
+    diagonal ones — inexpressible in a single shadow alpha."""
+    import amb_model
+
+    rows, hms, sigmas, alphas = [], [], [], []
+    for rel, entry in m.items():
+        if not (rel.startswith(("sweeps/elevation/", "sweeps/thickness/")) or
+                rel in ("calib/elevation_default.png",
+                        "calib/thickness_default.png")):
+            continue
+        a = entry["amb"]
+        h = amb_model.silhouette_mm(a)
+        if h < 1.0:
+            continue                    # sheet at rest: no visible shadow
+        # signed displacement component toward each edge: positive on the
+        # shadow side, zero on perpendicular edges, negative on the lit
+        # side. Lit edges are excluded — the shadow vacates them entirely
+        # (reach clamps at zero, which a linear fit cannot express).
+        lx, ly = a["light_x"], a["light_y"]
+        signed = {"left": lx, "right": -lx, "top": ly, "bottom": -ly}
+        peak_frame = 0.0
+        for edge, d in entry["metrics"]["drop_shadow"].items():
+            if signed[edge] < 0:
+                continue
+            rows.append([h * signed[edge], 1.0])
+            hms.append(d["hm_mm"])
+            if signed[edge] == max(signed.values()) and d["sigma_mm"] > 0:
+                sigmas.append((h, d["sigma_mm"]))
+            peak_frame = max(peak_frame, d["peak_alpha"])
+        alphas.append((a["key_light_intensity"] - a["fill_light_intensity"],
+                       a["elevation"], peak_frame))
+
+    R = np.array(rows); H = np.array(hms)
+    (A, C), *_ = np.linalg.lstsq(R, H, rcond=None)
+    se = np.array([s[0] for s in sigmas]); sv = np.array([s[1] for s in sigmas])
+    B_sigma = float((se * sv).sum() / (se * se).sum())
+    aX = np.array([[v[0], v[1], 1.0] for v in alphas])
+    ay = np.array([v[2] for v in alphas])
+    (D, De, D0), *_ = np.linalg.lstsq(aX, ay, rcond=None)
+    return {
+        "model": ("h = 8*elevation + 4.5*thickness; "
+                  "offset_px = A * h per light component; "
+                  "css_blur = 2 * sigma = B * h; spread = C const; "
+                  "alpha = D * (Ik - If) + De * elevation + D0"),
+        "A_offset_px_per_mm": round(float(A), 4),
+        "B_css_blur_px_per_mm": round(2 * B_sigma, 4),
+        "C_spread_px": round(float(C), 3),
+        "D_alpha_per_contrast": round(float(D), 3),
+        "De_alpha_per_level": round(float(De), 4),
+        "D0_alpha": round(float(D0), 3),
+        "r2_reach": round(r2(H, R @ [A, C]), 4),
+        "r2_alpha": round(r2(ay, aX @ [D, De, D0]), 4),
+        "n_edges": len(rows),
+    }
+
+
 # ------------------------------------------------------------------- main ---
 
-FITTERS = {"surface": fit_surface, "chamfer": fit_chamfer}
+FITTERS = {"surface": fit_surface, "chamfer": fit_chamfer,
+           "fillet": fit_fillet, "shadow": fit_shadow}
 
 
 def write_note(effect, coeffs):

@@ -39,6 +39,9 @@
     ".amb-surface-concave-h",
     ".amb-surface-convex",
     ".amb-surface-darker",
+    ".amb-thickness-0",
+    ".amb-thickness-1",
+    ".amb-thickness-2",
     ".ambient",
     ":root"
   ],
