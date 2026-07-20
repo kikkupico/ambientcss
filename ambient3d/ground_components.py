@@ -2,8 +2,10 @@
 Blender:
 
     blender -b -P ground_components.py
+    blender -b -P ground_components.py -- knob-flute button-round
 
-Each @ambientcss/components component gets its 3D counterpart (the
+Each @ambientcss/components component (and each button-shape / knob-type
+variant) gets its 3D counterpart (the
 richer designs the CSS components are modeled after) built at the CSS
 component's dimensions (1 CSS px = 1 mm, --ambx-grid = 4px), in neutral
 calibration materials, on the calibration rig under the default amb
@@ -50,11 +52,61 @@ def button():
                  cap_material=cap, base_material=plate)
 
 
+def button_round():
+    cap, plate, dark = _mats()
+    build_button(width=12 * GRID, height=4.5, shape_n=2.0, dome=0.3,
+                 fillet=0.8, base_size=(14 * GRID, 14 * GRID), base_h=2.5,
+                 base_style="flush", seat=1.2, clearance=0.5 * GRID / 2,
+                 cap_material=cap, base_material=plate)
+
+
+def button_square():
+    # EP-133-style pad: squarer superellipse, flatter and lower cap
+    cap, plate, dark = _mats()
+    build_button(width=14 * GRID, height=3.6, shape_n=6.0, dome=0.15,
+                 fillet=0.8, base_size=(16 * GRID, 16 * GRID), base_h=2.5,
+                 base_style="flush", seat=1.2, clearance=0.5 * GRID / 2,
+                 cap_material=cap, base_material=plate)
+
+
 def knob():
     cap, plate, dark = _mats()
     build_knob(radius=8 * GRID, height=9.0, ribs=36, rib_depth=0.5,
                indicator="dot", dot_frac=0.12, dot_offset=0.68, value=0.33,
                body_material=cap, accent_material=dark, base=None)
+
+
+def knob_line():
+    cap, plate, dark = _mats()
+    build_knob(radius=8 * GRID, height=9.0, ribs=36, rib_depth=0.5,
+               indicator="line", value=0.33,
+               body_material=cap, accent_material=dark, base=None)
+
+
+def knob_flute():
+    # OP-Z-style: broad flutes, deep roots, centered dot
+    cap, plate, dark = _mats()
+    build_knob(radius=8 * GRID, height=9.0, ribs=14, rib_depth=3.2,
+               rib_sharpness=8.0, taper=0.1, indicator="dot",
+               dot_frac=0.32, dot_offset=0.0, value=0.33,
+               body_material=cap, accent_material=dark, base=None)
+
+
+def knob_cap():
+    # OP-1-style encoder: fine knurl, smooth contrasting top disc
+    cap, plate, dark = _mats()
+    build_knob(radius=8 * GRID, height=9.0, ribs=48, rib_depth=0.8,
+               indicator="none", top_disc=True, value=0.33,
+               body_material=cap, accent_material=dark, top_material=dark,
+               base=None)
+
+
+def knob_wheel():
+    # machined wheel: bare fine knurl, no indicator
+    cap, plate, dark = _mats()
+    build_knob(radius=8 * GRID, height=9.0, ribs=48, rib_depth=0.8,
+               indicator="none", fillet=0.8, chamfer=0.3, value=0.33,
+               body_material=cap, base=None)
 
 
 def switch():
@@ -88,14 +140,22 @@ def slider():
                  value=0.5, plate_material=plate, thumb_material=cap)
 
 
-COMPONENTS = {"button": button, "knob": knob, "switch": switch,
-              "fader": fader, "slider": slider}
+COMPONENTS = {"button": button, "button-round": button_round,
+              "button-square": button_square,
+              "knob": knob, "knob-line": knob_line,
+              "knob-flute": knob_flute, "knob-cap": knob_cap,
+              "knob-wheel": knob_wheel,
+              "switch": switch, "fader": fader, "slider": slider}
 
 
 def main():
+    # optional filter: blender -b -P ground_components.py -- knob-flute ...
+    argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+    names = argv or list(COMPONENTS)
     os.makedirs(OUT, exist_ok=True)
     a = ap.amb()
-    for name, build in COMPONENTS.items():
+    for name in names:
+        build = COMPONENTS[name]
         kit.reset_scene()
         ap.setup_calibration_rig(a, patches=False)
         build()

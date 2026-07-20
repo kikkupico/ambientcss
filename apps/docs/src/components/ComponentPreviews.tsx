@@ -107,6 +107,39 @@ export function KnobPreview() {
   );
 }
 
+export function KnobVariantsPreview() {
+  const [dot, setDot] = useState(42);
+  const [line, setLine] = useState(70);
+  const [flute, setFlute] = useState(25);
+  const [cap, setCap] = useState(55);
+  const [wheel, setWheel] = useState(80);
+
+  return (
+    <DemoShell>
+      <div className="docs-demo-row">
+        <AmbientKnob label="Dot" value={dot} onChange={setDot} />
+        <AmbientKnob label="Line" variant="line" value={line} onChange={setLine} />
+        <AmbientKnob label="Flute" variant="flute" value={flute} onChange={setFlute} />
+        <AmbientKnob label="Cap" variant="cap" value={cap} onChange={setCap} />
+        <AmbientKnob label="Wheel" variant="wheel" material="shiny" value={wheel} onChange={setWheel} />
+      </div>
+    </DemoShell>
+  );
+}
+
+export function ButtonShapesPreview() {
+  return (
+    <DemoShell>
+      <div className="docs-demo-row">
+        <AmbientButton>Play</AmbientButton>
+        <AmbientButton shape="round">On</AmbientButton>
+        <AmbientButton shape="round" material="shiny" aria-label="Metal button" />
+        <AmbientButton shape="square">FX</AmbientButton>
+      </div>
+    </DemoShell>
+  );
+}
+
 export function SliderFaderPreview() {
   const [pan, setPan] = useState(50);
   const [level, setLevel] = useState(72);
@@ -152,9 +185,23 @@ export function GroundedButtonDemo() {
   return <AmbientButton>OK</AmbientButton>;
 }
 
-export function GroundedKnobDemo() {
+export function GroundedButtonRoundDemo() {
+  return <AmbientButton shape="round">On</AmbientButton>;
+}
+
+export function GroundedButtonSquareDemo() {
+  return <AmbientButton shape="square">FX</AmbientButton>;
+}
+
+export function GroundedKnobDemo({
+  variant
+}: {
+  variant?: "dot" | "line" | "flute" | "cap" | "wheel";
+}) {
   const [v, setV] = useState(33);
-  return <AmbientKnob aria-label="Knob" value={v} min={0} max={100} onChange={setV} />;
+  return (
+    <AmbientKnob aria-label="Knob" variant={variant} value={v} min={0} max={100} onChange={setV} />
+  );
 }
 
 export function GroundedSwitchDemo() {

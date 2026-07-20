@@ -2,7 +2,7 @@
 title: AmbientButton
 ---
 
-import { ButtonPreview, GroundedButtonDemo } from "@site/src/components/ComponentPreviews";
+import { ButtonPreview, ButtonShapesPreview, GroundedButtonDemo, GroundedButtonRoundDemo, GroundedButtonSquareDemo } from "@site/src/components/ComponentPreviews";
 import { RenderComparison } from "@site/src/components/RenderComparison";
 
 `AmbientButton` wraps a native `<button>` with ambient styling.
@@ -20,9 +20,32 @@ chamfer bands and the swept shadow shrink with it.
 
 <RenderComparison slug="button" dir="components"><GroundedButtonDemo /></RenderComparison>
 
+## Shapes
+
+Cap silhouettes from the referent lineup (`ambient3d/generate.py`):
+
+<ButtonShapesPreview />
+
+- **`pill`** (default) — the wide stadium transport key.
+- **`round`** — a circular key (superellipse exponent 2). Pair with
+  `material="shiny"` for the machined metal-button look.
+- **`square`** — a squarer, flatter pad (exponent 6): tighter corners
+  and a 3.6mm cap instead of the key's 4.5mm, with the same 0.7mm press
+  travel.
+
+### Grounded shape counterparts
+
+<RenderComparison slug="button-round" dir="components"><GroundedButtonRoundDemo /></RenderComparison>
+<RenderComparison slug="button-square" dir="components"><GroundedButtonSquareDemo /></RenderComparison>
+
 ## Props
 
-Inherits all `ButtonHTMLAttributes<HTMLButtonElement>` props.
+| Prop | Type | Default |
+| --- | --- | --- |
+| `shape` | `"pill" \| "round" \| "square"` | `"pill"` |
+| `material` | `"matte" \| "shiny" \| "glass"` | `"matte"` |
+
+Also inherits all `ButtonHTMLAttributes<HTMLButtonElement>` props.
 
 ## Examples
 

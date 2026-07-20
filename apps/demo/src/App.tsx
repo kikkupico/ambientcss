@@ -525,7 +525,7 @@ export function App() {
               <AmbientKnob value={knob1} onChange={setKnob1} label="Knob" />
             </div>
             <div className="component-cell" data-visible={compView.visible}>
-              <AmbientKnob value={knob2} onChange={setKnob2} label="Knob" />
+              <AmbientKnob value={knob2} onChange={setKnob2} variant="flute" label="Knob" />
             </div>
             <div className="component-cell" data-visible={compView.visible}>
               <AmbientSlider value={slider1} min={0} max={100} onChange={setSlider1} label="Slider" />
@@ -541,6 +541,12 @@ export function App() {
             </div>
             <div className="component-cell" data-visible={compView.visible}>
               <AmbientButton>Button</AmbientButton>
+            </div>
+            <div className="component-cell" data-visible={compView.visible}>
+              <AmbientButton shape="round" material="shiny" aria-label="Round button" />
+            </div>
+            <div className="component-cell" data-visible={compView.visible}>
+              <AmbientButton shape="square">FX</AmbientButton>
             </div>
           </div>
           <div className="comp-led-row" data-visible={compView.visible}>
