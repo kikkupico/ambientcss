@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   AmbientProvider,
   AmbientButton,
@@ -84,6 +84,10 @@ const LIGHT_KNOBS: KnobCfg[] = [
 
 const ORBIT_COUNT = 9;
 const ANIM_DURATION = 800; // ms for preset transitions
+
+// Each cord is a short chain of shiny ambient balls; the topmost sit behind
+// the panel so a pull pays more of them out from under its edge.
+const CHAIN_BEADS = Array.from({ length: 6 });
 
 /* ══════════════════════════════════════════════════════════════════════════
    APP
@@ -221,37 +225,6 @@ export function App() {
   const grooveSectionRef = useRef<HTMLElement>(null);
   const compSectionRef = useRef<HTMLElement>(null);
 
-  /* Header dock ────────────────────────────────────────────────────────────
-     The chips + settings + panel skin fade in as the hero scrolls away.
-     Driven imperatively (a --scroll-p var) so the whole section tree isn't
-     re-rendered on every scroll frame. */
-  const themebarRef = useRef<HTMLElement>(null);
-
-  useLayoutEffect(() => {
-    const update = () => {
-      const heroH = heroRef.current?.offsetHeight || window.innerHeight;
-      const p = Math.max(0, Math.min(1, window.scrollY / (heroH * 0.7)));
-      document.documentElement.style.setProperty("--scroll-p", String(p));
-      themebarRef.current?.classList.toggle("is-docked", p > 0.6);
-    };
-
-    let raf = 0;
-    const onScroll = () => {
-      if (raf) return;
-      raf = requestAnimationFrame(() => { raf = 0; update(); });
-    };
-    const onResize = () => { update(); };
-
-    update();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onResize);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onResize);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, []);
-
   /* Orbit: pointer/touch-driven light direction ───────────────────────── */
   const [orbitLight, setOrbitLight] = useState({ x: -1, y: -1 });
   const orbitGridRef = useRef<HTMLDivElement>(null);
@@ -295,7 +268,6 @@ export function App() {
         onPreset={animateToPreset}
         onCustom={activateCustom}
         onProp={setThemeProp}
-        themebarRef={themebarRef}
       />
 
       {/* ── 1. HERO ──────────────────────────────────────────────────── */}
@@ -643,10 +615,9 @@ type PullCordSwitcherProps = {
   onPreset: (p: ThemePreset) => void;
   onCustom: () => void;
   onProp: (key: keyof AmbientTheme, value: number) => void;
-  themebarRef: React.RefObject<HTMLElement | null>;
 };
 
-function PullCordSwitcher({ theme, activePreset, onPreset, onCustom, onProp, themebarRef }: PullCordSwitcherProps) {
+function PullCordSwitcher({ theme, activePreset, onPreset, onCustom, onProp }: PullCordSwitcherProps) {
   const [consoleOpen, setConsoleOpen] = useState(false);
   // A pull is a transient tug: the cord springs down and snaps back like a
   // real draw cord (the persistent glow, not the position, marks the active
@@ -678,7 +649,7 @@ function PullCordSwitcher({ theme, activePreset, onPreset, onCustom, onProp, the
   const customActive = activePreset === "Custom";
 
   return (
-    <header className="cordbar" ref={themebarRef}>
+    <header className="cordbar">
       <div className={`cord-assembly${consoleOpen ? " is-open" : ""}`} ref={rigRef}>
         {/* One thick slab of the surface itself. Its upper region is the light
             console, parked above the top of the screen; only the bottom lip
@@ -713,9 +684,10 @@ function PullCordSwitcher({ theme, activePreset, onPreset, onCustom, onProp, the
         </div>
 
         {/* Cords hang from the slab's bottom edge. Each label is printed on the
-            panel's revealed lip; below it a simple elevated rod ends in a convex
-            ambient ball, both casting shadows. A pull tugs the cord and it
-            springs back — the highlighted label marks the active one. */}
+            panel's revealed lip; below it a chain of shiny ambient balls (drawn
+            behind the panel) ends in a glass ball. A pull slides the whole chain
+            and ball down and it springs back with almost no bounce — the
+            highlighted label marks the active one. */}
         <div className="cords" role="group" aria-label="Theme">
           {THEME_PRESETS.map((p) => {
             const active = activePreset === p.label;
@@ -730,10 +702,16 @@ function PullCordSwitcher({ theme, activePreset, onPreset, onCustom, onProp, the
                 <span className="cord-name">{p.icon} {p.label}</span>
                 <span
                   key={tugLabel === p.label ? `tug-${tugNonce}` : "rest"}
-                  className={`cord-line ambient amb-surface amb-surface-darker amb-elevation-3${tugLabel === p.label ? " is-tugging" : ""}`}
+                  className={`cord-pull${tugLabel === p.label ? " is-tugging" : ""}`}
                   aria-hidden
-                />
-                <span className="cord-ball ambient amb-surface amb-surface-convex amb-elevation-3 amb-rounded-full" aria-hidden />
+                >
+                  <span className="cord-chain">
+                    {CHAIN_BEADS.map((_, i) => (
+                      <span key={i} className="cord-bead ambient amb-surface amb-mat-shiny amb-rounded-full" />
+                    ))}
+                  </span>
+                  <span className="cord-ball ambient amb-surface amb-elevation-3 amb-rounded-full amb-mat-glass" />
+                </span>
               </button>
             );
           })}
@@ -749,10 +727,16 @@ function PullCordSwitcher({ theme, activePreset, onPreset, onCustom, onProp, the
             <span className="cord-name">⚙ Custom</span>
             <span
               key={tugLabel === "Custom" ? `tug-${tugNonce}` : "rest"}
-              className={`cord-line ambient amb-surface amb-surface-darker amb-elevation-3${tugLabel === "Custom" ? " is-tugging" : ""}`}
+              className={`cord-pull${tugLabel === "Custom" ? " is-tugging" : ""}`}
               aria-hidden
-            />
-            <span className="cord-ball ambient amb-surface amb-surface-convex amb-elevation-3 amb-rounded-full" aria-hidden />
+            >
+              <span className="cord-chain">
+                {CHAIN_BEADS.map((_, i) => (
+                  <span key={i} className="cord-bead ambient amb-surface amb-mat-shiny amb-rounded-full" />
+                ))}
+              </span>
+              <span className="cord-ball ambient amb-surface amb-elevation-3 amb-rounded-full amb-mat-glass" />
+            </span>
           </button>
         </div>
       </div>

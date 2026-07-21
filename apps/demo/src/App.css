@@ -629,11 +629,7 @@ body {
   transform: translateX(-50%);
   z-index: 100;
   width: min(560px, calc(100vw - 16px));
-  opacity: var(--scroll-p, 0);
-  transition: opacity 0.25s ease;
-  pointer-events: none;      /* only grabs the pointer once docked */
 }
-.cordbar.is-docked { pointer-events: auto; }
 
 /* The whole slab + cords, parked up by --reveal so only the lip shows. */
 .cord-assembly {
@@ -645,9 +641,12 @@ body {
 .cord-assembly.is-open { transform: translateY(0); }
 
 /* The slab: the ground's own material, told apart by thickness + shadow.
-   Content is the console; padding-bottom is the lip the cord labels sit on. */
+   Content is the console; padding-bottom is the lip the cord labels sit on.
+   z-index 1 seats it between the chains (behind) and the labels (in front). */
 .cord-panel {
   --lip: 30px;
+  position: relative;
+  z-index: 1;
   border-radius: 0 0 14px 14px;
   padding: 0 16px var(--lip);
 }
@@ -679,13 +678,15 @@ body {
   border-radius: 12px;
   padding: 14px 12px 12px;
 }
-/* Smaller grid so seven knobs fit — turning one shrinks the whole set. */
+/* Seven knobs on one even seven-column grid — a Dieter Rams row: equal
+   columns, equal air, each control centred in its cell. */
 .cord-console-grid {
   --ambx-grid: 3px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 16px 8px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  align-items: start;
+  justify-items: center;
+  gap: 0 6px;
 }
 .cord-console-hint {
   font-size: 7px;
@@ -696,10 +697,11 @@ body {
   text-align: center;
 }
 
-/* Cords hang from the slab. The label row is pulled up onto the lip. */
+/* Cords hang from the slab. The label row is pulled up onto the lip. No
+   z-index here, so each cord part stacks against the slab individually:
+   labels in front of it, chains and balls behind. */
 .cords {
   position: relative;
-  z-index: 2;
   display: flex;
   justify-content: center;
   gap: clamp(10px, 4vw, 40px);
@@ -721,13 +723,15 @@ body {
   align-items: center;
 }
 
-/* Label — printed on the panel's revealed lip, above its cord. */
+/* Label — printed on the panel's revealed lip, in front of the slab. */
 .cord-name {
+  position: relative;
+  z-index: 2;                    /* in front of the slab (z 1) */
   font-size: 9px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   white-space: nowrap;
-  margin-bottom: 12px;           /* clears the lip so the rod hangs below it */
+  margin-bottom: 12px;           /* clears the lip so the chain hangs below it */
   transition: color 0.2s ease;
 }
 .cord.is-active .cord-name { color: var(--amb-highlight-color); }
@@ -737,29 +741,44 @@ body {
   text-decoration: underline;
 }
 
-/* Simple elevated rod — plain material, casts a shadow. A pull tugs it down
-   and it springs back like a real draw cord. */
-.cord-line {
-  width: 4px;
-  height: 24px;
-  border-radius: 2px;
+/* The pull = chain + ball, drawn BEHIND the slab (z 0). A pull slides the
+   whole group down and it retracts with almost no bounce; the panel edge is
+   the housing the chain pays out from. */
+.cord-pull {
+  position: relative;
+  z-index: 0;                    /* behind the slab (z 1) */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-.cord-line.is-tugging {
-  animation: cord-tug 0.62s cubic-bezier(0.34, 1.56, 0.64, 1);
+.cord-pull.is-tugging {
+  animation: cord-tug 0.42s cubic-bezier(0.4, 0, 0.2, 1);   /* near-bounceless */
 }
 @keyframes cord-tug {
-  0%   { height: 24px; }
-  28%  { height: 62px; }   /* yank down */
-  55%  { height: 32px; }   /* overshoot back */
-  78%  { height: 42px; }
-  100% { height: 24px; }   /* settle */
+  0%   { transform: translateY(0); }
+  44%  { transform: translateY(20px); }   /* pays out */
+  100% { transform: translateY(0); }       /* retracts, no overshoot */
 }
 
-/* Convex ambient disc on the cord end. */
+/* Chain of tiny shiny ambient balls. Its top is pulled up behind the panel
+   lip so only the lower balls show at rest. */
+.cord-chain {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  margin-top: -18px;
+}
+.cord-bead {
+  width: 7px;
+  height: 7px;
+}
+
+/* Glass ambient ball on the chain end. */
 .cord-ball {
-  width: 28px;
-  height: 28px;
-  margin-top: -1px;
+  width: 26px;
+  height: 26px;
+  margin-top: 1px;
 }
 
 @media (max-width: 600px) {
