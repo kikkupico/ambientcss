@@ -96,7 +96,7 @@ function App() {
 }
 ```
 
-**Surfaces:** `.amb-surface` `.amb-surface-darker` `.amb-surface-concave` `.amb-surface-convex`
+**Surfaces:** `.amb-surface` `.amb-surface-darker` `.amb-surface-darkest` `.amb-surface-lighter` `.amb-surface-lightest` `.amb-surface-concave` `.amb-surface-convex`
 
 **Edges:** `.amb-chamfer` `.amb-fillet` `.amb-chamfer-2` `.amb-fillet-2`
 

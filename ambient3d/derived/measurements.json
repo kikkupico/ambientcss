@@ -516,6 +516,31 @@
   },
   "calib/surface_darker_default.png": {
     "amb": {
+      "albedo": 0.31,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 61.47430731466939,
+        "noise": 0.0048767676020008395,
+        "srgb_pct": 58.19819126724764
+      }
+    }
+  },
+  "calib/surface_darkest_default.png": {
+    "amb": {
       "albedo": 0.06,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
@@ -561,6 +586,56 @@
         "lstar": 91.13361764043056,
         "noise": 0.007103417143002184,
         "srgb_pct": 90.01843228031956
+      }
+    }
+  },
+  "calib/surface_lighter_default.png": {
+    "amb": {
+      "albedo": 0.91,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 94.90666606575357,
+        "noise": 0.007409671783960569,
+        "srgb_pct": 94.24176198257082
+      }
+    }
+  },
+  "calib/surface_lightest_default.png": {
+    "amb": {
+      "albedo": 0.95,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 96.50433624323304,
+        "noise": 0.007535354812548347,
+        "srgb_pct": 96.04102668845317
       }
     }
   },
@@ -2068,6 +2143,231 @@
   },
   "sweeps/darker/fill_light_intensity=0.35.png": {
     "amb": {
+      "albedo": 0.31,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.35,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 55.90999258229546,
+        "noise": 0.00550140482195284,
+        "srgb_pct": 52.53186501452433
+      }
+    }
+  },
+  "sweeps/darker/fill_light_intensity=0.7.png": {
+    "amb": {
+      "albedo": 0.31,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 61.47430510647821,
+        "noise": 0.0048767232936808525,
+        "srgb_pct": 58.19818899782134
+      }
+    }
+  },
+  "sweeps/darker/fill_light_intensity=0.png": {
+    "amb": {
+      "albedo": 0.31,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.0,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 49.31327418254506,
+        "noise": 0.00640895515860198,
+        "srgb_pct": 45.955498819898345
+      }
+    }
+  },
+  "sweeps/darker/key_light_intensity=0.1.png": {
+    "amb": {
+      "albedo": 0.31,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.1,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 44.113825281358054,
+        "noise": 0.0018225047400900639,
+        "srgb_pct": 40.88717547204069
+      }
+    }
+  },
+  "sweeps/darker/key_light_intensity=0.3.png": {
+    "amb": {
+      "albedo": 0.31,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.3,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 49.35930702026596,
+        "noise": 0.0026268383269542326,
+        "srgb_pct": 46.00083514887437
+      }
+    }
+  },
+  "sweeps/darker/key_light_intensity=0.5.png": {
+    "amb": {
+      "albedo": 0.31,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.5,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 53.87332179137937,
+        "noise": 0.0034690606067177155,
+        "srgb_pct": 50.48468137254902
+      }
+    }
+  },
+  "sweeps/darker/key_light_intensity=0.7.png": {
+    "amb": {
+      "albedo": 0.31,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.7,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 57.87099105711174,
+        "noise": 0.0042186301116211794,
+        "srgb_pct": 54.51673701888162
+      }
+    }
+  },
+  "sweeps/darker/key_light_intensity=0.9.png": {
+    "amb": {
+      "albedo": 0.31,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 61.47430510647821,
+        "noise": 0.004876838871630696,
+        "srgb_pct": 58.19818899782134
+      }
+    }
+  },
+  "sweeps/darker/key_light_intensity=1.png": {
+    "amb": {
+      "albedo": 0.31,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 1.0,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 63.155603540202264,
+        "noise": 0.005187243251282443,
+        "srgb_pct": 59.93077342047929
+      }
+    }
+  },
+  "sweeps/darkest/fill_light_intensity=0.35.png": {
+    "amb": {
       "albedo": 0.06,
       "chamfer": 0.0,
       "chamfer_width": 1.0,
@@ -2091,7 +2391,7 @@
       }
     }
   },
-  "sweeps/darker/fill_light_intensity=0.7.png": {
+  "sweeps/darkest/fill_light_intensity=0.7.png": {
     "amb": {
       "albedo": 0.06,
       "chamfer": 0.0,
@@ -2116,7 +2416,7 @@
       }
     }
   },
-  "sweeps/darker/fill_light_intensity=0.png": {
+  "sweeps/darkest/fill_light_intensity=0.png": {
     "amb": {
       "albedo": 0.06,
       "chamfer": 0.0,
@@ -2141,7 +2441,7 @@
       }
     }
   },
-  "sweeps/darker/key_light_intensity=0.1.png": {
+  "sweeps/darkest/key_light_intensity=0.1.png": {
     "amb": {
       "albedo": 0.06,
       "chamfer": 0.0,
@@ -2166,7 +2466,7 @@
       }
     }
   },
-  "sweeps/darker/key_light_intensity=0.3.png": {
+  "sweeps/darkest/key_light_intensity=0.3.png": {
     "amb": {
       "albedo": 0.06,
       "chamfer": 0.0,
@@ -2191,7 +2491,7 @@
       }
     }
   },
-  "sweeps/darker/key_light_intensity=0.5.png": {
+  "sweeps/darkest/key_light_intensity=0.5.png": {
     "amb": {
       "albedo": 0.06,
       "chamfer": 0.0,
@@ -2216,7 +2516,7 @@
       }
     }
   },
-  "sweeps/darker/key_light_intensity=0.7.png": {
+  "sweeps/darkest/key_light_intensity=0.7.png": {
     "amb": {
       "albedo": 0.06,
       "chamfer": 0.0,
@@ -2241,7 +2541,7 @@
       }
     }
   },
-  "sweeps/darker/key_light_intensity=0.9.png": {
+  "sweeps/darkest/key_light_intensity=0.9.png": {
     "amb": {
       "albedo": 0.06,
       "chamfer": 0.0,
@@ -2266,7 +2566,7 @@
       }
     }
   },
-  "sweeps/darker/key_light_intensity=1.png": {
+  "sweeps/darkest/key_light_intensity=1.png": {
     "amb": {
       "albedo": 0.06,
       "chamfer": 0.0,
@@ -4983,6 +5283,456 @@
         "floor_over_ref": 0.996889867897019,
         "floor_srgb_pct": 89.61070261437911,
         "v_ref": 0.8989027323892522
+      }
+    }
+  },
+  "sweeps/lighter/fill_light_intensity=0.35.png": {
+    "amb": {
+      "albedo": 0.91,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.35,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 86.93996182775196,
+        "noise": 0.008396119096667052,
+        "srgb_pct": 85.36779230210604
+      }
+    }
+  },
+  "sweeps/lighter/fill_light_intensity=0.7.png": {
+    "amb": {
+      "albedo": 0.91,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 94.90667010329207,
+        "noise": 0.007409608129746503,
+        "srgb_pct": 94.24176652142339
+      }
+    }
+  },
+  "sweeps/lighter/fill_light_intensity=0.png": {
+    "amb": {
+      "albedo": 0.91,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.0,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 77.51081490416935,
+        "noise": 0.009870966861290225,
+        "srgb_pct": 75.08556871822806
+      }
+    }
+  },
+  "sweeps/lighter/key_light_intensity=0.1.png": {
+    "amb": {
+      "albedo": 0.91,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.1,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 70.05548052917602,
+        "noise": 0.0020629754787975917,
+        "srgb_pct": 67.13620415758896
+      }
+    }
+  },
+  "sweeps/lighter/key_light_intensity=0.3.png": {
+    "amb": {
+      "albedo": 0.91,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.3,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 77.55818192088077,
+        "noise": 0.0036301019280720282,
+        "srgb_pct": 75.13659676833699
+      }
+    }
+  },
+  "sweeps/lighter/key_light_intensity=0.5.png": {
+    "amb": {
+      "albedo": 0.91,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.5,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 84.02238776838124,
+        "noise": 0.005078031030797309,
+        "srgb_pct": 82.16000590050837
+      }
+    }
+  },
+  "sweeps/lighter/key_light_intensity=0.7.png": {
+    "amb": {
+      "albedo": 0.91,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.7,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 89.74238042699541,
+        "noise": 0.006324731072141837,
+        "srgb_pct": 88.4704543391431
+      }
+    }
+  },
+  "sweeps/lighter/key_light_intensity=0.9.png": {
+    "amb": {
+      "albedo": 0.91,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 94.90666404698433,
+        "noise": 0.0074094774022754935,
+        "srgb_pct": 94.24175971314453
+      }
+    }
+  },
+  "sweeps/lighter/key_light_intensity=1.png": {
+    "amb": {
+      "albedo": 0.91,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 1.0,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 97.3134375567123,
+        "noise": 0.007890951695449141,
+        "srgb_pct": 96.95466594045025
+      }
+    }
+  },
+  "sweeps/lightest/fill_light_intensity=0.35.png": {
+    "amb": {
+      "albedo": 0.95,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.35,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 88.42193378231264,
+        "noise": 0.008545539906203908,
+        "srgb_pct": 87.005943627451
+      }
+    }
+  },
+  "sweeps/lightest/fill_light_intensity=0.7.png": {
+    "amb": {
+      "albedo": 0.95,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 96.50438049763122,
+        "noise": 0.0075354110741574195,
+        "srgb_pct": 96.04107661583153
+      }
+    }
+  },
+  "sweeps/lightest/fill_light_intensity=0.png": {
+    "amb": {
+      "albedo": 0.95,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.0,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 78.85872792393062,
+        "noise": 0.01004843902959565,
+        "srgb_pct": 76.54017792302106
+      }
+    }
+  },
+  "sweeps/lightest/key_light_intensity=0.1.png": {
+    "amb": {
+      "albedo": 0.95,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.1,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 71.29450411974146,
+        "noise": 0.002112270844511545,
+        "srgb_pct": 68.44581517792301
+      }
+    }
+  },
+  "sweeps/lightest/key_light_intensity=0.3.png": {
+    "amb": {
+      "albedo": 0.95,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.3,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 78.90725865478812,
+        "noise": 0.0036927188358246293,
+        "srgb_pct": 76.59264705882356
+      }
+    }
+  },
+  "sweeps/lightest/key_light_intensity=0.5.png": {
+    "amb": {
+      "albedo": 0.95,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.5,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 85.4631991345542,
+        "noise": 0.005163778965509278,
+        "srgb_pct": 83.74125363108207
+      }
+    }
+  },
+  "sweeps/lightest/key_light_intensity=0.7.png": {
+    "amb": {
+      "albedo": 0.95,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.7,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 91.26656626281678,
+        "noise": 0.006436992467456479,
+        "srgb_pct": 90.1666235475672
+      }
+    }
+  },
+  "sweeps/lightest/key_light_intensity=0.9.png": {
+    "amb": {
+      "albedo": 0.95,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 0.9,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 96.50435837043267,
+        "noise": 0.007535420347561432,
+        "srgb_pct": 96.04105165214234
+      }
+    }
+  },
+  "sweeps/lightest/key_light_intensity=1.png": {
+    "amb": {
+      "albedo": 0.95,
+      "chamfer": 0.0,
+      "chamfer_width": 1.0,
+      "elevation": 0.0,
+      "emit": null,
+      "fill_light_intensity": 0.7,
+      "fillet": 0.0,
+      "fillet_width": 1.0,
+      "key_light_intensity": 1.0,
+      "light_x": -1.0,
+      "light_y": -1.0,
+      "mat": "matte",
+      "surface": "flat",
+      "thickness": 0.0
+    },
+    "metrics": {
+      "surface_lightness": {
+        "lstar": 98.92787440029348,
+        "noise": 0.007660509256597491,
+        "srgb_pct": 98.78256172839505
       }
     }
   },

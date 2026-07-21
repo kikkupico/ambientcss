@@ -112,8 +112,18 @@ SHEET_PROUD_MM = 0.02     # how far an embedded sheet sits above the ground
 SAGITTA_MM = 4.0          # dish/dome depth of the curved surface variants
                           # (deep enough that its shading dominates the
                           # residual plate-wide irradiance gradient)
-DARKER_ALBEDO = 0.06      # .amb-surface-darker plate (~30% of the default
+DARKER_ALBEDO = 0.31      # .amb-surface-darker plate (~58% of the default
+                          # lightness at the (0.9, 0.7) defaults) — grooves
+                          # and mid-tone circle fills compose with this
+DARKEST_ALBEDO = 0.06     # .amb-surface-darkest plate (~27% of the default
+                          # lightness at the (0.9, 0.7) defaults) — the
+                          # original .amb-surface-darker tone, kept for
+                          # spots that need the deepest contrast
+LIGHTER_ALBEDO = 0.91     # .amb-surface-lighter plate (~94% of the default
                           # lightness at the (0.9, 0.7) defaults)
+LIGHTEST_ALBEDO = 0.95    # .amb-surface-lightest plate (~96% of the default
+                          # lightness at the (0.9, 0.7) defaults) — near the
+                          # albedo-1.0 physical ceiling above GROUND_ALBEDO
 
 # Defaults mirror the :root block of packages/ambient-css/src/ambient.css.
 AMB_DEFAULTS = {

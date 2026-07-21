@@ -225,11 +225,59 @@
       }
     },
     {
+      "id": "surface_lighter_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": {
+        "albedo": 0.91
+      },
+      "css": {
+        "classes": [
+          "amb-surface-lighter"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "surface_lightness"
+      ],
+      "docs": {
+        "publish": true,
+        "slug": "surface-lighter"
+      }
+    },
+    {
+      "id": "surface_lightest_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": {
+        "albedo": 0.95
+      },
+      "css": {
+        "classes": [
+          "amb-surface-lightest"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "surface_lightness"
+      ],
+      "docs": {
+        "publish": true,
+        "slug": "surface-lightest"
+      }
+    },
+    {
       "id": "surface_darker_default",
       "kind": "effect",
       "builder": "plate",
       "amb": {
-        "albedo": 0.06
+        "albedo": 0.31
       },
       "css": {
         "classes": [
@@ -246,6 +294,30 @@
       "docs": {
         "publish": true,
         "slug": "surface-darker"
+      }
+    },
+    {
+      "id": "surface_darkest_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": {
+        "albedo": 0.06
+      },
+      "css": {
+        "classes": [
+          "amb-surface-darkest"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "surface_lightness"
+      ],
+      "docs": {
+        "publish": true,
+        "slug": "surface-darkest"
       }
     },
     {
@@ -1234,14 +1306,140 @@
       ]
     },
     {
+      "id": "lighter",
+      "builder": "plate",
+      "amb": {
+        "albedo": 0.91
+      },
+      "css": {
+        "classes": [
+          "amb-surface-lighter"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "surface_lightness"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "key_light_intensity": [
+              0.1,
+              0.3,
+              0.5,
+              0.7,
+              0.9,
+              1.0
+            ]
+          }
+        },
+        {
+          "vary": {
+            "fill_light_intensity": [
+              0.0,
+              0.35,
+              0.7
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "lightest",
+      "builder": "plate",
+      "amb": {
+        "albedo": 0.95
+      },
+      "css": {
+        "classes": [
+          "amb-surface-lightest"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "surface_lightness"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "key_light_intensity": [
+              0.1,
+              0.3,
+              0.5,
+              0.7,
+              0.9,
+              1.0
+            ]
+          }
+        },
+        {
+          "vary": {
+            "fill_light_intensity": [
+              0.0,
+              0.35,
+              0.7
+            ]
+          }
+        }
+      ]
+    },
+    {
       "id": "darker",
+      "builder": "plate",
+      "amb": {
+        "albedo": 0.31
+      },
+      "css": {
+        "classes": [
+          "amb-surface-darker"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "surface_lightness"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "key_light_intensity": [
+              0.1,
+              0.3,
+              0.5,
+              0.7,
+              0.9,
+              1.0
+            ]
+          }
+        },
+        {
+          "vary": {
+            "fill_light_intensity": [
+              0.0,
+              0.35,
+              0.7
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "darkest",
       "builder": "plate",
       "amb": {
         "albedo": 0.06
       },
       "css": {
         "classes": [
-          "amb-surface-darker"
+          "amb-surface-darkest"
         ],
         "size": [
           80,

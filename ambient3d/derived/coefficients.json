@@ -26,6 +26,14 @@
     "r2_end": 0.9397
   },
   "darker": {
+    "f_pct": 17.4,
+    "floor_pct": 27.26,
+    "k_pct": 20.95,
+    "max_resid_pct": 0.649,
+    "model": "L% = k * key_intensity + f * fill_intensity + floor",
+    "r2": 0.99642
+  },
+  "darkest": {
     "f_pct": 8.76,
     "floor_pct": 11.03,
     "k_pct": 10.56,
@@ -79,6 +87,22 @@
     "r2_shadow_alpha": 0.9528,
     "sa0_alpha": 0.308,
     "sa_alpha_per_contrast": 0.238
+  },
+  "lighter": {
+    "f_pct": 27.23,
+    "floor_pct": 45.81,
+    "k_pct": 32.81,
+    "max_resid_pct": 1.012,
+    "model": "L% = k * key_intensity + f * fill_intensity + floor",
+    "r2": 0.99646
+  },
+  "lightest": {
+    "f_pct": 27.71,
+    "floor_pct": 46.74,
+    "k_pct": 33.39,
+    "max_resid_pct": 1.034,
+    "model": "L% = k * key_intensity + f * fill_intensity + floor",
+    "r2": 0.99642
   },
   "shadow": {
     "A_offset_px_per_mm": 0.8526,

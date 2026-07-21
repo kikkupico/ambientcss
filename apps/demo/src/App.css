@@ -622,3 +622,249 @@ body {
 .moving-circle {
   animation: slide-out 3s ease-in-out infinite;
 }
+
+/* ==========================================================================
+   THEME BAR (header) — global light control: presets + settings pulldown
+   ========================================================================== */
+
+.themebar {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: min(960px, calc(100vw - 32px));
+  padding: 10px 16px;
+}
+
+/* Panel skin — fades in as the bar docks (opacity rides the scroll var). */
+.themebar-skin {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: var(--scroll-p, 0);
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+}
+
+.themebar-brand {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 15px;
+  letter-spacing: 0.14em;
+  color: var(--amb-label);
+  white-space: nowrap;
+  padding-left: 4px;
+  transform-origin: center;
+  pointer-events: none;
+}
+
+/* Subtitle sitting under the big wordmark; fades out as the title docks. */
+.hero-morph-sub {
+  position: fixed;
+  top: 52vh;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  text-align: center;
+  font-size: clamp(11px, 1.6vw, 16px);
+  letter-spacing: 0.55em;
+  text-transform: lowercase;
+  color: var(--amb-lume);
+  opacity: calc(1 - var(--scroll-p, 0));
+  pointer-events: none;
+}
+
+.themebar-presets {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: 8px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+  justify-content: center;
+  opacity: var(--scroll-p, 0);
+  transition: opacity 0.2s ease;
+}
+
+/* Preset = an LED stacked over a real AmbientButton. */
+.preset-item {
+  display: inline-grid;
+  justify-items: center;
+  gap: 5px;
+}
+.preset-led {
+  width: 7px;
+  height: 7px;
+}
+.preset-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.preset-icon { font-size: 12px; line-height: 1; }
+
+/* Slim the AmbientButton caps down to header scale. */
+.themebar .preset-btn,
+.themebar .settings-btn { min-width: 0; }
+.themebar .preset-btn .amb-button-cap,
+.themebar .settings-btn .amb-button-cap {
+  padding: 6px 11px;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+}
+.preset-btn.is-active .amb-button-cap { color: var(--amb-highlight-color); }
+.settings-caret { font-size: 8px; transition: transform 0.2s ease; }
+.settings-caret.is-open { transform: rotate(180deg); }
+.settings-gear { font-size: 12px; }
+
+.themebar-settings {
+  position: relative;
+  z-index: 3;
+  opacity: var(--scroll-p, 0);
+  transition: opacity 0.2s ease;
+}
+
+/* Chips + settings only interactive once the bar has docked. */
+.themebar:not(.is-docked) .themebar-presets,
+.themebar:not(.is-docked) .themebar-settings {
+  pointer-events: none;
+}
+
+/* Settings pulldown — an AmbientPanel holding a console of AmbientKnobs. */
+.settings-menu {
+  position: absolute;
+  top: calc(100% + 14px);
+  right: 0;
+  width: min(372px, calc(100vw - 32px));
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  z-index: 110;
+  animation: settings-in 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes settings-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.settings-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 8px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--amb-lume);
+}
+.settings-preset {
+  margin-left: auto;
+  color: var(--amb-highlight-color);
+  letter-spacing: 0.2em;
+}
+
+/* The console runs on a smaller grid so seven knobs fit — turning the
+   knob shrinks the whole ambient component set proportionally. */
+.settings-console {
+  --ambx-grid: 3px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px 6px;
+}
+.settings-hint {
+  font-size: 7px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--amb-lume);
+  opacity: 0.6;
+  text-align: center;
+  margin-top: 2px;
+}
+
+@media (max-width: 640px) {
+  .themebar {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 12px;
+  }
+  .themebar-presets { order: 3; width: 100%; margin: 0; }
+  .settings-word { display: none; }
+  .settings-menu { width: min(280px, calc(100vw - 40px)); }
+}
+
+/* ==========================================================================
+   GROOVE scene — grounded recesses
+   ========================================================================== */
+
+.groove-wall {
+  display: flex;
+  gap: clamp(28px, 5vw, 56px);
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.groove-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+.groove-swatch {
+  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.groove-swatch[data-visible="false"] { opacity: 0; transform: translateY(28px); }
+.groove-swatch[data-visible="true"]  { opacity: 1; transform: none; }
+
+/* A lume-floored channel echoes the fader/slider tracks — dark in bright
+   light, glowing when the room goes dark. */
+.groove-lume { background-color: var(--amb-lume); }
+
+/* .amb-groove's own floor sits within a hair of the open ground (see its
+   comment in ambient.css); pairing with .amb-surface-darker's formula
+   here gives the well/inset recesses a floor that reads as visibly
+   deeper material, not just a shadow band on the same page color. */
+.groove-darker {
+  background-color: hsl(
+    var(--amb-light-hue)
+    var(--amb-light-saturation)
+    calc(
+      var(--amb-key-light-intensity) * 21% +
+        var(--amb-fill-light-intensity) * 17.4% + 27.3%
+    )
+  );
+}
+
+.groove-channel {
+  width: clamp(150px, 24vw, 240px);
+  height: 28px;
+  border-radius: 999px;
+  --amb-thickness: 0.4;
+}
+.groove-well {
+  width: clamp(96px, 15vw, 140px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  --amb-thickness: 0.5;
+}
+.groove-inset {
+  width: clamp(130px, 20vw, 180px);
+  height: 116px;
+  border-radius: 16px;
+  --amb-thickness: 0.5;
+}
+.groove-label {
+  font-size: 8px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--amb-lume);
+}

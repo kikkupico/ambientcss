@@ -92,12 +92,6 @@
   --amb-thickness: 2;
 }
 
-.amb-chamfer-minus-1 {
-  --amb-chamfer: 1;
-  --amb-chamfer-width: -1;
-  --amb-thickness: 1;
-}
-
 .amb-fillet {
   --amb-fillet: 1;
   --amb-thickness: 1;
@@ -107,12 +101,6 @@
   --amb-fillet: 1;
   --amb-fillet-width: 2;
   --amb-thickness: 2;
-}
-
-.amb-fillet-minus-1 {
-  --amb-fillet: 1;
-  --amb-fillet-width: -1;
-  --amb-thickness: 1;
 }
 
 /* A groove is a recess CUT into material, so like the edge treatments it
@@ -334,15 +322,63 @@
 }
 
 .amb-surface-darker {
-  /* Grounded fit (ambient3d/derived/notes/darker.md): a dark plate under
-     the same lights — affine in both intensities like .amb-surface,
-     R^2 0.996; reproduces the old 27% at the (0.9, 0.7) defaults. */
+  /* Grounded fit (ambient3d/derived/notes/darker.md): a mid-tone plate
+     (albedo 0.31) under the same lights — affine in both intensities
+     like .amb-surface, R^2 0.996; reproduces 58% at the (0.9, 0.7)
+     defaults. */
+  background-color: hsl(
+    var(--amb-light-hue)
+    var(--amb-light-saturation)
+    calc(
+      var(--amb-key-light-intensity) * 21% +
+        var(--amb-fill-light-intensity) * 17.4% + 27.3%
+    )
+  );
+}
+
+.amb-surface-darkest {
+  /* Grounded fit (ambient3d/derived/notes/darkest.md): a dark plate
+     (albedo 0.06 — the original .amb-surface-darker tone) under the same
+     lights — affine in both intensities like .amb-surface, R^2 0.996;
+     reproduces 27% at the (0.9, 0.7) defaults. */
   background-color: hsl(
     var(--amb-light-hue)
     var(--amb-light-saturation)
     calc(
       var(--amb-key-light-intensity) * 10.6% +
         var(--amb-fill-light-intensity) * 8.8% + 11%
+    )
+  );
+}
+
+.amb-surface-lighter {
+  /* Grounded fit (ambient3d/derived/notes/lighter.md): a near-white plate
+     (albedo 0.91, above the .amb-surface reference ground's 0.82) under
+     the same lights — affine in both intensities like .amb-surface,
+     R^2 0.996; reproduces 94% at the (0.9, 0.7) defaults. Headroom above
+     .amb-surface is physically narrow (a Lambertian plate caps near
+     albedo 1.0), so this and .amb-surface-lightest sit close together. */
+  background-color: hsl(
+    var(--amb-light-hue)
+    var(--amb-light-saturation)
+    calc(
+      var(--amb-key-light-intensity) * 32.8% +
+        var(--amb-fill-light-intensity) * 27.2% + 45.8%
+    )
+  );
+}
+
+.amb-surface-lightest {
+  /* Grounded fit (ambient3d/derived/notes/lightest.md): a near-white plate
+     (albedo 0.95) under the same lights — affine in both intensities
+     like .amb-surface, R^2 0.996; reproduces 96% at the (0.9, 0.7)
+     defaults. */
+  background-color: hsl(
+    var(--amb-light-hue)
+    var(--amb-light-saturation)
+    calc(
+      var(--amb-key-light-intensity) * 33.4% +
+        var(--amb-fill-light-intensity) * 27.7% + 46.7%
     )
   );
 }

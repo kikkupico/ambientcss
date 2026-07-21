@@ -634,6 +634,22 @@
   },
   "calib/surface_darker_default.png": {
     "surface_lightness.lstar": {
+      "css": 60.0444,
+      "diff": 1.4299,
+      "ok": true,
+      "render": 61.4743,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 56.732,
+      "diff": 1.4662,
+      "ok": true,
+      "render": 58.1982,
+      "tol": 3.0
+    }
+  },
+  "calib/surface_darkest_default.png": {
+    "surface_lightness.lstar": {
       "css": 27.6815,
       "diff": 1.1102,
       "ok": true,
@@ -661,6 +677,38 @@
       "diff": 0.0469,
       "ok": true,
       "render": 90.0184,
+      "tol": 3.0
+    }
+  },
+  "calib/surface_lighter_default.png": {
+    "surface_lightness.lstar": {
+      "css": 94.7962,
+      "diff": 0.1104,
+      "ok": true,
+      "render": 94.9067,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 94.1176,
+      "diff": 0.1241,
+      "ok": true,
+      "render": 94.2418,
+      "tol": 3.0
+    }
+  },
+  "calib/surface_lightest_default.png": {
+    "surface_lightness.lstar": {
+      "css": 96.5375,
+      "diff": 0.0332,
+      "ok": true,
+      "render": 96.5043,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 96.0784,
+      "diff": 0.0374,
+      "ok": true,
+      "render": 96.041,
       "tol": 3.0
     }
   },
@@ -3390,6 +3438,150 @@
   },
   "sweeps/darker/fill_light_intensity=0.35.png": {
     "surface_lightness.lstar": {
+      "css": 53.8462,
+      "diff": 2.0638,
+      "ok": true,
+      "render": 55.91,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 50.4575,
+      "diff": 2.0743,
+      "ok": true,
+      "render": 52.5319,
+      "tol": 3.0
+    }
+  },
+  "sweeps/darker/fill_light_intensity=0.7.png": {
+    "surface_lightness.lstar": {
+      "css": 60.0444,
+      "diff": 1.4299,
+      "ok": true,
+      "render": 61.4743,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 56.732,
+      "diff": 1.4662,
+      "ok": true,
+      "render": 58.1982,
+      "tol": 3.0
+    }
+  },
+  "sweeps/darker/fill_light_intensity=0.png": {
+    "surface_lightness.lstar": {
+      "css": 47.6407,
+      "diff": 1.6725,
+      "ok": true,
+      "render": 49.3133,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 44.3137,
+      "diff": 1.6418,
+      "ok": true,
+      "render": 45.9555,
+      "tol": 3.0
+    }
+  },
+  "sweeps/darker/key_light_intensity=0.1.png": {
+    "surface_lightness.lstar": {
+      "css": 43.0562,
+      "diff": 1.0576,
+      "ok": true,
+      "render": 44.1138,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 39.8693,
+      "diff": 1.0179,
+      "ok": true,
+      "render": 40.8872,
+      "tol": 3.0
+    }
+  },
+  "sweeps/darker/key_light_intensity=0.3.png": {
+    "surface_lightness.lstar": {
+      "css": 47.2396,
+      "diff": 2.1197,
+      "ok": true,
+      "render": 49.3593,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 43.9216,
+      "diff": 2.0793,
+      "ok": true,
+      "render": 46.0008,
+      "tol": 3.0
+    }
+  },
+  "sweeps/darker/key_light_intensity=0.5.png": {
+    "surface_lightness.lstar": {
+      "css": 51.3549,
+      "diff": 2.5184,
+      "ok": true,
+      "render": 53.8733,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 47.9739,
+      "diff": 2.5108,
+      "ok": true,
+      "render": 50.4847,
+      "tol": 3.0
+    }
+  },
+  "sweeps/darker/key_light_intensity=0.7.png": {
+    "surface_lightness.lstar": {
+      "css": 55.7974,
+      "diff": 2.0736,
+      "ok": true,
+      "render": 57.871,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 52.4183,
+      "diff": 2.0984,
+      "ok": true,
+      "render": 54.5167,
+      "tol": 3.0
+    }
+  },
+  "sweeps/darker/key_light_intensity=0.9.png": {
+    "surface_lightness.lstar": {
+      "css": 60.0444,
+      "diff": 1.4299,
+      "ok": true,
+      "render": 61.4743,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 56.732,
+      "diff": 1.4662,
+      "ok": true,
+      "render": 58.1982,
+      "tol": 3.0
+    }
+  },
+  "sweeps/darker/key_light_intensity=1.png": {
+    "surface_lightness.lstar": {
+      "css": 62.0822,
+      "diff": 1.0734,
+      "ok": true,
+      "render": 63.1556,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 58.8235,
+      "diff": 1.1072,
+      "ok": true,
+      "render": 59.9308,
+      "tol": 3.0
+    }
+  },
+  "sweeps/darkest/fill_light_intensity=0.35.png": {
+    "surface_lightness.lstar": {
       "css": 24.2716,
       "diff": 1.3014,
       "ok": true,
@@ -3404,7 +3596,7 @@
       "tol": 3.0
     }
   },
-  "sweeps/darker/fill_light_intensity=0.7.png": {
+  "sweeps/darkest/fill_light_intensity=0.7.png": {
     "surface_lightness.lstar": {
       "css": 27.6815,
       "diff": 1.1102,
@@ -3420,7 +3612,7 @@
       "tol": 3.0
     }
   },
-  "sweeps/darker/fill_light_intensity=0.png": {
+  "sweeps/darkest/fill_light_intensity=0.png": {
     "surface_lightness.lstar": {
       "css": 20.9409,
       "diff": 0.8358,
@@ -3436,7 +3628,7 @@
       "tol": 3.0
     }
   },
-  "sweeps/darker/key_light_intensity=0.1.png": {
+  "sweeps/darkest/key_light_intensity=0.1.png": {
     "surface_lightness.lstar": {
       "css": 18.1591,
       "diff": 0.5982,
@@ -3452,7 +3644,7 @@
       "tol": 3.0
     }
   },
-  "sweeps/darker/key_light_intensity=0.3.png": {
+  "sweeps/darkest/key_light_intensity=0.3.png": {
     "surface_lightness.lstar": {
       "css": 20.7878,
       "diff": 0.9969,
@@ -3468,7 +3660,7 @@
       "tol": 3.0
     }
   },
-  "sweeps/darker/key_light_intensity=0.5.png": {
+  "sweeps/darkest/key_light_intensity=0.5.png": {
     "surface_lightness.lstar": {
       "css": 23.0687,
       "diff": 1.3272,
@@ -3484,7 +3676,7 @@
       "tol": 3.0
     }
   },
-  "sweeps/darker/key_light_intensity=0.7.png": {
+  "sweeps/darkest/key_light_intensity=0.7.png": {
     "surface_lightness.lstar": {
       "css": 25.3168,
       "diff": 1.3891,
@@ -3500,7 +3692,7 @@
       "tol": 3.0
     }
   },
-  "sweeps/darker/key_light_intensity=0.9.png": {
+  "sweeps/darkest/key_light_intensity=0.9.png": {
     "surface_lightness.lstar": {
       "css": 27.6815,
       "diff": 1.1102,
@@ -3516,7 +3708,7 @@
       "tol": 3.0
     }
   },
-  "sweeps/darker/key_light_intensity=1.png": {
+  "sweeps/darkest/key_light_intensity=1.png": {
     "surface_lightness.lstar": {
       "css": 28.706,
       "diff": 1.0581,
@@ -9279,6 +9471,294 @@
       "ok": true,
       "render": 0.8989,
       "tol": 0.04
+    }
+  },
+  "sweeps/lighter/fill_light_intensity=0.35.png": {
+    "surface_lightness.lstar": {
+      "css": 85.9836,
+      "diff": 0.9564,
+      "ok": true,
+      "render": 86.94,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 84.3137,
+      "diff": 1.0541,
+      "ok": true,
+      "render": 85.3678,
+      "tol": 3.0
+    }
+  },
+  "sweeps/lighter/fill_light_intensity=0.7.png": {
+    "surface_lightness.lstar": {
+      "css": 94.7962,
+      "diff": 0.1104,
+      "ok": true,
+      "render": 94.9067,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 94.1176,
+      "diff": 0.1241,
+      "ok": true,
+      "render": 94.2418,
+      "tol": 3.0
+    }
+  },
+  "sweeps/lighter/fill_light_intensity=0.png": {
+    "surface_lightness.lstar": {
+      "css": 76.9759,
+      "diff": 0.5349,
+      "ok": true,
+      "render": 77.5108,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 74.5098,
+      "diff": 0.5758,
+      "ok": true,
+      "render": 75.0856,
+      "tol": 3.0
+    }
+  },
+  "sweeps/lighter/key_light_intensity=0.1.png": {
+    "surface_lightness.lstar": {
+      "css": 69.8582,
+      "diff": 0.1973,
+      "ok": true,
+      "render": 70.0555,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 66.9281,
+      "diff": 0.2081,
+      "ok": true,
+      "render": 67.1362,
+      "tol": 3.0
+    }
+  },
+  "sweeps/lighter/key_light_intensity=0.3.png": {
+    "surface_lightness.lstar": {
+      "css": 76.2461,
+      "diff": 1.3121,
+      "ok": true,
+      "render": 77.5582,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 73.7255,
+      "diff": 1.4111,
+      "ok": true,
+      "render": 75.1366,
+      "tol": 3.0
+    }
+  },
+  "sweeps/lighter/key_light_intensity=0.5.png": {
+    "surface_lightness.lstar": {
+      "css": 82.4054,
+      "diff": 1.617,
+      "ok": true,
+      "render": 84.0224,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 80.3922,
+      "diff": 1.7678,
+      "ok": true,
+      "render": 82.16,
+      "tol": 3.0
+    }
+  },
+  "sweeps/lighter/key_light_intensity=0.7.png": {
+    "surface_lightness.lstar": {
+      "css": 88.7057,
+      "diff": 1.0367,
+      "ok": true,
+      "render": 89.7424,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 87.3203,
+      "diff": 1.1502,
+      "ok": true,
+      "render": 88.4705,
+      "tol": 3.0
+    }
+  },
+  "sweeps/lighter/key_light_intensity=0.9.png": {
+    "surface_lightness.lstar": {
+      "css": 94.7962,
+      "diff": 0.1104,
+      "ok": true,
+      "render": 94.9067,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 94.1176,
+      "diff": 0.1241,
+      "ok": true,
+      "render": 94.2418,
+      "tol": 3.0
+    }
+  },
+  "sweeps/lighter/key_light_intensity=1.png": {
+    "surface_lightness.lstar": {
+      "css": 97.8101,
+      "diff": 0.4967,
+      "ok": true,
+      "render": 97.3134,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 97.5163,
+      "diff": 0.5617,
+      "ok": true,
+      "render": 96.9547,
+      "tol": 3.0
+    }
+  },
+  "sweeps/lightest/fill_light_intensity=0.35.png": {
+    "surface_lightness.lstar": {
+      "css": 87.406,
+      "diff": 1.0159,
+      "ok": true,
+      "render": 88.4219,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 85.8824,
+      "diff": 1.1236,
+      "ok": true,
+      "render": 87.0059,
+      "tol": 3.0
+    }
+  },
+  "sweeps/lightest/fill_light_intensity=0.7.png": {
+    "surface_lightness.lstar": {
+      "css": 96.5375,
+      "diff": 0.0331,
+      "ok": true,
+      "render": 96.5044,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 96.0784,
+      "diff": 0.0374,
+      "ok": true,
+      "render": 96.0411,
+      "tol": 3.0
+    }
+  },
+  "sweeps/lightest/fill_light_intensity=0.png": {
+    "surface_lightness.lstar": {
+      "css": 78.3103,
+      "diff": 0.5484,
+      "ok": true,
+      "render": 78.8587,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 75.9477,
+      "diff": 0.5925,
+      "ok": true,
+      "render": 76.5402,
+      "tol": 3.0
+    }
+  },
+  "sweeps/lightest/key_light_intensity=0.1.png": {
+    "surface_lightness.lstar": {
+      "css": 71.0956,
+      "diff": 0.1989,
+      "ok": true,
+      "render": 71.2945,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 68.2353,
+      "diff": 0.2105,
+      "ok": true,
+      "render": 68.4458,
+      "tol": 3.0
+    }
+  },
+  "sweeps/lightest/key_light_intensity=0.3.png": {
+    "surface_lightness.lstar": {
+      "css": 77.5831,
+      "diff": 1.3242,
+      "ok": true,
+      "render": 78.9073,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 75.1634,
+      "diff": 1.4292,
+      "ok": true,
+      "render": 76.5926,
+      "tol": 3.0
+    }
+  },
+  "sweeps/lightest/key_light_intensity=0.5.png": {
+    "surface_lightness.lstar": {
+      "css": 84.0792,
+      "diff": 1.384,
+      "ok": true,
+      "render": 85.4632,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 82.2222,
+      "diff": 1.519,
+      "ok": true,
+      "render": 83.7413,
+      "tol": 3.0
+    }
+  },
+  "sweeps/lightest/key_light_intensity=0.7.png": {
+    "surface_lightness.lstar": {
+      "css": 90.2365,
+      "diff": 1.0301,
+      "ok": true,
+      "render": 91.2666,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 89.0196,
+      "diff": 1.147,
+      "ok": true,
+      "render": 90.1666,
+      "tol": 3.0
+    }
+  },
+  "sweeps/lightest/key_light_intensity=0.9.png": {
+    "surface_lightness.lstar": {
+      "css": 96.5375,
+      "diff": 0.0331,
+      "ok": true,
+      "render": 96.5044,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 96.0784,
+      "diff": 0.0374,
+      "ok": true,
+      "render": 96.0411,
+      "tol": 3.0
+    }
+  },
+  "sweeps/lightest/key_light_intensity=1.png": {
+    "surface_lightness.lstar": {
+      "css": 99.6549,
+      "diff": 0.727,
+      "ok": true,
+      "render": 98.9279,
+      "tol": 3.0
+    },
+    "surface_lightness.srgb_pct": {
+      "css": 99.6078,
+      "diff": 0.8253,
+      "ok": true,
+      "render": 98.7826,
+      "tol": 3.0
     }
   },
   "sweeps/shiny/fill_light_intensity=0.3.png": {

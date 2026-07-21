@@ -2,8 +2,8 @@
 
 Model: `L% = k * key_intensity + f * fill_intensity + floor`
 
-- **k_pct**: `10.56`
-- **f_pct**: `8.76`
-- **floor_pct**: `11.03`
-- **r2**: `0.99649`
-- **max_resid_pct**: `0.325`
+- **k_pct**: `20.95`
+- **f_pct**: `17.4`
+- **floor_pct**: `27.26`
+- **r2**: `0.99642`
+- **max_resid_pct**: `0.649`

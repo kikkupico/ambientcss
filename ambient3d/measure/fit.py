@@ -219,12 +219,12 @@ def fit_curved(m):
     }
 
 
-def fit_darker(m):
-    """Same affine surface model as .amb-surface, fit on the dark plate."""
+def _fit_tinted(m, sweep_prefix, calib_name):
+    """Same affine surface model as .amb-surface, fit on a lighter/darker
+    plate (different albedo, same rig)."""
     pts = []
     for rel, entry in m.items():
-        if (rel.startswith("sweeps/darker/") or
-                rel == "calib/surface_darker_default.png"):
+        if rel.startswith(sweep_prefix) or rel == calib_name:
             a = entry["amb"]
             pts.append((a["key_light_intensity"], a["fill_light_intensity"],
                         entry["metrics"]["surface_lightness"]["srgb_pct"]))
@@ -240,6 +240,22 @@ def fit_darker(m):
         "r2": round(r2(L, pred), 5),
         "max_resid_pct": round(float(np.abs(L - pred).max()), 3),
     }
+
+
+def fit_darker(m):
+    return _fit_tinted(m, "sweeps/darker/", "calib/surface_darker_default.png")
+
+
+def fit_darkest(m):
+    return _fit_tinted(m, "sweeps/darkest/", "calib/surface_darkest_default.png")
+
+
+def fit_lighter(m):
+    return _fit_tinted(m, "sweeps/lighter/", "calib/surface_lighter_default.png")
+
+
+def fit_lightest(m):
+    return _fit_tinted(m, "sweeps/lightest/", "calib/surface_lightest_default.png")
 
 
 # -------------------------------------------------------------- elevation ---
@@ -556,6 +572,8 @@ def fit_glow(m):
 FITTERS = {"surface": fit_surface, "chamfer": fit_chamfer,
            "fillet": fit_fillet, "shadow": fit_shadow,
            "curved": fit_curved, "darker": fit_darker,
+           "darkest": fit_darkest, "lighter": fit_lighter,
+           "lightest": fit_lightest,
            "shiny": fit_shiny, "glow": fit_glow,
            "groove": fit_groove}
 

@@ -1,57 +1,15 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   AmbientProvider,
-  AmbientPanel,
   AmbientButton,
   AmbientKnob,
   AmbientFader,
   AmbientSlider,
   AmbientSwitch,
+  AmbientPanel,
   type AmbientTheme,
+  type AmbientKnobVariant,
 } from "@ambientcss/components";
-
-/* ── Scroll-driven theme keyframes ────────────────────────────────────────
-   As the user scrolls, the global lighting morphs through these states.    */
-
-type LightFrame = {
-  lightX: number;
-  lightY: number;
-  keyLight: number;
-  fillLight: number;
-  lightHue: number;
-  lightSaturation: number;
-};
-
-const LIGHT_FRAMES: LightFrame[] = [
-  // Hero – bright, top-left
-  { lightX: -1, lightY: -1, keyLight: 0.92, fillLight: 0.72, lightHue: 234, lightSaturation: 10 },
-  // Orbit – rotating light (starting point, will be overridden locally)
-  { lightX: 1, lightY: -0.5, keyLight: 0.85, fillLight: 0.65, lightHue: 220, lightSaturation: 15 },
-  // Elevation – dramatic top light
-  { lightX: 0, lightY: -1, keyLight: 0.9, fillLight: 0.5, lightHue: 240, lightSaturation: 8 },
-  // Surfaces – warm side light
-  { lightX: -1, lightY: 0, keyLight: 0.88, fillLight: 0.6, lightHue: 30, lightSaturation: 20 },
-  // Edges – cool overhead
-  { lightX: 0.3, lightY: -1, keyLight: 0.82, fillLight: 0.55, lightHue: 210, lightSaturation: 18 },
-  // Components – neutral bright
-  { lightX: -0.7, lightY: -0.7, keyLight: 0.9, fillLight: 0.7, lightHue: 234, lightSaturation: 5 },
-  // Theming playground – neutral bright (user takes over here)
-  { lightX: -0.7, lightY: -0.7, keyLight: 0.9, fillLight: 0.7, lightHue: 234, lightSaturation: 5 },
-  // Finale – bright dawn
-  { lightX: -1, lightY: -1, keyLight: 0.95, fillLight: 0.8, lightHue: 40, lightSaturation: 12 },
-];
-
-function lerpFrame(a: LightFrame, b: LightFrame, t: number): LightFrame {
-  const l = (x: number, y: number) => x + (y - x) * t;
-  return {
-    lightX: l(a.lightX, b.lightX),
-    lightY: l(a.lightY, b.lightY),
-    keyLight: l(a.keyLight, b.keyLight),
-    fillLight: l(a.fillLight, b.fillLight),
-    lightHue: l(a.lightHue, b.lightHue),
-    lightSaturation: l(a.lightSaturation, b.lightSaturation),
-  };
-}
 
 /* ── Intersection observer hook ───────────────────────────────────────── */
 
@@ -73,10 +31,14 @@ function useInView(threshold = 0.25) {
   return { ref, visible };
 }
 
-/* ── Theming presets ──────────────────────────────────────────────────── */
+/* ── Theming presets ──────────────────────────────────────────────────────
+   The lighting is driven entirely by the header now (presets + the settings
+   pulldown) — not by scroll. Every scene below re-lights from the same theme. */
 
 type ThemePreset = {
   label: string;
+  icon: string;
+  led: string;         // indicator colour
   lightX: number;      // -1..1
   lightY: number;      // -1..1
   keyLight: number;    // 0..1
@@ -86,12 +48,38 @@ type ThemePreset = {
   lumeHue: number; // 0..360
 };
 
-// Day/Night use the exact values from the original sticky day→night transition
 const THEME_PRESETS: ThemePreset[] = [
-  { label: "Day",    lightX: -0.7, lightY: -0.7, keyLight: 0.9,  fillLight: 0.7,  lightHue: 234, lightSaturation: 5,  lumeHue: 16 },
-  { label: "Night",  lightX: 0.7,  lightY: -0.7, keyLight: 0.3,  fillLight: 0.1,  lightHue: 250, lightSaturation: 30, lumeHue: 16 },
-  { label: "Sci-Fi", lightX: 0,    lightY: -0.9, keyLight: 0.2,  fillLight: 0.05, lightHue: 190, lightSaturation: 50, lumeHue: 180 },
-  { label: "Fun",    lightX: 0,    lightY: -1,   keyLight: 0.55, fillLight: 0,    lightHue: 0,   lightSaturation: 100, lumeHue: 0 },
+  { label: "Day",    icon: "☀", led: "#f59e0b", lightX: -0.7, lightY: -0.7, keyLight: 0.9,  fillLight: 0.7,  lightHue: 234, lightSaturation: 5,   lumeHue: 16 },
+  { label: "Night",  icon: "☾", led: "#6366f1", lightX: 0.7,  lightY: -0.7, keyLight: 0.3,  fillLight: 0.1,  lightHue: 250, lightSaturation: 30,  lumeHue: 16 },
+  { label: "Sci-Fi", icon: "✦", led: "#22d3d3", lightX: 0,    lightY: -0.9, keyLight: 0.2,  fillLight: 0.05, lightHue: 190, lightSaturation: 50,  lumeHue: 180 },
+  { label: "Fun",    icon: "✷", led: "#ec4899", lightX: 0,    lightY: -1,   keyLight: 0.55, fillLight: 0,    lightHue: 0,   lightSaturation: 100, lumeHue: 0 },
+];
+
+const DEFAULTS = THEME_PRESETS[0]!;
+
+/* The settings pulldown is a little lighting console: one AmbientKnob per
+   light parameter. The knobs themselves re-shade as you turn them, since
+   they're lit by the very light they control. */
+type KnobCfg = {
+  key: string;
+  label: string;
+  prop: keyof AmbientTheme;
+  variant: AmbientKnobVariant;
+  min: number;
+  max: number;
+  step: number;
+  value: (t: ThemePreset) => number;
+  to: (v: number) => number;
+};
+
+const LIGHT_KNOBS: KnobCfg[] = [
+  { key: "lx",   label: "Light X", prop: "lightX",         variant: "line",  min: -100, max: 100, step: 2, value: (t) => Math.round(t.lightX * 100),  to: (v) => v / 100 },
+  { key: "ly",   label: "Light Y", prop: "lightY",         variant: "line",  min: -100, max: 100, step: 2, value: (t) => Math.round(t.lightY * 100),  to: (v) => v / 100 },
+  { key: "key",  label: "Key",     prop: "keyLight",       variant: "dot",   min: 0,    max: 100, step: 1, value: (t) => Math.round(t.keyLight * 100), to: (v) => v / 100 },
+  { key: "fill", label: "Fill",    prop: "fillLight",      variant: "dot",   min: 0,    max: 100, step: 1, value: (t) => Math.round(t.fillLight * 100), to: (v) => v / 100 },
+  { key: "hue",  label: "Hue",     prop: "lightHue",       variant: "flute", min: 0,    max: 360, step: 2, value: (t) => Math.round(t.lightHue),       to: (v) => v },
+  { key: "sat",  label: "Sat",     prop: "lightSaturation", variant: "dot",  min: 0,    max: 100, step: 1, value: (t) => Math.round(t.lightSaturation), to: (v) => v },
+  { key: "lume", label: "Lume",    prop: "lumeHue",        variant: "cap",   min: 0,    max: 360, step: 2, value: (t) => Math.round(t.lumeHue),        to: (v) => v },
 ];
 
 const ORBIT_COUNT = 9;
@@ -103,15 +91,18 @@ const ANIM_DURATION = 800; // ms for preset transitions
 
 export function App() {
   const [theme, setTheme] = useState<AmbientTheme>({
-    lightX: LIGHT_FRAMES[0]!.lightX,
-    lightY: LIGHT_FRAMES[0]!.lightY,
-    keyLight: LIGHT_FRAMES[0]!.keyLight,
-    fillLight: LIGHT_FRAMES[0]!.fillLight,
-    lightHue: LIGHT_FRAMES[0]!.lightHue,
-    lightSaturation: LIGHT_FRAMES[0]!.lightSaturation,
+    lightX: DEFAULTS.lightX,
+    lightY: DEFAULTS.lightY,
+    keyLight: DEFAULTS.keyLight,
+    fillLight: DEFAULTS.fillLight,
+    lightHue: DEFAULTS.lightHue,
+    lightSaturation: DEFAULTS.lightSaturation,
+    lumeHue: DEFAULTS.lumeHue,
   });
+  const [activePreset, setActivePreset] = useState("Day");
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
-  /* Scroll to next section helper -------------------------------------------- */
+  /* Scroll navigation helpers --------------------------------------------- */
   const scrollToNextSection = useCallback((currentRef: React.RefObject<HTMLElement | null>) => {
     const current = currentRef.current;
     if (!current) return;
@@ -122,142 +113,74 @@ export function App() {
     }
   }, []);
 
-  /* Scroll to top helper ------------------------------------------------------ */
   const scrollToTop = useCallback(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  /* Scroll-driven lighting ------------------------------------------------ */
-  const ticking = useRef(false);
-  const playgroundRef = useRef<HTMLDivElement>(null);
-  const MAT_FRAME: LightFrame = {
-    lightX: -0.07149788059853948,
-    lightY: -0.8371655411643154,
-    keyLight: 0.9096766095862159,
-    fillLight: 0.3450576107922515,
-    lightHue: 183.35334881144593,
-    lightSaturation: 23.652771721409685,
-  };
-  const handleScroll = useCallback(() => {
-    if (ticking.current) return;
-    ticking.current = true;
-    requestAnimationFrame(() => {
-      // Check if playground section is in view
-      const pgEl = playgroundRef.current;
-      if (pgEl) {
-        const rect = pgEl.getBoundingClientRect();
-        const vh = window.innerHeight;
-        const inView = rect.top < vh * 0.5 && rect.bottom > vh * 0.5;
-        if (inView) {
-          ticking.current = false;
-          return; // Don't update theme from scroll while playground is active
-        }
-      }
-
-      const scrollY = window.scrollY;
-      const vh = window.innerHeight;
-      const totalScroll = document.documentElement.scrollHeight - vh;
-      const globalProgress = totalScroll > 0 ? scrollY / totalScroll : 0;
-
-      const frameCount = LIGHT_FRAMES.length - 1;
-      const raw = globalProgress * frameCount;
-      const idx = Math.min(Math.floor(raw), frameCount - 1);
-      const t = raw - idx;
-
-      let frame = lerpFrame(LIGHT_FRAMES[idx]!, LIGHT_FRAMES[idx + 1]!, t);
-
-      // Blend toward dramatic materials lighting as the materials section centres in the viewport
-      const matEl = matSectionRef.current;
-      if (matEl) {
-        const rect = matEl.getBoundingClientRect();
-        const sectionMid = rect.top + rect.height / 2;
-        const distFromCenter = Math.abs(sectionMid - vh / 2);
-        const blend = Math.max(0, 1 - distFromCenter / (vh * 0.6));
-        if (blend > 0) frame = lerpFrame(frame, MAT_FRAME, blend);
-      }
-
-      setTheme({
-        lightX: frame.lightX,
-        lightY: frame.lightY,
-        keyLight: frame.keyLight,
-        fillLight: frame.fillLight,
-        lightHue: frame.lightHue,
-        lightSaturation: frame.lightSaturation,
-      });
-
-      ticking.current = false;
-    });
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
-
-  /* Animated theme transitions -------------------------------------------- */
+  /* Animated theme transitions (preset chips) ----------------------------- */
   const animRef = useRef<number>(0);
-  const animFrom = useRef<ThemePreset | null>(null);
-  const animTo = useRef<ThemePreset | null>(null);
+  const animFrom = useRef<AmbientTheme | null>(null);
+  const animTo = useRef<AmbientTheme | null>(null);
   const animStart = useRef(0);
   const themeRef = useRef(theme);
   themeRef.current = theme;
 
   const animateToPreset = useCallback((target: ThemePreset) => {
-    // Cancel any running animation
+    setActivePreset(target.label);
     if (animRef.current) cancelAnimationFrame(animRef.current);
 
-    // Snapshot current theme as starting point (via ref to avoid stale closure)
     const cur = themeRef.current;
     animFrom.current = {
-      label: "",
-      lightX: cur.lightX ?? 0,
-      lightY: cur.lightY ?? 0,
-      keyLight: cur.keyLight ?? 0.9,
-      fillLight: cur.fillLight ?? 0.7,
-      lightHue: cur.lightHue ?? 234,
-      lightSaturation: cur.lightSaturation ?? 5,
-      lumeHue: cur.lumeHue ?? 16,
+      lightX: cur.lightX ?? DEFAULTS.lightX,
+      lightY: cur.lightY ?? DEFAULTS.lightY,
+      keyLight: cur.keyLight ?? DEFAULTS.keyLight,
+      fillLight: cur.fillLight ?? DEFAULTS.fillLight,
+      lightHue: cur.lightHue ?? DEFAULTS.lightHue,
+      lightSaturation: cur.lightSaturation ?? DEFAULTS.lightSaturation,
+      lumeHue: cur.lumeHue ?? DEFAULTS.lumeHue,
     };
-    animTo.current = target;
+    animTo.current = {
+      lightX: target.lightX,
+      lightY: target.lightY,
+      keyLight: target.keyLight,
+      fillLight: target.fillLight,
+      lightHue: target.lightHue,
+      lightSaturation: target.lightSaturation,
+      lumeHue: target.lumeHue,
+    };
     animStart.current = performance.now();
 
     function tick(now: number) {
       const from = animFrom.current!;
       const to = animTo.current!;
-      const elapsed = now - animStart.current;
-      const rawT = Math.min(elapsed / ANIM_DURATION, 1);
-      // Ease out cubic for smooth deceleration
-      const t = 1 - Math.pow(1 - rawT, 3);
-
+      const rawT = Math.min((now - animStart.current) / ANIM_DURATION, 1);
+      const t = 1 - Math.pow(1 - rawT, 3); // ease-out cubic
       const lerp = (a: number, b: number) => a + (b - a) * t;
 
       setTheme({
-        lightX: lerp(from.lightX, to.lightX),
-        lightY: lerp(from.lightY, to.lightY),
-        keyLight: lerp(from.keyLight, to.keyLight),
-        fillLight: lerp(from.fillLight, to.fillLight),
-        lightHue: lerp(from.lightHue, to.lightHue),
-        lightSaturation: lerp(from.lightSaturation, to.lightSaturation),
-        lumeHue: lerp(from.lumeHue, to.lumeHue),
+        lightX: lerp(from.lightX!, to.lightX!),
+        lightY: lerp(from.lightY!, to.lightY!),
+        keyLight: lerp(from.keyLight!, to.keyLight!),
+        fillLight: lerp(from.fillLight!, to.fillLight!),
+        lightHue: lerp(from.lightHue!, to.lightHue!),
+        lightSaturation: lerp(from.lightSaturation!, to.lightSaturation!),
+        lumeHue: lerp(from.lumeHue!, to.lumeHue!),
       });
 
-      if (rawT < 1) {
-        animRef.current = requestAnimationFrame(tick);
-      } else {
-        animRef.current = 0;
-      }
+      if (rawT < 1) animRef.current = requestAnimationFrame(tick);
+      else animRef.current = 0;
     }
 
     animRef.current = requestAnimationFrame(tick);
   }, []);
 
-  // Cancel animation and set a single theme property (for control changes)
+  // Set a single theme property (settings pulldown sliders).
   const setThemeProp = useCallback((key: keyof AmbientTheme, value: number) => {
     if (animRef.current) { cancelAnimationFrame(animRef.current); animRef.current = 0; }
+    setActivePreset("Custom");
     setTheme(prev => ({ ...prev, [key]: value }));
   }, []);
 
-  // Cleanup animation on unmount
   useEffect(() => {
     return () => { if (animRef.current) cancelAnimationFrame(animRef.current); };
   }, []);
@@ -273,22 +196,88 @@ export function App() {
   /* InView hooks for each section ----------------------------------------- */
   const orbitView = useInView(0.2);
   const elevView = useInView(0.15);
+  const thickView = useInView(0.2);
   const surfView = useInView(0.2);
   const matView = useInView(0.2);
   const edgeView = useInView(0.2);
+  const grooveView = useInView(0.2);
   const compView = useInView(0.1);
-  const playgroundView = useInView(0.1);
   const finaleView = useInView(0.3);
 
   /* Section refs for scroll navigation ------------------------------------ */
   const heroRef = useRef<HTMLElement>(null);
   const orbitSectionRef = useRef<HTMLElement>(null);
   const elevSectionRef = useRef<HTMLElement>(null);
+  const thickSectionRef = useRef<HTMLElement>(null);
   const surfSectionRef = useRef<HTMLElement>(null);
   const matSectionRef = useRef<HTMLElement>(null);
   const edgeSectionRef = useRef<HTMLElement>(null);
+  const grooveSectionRef = useRef<HTMLElement>(null);
   const compSectionRef = useRef<HTMLElement>(null);
-  const playgroundSectionRef = useRef<HTMLElement>(null);
+
+  /* Hero-title → header morph ─────────────────────────────────────────────
+     The big centred "ambient" wordmark shrinks and flies up into the header
+     brand as the hero scrolls away; the chips + settings + panel skin fade
+     in. Driven imperatively (a --scroll-p var + a direct transform) so the
+     whole section tree isn't re-rendered on every scroll frame. */
+  const themebarRef = useRef<HTMLElement>(null);
+  const brandRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const brand = brandRef.current;
+    const home = { cx: 0, cy: 0, w: 1 };
+    let bigScale = 5;
+
+    const measure = () => {
+      if (!brand) return;
+      const prev = brand.style.transform;
+      brand.style.transform = "none";
+      const r = brand.getBoundingClientRect();
+      brand.style.transform = prev;
+      home.cx = r.left + r.width / 2;
+      home.cy = r.top + r.height / 2;
+      home.w = r.width || 1;
+      bigScale = Math.max(2, Math.min(6, (window.innerWidth * 0.66) / home.w));
+    };
+
+    const update = () => {
+      const heroH = heroRef.current?.offsetHeight || window.innerHeight;
+      const p = Math.max(0, Math.min(1, window.scrollY / (heroH * 0.7)));
+      document.documentElement.style.setProperty("--scroll-p", String(p));
+      if (brand) {
+        if (p >= 1) {
+          // Fully docked: drop the transform layer so the wordmark renders
+          // natively crisp instead of rasterised at a scaled resolution.
+          brand.style.transform = "none";
+          brand.style.willChange = "auto";
+        } else {
+          const s = bigScale - (bigScale - 1) * p;
+          const dx = (window.innerWidth / 2 - home.cx) * (1 - p);
+          const dy = (window.innerHeight * 0.42 - home.cy) * (1 - p);
+          brand.style.transform = `translate(${dx}px, ${dy}px) scale(${s})`;
+          brand.style.willChange = "transform";
+        }
+      }
+      themebarRef.current?.classList.toggle("is-docked", p > 0.6);
+    };
+
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => { raf = 0; update(); });
+    };
+    const onResize = () => { measure(); update(); };
+
+    measure();
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
 
   /* Orbit: pointer/touch-driven light direction ───────────────────────── */
   const [orbitLight, setOrbitLight] = useState({ x: -1, y: -1 });
@@ -315,21 +304,33 @@ export function App() {
       tabIndex={0}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') scrollToNextSection(sectionRef); }}
     >
-      <div className="scroll-down-circle ambient amb-surface amb-chamfer amb-rounded-full">
+      <div className="scroll-down-circle ambient amb-surface amb-rounded-full">
         <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7" /></svg>
       </div>
     </div>
   );
 
+  const mergedTheme = { ...DEFAULTS, ...theme };
+
   return (
     <AmbientProvider className="amb-surface" theme={theme}>
 
+      {/* ── HEADER — global light control (hero title morphs into it) ───── */}
+      <ThemeBar
+        theme={mergedTheme}
+        activePreset={activePreset}
+        settingsOpen={settingsOpen}
+        onToggleSettings={() => setSettingsOpen(v => !v)}
+        onPreset={animateToPreset}
+        onProp={setThemeProp}
+        themebarRef={themebarRef}
+        brandRef={brandRef}
+      />
+      {/* Subtitle that lives under the big wordmark and fades as it docks. */}
+      <div className="hero-morph-sub">physically based css</div>
+
       {/* ── 1. HERO ──────────────────────────────────────────────────── */}
       <section className="hero amb-surface" ref={heroRef}>
-        <div>
-          <div className="hero-title">ambient</div>
-          <div className="hero-sub">physically based css</div>
-        </div>
         <div
           className="hero-scroll-hint"
           onClick={() => scrollToNextSection(heroRef)}
@@ -337,7 +338,7 @@ export function App() {
           tabIndex={0}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') scrollToNextSection(heroRef); }}
         >
-          <div className="hero-scroll-circle ambient amb-surface amb-chamfer amb-bounce amb-rounded-full">
+          <div className="hero-scroll-circle ambient amb-surface amb-bounce amb-rounded-full">
             <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7" /></svg>
           </div>
           <span>Scroll</span>
@@ -386,7 +387,7 @@ export function App() {
             {([0, 1, 2, 3] as const).map((elev, i) => (
               <div className="elevation-item" key={elev}>
                 <div
-                  className={`elevation-circle ambient amb-surface amb-chamfer amb-elevation-${elev}`}
+                  className={`elevation-circle ambient amb-surface-lighter amb-elevation-${elev}`}
                   data-visible={elevView.visible}
                   style={{ transitionDelay: `${i * 0.08}s` }}
                 />
@@ -395,7 +396,7 @@ export function App() {
             ))}
             <div className="elevation-item">
               <div
-                className="elevation-circle ambient amb-surface amb-chamfer amb-bounce"
+                className="elevation-circle ambient amb-surface-lighter amb-bounce"
                 data-visible={elevView.visible}
                 style={{ transitionDelay: "0.32s" }}
               />
@@ -404,6 +405,31 @@ export function App() {
           </div>
         </div>
         <ScrollButton sectionRef={elevSectionRef} />
+      </section>
+
+      {/* ── THICKNESS (grounded) ─────────────────────────────────────── */}
+      <section className="scene amb-surface" ref={thickSectionRef}>
+        <div className="scene-inner" ref={thickView.ref}>
+          <div className="scene-label">Thickness</div>
+          <div className="scene-hint">grounded material depth — shadow grows with thickness, no elevation · new</div>
+          <div className="elevation-row">
+            {[
+              { t: 0, label: "t0 · sheet" },
+              { t: 1, label: "t1 · button" },
+              { t: 2, label: "t2 · knob" },
+            ].map(({ t, label }, i) => (
+              <div className="elevation-item" key={t}>
+                <div
+                  className={`elevation-circle ambient amb-surface-lighter amb-chamfer amb-thickness-${t}`}
+                  data-visible={thickView.visible}
+                  style={{ transitionDelay: `${i * 0.1}s` }}
+                />
+                <span className="elevation-label">{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <ScrollButton sectionRef={thickSectionRef} />
       </section>
 
       {/* ── 4. SURFACES ──────────────────────────────────────────────── */}
@@ -420,13 +446,7 @@ export function App() {
                 <div
                   className={`surface-swatch ambient amb-chamfer-2 amb-elevation-2 ${cls}`}
                   data-visible={surfView.visible}
-                  style={{
-                    transitionDelay: `${i * 0.12}s`,
-                    "--amb-light-y": -1,
-                    "--amb-light-x": -0.8,
-                    "--amb-key-light-intensity": 0.9,
-                    "--amb-fill-light-intensity": 0.45,
-                  } as React.CSSProperties}
+                  style={{ transitionDelay: `${i * 0.12}s` } as React.CSSProperties}
                 />
                 <span className="surface-label">{label}</span>
               </div>
@@ -496,10 +516,8 @@ export function App() {
             {[
               { cls: "amb-chamfer", elev: 1, label: "Chamfer" },
               { cls: "amb-chamfer-2", elev: 1, label: "Chamfer 2x" },
-              { cls: "amb-chamfer-minus-1", elev: 0, label: "Chamfer -1" },
               { cls: "amb-fillet", elev: 1, label: "Fillet" },
               { cls: "amb-fillet-2", elev: 1, label: "Fillet 2x" },
-              { cls: "amb-fillet-minus-1", elev: 0, label: "Fillet -1" },
             ].map(({ cls, elev, label }, i) => (
               <div className="edge-item" key={label}>
                 <div
@@ -515,7 +533,32 @@ export function App() {
         <ScrollButton sectionRef={edgeSectionRef} />
       </section>
 
-      {/* ── 6. COMPONENTS ─────────────────────────────────────────────── */}
+      {/* ── GROOVE (grounded) ────────────────────────────────────────── */}
+      <section className="scene amb-surface" ref={grooveSectionRef}>
+        <div className="scene-inner" ref={grooveView.ref}>
+          <div className="scene-label">Groove</div>
+          <div className="scene-hint">grounded recess — lit-wall shadow + far-wall bounce · new</div>
+          <div className="groove-wall">
+            {[
+              { cls: "groove-channel", label: "Channel", tone: "lume" },
+              { cls: "groove-well", label: "Well", tone: "darker" },
+              { cls: "groove-inset", label: "Inset", tone: "darker" },
+            ].map(({ cls, label, tone }, i) => (
+              <div className="groove-item" key={label}>
+                <div
+                  className={`groove-swatch ambient amb-groove ${cls} groove-${tone}`}
+                  data-visible={grooveView.visible}
+                  style={{ transitionDelay: `${i * 0.1}s` }}
+                />
+                <span className="groove-label">{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <ScrollButton sectionRef={grooveSectionRef} />
+      </section>
+
+      {/* ── 7. COMPONENTS ─────────────────────────────────────────────── */}
       <section className="scene amb-surface" ref={compSectionRef}>
         <div className="scene-inner" ref={compView.ref}>
           <div className="scene-label">Components</div>
@@ -556,80 +599,6 @@ export function App() {
           </div>
         </div>
         <ScrollButton sectionRef={compSectionRef} />
-      </section>
-
-      {/* ── 7. THEMING PLAYGROUND ─────────────────────────────────────── */}
-      <section className="scene amb-surface" ref={playgroundSectionRef}>
-        <div className="scene-inner" ref={playgroundView.ref}>
-          <div className="scene-label">Endless Theming Possibilities</div>
-          <div className="scene-hint">tap a preset or tweak the controls</div>
-
-          <div className="theme-presets">
-            {THEME_PRESETS.map((preset) => (
-              <AmbientButton
-                key={preset.label}
-                onClick={() => animateToPreset(preset)}
-              >
-                {preset.label}
-              </AmbientButton>
-            ))}
-          </div>
-
-          <div className="theme-playground">
-            <div className="theme-controls">
-              <div className="theme-controls-row">
-                <AmbientKnob
-                  value={Math.round((theme.keyLight ?? 0.9) * 100)}
-                  onChange={(v) => setThemeProp("keyLight", v / 100)}
-                  label="Key Light"
-                  material="shiny"
-                />
-                <AmbientFader
-                  value={Math.round((theme.lightY ?? 0) * -100)}
-                  min={-100}
-                  max={100}
-                  onChange={(v) => setThemeProp("lightY", v / -100)}
-                  label="Light Y"
-                  material="glass"
-                />
-                <AmbientKnob
-                  value={Math.round((theme.fillLight ?? 0.7) * 100)}
-                  onChange={(v) => setThemeProp("fillLight", v / 100)}
-                  label="Fill Light"
-                  material="shiny"
-                />
-              </div>
-              <div className="theme-controls-row">
-                <AmbientSlider
-                  value={Math.round((theme.lightX ?? 0) * 100)}
-                  min={-100}
-                  max={100}
-                  onChange={(v) => setThemeProp("lightX", v / 100)}
-                  label="Light X"
-                  material="glass"
-                />
-              </div>
-              <div className="theme-controls-row">
-                <AmbientKnob
-                  value={Math.round(((theme.lightHue ?? 234) / 360) * 100)}
-                  onChange={(v) => setThemeProp("lightHue", (v / 100) * 360)}
-                  label="Hue"
-                />
-                <AmbientKnob
-                  value={Math.round(theme.lightSaturation ?? 5)}
-                  onChange={(v) => setThemeProp("lightSaturation", v)}
-                  label="Saturation"
-                />
-                <AmbientKnob
-                  value={Math.round(((theme.lumeHue ?? 16) / 360) * 100)}
-                  onChange={(v) => setThemeProp("lumeHue", (v / 100) * 360)}
-                  label="Lume Hue"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-        <ScrollButton sectionRef={playgroundSectionRef} />
       </section>
 
       {/* ── 8. FINALE ────────────────────────────────────────────────── */}
@@ -673,7 +642,7 @@ export function App() {
             tabIndex={0}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') scrollToTop(); }}
           >
-            <div className="scroll-top-circle ambient amb-surface amb-chamfer amb-rounded-full">
+            <div className="scroll-top-circle ambient amb-surface amb-rounded-full">
               <svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7" /></svg>
             </div>
             <span>Top</span>
@@ -682,5 +651,101 @@ export function App() {
       </section>
 
     </AmbientProvider>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   THEME BAR — the header. Presets + a settings pulldown that drives the
+   global light. Everything below re-lights from these values.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+type ThemeBarProps = {
+  theme: ThemePreset;
+  activePreset: string;
+  settingsOpen: boolean;
+  onToggleSettings: () => void;
+  onPreset: (p: ThemePreset) => void;
+  onProp: (key: keyof AmbientTheme, value: number) => void;
+  themebarRef: React.RefObject<HTMLElement | null>;
+  brandRef: React.RefObject<HTMLDivElement | null>;
+};
+
+function ThemeBar({ theme, activePreset, settingsOpen, onToggleSettings, onPreset, onProp, themebarRef, brandRef }: ThemeBarProps) {
+  return (
+    <header className="themebar" ref={themebarRef}>
+      {/* Panel skin fades in as the bar docks (opacity rides --scroll-p). */}
+      <AmbientPanel material="matte" className="themebar-skin" aria-hidden />
+
+      <div className="themebar-brand" ref={brandRef}>
+        ambient
+      </div>
+
+      {/* Presets — real AmbientButtons seated in the bar, each with an LED
+          that lights (and the cap goes shiny) when its preset is active. */}
+      <div className="themebar-presets">
+        {THEME_PRESETS.map((p) => {
+          const active = activePreset === p.label;
+          return (
+            <div className="preset-item" key={p.label}>
+              <span
+                className={`amb-led preset-led${active ? "" : " amb-led-off"}`}
+                style={{ "--amb-led-color": p.led } as React.CSSProperties}
+              />
+              <AmbientButton
+                className={`preset-btn${active ? " is-active" : ""}`}
+                material={active ? "shiny" : "matte"}
+                onClick={() => onPreset(p)}
+                aria-pressed={active}
+              >
+                <span className="preset-inner">
+                  <span className="preset-icon">{p.icon}</span>
+                  {p.label}
+                </span>
+              </AmbientButton>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Settings — a metal (shiny) key that drops a knob console. */}
+      <div className="themebar-settings">
+        <AmbientButton
+          className={`settings-btn${settingsOpen ? " is-active" : ""}`}
+          material="shiny"
+          onClick={onToggleSettings}
+          aria-expanded={settingsOpen}
+        >
+          <span className="preset-inner">
+            <span className="settings-gear">⚙</span>
+            Light
+            <span className={`settings-caret${settingsOpen ? " is-open" : ""}`}>▾</span>
+          </span>
+        </AmbientButton>
+
+        {settingsOpen && (
+          <AmbientPanel material="matte" className="settings-menu">
+            <div className="settings-title">
+              Global light
+              <span className="settings-preset">{activePreset}</span>
+            </div>
+            <div className="settings-console">
+              {LIGHT_KNOBS.map((k) => (
+                <AmbientKnob
+                  key={k.key}
+                  value={k.value(theme)}
+                  min={k.min}
+                  max={k.max}
+                  step={k.step}
+                  variant={k.variant}
+                  onChange={(v) => onProp(k.prop, k.to(v))}
+                  label={k.label}
+                />
+              ))}
+            </div>
+            <div className="settings-hint">every scene re-lights live</div>
+          </AmbientPanel>
+        )}
+      </div>
+    </header>
   );
 }
