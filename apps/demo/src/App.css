@@ -495,26 +495,17 @@ body {
   margin-top: 56px;
 }
 
+/* Standard amb-button well/cap structure (see AmbientButton), just on an
+   <a> instead of a <button> so these stay real navigable links. */
 .finale-link {
+  display: inline-block;
+  text-decoration: none;
+}
+
+.finale-link .amb-button-cap {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 14px 28px;
-  font-family: "Michroma", sans-serif;
-  font-size: 11px;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  text-decoration: none;
-  color: var(--amb-lume);
-  cursor: pointer;
-}
-
-.finale-link:hover {
-  --amb-elevation: 2;
-}
-
-.finale-link:active {
-  --amb-elevation: 0;
 }
 
 .finale-link-icon {
@@ -647,37 +638,6 @@ body {
   z-index: 0;
   opacity: var(--scroll-p, 0);
   backdrop-filter: blur(8px);
-  pointer-events: none;
-}
-
-.themebar-brand {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 15px;
-  letter-spacing: 0.14em;
-  color: var(--amb-label);
-  white-space: nowrap;
-  padding-left: 4px;
-  transform-origin: center;
-  pointer-events: none;
-}
-
-/* Subtitle sitting under the big wordmark; fades out as the title docks. */
-.hero-morph-sub {
-  position: fixed;
-  top: 52vh;
-  left: 0;
-  right: 0;
-  z-index: 99;
-  text-align: center;
-  font-size: clamp(11px, 1.6vw, 16px);
-  letter-spacing: 0.55em;
-  text-transform: lowercase;
-  color: var(--amb-lume);
-  opacity: calc(1 - var(--scroll-p, 0));
   pointer-events: none;
 }
 

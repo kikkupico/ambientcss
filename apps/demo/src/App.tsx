@@ -215,49 +215,17 @@ export function App() {
   const grooveSectionRef = useRef<HTMLElement>(null);
   const compSectionRef = useRef<HTMLElement>(null);
 
-  /* Hero-title → header morph ─────────────────────────────────────────────
-     The big centred "ambient" wordmark shrinks and flies up into the header
-     brand as the hero scrolls away; the chips + settings + panel skin fade
-     in. Driven imperatively (a --scroll-p var + a direct transform) so the
-     whole section tree isn't re-rendered on every scroll frame. */
+  /* Header dock ────────────────────────────────────────────────────────────
+     The chips + settings + panel skin fade in as the hero scrolls away.
+     Driven imperatively (a --scroll-p var) so the whole section tree isn't
+     re-rendered on every scroll frame. */
   const themebarRef = useRef<HTMLElement>(null);
-  const brandRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    const brand = brandRef.current;
-    const home = { cx: 0, cy: 0, w: 1 };
-    let bigScale = 5;
-
-    const measure = () => {
-      if (!brand) return;
-      const prev = brand.style.transform;
-      brand.style.transform = "none";
-      const r = brand.getBoundingClientRect();
-      brand.style.transform = prev;
-      home.cx = r.left + r.width / 2;
-      home.cy = r.top + r.height / 2;
-      home.w = r.width || 1;
-      bigScale = Math.max(2, Math.min(6, (window.innerWidth * 0.66) / home.w));
-    };
-
     const update = () => {
       const heroH = heroRef.current?.offsetHeight || window.innerHeight;
       const p = Math.max(0, Math.min(1, window.scrollY / (heroH * 0.7)));
       document.documentElement.style.setProperty("--scroll-p", String(p));
-      if (brand) {
-        if (p >= 1) {
-          // Fully docked: drop the transform layer so the wordmark renders
-          // natively crisp instead of rasterised at a scaled resolution.
-          brand.style.transform = "none";
-          brand.style.willChange = "auto";
-        } else {
-          const s = bigScale - (bigScale - 1) * p;
-          const dx = (window.innerWidth / 2 - home.cx) * (1 - p);
-          const dy = (window.innerHeight * 0.42 - home.cy) * (1 - p);
-          brand.style.transform = `translate(${dx}px, ${dy}px) scale(${s})`;
-          brand.style.willChange = "transform";
-        }
-      }
       themebarRef.current?.classList.toggle("is-docked", p > 0.6);
     };
 
@@ -266,9 +234,8 @@ export function App() {
       if (raf) return;
       raf = requestAnimationFrame(() => { raf = 0; update(); });
     };
-    const onResize = () => { measure(); update(); };
+    const onResize = () => { update(); };
 
-    measure();
     update();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
@@ -315,7 +282,7 @@ export function App() {
   return (
     <AmbientProvider className="amb-surface" theme={theme}>
 
-      {/* ── HEADER — global light control (hero title morphs into it) ───── */}
+      {/* ── HEADER — global light control ────────────────────────────── */}
       <ThemeBar
         theme={mergedTheme}
         activePreset={activePreset}
@@ -324,13 +291,12 @@ export function App() {
         onPreset={animateToPreset}
         onProp={setThemeProp}
         themebarRef={themebarRef}
-        brandRef={brandRef}
       />
-      {/* Subtitle that lives under the big wordmark and fades as it docks. */}
-      <div className="hero-morph-sub">physically based css</div>
 
       {/* ── 1. HERO ──────────────────────────────────────────────────── */}
       <section className="hero amb-surface" ref={heroRef}>
+        <div className="hero-title">ambient</div>
+        <div className="hero-sub">physically based css</div>
         <div
           className="hero-scroll-hint"
           onClick={() => scrollToNextSection(heroRef)}
@@ -411,7 +377,6 @@ export function App() {
       <section className="scene amb-surface" ref={thickSectionRef}>
         <div className="scene-inner" ref={thickView.ref}>
           <div className="scene-label">Thickness</div>
-          <div className="scene-hint">grounded material depth — shadow grows with thickness, no elevation · new</div>
           <div className="elevation-row">
             {[
               { t: 0, label: "t0 · sheet" },
@@ -537,7 +502,6 @@ export function App() {
       <section className="scene amb-surface" ref={grooveSectionRef}>
         <div className="scene-inner" ref={grooveView.ref}>
           <div className="scene-label">Groove</div>
-          <div className="scene-hint">grounded recess — lit-wall shadow + far-wall bounce · new</div>
           <div className="groove-wall">
             {[
               { cls: "groove-channel", label: "Channel", tone: "lume" },
@@ -612,27 +576,31 @@ export function App() {
           <div className="finale-sub" data-visible={finaleView.visible}>physically based css</div>
           <div className="finale-links">
             <a
-              className="finale-link ambient amb-surface amb-chamfer amb-elevation-1 amb-rounded-lg"
+              className="finale-link amb-button amb-groove ambx-button"
               href="https://github.com/kikkupico/ambientcss"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <svg className="finale-link-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
-              </svg>
-              GitHub
+              <span className="amb-button-cap ambient amb-chamfer amb-surface amb-heading-3 amb-mat-matte">
+                <svg className="finale-link-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
+                </svg>
+                GitHub
+              </span>
             </a>
             <a
-              className="finale-link ambient amb-surface amb-chamfer amb-elevation-1 amb-rounded-lg"
+              className="finale-link amb-button amb-groove ambx-button"
               href="https://kikkupico.github.io/ambientcss/"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <svg className="finale-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-              </svg>
-              Docs
+              <span className="amb-button-cap ambient amb-chamfer amb-surface amb-heading-3 amb-mat-matte">
+                <svg className="finale-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                </svg>
+                Docs
+              </span>
             </a>
           </div>
           <div
@@ -667,18 +635,13 @@ type ThemeBarProps = {
   onPreset: (p: ThemePreset) => void;
   onProp: (key: keyof AmbientTheme, value: number) => void;
   themebarRef: React.RefObject<HTMLElement | null>;
-  brandRef: React.RefObject<HTMLDivElement | null>;
 };
 
-function ThemeBar({ theme, activePreset, settingsOpen, onToggleSettings, onPreset, onProp, themebarRef, brandRef }: ThemeBarProps) {
+function ThemeBar({ theme, activePreset, settingsOpen, onToggleSettings, onPreset, onProp, themebarRef }: ThemeBarProps) {
   return (
     <header className="themebar" ref={themebarRef}>
       {/* Panel skin fades in as the bar docks (opacity rides --scroll-p). */}
       <AmbientPanel material="matte" className="themebar-skin" aria-hidden />
-
-      <div className="themebar-brand" ref={brandRef}>
-        ambient
-      </div>
 
       {/* Presets — real AmbientButtons seated in the bar, each with an LED
           that lights (and the cap goes shiny) when its preset is active. */}
