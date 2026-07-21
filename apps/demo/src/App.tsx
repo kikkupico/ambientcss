@@ -100,7 +100,6 @@ export function App() {
     lumeHue: DEFAULTS.lumeHue,
   });
   const [activePreset, setActivePreset] = useState("Day");
-  const [settingsOpen, setSettingsOpen] = useState(false);
 
   /* Scroll navigation helpers --------------------------------------------- */
   const scrollToNextSection = useCallback((currentRef: React.RefObject<HTMLElement | null>) => {
@@ -174,11 +173,18 @@ export function App() {
     animRef.current = requestAnimationFrame(tick);
   }, []);
 
-  // Set a single theme property (settings pulldown sliders).
+  // Set a single theme property (the custom-cord light console).
   const setThemeProp = useCallback((key: keyof AmbientTheme, value: number) => {
     if (animRef.current) { cancelAnimationFrame(animRef.current); animRef.current = 0; }
     setActivePreset("Custom");
     setTheme(prev => ({ ...prev, [key]: value }));
+  }, []);
+
+  // Pulling the Custom cord marks the theme "Custom" and hands the scene to
+  // the console — the light keeps its current values, now free to tune.
+  const activateCustom = useCallback(() => {
+    if (animRef.current) { cancelAnimationFrame(animRef.current); animRef.current = 0; }
+    setActivePreset("Custom");
   }, []);
 
   useEffect(() => {
@@ -283,12 +289,11 @@ export function App() {
     <AmbientProvider className="amb-surface" theme={theme}>
 
       {/* ── HEADER — global light control ────────────────────────────── */}
-      <ThemeBar
+      <PullCordSwitcher
         theme={mergedTheme}
         activePreset={activePreset}
-        settingsOpen={settingsOpen}
-        onToggleSettings={() => setSettingsOpen(v => !v)}
         onPreset={animateToPreset}
+        onCustom={activateCustom}
         onProp={setThemeProp}
         themebarRef={themebarRef}
       />
@@ -623,91 +628,133 @@ export function App() {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   THEME BAR — the header. Presets + a settings pulldown that drives the
-   global light. Everything below re-lights from these values.
+   PULL-CORD SWITCHER — the header. Five cords hang from a housing rail: one
+   per theme preset, plus a "Custom" cord. Pulling a cord activates its theme
+   and drops the cord — the lowered cord IS the current-selection indicator,
+   so only one hangs low at a time. Pulling Custom draws the light-console
+   assembly down from the rail; clicking outside (or Esc) rolls it back up.
+   Reuses the same THEME_PRESETS / LIGHT_KNOBS / re-light machinery ThemeBar
+   used to drive.
    ══════════════════════════════════════════════════════════════════════════ */
 
-type ThemeBarProps = {
+type PullCordSwitcherProps = {
   theme: ThemePreset;
   activePreset: string;
-  settingsOpen: boolean;
-  onToggleSettings: () => void;
   onPreset: (p: ThemePreset) => void;
+  onCustom: () => void;
   onProp: (key: keyof AmbientTheme, value: number) => void;
   themebarRef: React.RefObject<HTMLElement | null>;
 };
 
-function ThemeBar({ theme, activePreset, settingsOpen, onToggleSettings, onPreset, onProp, themebarRef }: ThemeBarProps) {
+function PullCordSwitcher({ theme, activePreset, onPreset, onCustom, onProp, themebarRef }: PullCordSwitcherProps) {
+  const [consoleOpen, setConsoleOpen] = useState(false);
+  // A pull is a transient tug: the cord springs down and snaps back like a
+  // real draw cord (the persistent glow, not the position, marks the active
+  // one). tugNonce re-keys the tugged rod so its spring animation replays.
+  const [tugLabel, setTugLabel] = useState<string | null>(null);
+  const [tugNonce, setTugNonce] = useState(0);
+  const rigRef = useRef<HTMLDivElement>(null);
+
+  // While the console is down, a click outside the rig (or Escape) rolls the
+  // whole assembly back up. Custom stays the active theme — its cord stays low.
+  useEffect(() => {
+    if (!consoleOpen) return;
+    const onDown = (e: PointerEvent) => {
+      if (!rigRef.current?.contains(e.target as Node)) setConsoleOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setConsoleOpen(false); };
+    document.addEventListener("pointerdown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [consoleOpen]);
+
+  const tug = (label: string) => { setTugLabel(label); setTugNonce((n) => n + 1); };
+  const pullTheme = (p: ThemePreset) => { tug(p.label); onPreset(p); setConsoleOpen(false); };
+  const pullCustom = () => { tug("Custom"); onCustom(); setConsoleOpen((o) => !o); };
+
+  const customActive = activePreset === "Custom";
+
   return (
-    <header className="themebar" ref={themebarRef}>
-      {/* Panel skin fades in as the bar docks (opacity rides --scroll-p). */}
-      <AmbientPanel material="matte" className="themebar-skin" aria-hidden />
-
-      {/* Presets — real AmbientButtons seated in the bar, each with an LED
-          that lights (and the cap goes shiny) when its preset is active. */}
-      <div className="themebar-presets">
-        {THEME_PRESETS.map((p) => {
-          const active = activePreset === p.label;
-          return (
-            <div className="preset-item" key={p.label}>
-              <span
-                className={`amb-led preset-led${active ? "" : " amb-led-off"}`}
-                style={{ "--amb-led-color": p.led } as React.CSSProperties}
-              />
-              <AmbientButton
-                className={`preset-btn${active ? " is-active" : ""}`}
-                material={active ? "shiny" : "matte"}
-                onClick={() => onPreset(p)}
-                aria-pressed={active}
-              >
-                <span className="preset-inner">
-                  <span className="preset-icon">{p.icon}</span>
-                  {p.label}
-                </span>
-              </AmbientButton>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Settings — a metal (shiny) key that drops a knob console. */}
-      <div className="themebar-settings">
-        <AmbientButton
-          className={`settings-btn${settingsOpen ? " is-active" : ""}`}
-          material="shiny"
-          onClick={onToggleSettings}
-          aria-expanded={settingsOpen}
-        >
-          <span className="preset-inner">
-            <span className="settings-gear">⚙</span>
-            Light
-            <span className={`settings-caret${settingsOpen ? " is-open" : ""}`}>▾</span>
-          </span>
-        </AmbientButton>
-
-        {settingsOpen && (
-          <AmbientPanel material="matte" className="settings-menu">
-            <div className="settings-title">
+    <header className="cordbar" ref={themebarRef}>
+      <div className={`cord-assembly${consoleOpen ? " is-open" : ""}`} ref={rigRef}>
+        {/* One thick slab of the surface itself. Its upper region is the light
+            console, parked above the top of the screen; only the bottom lip
+            shows at rest. Pulling Custom drops the whole slab into view — the
+            console was always just the hidden part of this panel. */}
+        <div className="cord-panel ambient amb-surface amb-chamfer amb-thickness-2 amb-elevation-1">
+          <div className="cord-console">
+            <div className="cord-console-title">
               Global light
-              <span className="settings-preset">{activePreset}</span>
+              <span className="cord-console-preset">Custom</span>
             </div>
-            <div className="settings-console">
-              {LIGHT_KNOBS.map((k) => (
-                <AmbientKnob
-                  key={k.key}
-                  value={k.value(theme)}
-                  min={k.min}
-                  max={k.max}
-                  step={k.step}
-                  variant={k.variant}
-                  onChange={(v) => onProp(k.prop, k.to(v))}
-                  label={k.label}
+            {/* Controls sit in a recessed darker well so they pop and read
+                apart from the cord labels below. */}
+            <div className="cord-console-well ambient amb-groove groove-darker">
+              <div className="cord-console-grid">
+                {LIGHT_KNOBS.map((k) => (
+                  <AmbientKnob
+                    key={k.key}
+                    value={k.value(theme)}
+                    min={k.min}
+                    max={k.max}
+                    step={k.step}
+                    variant={k.variant}
+                    onChange={(v) => onProp(k.prop, k.to(v))}
+                    label={k.label}
+                  />
+                ))}
+              </div>
+            </div>
+            <div className="cord-console-hint">every scene re-lights live</div>
+          </div>
+        </div>
+
+        {/* Cords hang from the slab's bottom edge. Each label is printed on the
+            panel's revealed lip; below it a simple elevated rod ends in a convex
+            ambient ball, both casting shadows. A pull tugs the cord and it
+            springs back — the highlighted label marks the active one. */}
+        <div className="cords" role="group" aria-label="Theme">
+          {THEME_PRESETS.map((p) => {
+            const active = activePreset === p.label;
+            return (
+              <button
+                key={p.label}
+                type="button"
+                className={`cord${active ? " is-active" : ""}`}
+                aria-pressed={active}
+                onClick={() => pullTheme(p)}
+              >
+                <span className="cord-name">{p.icon} {p.label}</span>
+                <span
+                  key={tugLabel === p.label ? `tug-${tugNonce}` : "rest"}
+                  className={`cord-line ambient amb-surface amb-surface-darker amb-elevation-3${tugLabel === p.label ? " is-tugging" : ""}`}
+                  aria-hidden
                 />
-              ))}
-            </div>
-            <div className="settings-hint">every scene re-lights live</div>
-          </AmbientPanel>
-        )}
+                <span className="cord-ball ambient amb-surface amb-surface-convex amb-elevation-3 amb-rounded-full" aria-hidden />
+              </button>
+            );
+          })}
+
+          {/* Custom cord — drops the slab to reveal the console. */}
+          <button
+            type="button"
+            className={`cord cord-custom${customActive ? " is-active" : ""}${consoleOpen ? " is-open" : ""}`}
+            aria-pressed={customActive}
+            aria-expanded={consoleOpen}
+            onClick={pullCustom}
+          >
+            <span className="cord-name">⚙ Custom</span>
+            <span
+              key={tugLabel === "Custom" ? `tug-${tugNonce}` : "rest"}
+              className={`cord-line ambient amb-surface amb-surface-darker amb-elevation-3${tugLabel === "Custom" ? " is-tugging" : ""}`}
+              aria-hidden
+            />
+            <span className="cord-ball ambient amb-surface amb-surface-convex amb-elevation-3 amb-rounded-full" aria-hidden />
+          </button>
+        </div>
       </div>
     </header>
   );

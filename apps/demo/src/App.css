@@ -615,106 +615,50 @@ body {
 }
 
 /* ==========================================================================
-   THEME BAR (header) — global light control: presets + settings pulldown
+   PULL-CORD SWITCHER (header) — cords hang from one thick slab of the
+   surface. The slab's upper region is the light console, parked above the
+   top of the screen; pulling Custom drops the whole slab (cords and all)
+   into view — the console was always just its hidden part. The active
+   cord's convex ball descends and glows.
    ========================================================================== */
 
-.themebar {
+.cordbar {
   position: fixed;
-  top: 16px;
+  top: 0;
   left: 50%;
   transform: translateX(-50%);
   z-index: 100;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  width: min(960px, calc(100vw - 32px));
-  padding: 10px 16px;
-}
-
-/* Panel skin — fades in as the bar docks (opacity rides the scroll var). */
-.themebar-skin {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
+  width: min(560px, calc(100vw - 16px));
   opacity: var(--scroll-p, 0);
-  backdrop-filter: blur(8px);
-  pointer-events: none;
+  transition: opacity 0.25s ease;
+  pointer-events: none;      /* only grabs the pointer once docked */
 }
+.cordbar.is-docked { pointer-events: auto; }
 
-.themebar-presets {
+/* The whole slab + cords, parked up by --reveal so only the lip shows. */
+.cord-assembly {
+  --reveal: 212px;
   position: relative;
-  z-index: 2;
-  display: flex;
-  gap: 8px;
-  margin: 0 auto;
-  flex-wrap: wrap;
-  justify-content: center;
-  opacity: var(--scroll-p, 0);
-  transition: opacity 0.2s ease;
+  transform: translateY(calc(-1 * var(--reveal)));
+  transition: transform 0.52s cubic-bezier(0.48, 1.3, 0.5, 1);   /* drawer */
 }
+.cord-assembly.is-open { transform: translateY(0); }
 
-/* Preset = an LED stacked over a real AmbientButton. */
-.preset-item {
-  display: inline-grid;
-  justify-items: center;
-  gap: 5px;
+/* The slab: the ground's own material, told apart by thickness + shadow.
+   Content is the console; padding-bottom is the lip the cord labels sit on. */
+.cord-panel {
+  --lip: 30px;
+  border-radius: 0 0 14px 14px;
+  padding: 0 16px var(--lip);
 }
-.preset-led {
-  width: 7px;
-  height: 7px;
-}
-.preset-inner {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-}
-.preset-icon { font-size: 12px; line-height: 1; }
-
-/* Slim the AmbientButton caps down to header scale. */
-.themebar .preset-btn,
-.themebar .settings-btn { min-width: 0; }
-.themebar .preset-btn .amb-button-cap,
-.themebar .settings-btn .amb-button-cap {
-  padding: 6px 11px;
-  font-size: 9px;
-  letter-spacing: 0.14em;
-}
-.preset-btn.is-active .amb-button-cap { color: var(--amb-highlight-color); }
-.settings-caret { font-size: 8px; transition: transform 0.2s ease; }
-.settings-caret.is-open { transform: rotate(180deg); }
-.settings-gear { font-size: 12px; }
-
-.themebar-settings {
-  position: relative;
-  z-index: 3;
-  opacity: var(--scroll-p, 0);
-  transition: opacity 0.2s ease;
-}
-
-/* Chips + settings only interactive once the bar has docked. */
-.themebar:not(.is-docked) .themebar-presets,
-.themebar:not(.is-docked) .themebar-settings {
-  pointer-events: none;
-}
-
-/* Settings pulldown — an AmbientPanel holding a console of AmbientKnobs. */
-.settings-menu {
-  position: absolute;
-  top: calc(100% + 14px);
-  right: 0;
-  width: min(372px, calc(100vw - 32px));
+.cord-console {
+  height: 212px;                 /* == --reveal: the region hidden up top */
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  z-index: 110;
-  animation: settings-in 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+  justify-content: center;
+  gap: 10px;
 }
-@keyframes settings-in {
-  from { opacity: 0; transform: translateY(-8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.settings-title {
+.cord-console-title {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -723,40 +667,110 @@ body {
   text-transform: uppercase;
   color: var(--amb-lume);
 }
-.settings-preset {
+.cord-console-preset {
   margin-left: auto;
   color: var(--amb-highlight-color);
   letter-spacing: 0.2em;
 }
-
-/* The console runs on a smaller grid so seven knobs fit — turning the
-   knob shrinks the whole ambient component set proportionally. */
-.settings-console {
+/* Recessed darker well the controls sit in — a groove with a darker floor
+   (groove-darker is a demo-local override that wins the floor colour). */
+.cord-console-well {
+  --amb-thickness: 1;
+  border-radius: 12px;
+  padding: 14px 12px 12px;
+}
+/* Smaller grid so seven knobs fit — turning one shrinks the whole set. */
+.cord-console-grid {
   --ambx-grid: 3px;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 16px 6px;
+  gap: 16px 8px;
 }
-.settings-hint {
+.cord-console-hint {
   font-size: 7px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--amb-lume);
   opacity: 0.6;
   text-align: center;
-  margin-top: 2px;
 }
 
-@media (max-width: 640px) {
-  .themebar {
-    flex-wrap: wrap;
-    gap: 10px;
-    padding: 10px 12px;
-  }
-  .themebar-presets { order: 3; width: 100%; margin: 0; }
-  .settings-word { display: none; }
-  .settings-menu { width: min(280px, calc(100vw - 40px)); }
+/* Cords hang from the slab. The label row is pulled up onto the lip. */
+.cords {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  gap: clamp(10px, 4vw, 40px);
+  padding: 0 18px;
+  margin-top: calc(-1 * var(--lip, 30px) + 4px);
+}
+.cord {
+  appearance: none;
+  -webkit-appearance: none;
+  background: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--amb-label);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Label — printed on the panel's revealed lip, above its cord. */
+.cord-name {
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  margin-bottom: 12px;           /* clears the lip so the rod hangs below it */
+  transition: color 0.2s ease;
+}
+.cord.is-active .cord-name { color: var(--amb-highlight-color); }
+.cord:focus-visible { outline: none; }
+.cord:focus-visible .cord-name {
+  color: var(--amb-highlight-color);
+  text-decoration: underline;
+}
+
+/* Simple elevated rod — plain material, casts a shadow. A pull tugs it down
+   and it springs back like a real draw cord. */
+.cord-line {
+  width: 4px;
+  height: 24px;
+  border-radius: 2px;
+}
+.cord-line.is-tugging {
+  animation: cord-tug 0.62s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes cord-tug {
+  0%   { height: 24px; }
+  28%  { height: 62px; }   /* yank down */
+  55%  { height: 32px; }   /* overshoot back */
+  78%  { height: 42px; }
+  100% { height: 24px; }   /* settle */
+}
+
+/* Convex ambient disc on the cord end. */
+.cord-ball {
+  width: 28px;
+  height: 28px;
+  margin-top: -1px;
+}
+
+@media (max-width: 600px) {
+  .cordbar { width: calc(100vw - 8px); }
+  .cords { gap: 5px; padding: 0 8px; }
+  .cord-name { font-size: 8px; letter-spacing: 0.06em; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cord-assembly { transition: none; }
+  .cord-line.is-tugging { animation: none; }
 }
 
 /* ==========================================================================
