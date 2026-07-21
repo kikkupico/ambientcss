@@ -41,6 +41,7 @@ jobs:
 
       - name: Build and typecheck
         run: |
+          pnpm api:check
           pnpm build
           pnpm typecheck
 

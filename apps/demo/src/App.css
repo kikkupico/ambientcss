@@ -495,26 +495,17 @@ body {
   margin-top: 56px;
 }
 
+/* Standard amb-button well/cap structure (see AmbientButton), just on an
+   <a> instead of a <button> so these stay real navigable links. */
 .finale-link {
+  display: inline-block;
+  text-decoration: none;
+}
+
+.finale-link .amb-button-cap {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 14px 28px;
-  font-family: "Michroma", sans-serif;
-  font-size: 11px;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  text-decoration: none;
-  color: var(--amb-lume);
-  cursor: pointer;
-}
-
-.finale-link:hover {
-  --amb-elevation: 2;
-}
-
-.finale-link:active {
-  --amb-elevation: 0;
 }
 
 .finale-link-icon {
@@ -621,4 +612,252 @@ body {
 
 .moving-circle {
   animation: slide-out 3s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   PULL-CORD SWITCHER (header) — cords hang from one thick slab of the
+   surface. The slab's upper region is the light console, parked above the
+   top of the screen; pulling Custom drops the whole slab (cords and all)
+   into view — the console was always just its hidden part. The active
+   cord's convex ball descends and glows.
+   ========================================================================== */
+
+.cordbar {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  width: min(560px, calc(100vw - 16px));
+}
+
+/* The whole slab + cords, parked up by --reveal so only the lip shows. */
+.cord-assembly {
+  --reveal: 212px;
+  position: relative;
+  transform: translateY(calc(-1 * var(--reveal)));
+  transition: transform 0.52s cubic-bezier(0.48, 1.3, 0.5, 1);   /* drawer */
+}
+.cord-assembly.is-open { transform: translateY(0); }
+
+/* The slab: the ground's own material, told apart by thickness + shadow.
+   Content is the console; padding-bottom is the lip the cord labels sit on.
+   z-index 1 seats it between the chains (behind) and the labels (in front). */
+.cord-panel {
+  --lip: 30px;
+  position: relative;
+  z-index: 1;
+  border-radius: 0 0 14px 14px;
+  padding: 0 16px var(--lip);
+}
+.cord-console {
+  height: 212px;                 /* == --reveal: the region hidden up top */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+.cord-console-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 8px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--amb-lume);
+}
+.cord-console-preset {
+  margin-left: auto;
+  color: var(--amb-highlight-color);
+  letter-spacing: 0.2em;
+}
+/* Recessed darker well the controls sit in — a groove with a darker floor
+   (groove-darker is a demo-local override that wins the floor colour). */
+.cord-console-well {
+  --amb-thickness: 1;
+  border-radius: 12px;
+  padding: 14px 12px 12px;
+}
+/* Seven knobs on one even seven-column grid — a Dieter Rams row: equal
+   columns, equal air, each control centred in its cell. */
+.cord-console-grid {
+  --ambx-grid: 3px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  align-items: start;
+  justify-items: center;
+  gap: 0 6px;
+}
+.cord-console-hint {
+  font-size: 7px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--amb-lume);
+  opacity: 0.6;
+  text-align: center;
+}
+
+/* Cords hang from the slab. The label row is pulled up onto the lip. No
+   z-index here, so each cord part stacks against the slab individually:
+   labels in front of it, chains and balls behind. */
+.cords {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  gap: clamp(10px, 4vw, 40px);
+  padding: 0 18px;
+  margin-top: calc(-1 * var(--lip, 30px) + 4px);
+}
+.cord {
+  appearance: none;
+  -webkit-appearance: none;
+  background: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--amb-label);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Label — printed on the panel's revealed lip, in front of the slab. */
+.cord-name {
+  position: relative;
+  z-index: 2;                    /* in front of the slab (z 1) */
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  margin-bottom: 12px;           /* clears the lip so the chain hangs below it */
+  transition: color 0.2s ease;
+}
+.cord.is-active .cord-name { color: var(--amb-highlight-color); }
+.cord:focus-visible { outline: none; }
+.cord:focus-visible .cord-name {
+  color: var(--amb-highlight-color);
+  text-decoration: underline;
+}
+
+/* The pull = chain + ball, drawn BEHIND the slab (z 0). A pull slides the
+   whole group down and it retracts with almost no bounce; the panel edge is
+   the housing the chain pays out from. */
+.cord-pull {
+  position: relative;
+  z-index: 0;                    /* behind the slab (z 1) */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.cord-pull.is-tugging {
+  animation: cord-tug 0.42s cubic-bezier(0.4, 0, 0.2, 1);   /* near-bounceless */
+}
+@keyframes cord-tug {
+  0%   { transform: translateY(0); }
+  44%  { transform: translateY(20px); }   /* pays out */
+  100% { transform: translateY(0); }       /* retracts, no overshoot */
+}
+
+/* Chain of tiny shiny ambient balls. Its top is pulled up behind the panel
+   lip so only the lower balls show at rest. */
+.cord-chain {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  margin-top: -18px;
+}
+.cord-bead {
+  width: 7px;
+  height: 7px;
+}
+
+/* Glass ambient ball on the chain end. */
+.cord-ball {
+  width: 26px;
+  height: 26px;
+  margin-top: 1px;
+}
+
+@media (max-width: 600px) {
+  .cordbar { width: calc(100vw - 8px); }
+  .cords { gap: 5px; padding: 0 8px; }
+  .cord-name { font-size: 8px; letter-spacing: 0.06em; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cord-assembly { transition: none; }
+  .cord-line.is-tugging { animation: none; }
+}
+
+/* ==========================================================================
+   GROOVE scene — grounded recesses
+   ========================================================================== */
+
+.groove-wall {
+  display: flex;
+  gap: clamp(28px, 5vw, 56px);
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.groove-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+.groove-swatch {
+  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.groove-swatch[data-visible="false"] { opacity: 0; transform: translateY(28px); }
+.groove-swatch[data-visible="true"]  { opacity: 1; transform: none; }
+
+/* A lume-floored channel echoes the fader/slider tracks — dark in bright
+   light, glowing when the room goes dark. */
+.groove-lume { background-color: var(--amb-lume); }
+
+/* .amb-groove's own floor sits within a hair of the open ground (see its
+   comment in ambient.css); pairing with .amb-surface-darker's formula
+   here gives the well/inset recesses a floor that reads as visibly
+   deeper material, not just a shadow band on the same page color. */
+.groove-darker {
+  background-color: hsl(
+    var(--amb-light-hue)
+    var(--amb-light-saturation)
+    calc(
+      var(--amb-key-light-intensity) * 21% +
+        var(--amb-fill-light-intensity) * 17.4% + 27.3%
+    )
+  );
+}
+
+.groove-channel {
+  width: clamp(150px, 24vw, 240px);
+  height: 28px;
+  border-radius: 999px;
+  --amb-thickness: 0.4;
+}
+.groove-well {
+  width: clamp(96px, 15vw, 140px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  --amb-thickness: 0.5;
+}
+.groove-inset {
+  width: clamp(130px, 20vw, 180px);
+  height: 116px;
+  border-radius: 16px;
+  --amb-thickness: 0.5;
+}
+.groove-label {
+  font-size: 8px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--amb-lume);
 }

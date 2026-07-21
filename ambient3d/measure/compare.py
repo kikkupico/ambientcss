@@ -1,0 +1,242 @@
+"""Verify the shipped CSS against the Blender ground truth.
+
+    node tools/css-harness/render.mjs      # (first) screenshot the CSS
+    python3 measure/compare.py [--effect chamfer]
+
+Runs the same metric extractors on the CSS screenshots and the renders,
+then diffs metric-by-metric against per-metric tolerances. Exits non-zero
+if any pair drifts out of tolerance. Writes derived/compare-report.json.
+Metrics are compared, never pixels — the CSS approximates the render
+within its formula shapes; pixel identity is not the contract.
+"""
+
+import argparse
+import json
+import os
+import sys
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, ROOT)
+
+from amb_model import amb, manifest_jobs
+from measure.fit import lit_edges
+from measure.metrics import EXTRACTORS, load, shiny_features
+
+HARNESS_OUT = os.path.join(ROOT, "..", "tools", "css-harness", "out")
+
+# tolerance per metric leaf key (absolute)
+TOLERANCES = {
+    "srgb_pct": 3.0,        # surface lightness, percent points
+    "lstar": 3.0,
+    "peak_srgb": 0.06,      # band depth, sRGB units
+    "mean_delta_srgb": 0.05,
+    "width_mm": 0.6,        # band width, mm (~CSS px)
+    "baseline_srgb": 0.04,
+    "hm_mm": 1.5,           # drop-shadow half-max reach, mm
+    "sigma_mm": 1.2,        # drop-shadow falloff sigma, mm
+    "peak_alpha": 0.06,
+    "v_ref": 0.04,          # unshadowed ground value
+    # chevron shape metrics (corner miter, contact hug): secondary to the
+    # primary peak/reach gates, bounded looser — the two-layer sweep
+    # approximation brackets the render rather than matching it exactly
+    "alpha": 0.10, "hm": 2.5,
+    "lit_third": 0.10, "mid_third": 0.10, "far_third": 0.10,
+    # gradient stops: END stops ride the full delta, where the sRGB
+    # asymmetry under axis-aligned lights (bright dish walls compress,
+    # dark dome flanks deepen) is inexpressible in one affine delta
+    # (notes/curved.md, r2_end 0.94) — mid stops stay tight
+    "0": 3.5, "0.35": 3.0, "0.5": 3.0, "0.65": 3.0, "1": 3.5,
+    "band_pos_frac": 0.1,   # specular band center, fraction of width
+    "band_fwhm_frac": 0.1,
+    "band_peak_srgb": 0.06,
+    "floor_srgb_pct": 3.0,  # groove floor lightness
+    "floor_lstar": 3.0,
+    "delta_end_srgb": 0.022,   # render keeps the ~1.4% ambient plate
+    "delta_mid_srgb": 0.022,   # gradient the CSS doesn't paint
+    "center_srgb_pct": 3.0,
+}
+SKIP_KEYS = {"noise", "floor_over_ref", "kind"}
+
+
+def flatten(d, prefix=""):
+    out = {}
+    for k, v in d.items():
+        key = f"{prefix}{k}"
+        if isinstance(v, dict):
+            out.update(flatten(v, key + "."))
+        else:
+            out[key] = v
+    return out
+
+
+def main():
+    p = argparse.ArgumentParser(prog="measure/compare.py")
+    p.add_argument("--effect", default=None,
+                   help="only frames whose path contains this substring")
+    p.add_argument("--renders-dir", default=os.path.join(ROOT, "renders"))
+    p.add_argument("--harness-dir", default=HARNESS_OUT)
+    args = p.parse_args()
+
+    with open(os.path.join(ROOT, "manifest.json")) as fh:
+        manifest = json.load(fh)
+
+    report, failures, compared = {}, 0, 0
+    for rel, amb_over, spec in manifest_jobs(manifest, all_jobs=True):
+        if args.effect and args.effect not in rel:
+            continue
+        if not spec.get("css"):
+            continue
+        render_png = os.path.join(args.renders_dir, rel)
+        css_png = os.path.join(args.harness_dir, rel)
+        if not (os.path.exists(render_png) and os.path.exists(css_png)):
+            print(f"SKIP (missing frame): {rel}", file=sys.stderr)
+            continue
+
+        a = amb(**{k.replace("-", "_"): v for k, v in amb_over.items()})
+        meta = {"amb": a, "plate": spec.get("geometry") or manifest["plate"],
+                "pxPerMm": manifest["pxPerMm"], "frameMm": manifest["frameMm"]}
+        truth_img, css_img = load(render_png), load(css_png)
+
+        # edge_bands: only gate the edges the CSS formula claims (lit and
+        # shadow edges for this light direction). Under an axis-aligned
+        # light the render shows a faint band on the perpendicular edges
+        # too — a real effect box-shadow cannot express per-edge; those are
+        # reported as residuals, not failures (see notes/chamfer.md).
+        lit, shadow = lit_edges(a)
+        gated_edges = set(lit) | set(shadow)
+
+        frame_report = {}
+        for metric in spec["measure"]:
+            truth = flatten(EXTRACTORS[metric](truth_img, meta))
+            got = flatten(EXTRACTORS[metric](css_img, meta))
+            if metric == "cyl_profile":
+                # the render's band must be measured against the matte
+                # reference (diffuse curvature swamps the running-median
+                # baseline when the specular is weak); the CSS side has no
+                # curvature, so its median baseline stands
+                ref_rel = ("calib/mat_shiny_matte_ref.png"
+                           if rel.startswith("calib/")
+                           else rel.replace("sweeps/shiny/",
+                                            "sweeps/shiny_ref/"))
+                ref_png = os.path.join(args.renders_dir, ref_rel)
+                if not os.path.exists(ref_png):
+                    continue
+                import numpy as np
+                ref = EXTRACTORS[metric](load(ref_png), meta)
+                excess = (np.array(truth["profile_srgb"]) -
+                          np.array(ref["profile_srgb"]))
+                truth.update(shiny_features(excess))
+                # peak/rim amplitudes are base-dependent (dark dome vs
+                # bright CSS surface compress differently in sRGB):
+                # geometry (position, width) gates; amplitudes report
+                for amp in ("band_peak_srgb", "rim_peak_srgb"):
+                    frame_report[f"{metric}.{amp}"] = {
+                        "render": truth.get(amp), "css": got.get(amp),
+                        "residual": True,
+                    }
+                    truth.pop(amp, None)
+            for key, tv in truth.items():
+                leaf = key.rsplit(".", 1)[-1]
+                if leaf in SKIP_KEYS:
+                    continue
+                # (drop_shadow gates all four edges: blur+spread reach
+                # every edge in the CSS model too. But under an
+                # axis-aligned light the render concentrates the whole
+                # shadow — deeper alpha, tighter perpendicular penumbra —
+                # anisotropy that a single isotropic box-shadow cannot
+                # express, so axis-light frames are residual-only.)
+                # glow is residual-only: the CSS lume color deliberately
+                # darkens in bright scenes while the physical halo is
+                # white — a design semantic, not a defect to gate.
+                if metric == "cyl_profile" and truth.get("clipped"):
+                    frame_report[f"{metric}.{key}"] = {
+                        "render": round(float(tv), 4) if not isinstance(tv, list) else None,
+                        "css": round(float(got[key]), 4) if not isinstance(got[key], list) else None,
+                        "residual": True,
+                    }
+                    continue
+                if metric == "glow":
+                    frame_report[f"{metric}.{key}"] = {
+                        "render": round(tv, 4), "css": round(got[key], 4),
+                        "residual": True,
+                    }
+                    continue
+                axis_light = (a["light_x"] == 0) != (a["light_y"] == 0)
+                if metric == "drop_shadow" and axis_light:
+                    frame_report[f"{metric}.{key}"] = {
+                        "render": round(tv, 4), "css": round(got[key], 4),
+                        "residual": True,
+                    }
+                    continue
+                # the chevron-shape metrics (mitred corner, contact hug)
+                # gate ATTACHED shadows — the swept-silhouette contract is
+                # about bodies at rest. A detached shadow concentrates at
+                # its corner and contact zone in ways a translated square
+                # cannot express; those frames report as residuals.
+                if (metric == "drop_shadow" and a["elevation"] != 0 and
+                        key.split(".", 1)[0] in ("corner", "hug")):
+                    frame_report[f"{metric}.{key}"] = {
+                        "render": round(tv, 4), "css": round(got[key], 4),
+                        "residual": True,
+                    }
+                    continue
+                # pure lit-side edges: the CSS never paints shadow there,
+                # but the studio fill (overhead-concentrated) lets a high
+                # elevated sheet cast a soft occlusion halo all around,
+                # which a displaced box-shadow cannot express
+                if metric == "drop_shadow":
+                    signed = {"left": a["light_x"], "right": -a["light_x"],
+                              "top": a["light_y"], "bottom": -a["light_y"]}
+                    edge = key.split(".", 1)[0]
+                    if signed.get(edge, 1) < 0:
+                        frame_report[f"{metric}.{key}"] = {
+                            "render": round(tv, 4),
+                            "css": round(got[key], 4),
+                            "residual": True,
+                        }
+                        continue
+                # a band this faint has no meaningful width: its half-max
+                # run is noise-sized, so only the amplitude gates
+                if (metric == "edge_bands" and leaf == "width_mm" and
+                        abs(truth.get(key.split(".", 1)[0] + ".peak_srgb",
+                                      1.0)) < 0.05):
+                    frame_report[f"{metric}.{key}"] = {
+                        "render": round(tv, 4), "css": round(got[key], 4),
+                        "residual": True,
+                    }
+                    continue
+                if metric == "edge_bands" and \
+                        key.split(".", 1)[0] not in gated_edges:
+                    frame_report[f"{metric}.{key}"] = {
+                        "render": round(tv, 4), "css": round(got[key], 4),
+                        "residual": True,
+                    }
+                    continue
+                tol = TOLERANCES.get(leaf)
+                if tol is None:
+                    continue
+                diff = abs(got[key] - tv)
+                ok = diff <= tol
+                frame_report[f"{metric}.{key}"] = {
+                    "render": round(tv, 4), "css": round(got[key], 4),
+                    "diff": round(diff, 4), "tol": tol, "ok": ok,
+                }
+                if not ok:
+                    failures += 1
+                    print(f"FAIL {rel} {metric}.{key}: "
+                          f"render={tv:.4f} css={got[key]:.4f} "
+                          f"diff={diff:.4f} > tol={tol}")
+        report[rel] = frame_report
+        compared += 1
+
+    out = os.path.join(ROOT, "derived", "compare-report.json")
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    with open(out, "w") as fh:
+        json.dump(report, fh, indent=2, sort_keys=True)
+    print(f"compared {compared} frame pair(s); {failures} metric failure(s)")
+    print(f"WROTE {out}")
+    sys.exit(1 if failures else 0)
+
+
+if __name__ == "__main__":
+    main()

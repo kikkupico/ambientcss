@@ -1,0 +1,1477 @@
+{
+  "pxPerMm": 4,
+  "frameMm": 128,
+  "plate": {
+    "size": [
+      80,
+      80
+    ]
+  },
+  "scenes": [
+    {
+      "id": "surface_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": {},
+      "css": {
+        "classes": [
+          "amb-surface"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "surface_lightness"
+      ],
+      "docs": {
+        "publish": true,
+        "slug": "surface"
+      }
+    },
+    {
+      "id": "chamfer_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": {
+        "chamfer": 1,
+        "thickness": 1
+      },
+      "css": {
+        "classes": [
+          "ambient",
+          "amb-chamfer",
+          "amb-surface"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "edge_bands"
+      ],
+      "docs": {
+        "publish": true,
+        "slug": "chamfer"
+      }
+    },
+    {
+      "id": "fillet_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": {
+        "fillet": 1,
+        "thickness": 1
+      },
+      "css": {
+        "classes": [
+          "ambient",
+          "amb-fillet",
+          "amb-surface"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "edge_bands"
+      ],
+      "docs": {
+        "publish": true,
+        "slug": "fillet"
+      }
+    },
+    {
+      "id": "elevation_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": {
+        "elevation": 1
+      },
+      "geometry": {
+        "size": [
+          40,
+          40
+        ]
+      },
+      "css": {
+        "classes": [
+          "ambient",
+          "amb-elevation-1",
+          "amb-thickness-0",
+          "amb-surface"
+        ],
+        "size": [
+          40,
+          40
+        ]
+      },
+      "measure": [
+        "drop_shadow"
+      ],
+      "docs": {
+        "publish": true,
+        "slug": "elevation"
+      }
+    },
+    {
+      "id": "thickness_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": {
+        "thickness": 1
+      },
+      "geometry": {
+        "size": [
+          40,
+          40
+        ]
+      },
+      "css": {
+        "classes": [
+          "ambient",
+          "amb-thickness-1",
+          "amb-surface"
+        ],
+        "size": [
+          40,
+          40
+        ]
+      },
+      "measure": [
+        "drop_shadow"
+      ],
+      "docs": {
+        "publish": true,
+        "slug": "thickness"
+      }
+    },
+    {
+      "id": "surface_concave_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": {
+        "surface": "concave",
+        "thickness": 1
+      },
+      "css": {
+        "classes": [
+          "amb-surface-concave"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "surface_gradient"
+      ],
+      "docs": {
+        "publish": true,
+        "slug": "surface-concave"
+      }
+    },
+    {
+      "id": "surface_concave_h_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": {
+        "surface": "concave-h",
+        "thickness": 1
+      },
+      "css": {
+        "classes": [
+          "amb-surface-concave-h"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "surface_gradient"
+      ],
+      "docs": {
+        "publish": true,
+        "slug": "surface-concave-h"
+      }
+    },
+    {
+      "id": "surface_convex_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": {
+        "surface": "convex",
+        "thickness": 1
+      },
+      "css": {
+        "classes": [
+          "amb-surface-convex"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "surface_gradient"
+      ],
+      "docs": {
+        "publish": true,
+        "slug": "surface-convex"
+      }
+    },
+    {
+      "id": "surface_lighter_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": {
+        "albedo": 0.91
+      },
+      "css": {
+        "classes": [
+          "amb-surface-lighter"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "surface_lightness"
+      ],
+      "docs": {
+        "publish": true,
+        "slug": "surface-lighter"
+      }
+    },
+    {
+      "id": "surface_lightest_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": {
+        "albedo": 0.95
+      },
+      "css": {
+        "classes": [
+          "amb-surface-lightest"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "surface_lightness"
+      ],
+      "docs": {
+        "publish": true,
+        "slug": "surface-lightest"
+      }
+    },
+    {
+      "id": "surface_darker_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": {
+        "albedo": 0.31
+      },
+      "css": {
+        "classes": [
+          "amb-surface-darker"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "surface_lightness"
+      ],
+      "docs": {
+        "publish": true,
+        "slug": "surface-darker"
+      }
+    },
+    {
+      "id": "surface_darkest_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": {
+        "albedo": 0.06
+      },
+      "css": {
+        "classes": [
+          "amb-surface-darkest"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "surface_lightness"
+      ],
+      "docs": {
+        "publish": true,
+        "slug": "surface-darkest"
+      }
+    },
+    {
+      "id": "mat_shiny_default",
+      "kind": "effect",
+      "builder": "dome",
+      "amb": {
+        "mat": "shiny",
+        "albedo": 0.2
+      },
+      "geometry": {
+        "size": [
+          40,
+          40
+        ],
+        "radius": 20
+      },
+      "css": {
+        "classes": [
+          "amb-mat-shiny",
+          "amb-surface"
+        ],
+        "size": [
+          40,
+          40
+        ]
+      },
+      "measure": [
+        "cyl_profile"
+      ],
+      "docs": {
+        "publish": true,
+        "slug": "mat-shiny"
+      }
+    },
+    {
+      "id": "mat_shiny_matte_ref",
+      "kind": "effect",
+      "builder": "dome",
+      "amb": {
+        "albedo": 0.2
+      },
+      "geometry": {
+        "size": [
+          40,
+          40
+        ],
+        "radius": 20
+      },
+      "measure": [
+        "cyl_profile"
+      ]
+    },
+    {
+      "id": "groove_default",
+      "kind": "effect",
+      "builder": "groove",
+      "amb": {
+        "thickness": 1
+      },
+      "geometry": {
+        "size": [
+          60,
+          24
+        ]
+      },
+      "css": {
+        "classes": [
+          "amb-groove"
+        ],
+        "size": [
+          60,
+          24
+        ]
+      },
+      "measure": [
+        "groove"
+      ],
+      "docs": {
+        "publish": true,
+        "slug": "groove"
+      }
+    },
+    {
+      "id": "emit_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": {
+        "emit": "#ffffff",
+        "thickness": 1
+      },
+      "geometry": {
+        "size": [
+          40,
+          40
+        ]
+      },
+      "css": {
+        "classes": [
+          "amb-glow"
+        ],
+        "size": [
+          40,
+          40
+        ],
+        "style": "background:#ffffff"
+      },
+      "measure": [
+        "glow"
+      ],
+      "docs": {
+        "publish": true,
+        "slug": "glow"
+      }
+    }
+  ],
+  "sweeps": [
+    {
+      "id": "surface",
+      "builder": "plate",
+      "amb": {},
+      "css": {
+        "classes": [
+          "amb-surface"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "surface_lightness"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "key_light_intensity": [
+              0.1,
+              0.2,
+              0.3,
+              0.4,
+              0.5,
+              0.6,
+              0.7,
+              0.8,
+              0.9,
+              1.0
+            ]
+          }
+        },
+        {
+          "vary": {
+            "fill_light_intensity": [
+              0.0,
+              0.35,
+              0.7
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "chamfer",
+      "builder": "plate",
+      "amb": {
+        "chamfer": 1,
+        "thickness": 1
+      },
+      "css": {
+        "classes": [
+          "ambient",
+          "amb-chamfer",
+          "amb-surface"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "edge_bands"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "light": [
+              [
+                -1,
+                -1
+              ],
+              [
+                1,
+                -1
+              ],
+              [
+                -1,
+                1
+              ],
+              [
+                1,
+                1
+              ],
+              [
+                0,
+                -1
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                0
+              ],
+              [
+                1,
+                0
+              ]
+            ]
+          }
+        },
+        {
+          "vary": {
+            "key_light_intensity": [
+              0.3,
+              0.5,
+              0.7,
+              0.9
+            ]
+          }
+        },
+        {
+          "vary": {
+            "fill_light_intensity": [
+              0.3,
+              0.5,
+              0.7
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "chamfer_w2",
+      "builder": "plate",
+      "amb": {
+        "chamfer": 1,
+        "thickness": 2
+      },
+      "css": {
+        "classes": [
+          "ambient",
+          "amb-chamfer-2",
+          "amb-surface"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "edge_bands"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "chamfer_width": [
+              2
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "fillet",
+      "builder": "plate",
+      "amb": {
+        "fillet": 1,
+        "thickness": 1
+      },
+      "css": {
+        "classes": [
+          "ambient",
+          "amb-fillet",
+          "amb-surface"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "edge_bands"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "light": [
+              [
+                -1,
+                -1
+              ],
+              [
+                1,
+                -1
+              ],
+              [
+                -1,
+                1
+              ],
+              [
+                1,
+                1
+              ],
+              [
+                0,
+                -1
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                0
+              ],
+              [
+                1,
+                0
+              ]
+            ]
+          }
+        },
+        {
+          "vary": {
+            "key_light_intensity": [
+              0.3,
+              0.5,
+              0.7,
+              0.9
+            ]
+          }
+        },
+        {
+          "vary": {
+            "fill_light_intensity": [
+              0.3,
+              0.5,
+              0.7
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "fillet_w2",
+      "builder": "plate",
+      "amb": {
+        "fillet": 1,
+        "thickness": 2
+      },
+      "css": {
+        "classes": [
+          "ambient",
+          "amb-fillet-2",
+          "amb-surface"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "edge_bands"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "fillet_width": [
+              2
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "elevation",
+      "builder": "plate",
+      "amb": {
+        "elevation": 2
+      },
+      "geometry": {
+        "size": [
+          40,
+          40
+        ]
+      },
+      "css": {
+        "classes": [
+          "ambient",
+          "amb-surface"
+        ],
+        "size": [
+          40,
+          40
+        ]
+      },
+      "measure": [
+        "drop_shadow"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "elevation": [
+              0,
+              1,
+              2,
+              3
+            ]
+          }
+        },
+        {
+          "vary": {
+            "thickness": [
+              1,
+              2
+            ]
+          }
+        },
+        {
+          "vary": {
+            "light": [
+              [
+                -1,
+                -1
+              ],
+              [
+                1,
+                -1
+              ],
+              [
+                -1,
+                1
+              ],
+              [
+                1,
+                1
+              ],
+              [
+                0,
+                -1
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                0
+              ],
+              [
+                1,
+                0
+              ]
+            ]
+          }
+        },
+        {
+          "vary": {
+            "key_light_intensity": [
+              0.3,
+              0.6,
+              0.9
+            ]
+          }
+        },
+        {
+          "vary": {
+            "fill_light_intensity": [
+              0.3,
+              0.5,
+              0.7
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "thickness",
+      "builder": "plate",
+      "amb": {
+        "elevation": 0,
+        "thickness": 1
+      },
+      "geometry": {
+        "size": [
+          40,
+          40
+        ]
+      },
+      "css": {
+        "classes": [
+          "ambient",
+          "amb-surface"
+        ],
+        "size": [
+          40,
+          40
+        ]
+      },
+      "measure": [
+        "drop_shadow"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "thickness": [
+              0,
+              1,
+              2
+            ]
+          }
+        },
+        {
+          "vary": {
+            "light": [
+              [
+                -1,
+                -1
+              ],
+              [
+                1,
+                -1
+              ],
+              [
+                -1,
+                1
+              ],
+              [
+                1,
+                1
+              ],
+              [
+                0,
+                -1
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                0
+              ],
+              [
+                1,
+                0
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "concave",
+      "builder": "plate",
+      "amb": {
+        "surface": "concave",
+        "thickness": 1
+      },
+      "css": {
+        "classes": [
+          "amb-surface-concave"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "surface_gradient"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "light": [
+              [
+                -1,
+                -1
+              ],
+              [
+                0,
+                -1
+              ],
+              [
+                1,
+                -1
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                0
+              ]
+            ]
+          }
+        },
+        {
+          "vary": {
+            "key_light_intensity": [
+              0.3,
+              0.6,
+              0.9
+            ]
+          }
+        },
+        {
+          "vary": {
+            "fill_light_intensity": [
+              0.3,
+              0.7
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "concave_h",
+      "builder": "plate",
+      "amb": {
+        "surface": "concave-h",
+        "thickness": 1
+      },
+      "css": {
+        "classes": [
+          "amb-surface-concave-h"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "surface_gradient"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "light": [
+              [
+                -1,
+                -1
+              ],
+              [
+                -1,
+                0
+              ],
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                -1
+              ]
+            ]
+          }
+        },
+        {
+          "vary": {
+            "key_light_intensity": [
+              0.3,
+              0.9
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "convex",
+      "builder": "plate",
+      "amb": {
+        "surface": "convex",
+        "thickness": 1
+      },
+      "css": {
+        "classes": [
+          "amb-surface-convex"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "surface_gradient"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "light": [
+              [
+                0,
+                -1
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                -1
+              ]
+            ]
+          }
+        },
+        {
+          "vary": {
+            "key_light_intensity": [
+              0.3,
+              0.9
+            ]
+          }
+        },
+        {
+          "vary": {
+            "fill_light_intensity": [
+              0.3
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "shiny",
+      "builder": "dome",
+      "amb": {
+        "mat": "shiny",
+        "albedo": 0.2
+      },
+      "geometry": {
+        "size": [
+          40,
+          40
+        ],
+        "radius": 20
+      },
+      "css": {
+        "classes": [
+          "amb-mat-shiny",
+          "amb-surface"
+        ],
+        "size": [
+          40,
+          40
+        ]
+      },
+      "measure": [
+        "cyl_profile"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "light": [
+              [
+                -1,
+                -1
+              ],
+              [
+                -1,
+                0
+              ],
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                -1
+              ]
+            ]
+          }
+        },
+        {
+          "vary": {
+            "key_light_intensity": [
+              0.3,
+              0.6,
+              0.9
+            ]
+          }
+        },
+        {
+          "vary": {
+            "fill_light_intensity": [
+              0.3
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "shiny_ref",
+      "builder": "dome",
+      "amb": {
+        "albedo": 0.2
+      },
+      "geometry": {
+        "size": [
+          40,
+          40
+        ],
+        "radius": 20
+      },
+      "measure": [
+        "cyl_profile"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "light": [
+              [
+                -1,
+                -1
+              ],
+              [
+                -1,
+                0
+              ],
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                -1
+              ]
+            ]
+          }
+        },
+        {
+          "vary": {
+            "key_light_intensity": [
+              0.3,
+              0.6,
+              0.9
+            ]
+          }
+        },
+        {
+          "vary": {
+            "fill_light_intensity": [
+              0.3
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "groove",
+      "builder": "groove",
+      "amb": {
+        "thickness": 1
+      },
+      "geometry": {
+        "size": [
+          60,
+          24
+        ]
+      },
+      "css": {
+        "classes": [
+          "amb-groove"
+        ],
+        "size": [
+          60,
+          24
+        ]
+      },
+      "measure": [
+        "groove"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "light": [
+              [
+                -1,
+                -1
+              ],
+              [
+                1,
+                -1
+              ],
+              [
+                -1,
+                1
+              ],
+              [
+                1,
+                1
+              ],
+              [
+                0,
+                -1
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                0
+              ],
+              [
+                1,
+                0
+              ]
+            ]
+          }
+        },
+        {
+          "vary": {
+            "key_light_intensity": [
+              0.3,
+              0.6,
+              0.9
+            ]
+          }
+        },
+        {
+          "vary": {
+            "fill_light_intensity": [
+              0.3,
+              0.7
+            ]
+          }
+        },
+        {
+          "vary": {
+            "thickness": [
+              2
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "emit",
+      "builder": "plate",
+      "amb": {
+        "emit": "#ffffff",
+        "thickness": 1
+      },
+      "geometry": {
+        "size": [
+          40,
+          40
+        ]
+      },
+      "css": {
+        "classes": [
+          "amb-glow"
+        ],
+        "size": [
+          40,
+          40
+        ],
+        "style": "background:#ffffff"
+      },
+      "measure": [
+        "glow"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "key_light_intensity": [
+              0.1,
+              0.5,
+              0.9
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "lighter",
+      "builder": "plate",
+      "amb": {
+        "albedo": 0.91
+      },
+      "css": {
+        "classes": [
+          "amb-surface-lighter"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "surface_lightness"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "key_light_intensity": [
+              0.1,
+              0.3,
+              0.5,
+              0.7,
+              0.9,
+              1.0
+            ]
+          }
+        },
+        {
+          "vary": {
+            "fill_light_intensity": [
+              0.0,
+              0.35,
+              0.7
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "lightest",
+      "builder": "plate",
+      "amb": {
+        "albedo": 0.95
+      },
+      "css": {
+        "classes": [
+          "amb-surface-lightest"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "surface_lightness"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "key_light_intensity": [
+              0.1,
+              0.3,
+              0.5,
+              0.7,
+              0.9,
+              1.0
+            ]
+          }
+        },
+        {
+          "vary": {
+            "fill_light_intensity": [
+              0.0,
+              0.35,
+              0.7
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "darker",
+      "builder": "plate",
+      "amb": {
+        "albedo": 0.31
+      },
+      "css": {
+        "classes": [
+          "amb-surface-darker"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "surface_lightness"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "key_light_intensity": [
+              0.1,
+              0.3,
+              0.5,
+              0.7,
+              0.9,
+              1.0
+            ]
+          }
+        },
+        {
+          "vary": {
+            "fill_light_intensity": [
+              0.0,
+              0.35,
+              0.7
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "darkest",
+      "builder": "plate",
+      "amb": {
+        "albedo": 0.06
+      },
+      "css": {
+        "classes": [
+          "amb-surface-darkest"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "surface_lightness"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "key_light_intensity": [
+              0.1,
+              0.3,
+              0.5,
+              0.7,
+              0.9,
+              1.0
+            ]
+          }
+        },
+        {
+          "vary": {
+            "fill_light_intensity": [
+              0.0,
+              0.35,
+              0.7
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -35,51 +35,264 @@
   letter-spacing: var(--ambx-type-tracking);
 }
 
+/* Button: a chamfered key cap seated in a clearance well — the referent
+   is components/button.py's "flush" style (cap seated into a hole with a
+   shadow gap ring around it). The button element IS the well: a shallow
+   groove (seat depth ~1.2mm = thickness 0.27) whose lume interior shows
+   as the gap ring around the cap. Pressing sinks the cap by the
+   referent's 0.7mm travel (thickness 1 -> 0.84): the chamfer bands and
+   the swept shadow shrink with it for free. */
 .amb-button {
   cursor: pointer;
-  border: medium solid var(--amb-lume);
-  background-color: inherit;
-  padding: calc(var(--ambx-grid) * 2);
+  border: none;
+  padding: var(--ambx-grid-half);       /* the clearance gap ring */
+  --amb-thickness: 0.27;                 /* seat depth of the well */
+  background-color: var(--amb-lume);
+  border-radius: calc(var(--ambx-grid) * 3 + var(--ambx-grid-half));
+  min-width: calc(var(--ambx-grid) * 16);
+}
+
+.amb-button-cap {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  padding: calc(var(--ambx-grid) * 1.5) calc(var(--ambx-grid) * 2);
   border-radius: calc(var(--ambx-grid) * 3);
   text-transform: uppercase;
-  min-width: calc(var(--ambx-grid) * 16);
   font-weight: 600;
-  color: var(--amb-lume);
+  color: var(--amb-label);
 }
 
 .amb-button:focus {
   outline-offset: var(--ambx-grid);
 }
 
-.amb-button:hover,
-.amb-knob:hover {
-  border-color: var(--amb-highlight-color);
+.amb-button:hover .amb-button-cap {
+  color: var(--amb-highlight-color);
 }
 
-.amb-button:active {
-  --amb-elevation: 0;
+.amb-button:active .amb-button-cap {
+  --amb-thickness: 0.84;
 }
 
+/* Button shapes, matching the referent lineup (ambient3d/generate.py):
+   the default stadium key above, a round key (superellipse exponent 2 —
+   pair with amb-mat-shiny for the machined metal-button look), and a
+   squarer, flatter EP-133-style pad (exponent 6: tighter corners and a
+   3.6mm cap instead of the key's 4.5mm — thickness 0.8 — with the same
+   0.7mm press travel). */
+.amb-button.amb-button-round {
+  min-width: calc(var(--ambx-grid) * 12);
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+
+.amb-button-round .amb-button-cap {
+  height: 100%;
+  padding: var(--ambx-grid);
+  border-radius: 50%;
+}
+
+.amb-button.amb-button-square {
+  min-width: calc(var(--ambx-grid) * 14);
+  aspect-ratio: 1;
+  border-radius: calc(var(--ambx-grid) * 2);
+}
+
+.amb-button-square .amb-button-cap {
+  height: 100%;
+  padding: var(--ambx-grid);
+  border-radius: calc(var(--ambx-grid) * 1.5);
+  --amb-thickness: 0.8;
+}
+
+.amb-button.amb-button-square:active .amb-button-cap {
+  --amb-thickness: 0.64;
+}
+
+/* Knob: a knob-scale body (thickness 2 = the referent knob.py's 9mm
+   height) resting on the panel. The rotating face carries the knurl — a
+   repeating-conic rib pattern, physically the referent's ribs catching
+   key light on one flank and shading on the other — under a smooth
+   opaque top disc (the OP-1-style cap), with an accent indicator dot.
+   The whole face rotates with the value, so the ribs move under the
+   fingers like the real thing. */
 .amb-knob {
   border-radius: 50%;
   height: calc(var(--ambx-grid) * 16);
   width: calc(var(--ambx-grid) * 16);
-  border: medium solid var(--amb-lume);
 }
 
-.amb-knob-indicator {
+/* The body is the smooth circle at the tooth-root radius: it carries
+   the ambient drop shadow (kept circular — the teeth are too fine to
+   read in a penumbra) while the clipped face above it supplies the
+   knurled silhouette. */
+.amb-knob-body {
   position: absolute;
-  top: 6px;
+  inset: calc(var(--ambx-grid) / 2);
+  border-radius: 50%;
+}
+
+/* The rotating face: clipped to the straight-knurl silhouette (the
+   inline SVG clipPath in AmbientKnob), opaque at the knob's surface
+   color, with per-tooth flank shading — a lit leading flank and a
+   shaded trailing flank every 10deg, phase-aligned with the clip's
+   teeth (conic 0 is rotated to the +x axis where the tooth path
+   starts) — under the smooth top disc. */
+.amb-knob-face {
+  position: absolute;
+  inset: 0;
+  background-color: hsl(
+    var(--amb-light-hue)
+    var(--amb-light-saturation)
+    calc(
+      var(--amb-key-light-intensity) * 31.5% +
+        var(--amb-fill-light-intensity) * 26.4% + 43.6%
+    )
+  );
+  background-image:
+    radial-gradient(
+      circle,
+      hsl(
+        var(--amb-light-hue)
+        var(--amb-light-saturation)
+        calc(
+          var(--amb-key-light-intensity) * 31.5% +
+            var(--amb-fill-light-intensity) * 26.4% + 43.6%
+        )
+      ) 0 60%,
+      transparent 61%
+    ),
+    repeating-conic-gradient(
+      from 90deg,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% /
+        calc(var(--amb-key-light-intensity) * 0.35)) 0deg 1.4deg,
+      transparent 2.2deg 4.6deg,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% /
+        calc((var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
+          * 0.3 + 0.16)) 5deg 6.4deg,
+      transparent 7.2deg 10deg
+    );
+}
+
+/* Fluted face (flute variant — the OP-Z-style referent: 14 broad
+   ridges split by narrow grooves, pitch 25.714deg). Flank bands sit on
+   the clip's rising (0–2.1deg) and falling (18.5–20.6deg) flanks;
+   deeper flutes catch more key light, so both bands run stronger than
+   the 36-rib knurl's. */
+.amb-knob-face-flute {
+  background-image:
+    radial-gradient(
+      circle,
+      hsl(
+        var(--amb-light-hue)
+        var(--amb-light-saturation)
+        calc(
+          var(--amb-key-light-intensity) * 31.5% +
+            var(--amb-fill-light-intensity) * 26.4% + 43.6%
+        )
+      ) 0 60%,
+      transparent 61%
+    ),
+    repeating-conic-gradient(
+      from 90deg,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% /
+        calc(var(--amb-key-light-intensity) * 0.45)) 0deg 2.1deg,
+      transparent 3.2deg 17.4deg,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% /
+        calc((var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
+          * 0.35 + 0.2)) 18.5deg 20.6deg,
+      transparent 21.6deg 25.7143deg
+    );
+}
+
+/* Fine knurl (cap and wheel variants: 48 ribs, pitch 7.5deg) — the
+   36-rib pattern's angles scaled by 3/4, same flank alphas. */
+.amb-knob-face-fine {
+  background-image:
+    radial-gradient(
+      circle,
+      hsl(
+        var(--amb-light-hue)
+        var(--amb-light-saturation)
+        calc(
+          var(--amb-key-light-intensity) * 31.5% +
+            var(--amb-fill-light-intensity) * 26.4% + 43.6%
+        )
+      ) 0 60%,
+      transparent 61%
+    ),
+    repeating-conic-gradient(
+      from 90deg,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% /
+        calc(var(--amb-key-light-intensity) * 0.35)) 0deg 1.05deg,
+      transparent 1.65deg 3.45deg,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% /
+        calc((var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
+          * 0.3 + 0.16)) 3.75deg 4.8deg,
+      transparent 5.4deg 7.5deg
+    );
+}
+
+/* Encoder cap (cap variant — the OP-1-style referent's smooth
+   contrasting top disc, 0.35mm proud of the knurl): the accent disc
+   replaces the surface-colored center disc over the fine knurl. */
+.amb-knob-face-cap {
+  background-image:
+    radial-gradient(circle, var(--amb-highlight-color) 0 65%, transparent 66%),
+    repeating-conic-gradient(
+      from 90deg,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% /
+        calc(var(--amb-key-light-intensity) * 0.35)) 0deg 1.05deg,
+      transparent 1.65deg 3.45deg,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% /
+        calc((var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
+          * 0.3 + 0.16)) 3.75deg 4.8deg,
+      transparent 5.4deg 7.5deg
+    );
+}
+
+.amb-knob-indicator-dot {
+  position: absolute;
+  top: 16%;
   left: 50%;
   transform: translateX(-50%);
+  width: calc(var(--ambx-grid) * 2);
+  height: calc(var(--ambx-grid) * 2);
+  border-radius: 50%;
+  background: var(--amb-highlight-color);
 }
 
-.amb-knob-grip {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+/* Centered dot (flute variant): the OP-Z referent's dot sits in the
+   middle of the cap (dot_frac 0.32), not at the rim. */
+.amb-knob-indicator-dot-center {
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(var(--ambx-grid) * 4.5);
+  height: calc(var(--ambx-grid) * 4.5);
 }
 
+/* Radial indicator line (line variant): the referent's accent bar,
+   center to ~85% of the cap radius, pointing at 12 o'clock. */
+.amb-knob-indicator-line {
+  position: absolute;
+  top: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(var(--ambx-grid) * 0.75);
+  height: 34%;
+  border-radius: calc(var(--ambx-grid) * 0.375);
+  background: var(--amb-highlight-color);
+}
+
+.amb-knob:hover .amb-knob-indicator-dot,
+.amb-knob:hover .amb-knob-indicator-line {
+  background: color-mix(in oklab, var(--amb-highlight-color), white 25%);
+}
+
+/* Tracks are grounded grooves (.amb-groove supplies the recess: lit-wall
+   shadow band + far-wall bounce) with a lume interior — dark in bright
+   light, glowing in low light — overriding the groove's neutral floor. */
 .amb-fader {
   position: relative;
   width: var(--ambx-grid);
@@ -88,6 +301,9 @@
   background-color: var(--amb-lume);
 }
 
+/* Fader thumb: the referent (fader.py) is a pill cap on a stem — 7mm
+   tall (thickness 1.5) riding 2.2mm above the plate (elevation 0.28) —
+   with a single grip line across the top. */
 .amb-fader-thumb {
   position: absolute;
   width: calc(var(--ambx-grid) * 6);
@@ -95,55 +311,41 @@
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  border-radius: calc(var(--ambx-grid) * 3);
+  border-radius: calc(var(--ambx-grid) * 2);
   display: grid;
   place-items: center;
+  --amb-thickness: 1.5;
+  --amb-elevation: 0.28;
 }
 
-.amb-fader-grip {
-  display: flex;
-  gap: 2px;
+.amb-fader-gripline {
+  width: 70%;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--amb-lume);
 }
 
-.amb-fader-dot {
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle at 30% 30%,
-    color-mix(in oklab, var(--amb-lume), white 30%) 0%,
-    var(--amb-lume) 55%,
-    color-mix(in oklab, var(--amb-lume), black 35%) 100%
-  );
-}
-
+/* Slider: the referent (slider.py) is a shallow concave channel (1mm
+   deep = thickness 0.22), not a through-slot, with a domed disc thumb
+   gliding over it. */
 .amb-slider {
   position: relative;
-  height: var(--ambx-grid);
+  height: calc(var(--ambx-grid) * 1.5);
   width: calc(var(--ambx-grid) * 30);
   border-radius: var(--ambx-grid);
   background-color: var(--amb-lume);
+  --amb-thickness: 0.22;
 }
 
 .amb-slider-thumb {
   position: absolute;
-  width: calc(var(--ambx-grid) * 9);
+  width: calc(var(--ambx-grid) * 6);
   height: calc(var(--ambx-grid) * 6);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  border-radius: calc(var(--ambx-grid) * 3);
-  display: grid;
-  place-items: center;
-}
-
-.amb-slider-grip {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  box-shadow:
-    inset 0 var(--ambx-grid-quarter) var(--ambx-grid-quarter) rgb(255 255 255 / 0.28),
-    inset 0 calc(var(--ambx-grid-quarter) * -1) var(--ambx-grid-quarter) rgb(0 0 0 / 0.22);
+  border-radius: 50%;
+  --amb-thickness: 0.7;
 }
 
 .amb-led {
@@ -164,14 +366,63 @@
   box-shadow: none;
 }
 
+/* Switch: a slide switch like the referent (switch.py) — a pill riding
+   in a dark stadium recess (well 1.5mm deep = thickness 0.33; the pill
+   stands 2.6mm above the recess floor = thickness 0.58), with an
+   optional LED above. The pill slides, nothing presses. */
 .amb-switch {
-  position: relative;
-  width: calc(var(--ambx-grid) * 6);
-  height: calc(var(--ambx-grid) * 6);
-  border-radius: 50%;
   cursor: pointer;
-  border: medium solid var(--amb-lume);
+  border: none;
+  padding: 0;
+  background: none;
+  display: inline-grid;
+  justify-items: center;
+  gap: var(--ambx-grid);
   margin: 0;
+}
+
+.amb-switch-track {
+  position: relative;
+  display: block;
+  width: var(--ambx-switch-w);
+  height: var(--ambx-switch-h);
+  border-radius: calc(var(--ambx-switch-h) / 2);
+  background-color: var(--amb-lume);
+  --amb-thickness: 0.33;
+}
+
+.amb-switch-pill {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: calc(var(--ambx-switch-w) * 0.52);
+  height: calc(var(--ambx-switch-h) * 0.78);
+  border-radius: calc(var(--ambx-switch-h) * 0.39);
+  transform: translate(calc(var(--ambx-switch-h) * 0.11), -50%);
+  transition: transform 140ms ease;
+  --amb-thickness: 0.58;
+}
+
+.amb-switch-on .amb-switch-pill {
+  transform: translate(
+    calc(var(--ambx-switch-w) - 100% - var(--ambx-switch-h) * 0.11),
+    -50%
+  );
+}
+
+.amb-switch:hover .amb-switch-pill {
+  background-color: color-mix(
+    in oklab,
+    hsl(
+      var(--amb-light-hue)
+      var(--amb-light-saturation)
+      calc(
+        var(--amb-key-light-intensity) * 31.5% +
+          var(--amb-fill-light-intensity) * 26.4% + 43.6%
+      )
+    ),
+    var(--amb-highlight-color) 12%
+  );
 }
 
 .ambx-panel {
@@ -185,29 +436,23 @@
 }
 
 .ambx-switch {
-  --ambx-switch-size: calc(var(--ambx-grid) * 6);
-  width: var(--ambx-switch-size);
-  height: var(--ambx-switch-size);
-  display: inline-grid;
-  place-items: center;
-  padding: 0;
+  --ambx-switch-w: calc(var(--ambx-grid) * 12);
+  --ambx-switch-h: calc(var(--ambx-grid) * 6);
 }
 
 .ambx-switch-sm {
-  --ambx-switch-size: calc(var(--ambx-grid) * 5);
+  --ambx-switch-w: calc(var(--ambx-grid) * 10);
+  --ambx-switch-h: calc(var(--ambx-grid) * 5);
 }
 
 .ambx-switch-md {
-  --ambx-switch-size: calc(var(--ambx-grid) * 6);
+  --ambx-switch-w: calc(var(--ambx-grid) * 12);
+  --ambx-switch-h: calc(var(--ambx-grid) * 6);
 }
 
 .ambx-switch-lg {
-  --ambx-switch-size: calc(var(--ambx-grid) * 8);
-}
-
-.amb-switch-on {
-  box-shadow:
-    inset 0 0 0 var(--ambx-grid-quarter) rgb(255 255 255 / 0.25);
+  --ambx-switch-w: calc(var(--ambx-grid) * 16);
+  --ambx-switch-h: calc(var(--ambx-grid) * 8);
 }
 
 .ambx-stack {

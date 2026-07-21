@@ -1,57 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   AmbientProvider,
-  AmbientPanel,
   AmbientButton,
   AmbientKnob,
   AmbientFader,
   AmbientSlider,
   AmbientSwitch,
+  AmbientPanel,
   type AmbientTheme,
+  type AmbientKnobVariant,
 } from "@ambientcss/components";
-
-/* ── Scroll-driven theme keyframes ────────────────────────────────────────
-   As the user scrolls, the global lighting morphs through these states.    */
-
-type LightFrame = {
-  lightX: number;
-  lightY: number;
-  keyLight: number;
-  fillLight: number;
-  lightHue: number;
-  lightSaturation: number;
-};
-
-const LIGHT_FRAMES: LightFrame[] = [
-  // Hero – bright, top-left
-  { lightX: -1, lightY: -1, keyLight: 0.92, fillLight: 0.72, lightHue: 234, lightSaturation: 10 },
-  // Orbit – rotating light (starting point, will be overridden locally)
-  { lightX: 1, lightY: -0.5, keyLight: 0.85, fillLight: 0.65, lightHue: 220, lightSaturation: 15 },
-  // Elevation – dramatic top light
-  { lightX: 0, lightY: -1, keyLight: 0.9, fillLight: 0.5, lightHue: 240, lightSaturation: 8 },
-  // Surfaces – warm side light
-  { lightX: -1, lightY: 0, keyLight: 0.88, fillLight: 0.6, lightHue: 30, lightSaturation: 20 },
-  // Edges – cool overhead
-  { lightX: 0.3, lightY: -1, keyLight: 0.82, fillLight: 0.55, lightHue: 210, lightSaturation: 18 },
-  // Components – neutral bright
-  { lightX: -0.7, lightY: -0.7, keyLight: 0.9, fillLight: 0.7, lightHue: 234, lightSaturation: 5 },
-  // Theming playground – neutral bright (user takes over here)
-  { lightX: -0.7, lightY: -0.7, keyLight: 0.9, fillLight: 0.7, lightHue: 234, lightSaturation: 5 },
-  // Finale – bright dawn
-  { lightX: -1, lightY: -1, keyLight: 0.95, fillLight: 0.8, lightHue: 40, lightSaturation: 12 },
-];
-
-function lerpFrame(a: LightFrame, b: LightFrame, t: number): LightFrame {
-  const l = (x: number, y: number) => x + (y - x) * t;
-  return {
-    lightX: l(a.lightX, b.lightX),
-    lightY: l(a.lightY, b.lightY),
-    keyLight: l(a.keyLight, b.keyLight),
-    fillLight: l(a.fillLight, b.fillLight),
-    lightHue: l(a.lightHue, b.lightHue),
-    lightSaturation: l(a.lightSaturation, b.lightSaturation),
-  };
-}
 
 /* ── Intersection observer hook ───────────────────────────────────────── */
 
@@ -73,10 +31,14 @@ function useInView(threshold = 0.25) {
   return { ref, visible };
 }
 
-/* ── Theming presets ──────────────────────────────────────────────────── */
+/* ── Theming presets ──────────────────────────────────────────────────────
+   The lighting is driven entirely by the header now (presets + the settings
+   pulldown) — not by scroll. Every scene below re-lights from the same theme. */
 
 type ThemePreset = {
   label: string;
+  icon: string;
+  led: string;         // indicator colour
   lightX: number;      // -1..1
   lightY: number;      // -1..1
   keyLight: number;    // 0..1
@@ -86,16 +48,46 @@ type ThemePreset = {
   lumeHue: number; // 0..360
 };
 
-// Day/Night use the exact values from the original sticky day→night transition
 const THEME_PRESETS: ThemePreset[] = [
-  { label: "Day",    lightX: -0.7, lightY: -0.7, keyLight: 0.9,  fillLight: 0.7,  lightHue: 234, lightSaturation: 5,  lumeHue: 16 },
-  { label: "Night",  lightX: 0.7,  lightY: -0.7, keyLight: 0.3,  fillLight: 0.1,  lightHue: 250, lightSaturation: 30, lumeHue: 16 },
-  { label: "Sci-Fi", lightX: 0,    lightY: -0.9, keyLight: 0.2,  fillLight: 0.05, lightHue: 190, lightSaturation: 50, lumeHue: 180 },
-  { label: "Fun",    lightX: 0,    lightY: -1,   keyLight: 0.55, fillLight: 0,    lightHue: 0,   lightSaturation: 100, lumeHue: 0 },
+  { label: "Day",    icon: "☀", led: "#f59e0b", lightX: -0.7, lightY: -0.7, keyLight: 0.9,  fillLight: 0.7,  lightHue: 234, lightSaturation: 5,   lumeHue: 16 },
+  { label: "Night",  icon: "☾", led: "#6366f1", lightX: 0.7,  lightY: -0.7, keyLight: 0.3,  fillLight: 0.1,  lightHue: 250, lightSaturation: 30,  lumeHue: 16 },
+  { label: "Sci-Fi", icon: "✦", led: "#22d3d3", lightX: 0,    lightY: -0.9, keyLight: 0.2,  fillLight: 0.05, lightHue: 190, lightSaturation: 50,  lumeHue: 180 },
+  { label: "Fun",    icon: "✷", led: "#ec4899", lightX: 0,    lightY: -1,   keyLight: 0.55, fillLight: 0,    lightHue: 0,   lightSaturation: 100, lumeHue: 0 },
+];
+
+const DEFAULTS = THEME_PRESETS[0]!;
+
+/* The settings pulldown is a little lighting console: one AmbientKnob per
+   light parameter. The knobs themselves re-shade as you turn them, since
+   they're lit by the very light they control. */
+type KnobCfg = {
+  key: string;
+  label: string;
+  prop: keyof AmbientTheme;
+  variant: AmbientKnobVariant;
+  min: number;
+  max: number;
+  step: number;
+  value: (t: ThemePreset) => number;
+  to: (v: number) => number;
+};
+
+const LIGHT_KNOBS: KnobCfg[] = [
+  { key: "lx",   label: "Light X", prop: "lightX",         variant: "line",  min: -100, max: 100, step: 2, value: (t) => Math.round(t.lightX * 100),  to: (v) => v / 100 },
+  { key: "ly",   label: "Light Y", prop: "lightY",         variant: "line",  min: -100, max: 100, step: 2, value: (t) => Math.round(t.lightY * 100),  to: (v) => v / 100 },
+  { key: "key",  label: "Key",     prop: "keyLight",       variant: "dot",   min: 0,    max: 100, step: 1, value: (t) => Math.round(t.keyLight * 100), to: (v) => v / 100 },
+  { key: "fill", label: "Fill",    prop: "fillLight",      variant: "dot",   min: 0,    max: 100, step: 1, value: (t) => Math.round(t.fillLight * 100), to: (v) => v / 100 },
+  { key: "hue",  label: "Hue",     prop: "lightHue",       variant: "flute", min: 0,    max: 360, step: 2, value: (t) => Math.round(t.lightHue),       to: (v) => v },
+  { key: "sat",  label: "Sat",     prop: "lightSaturation", variant: "dot",  min: 0,    max: 100, step: 1, value: (t) => Math.round(t.lightSaturation), to: (v) => v },
+  { key: "lume", label: "Lume",    prop: "lumeHue",        variant: "cap",   min: 0,    max: 360, step: 2, value: (t) => Math.round(t.lumeHue),        to: (v) => v },
 ];
 
 const ORBIT_COUNT = 9;
 const ANIM_DURATION = 800; // ms for preset transitions
+
+// Each cord is a short chain of shiny ambient balls; the topmost sit behind
+// the panel so a pull pays more of them out from under its edge.
+const CHAIN_BEADS = Array.from({ length: 6 });
 
 /* ══════════════════════════════════════════════════════════════════════════
    APP
@@ -103,15 +95,17 @@ const ANIM_DURATION = 800; // ms for preset transitions
 
 export function App() {
   const [theme, setTheme] = useState<AmbientTheme>({
-    lightX: LIGHT_FRAMES[0]!.lightX,
-    lightY: LIGHT_FRAMES[0]!.lightY,
-    keyLight: LIGHT_FRAMES[0]!.keyLight,
-    fillLight: LIGHT_FRAMES[0]!.fillLight,
-    lightHue: LIGHT_FRAMES[0]!.lightHue,
-    lightSaturation: LIGHT_FRAMES[0]!.lightSaturation,
+    lightX: DEFAULTS.lightX,
+    lightY: DEFAULTS.lightY,
+    keyLight: DEFAULTS.keyLight,
+    fillLight: DEFAULTS.fillLight,
+    lightHue: DEFAULTS.lightHue,
+    lightSaturation: DEFAULTS.lightSaturation,
+    lumeHue: DEFAULTS.lumeHue,
   });
+  const [activePreset, setActivePreset] = useState("Day");
 
-  /* Scroll to next section helper -------------------------------------------- */
+  /* Scroll navigation helpers --------------------------------------------- */
   const scrollToNextSection = useCallback((currentRef: React.RefObject<HTMLElement | null>) => {
     const current = currentRef.current;
     if (!current) return;
@@ -122,142 +116,81 @@ export function App() {
     }
   }, []);
 
-  /* Scroll to top helper ------------------------------------------------------ */
   const scrollToTop = useCallback(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  /* Scroll-driven lighting ------------------------------------------------ */
-  const ticking = useRef(false);
-  const playgroundRef = useRef<HTMLDivElement>(null);
-  const MAT_FRAME: LightFrame = {
-    lightX: -0.07149788059853948,
-    lightY: -0.8371655411643154,
-    keyLight: 0.9096766095862159,
-    fillLight: 0.3450576107922515,
-    lightHue: 183.35334881144593,
-    lightSaturation: 23.652771721409685,
-  };
-  const handleScroll = useCallback(() => {
-    if (ticking.current) return;
-    ticking.current = true;
-    requestAnimationFrame(() => {
-      // Check if playground section is in view
-      const pgEl = playgroundRef.current;
-      if (pgEl) {
-        const rect = pgEl.getBoundingClientRect();
-        const vh = window.innerHeight;
-        const inView = rect.top < vh * 0.5 && rect.bottom > vh * 0.5;
-        if (inView) {
-          ticking.current = false;
-          return; // Don't update theme from scroll while playground is active
-        }
-      }
-
-      const scrollY = window.scrollY;
-      const vh = window.innerHeight;
-      const totalScroll = document.documentElement.scrollHeight - vh;
-      const globalProgress = totalScroll > 0 ? scrollY / totalScroll : 0;
-
-      const frameCount = LIGHT_FRAMES.length - 1;
-      const raw = globalProgress * frameCount;
-      const idx = Math.min(Math.floor(raw), frameCount - 1);
-      const t = raw - idx;
-
-      let frame = lerpFrame(LIGHT_FRAMES[idx]!, LIGHT_FRAMES[idx + 1]!, t);
-
-      // Blend toward dramatic materials lighting as the materials section centres in the viewport
-      const matEl = matSectionRef.current;
-      if (matEl) {
-        const rect = matEl.getBoundingClientRect();
-        const sectionMid = rect.top + rect.height / 2;
-        const distFromCenter = Math.abs(sectionMid - vh / 2);
-        const blend = Math.max(0, 1 - distFromCenter / (vh * 0.6));
-        if (blend > 0) frame = lerpFrame(frame, MAT_FRAME, blend);
-      }
-
-      setTheme({
-        lightX: frame.lightX,
-        lightY: frame.lightY,
-        keyLight: frame.keyLight,
-        fillLight: frame.fillLight,
-        lightHue: frame.lightHue,
-        lightSaturation: frame.lightSaturation,
-      });
-
-      ticking.current = false;
-    });
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
-
-  /* Animated theme transitions -------------------------------------------- */
+  /* Animated theme transitions (preset chips) ----------------------------- */
   const animRef = useRef<number>(0);
-  const animFrom = useRef<ThemePreset | null>(null);
-  const animTo = useRef<ThemePreset | null>(null);
+  const animFrom = useRef<AmbientTheme | null>(null);
+  const animTo = useRef<AmbientTheme | null>(null);
   const animStart = useRef(0);
   const themeRef = useRef(theme);
   themeRef.current = theme;
 
   const animateToPreset = useCallback((target: ThemePreset) => {
-    // Cancel any running animation
+    setActivePreset(target.label);
     if (animRef.current) cancelAnimationFrame(animRef.current);
 
-    // Snapshot current theme as starting point (via ref to avoid stale closure)
     const cur = themeRef.current;
     animFrom.current = {
-      label: "",
-      lightX: cur.lightX ?? 0,
-      lightY: cur.lightY ?? 0,
-      keyLight: cur.keyLight ?? 0.9,
-      fillLight: cur.fillLight ?? 0.7,
-      lightHue: cur.lightHue ?? 234,
-      lightSaturation: cur.lightSaturation ?? 5,
-      lumeHue: cur.lumeHue ?? 16,
+      lightX: cur.lightX ?? DEFAULTS.lightX,
+      lightY: cur.lightY ?? DEFAULTS.lightY,
+      keyLight: cur.keyLight ?? DEFAULTS.keyLight,
+      fillLight: cur.fillLight ?? DEFAULTS.fillLight,
+      lightHue: cur.lightHue ?? DEFAULTS.lightHue,
+      lightSaturation: cur.lightSaturation ?? DEFAULTS.lightSaturation,
+      lumeHue: cur.lumeHue ?? DEFAULTS.lumeHue,
     };
-    animTo.current = target;
+    animTo.current = {
+      lightX: target.lightX,
+      lightY: target.lightY,
+      keyLight: target.keyLight,
+      fillLight: target.fillLight,
+      lightHue: target.lightHue,
+      lightSaturation: target.lightSaturation,
+      lumeHue: target.lumeHue,
+    };
     animStart.current = performance.now();
 
     function tick(now: number) {
       const from = animFrom.current!;
       const to = animTo.current!;
-      const elapsed = now - animStart.current;
-      const rawT = Math.min(elapsed / ANIM_DURATION, 1);
-      // Ease out cubic for smooth deceleration
-      const t = 1 - Math.pow(1 - rawT, 3);
-
+      const rawT = Math.min((now - animStart.current) / ANIM_DURATION, 1);
+      const t = 1 - Math.pow(1 - rawT, 3); // ease-out cubic
       const lerp = (a: number, b: number) => a + (b - a) * t;
 
       setTheme({
-        lightX: lerp(from.lightX, to.lightX),
-        lightY: lerp(from.lightY, to.lightY),
-        keyLight: lerp(from.keyLight, to.keyLight),
-        fillLight: lerp(from.fillLight, to.fillLight),
-        lightHue: lerp(from.lightHue, to.lightHue),
-        lightSaturation: lerp(from.lightSaturation, to.lightSaturation),
-        lumeHue: lerp(from.lumeHue, to.lumeHue),
+        lightX: lerp(from.lightX!, to.lightX!),
+        lightY: lerp(from.lightY!, to.lightY!),
+        keyLight: lerp(from.keyLight!, to.keyLight!),
+        fillLight: lerp(from.fillLight!, to.fillLight!),
+        lightHue: lerp(from.lightHue!, to.lightHue!),
+        lightSaturation: lerp(from.lightSaturation!, to.lightSaturation!),
+        lumeHue: lerp(from.lumeHue!, to.lumeHue!),
       });
 
-      if (rawT < 1) {
-        animRef.current = requestAnimationFrame(tick);
-      } else {
-        animRef.current = 0;
-      }
+      if (rawT < 1) animRef.current = requestAnimationFrame(tick);
+      else animRef.current = 0;
     }
 
     animRef.current = requestAnimationFrame(tick);
   }, []);
 
-  // Cancel animation and set a single theme property (for control changes)
+  // Set a single theme property (the custom-cord light console).
   const setThemeProp = useCallback((key: keyof AmbientTheme, value: number) => {
     if (animRef.current) { cancelAnimationFrame(animRef.current); animRef.current = 0; }
+    setActivePreset("Custom");
     setTheme(prev => ({ ...prev, [key]: value }));
   }, []);
 
-  // Cleanup animation on unmount
+  // Pulling the Custom cord marks the theme "Custom" and hands the scene to
+  // the console — the light keeps its current values, now free to tune.
+  const activateCustom = useCallback(() => {
+    if (animRef.current) { cancelAnimationFrame(animRef.current); animRef.current = 0; }
+    setActivePreset("Custom");
+  }, []);
+
   useEffect(() => {
     return () => { if (animRef.current) cancelAnimationFrame(animRef.current); };
   }, []);
@@ -273,22 +206,24 @@ export function App() {
   /* InView hooks for each section ----------------------------------------- */
   const orbitView = useInView(0.2);
   const elevView = useInView(0.15);
+  const thickView = useInView(0.2);
   const surfView = useInView(0.2);
   const matView = useInView(0.2);
   const edgeView = useInView(0.2);
+  const grooveView = useInView(0.2);
   const compView = useInView(0.1);
-  const playgroundView = useInView(0.1);
   const finaleView = useInView(0.3);
 
   /* Section refs for scroll navigation ------------------------------------ */
   const heroRef = useRef<HTMLElement>(null);
   const orbitSectionRef = useRef<HTMLElement>(null);
   const elevSectionRef = useRef<HTMLElement>(null);
+  const thickSectionRef = useRef<HTMLElement>(null);
   const surfSectionRef = useRef<HTMLElement>(null);
   const matSectionRef = useRef<HTMLElement>(null);
   const edgeSectionRef = useRef<HTMLElement>(null);
+  const grooveSectionRef = useRef<HTMLElement>(null);
   const compSectionRef = useRef<HTMLElement>(null);
-  const playgroundSectionRef = useRef<HTMLElement>(null);
 
   /* Orbit: pointer/touch-driven light direction ───────────────────────── */
   const [orbitLight, setOrbitLight] = useState({ x: -1, y: -1 });
@@ -315,21 +250,30 @@ export function App() {
       tabIndex={0}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') scrollToNextSection(sectionRef); }}
     >
-      <div className="scroll-down-circle ambient amb-surface amb-chamfer amb-rounded-full">
+      <div className="scroll-down-circle ambient amb-surface amb-rounded-full">
         <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7" /></svg>
       </div>
     </div>
   );
 
+  const mergedTheme = { ...DEFAULTS, ...theme };
+
   return (
     <AmbientProvider className="amb-surface" theme={theme}>
 
+      {/* ── HEADER — global light control ────────────────────────────── */}
+      <PullCordSwitcher
+        theme={mergedTheme}
+        activePreset={activePreset}
+        onPreset={animateToPreset}
+        onCustom={activateCustom}
+        onProp={setThemeProp}
+      />
+
       {/* ── 1. HERO ──────────────────────────────────────────────────── */}
       <section className="hero amb-surface" ref={heroRef}>
-        <div>
-          <div className="hero-title">ambient</div>
-          <div className="hero-sub">physically based css</div>
-        </div>
+        <div className="hero-title">ambient</div>
+        <div className="hero-sub">physically based css</div>
         <div
           className="hero-scroll-hint"
           onClick={() => scrollToNextSection(heroRef)}
@@ -337,7 +281,7 @@ export function App() {
           tabIndex={0}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') scrollToNextSection(heroRef); }}
         >
-          <div className="hero-scroll-circle ambient amb-surface amb-chamfer amb-bounce amb-rounded-full">
+          <div className="hero-scroll-circle ambient amb-surface amb-bounce amb-rounded-full">
             <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7" /></svg>
           </div>
           <span>Scroll</span>
@@ -386,7 +330,7 @@ export function App() {
             {([0, 1, 2, 3] as const).map((elev, i) => (
               <div className="elevation-item" key={elev}>
                 <div
-                  className={`elevation-circle ambient amb-surface amb-chamfer amb-elevation-${elev}`}
+                  className={`elevation-circle ambient amb-surface-lighter amb-elevation-${elev}`}
                   data-visible={elevView.visible}
                   style={{ transitionDelay: `${i * 0.08}s` }}
                 />
@@ -395,7 +339,7 @@ export function App() {
             ))}
             <div className="elevation-item">
               <div
-                className="elevation-circle ambient amb-surface amb-chamfer amb-bounce"
+                className="elevation-circle ambient amb-surface-lighter amb-bounce"
                 data-visible={elevView.visible}
                 style={{ transitionDelay: "0.32s" }}
               />
@@ -404,6 +348,30 @@ export function App() {
           </div>
         </div>
         <ScrollButton sectionRef={elevSectionRef} />
+      </section>
+
+      {/* ── THICKNESS (grounded) ─────────────────────────────────────── */}
+      <section className="scene amb-surface" ref={thickSectionRef}>
+        <div className="scene-inner" ref={thickView.ref}>
+          <div className="scene-label">Thickness</div>
+          <div className="elevation-row">
+            {[
+              { t: 0, label: "t0 · sheet" },
+              { t: 1, label: "t1 · button" },
+              { t: 2, label: "t2 · knob" },
+            ].map(({ t, label }, i) => (
+              <div className="elevation-item" key={t}>
+                <div
+                  className={`elevation-circle ambient amb-surface-lighter amb-chamfer amb-thickness-${t}`}
+                  data-visible={thickView.visible}
+                  style={{ transitionDelay: `${i * 0.1}s` }}
+                />
+                <span className="elevation-label">{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <ScrollButton sectionRef={thickSectionRef} />
       </section>
 
       {/* ── 4. SURFACES ──────────────────────────────────────────────── */}
@@ -420,13 +388,7 @@ export function App() {
                 <div
                   className={`surface-swatch ambient amb-chamfer-2 amb-elevation-2 ${cls}`}
                   data-visible={surfView.visible}
-                  style={{
-                    transitionDelay: `${i * 0.12}s`,
-                    "--amb-light-y": -1,
-                    "--amb-light-x": -0.8,
-                    "--amb-key-light-intensity": 0.9,
-                    "--amb-fill-light-intensity": 0.45,
-                  } as React.CSSProperties}
+                  style={{ transitionDelay: `${i * 0.12}s` } as React.CSSProperties}
                 />
                 <span className="surface-label">{label}</span>
               </div>
@@ -496,10 +458,8 @@ export function App() {
             {[
               { cls: "amb-chamfer", elev: 1, label: "Chamfer" },
               { cls: "amb-chamfer-2", elev: 1, label: "Chamfer 2x" },
-              { cls: "amb-chamfer-minus-1", elev: 0, label: "Chamfer -1" },
               { cls: "amb-fillet", elev: 1, label: "Fillet" },
               { cls: "amb-fillet-2", elev: 1, label: "Fillet 2x" },
-              { cls: "amb-fillet-minus-1", elev: 0, label: "Fillet -1" },
             ].map(({ cls, elev, label }, i) => (
               <div className="edge-item" key={label}>
                 <div
@@ -515,7 +475,31 @@ export function App() {
         <ScrollButton sectionRef={edgeSectionRef} />
       </section>
 
-      {/* ── 6. COMPONENTS ─────────────────────────────────────────────── */}
+      {/* ── GROOVE (grounded) ────────────────────────────────────────── */}
+      <section className="scene amb-surface" ref={grooveSectionRef}>
+        <div className="scene-inner" ref={grooveView.ref}>
+          <div className="scene-label">Groove</div>
+          <div className="groove-wall">
+            {[
+              { cls: "groove-channel", label: "Channel", tone: "lume" },
+              { cls: "groove-well", label: "Well", tone: "darker" },
+              { cls: "groove-inset", label: "Inset", tone: "darker" },
+            ].map(({ cls, label, tone }, i) => (
+              <div className="groove-item" key={label}>
+                <div
+                  className={`groove-swatch ambient amb-groove ${cls} groove-${tone}`}
+                  data-visible={grooveView.visible}
+                  style={{ transitionDelay: `${i * 0.1}s` }}
+                />
+                <span className="groove-label">{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <ScrollButton sectionRef={grooveSectionRef} />
+      </section>
+
+      {/* ── 7. COMPONENTS ─────────────────────────────────────────────── */}
       <section className="scene amb-surface" ref={compSectionRef}>
         <div className="scene-inner" ref={compView.ref}>
           <div className="scene-label">Components</div>
@@ -525,7 +509,7 @@ export function App() {
               <AmbientKnob value={knob1} onChange={setKnob1} label="Knob" />
             </div>
             <div className="component-cell" data-visible={compView.visible}>
-              <AmbientKnob value={knob2} onChange={setKnob2} label="Knob" />
+              <AmbientKnob value={knob2} onChange={setKnob2} variant="flute" label="Knob" />
             </div>
             <div className="component-cell" data-visible={compView.visible}>
               <AmbientSlider value={slider1} min={0} max={100} onChange={setSlider1} label="Slider" />
@@ -542,6 +526,12 @@ export function App() {
             <div className="component-cell" data-visible={compView.visible}>
               <AmbientButton>Button</AmbientButton>
             </div>
+            <div className="component-cell" data-visible={compView.visible}>
+              <AmbientButton shape="round" material="shiny" aria-label="Round button" />
+            </div>
+            <div className="component-cell" data-visible={compView.visible}>
+              <AmbientButton shape="square">FX</AmbientButton>
+            </div>
           </div>
           <div className="comp-led-row" data-visible={compView.visible}>
             <div className="amb-led" style={{ "--amb-led-color": "#ef4444" } as React.CSSProperties} />
@@ -550,80 +540,6 @@ export function App() {
           </div>
         </div>
         <ScrollButton sectionRef={compSectionRef} />
-      </section>
-
-      {/* ── 7. THEMING PLAYGROUND ─────────────────────────────────────── */}
-      <section className="scene amb-surface" ref={playgroundSectionRef}>
-        <div className="scene-inner" ref={playgroundView.ref}>
-          <div className="scene-label">Endless Theming Possibilities</div>
-          <div className="scene-hint">tap a preset or tweak the controls</div>
-
-          <div className="theme-presets">
-            {THEME_PRESETS.map((preset) => (
-              <AmbientButton
-                key={preset.label}
-                onClick={() => animateToPreset(preset)}
-              >
-                {preset.label}
-              </AmbientButton>
-            ))}
-          </div>
-
-          <div className="theme-playground">
-            <div className="theme-controls">
-              <div className="theme-controls-row">
-                <AmbientKnob
-                  value={Math.round((theme.keyLight ?? 0.9) * 100)}
-                  onChange={(v) => setThemeProp("keyLight", v / 100)}
-                  label="Key Light"
-                  material="shiny"
-                />
-                <AmbientFader
-                  value={Math.round((theme.lightY ?? 0) * -100)}
-                  min={-100}
-                  max={100}
-                  onChange={(v) => setThemeProp("lightY", v / -100)}
-                  label="Light Y"
-                  material="glass"
-                />
-                <AmbientKnob
-                  value={Math.round((theme.fillLight ?? 0.7) * 100)}
-                  onChange={(v) => setThemeProp("fillLight", v / 100)}
-                  label="Fill Light"
-                  material="shiny"
-                />
-              </div>
-              <div className="theme-controls-row">
-                <AmbientSlider
-                  value={Math.round((theme.lightX ?? 0) * 100)}
-                  min={-100}
-                  max={100}
-                  onChange={(v) => setThemeProp("lightX", v / 100)}
-                  label="Light X"
-                  material="glass"
-                />
-              </div>
-              <div className="theme-controls-row">
-                <AmbientKnob
-                  value={Math.round(((theme.lightHue ?? 234) / 360) * 100)}
-                  onChange={(v) => setThemeProp("lightHue", (v / 100) * 360)}
-                  label="Hue"
-                />
-                <AmbientKnob
-                  value={Math.round(theme.lightSaturation ?? 5)}
-                  onChange={(v) => setThemeProp("lightSaturation", v)}
-                  label="Saturation"
-                />
-                <AmbientKnob
-                  value={Math.round(((theme.lumeHue ?? 16) / 360) * 100)}
-                  onChange={(v) => setThemeProp("lumeHue", (v / 100) * 360)}
-                  label="Lume Hue"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-        <ScrollButton sectionRef={playgroundSectionRef} />
       </section>
 
       {/* ── 8. FINALE ────────────────────────────────────────────────── */}
@@ -637,27 +553,31 @@ export function App() {
           <div className="finale-sub" data-visible={finaleView.visible}>physically based css</div>
           <div className="finale-links">
             <a
-              className="finale-link ambient amb-surface amb-chamfer amb-elevation-1 amb-rounded-lg"
+              className="finale-link amb-button amb-groove ambx-button"
               href="https://github.com/kikkupico/ambientcss"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <svg className="finale-link-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
-              </svg>
-              GitHub
+              <span className="amb-button-cap ambient amb-chamfer amb-surface amb-heading-3 amb-mat-matte">
+                <svg className="finale-link-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
+                </svg>
+                GitHub
+              </span>
             </a>
             <a
-              className="finale-link ambient amb-surface amb-chamfer amb-elevation-1 amb-rounded-lg"
+              className="finale-link amb-button amb-groove ambx-button"
               href="https://kikkupico.github.io/ambientcss/"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <svg className="finale-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-              </svg>
-              Docs
+              <span className="amb-button-cap ambient amb-chamfer amb-surface amb-heading-3 amb-mat-matte">
+                <svg className="finale-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                </svg>
+                Docs
+              </span>
             </a>
           </div>
           <div
@@ -667,7 +587,7 @@ export function App() {
             tabIndex={0}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') scrollToTop(); }}
           >
-            <div className="scroll-top-circle ambient amb-surface amb-chamfer amb-rounded-full">
+            <div className="scroll-top-circle ambient amb-surface amb-rounded-full">
               <svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7" /></svg>
             </div>
             <span>Top</span>
@@ -676,5 +596,150 @@ export function App() {
       </section>
 
     </AmbientProvider>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   PULL-CORD SWITCHER — the header. Five cords hang from a housing rail: one
+   per theme preset, plus a "Custom" cord. Pulling a cord activates its theme
+   and drops the cord — the lowered cord IS the current-selection indicator,
+   so only one hangs low at a time. Pulling Custom draws the light-console
+   assembly down from the rail; clicking outside (or Esc) rolls it back up.
+   Reuses the same THEME_PRESETS / LIGHT_KNOBS / re-light machinery ThemeBar
+   used to drive.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+type PullCordSwitcherProps = {
+  theme: ThemePreset;
+  activePreset: string;
+  onPreset: (p: ThemePreset) => void;
+  onCustom: () => void;
+  onProp: (key: keyof AmbientTheme, value: number) => void;
+};
+
+function PullCordSwitcher({ theme, activePreset, onPreset, onCustom, onProp }: PullCordSwitcherProps) {
+  const [consoleOpen, setConsoleOpen] = useState(false);
+  // A pull is a transient tug: the cord springs down and snaps back like a
+  // real draw cord (the persistent glow, not the position, marks the active
+  // one). tugNonce re-keys the tugged rod so its spring animation replays.
+  const [tugLabel, setTugLabel] = useState<string | null>(null);
+  const [tugNonce, setTugNonce] = useState(0);
+  const rigRef = useRef<HTMLDivElement>(null);
+
+  // While the console is down, a click outside the rig (or Escape) rolls the
+  // whole assembly back up. Custom stays the active theme — its cord stays low.
+  useEffect(() => {
+    if (!consoleOpen) return;
+    const onDown = (e: PointerEvent) => {
+      if (!rigRef.current?.contains(e.target as Node)) setConsoleOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setConsoleOpen(false); };
+    document.addEventListener("pointerdown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [consoleOpen]);
+
+  const tug = (label: string) => { setTugLabel(label); setTugNonce((n) => n + 1); };
+  const pullTheme = (p: ThemePreset) => { tug(p.label); onPreset(p); setConsoleOpen(false); };
+  const pullCustom = () => { tug("Custom"); onCustom(); setConsoleOpen((o) => !o); };
+
+  const customActive = activePreset === "Custom";
+
+  return (
+    <header className="cordbar">
+      <div className={`cord-assembly${consoleOpen ? " is-open" : ""}`} ref={rigRef}>
+        {/* One thick slab of the surface itself. Its upper region is the light
+            console, parked above the top of the screen; only the bottom lip
+            shows at rest. Pulling Custom drops the whole slab into view — the
+            console was always just the hidden part of this panel. */}
+        <div className="cord-panel ambient amb-surface amb-chamfer amb-thickness-2 amb-elevation-1">
+          <div className="cord-console">
+            <div className="cord-console-title">
+              Global light
+              <span className="cord-console-preset">Custom</span>
+            </div>
+            {/* Controls sit in a recessed darker well so they pop and read
+                apart from the cord labels below. */}
+            <div className="cord-console-well ambient amb-groove groove-darker">
+              <div className="cord-console-grid">
+                {LIGHT_KNOBS.map((k) => (
+                  <AmbientKnob
+                    key={k.key}
+                    value={k.value(theme)}
+                    min={k.min}
+                    max={k.max}
+                    step={k.step}
+                    variant={k.variant}
+                    onChange={(v) => onProp(k.prop, k.to(v))}
+                    label={k.label}
+                  />
+                ))}
+              </div>
+            </div>
+            <div className="cord-console-hint">every scene re-lights live</div>
+          </div>
+        </div>
+
+        {/* Cords hang from the slab's bottom edge. Each label is printed on the
+            panel's revealed lip; below it a chain of shiny ambient balls (drawn
+            behind the panel) ends in a glass ball. A pull slides the whole chain
+            and ball down and it springs back with almost no bounce — the
+            highlighted label marks the active one. */}
+        <div className="cords" role="group" aria-label="Theme">
+          {THEME_PRESETS.map((p) => {
+            const active = activePreset === p.label;
+            return (
+              <button
+                key={p.label}
+                type="button"
+                className={`cord${active ? " is-active" : ""}`}
+                aria-pressed={active}
+                onClick={() => pullTheme(p)}
+              >
+                <span className="cord-name">{p.icon} {p.label}</span>
+                <span
+                  key={tugLabel === p.label ? `tug-${tugNonce}` : "rest"}
+                  className={`cord-pull${tugLabel === p.label ? " is-tugging" : ""}`}
+                  aria-hidden
+                >
+                  <span className="cord-chain">
+                    {CHAIN_BEADS.map((_, i) => (
+                      <span key={i} className="cord-bead ambient amb-surface amb-mat-shiny amb-rounded-full" />
+                    ))}
+                  </span>
+                  <span className="cord-ball ambient amb-surface amb-elevation-3 amb-rounded-full amb-mat-glass" />
+                </span>
+              </button>
+            );
+          })}
+
+          {/* Custom cord — drops the slab to reveal the console. */}
+          <button
+            type="button"
+            className={`cord cord-custom${customActive ? " is-active" : ""}${consoleOpen ? " is-open" : ""}`}
+            aria-pressed={customActive}
+            aria-expanded={consoleOpen}
+            onClick={pullCustom}
+          >
+            <span className="cord-name">⚙ Custom</span>
+            <span
+              key={tugLabel === "Custom" ? `tug-${tugNonce}` : "rest"}
+              className={`cord-pull${tugLabel === "Custom" ? " is-tugging" : ""}`}
+              aria-hidden
+            >
+              <span className="cord-chain">
+                {CHAIN_BEADS.map((_, i) => (
+                  <span key={i} className="cord-bead ambient amb-surface amb-mat-shiny amb-rounded-full" />
+                ))}
+              </span>
+              <span className="cord-ball ambient amb-surface amb-elevation-3 amb-rounded-full amb-mat-glass" />
+            </span>
+          </button>
+        </div>
+      </div>
+    </header>
   );
 }

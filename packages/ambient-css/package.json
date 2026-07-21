@@ -36,6 +36,8 @@
   ],
   "scripts": {
     "build": "node ../../scripts/build-css.mjs src/ambient.css dist/ambient.css",
+    "api:check": "node ../../scripts/check-css-api.mjs src/ambient.css api-baseline.json",
+    "api:write": "node ../../scripts/check-css-api.mjs src/ambient.css api-baseline.json --write",
     "clean": "rm -rf dist",
     "typecheck": "echo \"No typecheck for CSS package\""
   },

@@ -2,7 +2,7 @@
 title: Concept
 ---
 
-import { ConceptIsometricDiagrams } from "@site/src/components/ConceptIsometricDiagrams";
+import { ConceptScene } from "@site/src/components/ConceptScene";
 
 ## Motivation
 
@@ -16,9 +16,9 @@ Ambient CSS starts from the other end. Instead of choosing shadow values per com
 
 ## How it works
 
-<ConceptIsometricDiagrams />
+<ConceptScene />
 
-The model treats the UI as flat surfaces viewed straight on (orthographic projection). There's no perspective distortion. Depth comes from lighting and edge treatment.
+The model treats the UI as flat surfaces viewed straight on (orthographic projection) — the scene above, dragged to a front-on angle, is what the CSS is approximating in 2D. There's no perspective distortion; depth comes entirely from lighting and edge treatment, not from anything geometric.
 
 ### Light environment
 

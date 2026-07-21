@@ -38,8 +38,8 @@ export function AmbientSwitch({
       aria-checked={active}
       aria-labelledby={label ? labelId : props["aria-labelledby"]}
       className={cn(
-        "ambient amb-switch amb-chamfer amb-elevation-1 amb-heading-3",
-        active ? "amb-surface-convex amb-switch-on" : "amb-surface-concave",
+        "amb-switch",
+        active && "amb-switch-on",
         "ambx-switch",
         `ambx-switch-${size}`,
         className
@@ -58,6 +58,9 @@ export function AmbientSwitch({
           style={typeof led === "string" ? { "--amb-led-color": led } as React.CSSProperties : undefined}
         />
       ) : null}
+      <span className="amb-switch-track amb-groove">
+        <span className="amb-switch-pill ambient amb-fillet amb-surface-convex" />
+      </span>
       {children}
     </button>
   );

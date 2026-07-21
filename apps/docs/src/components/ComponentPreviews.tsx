@@ -107,6 +107,39 @@ export function KnobPreview() {
   );
 }
 
+export function KnobVariantsPreview() {
+  const [dot, setDot] = useState(42);
+  const [line, setLine] = useState(70);
+  const [flute, setFlute] = useState(25);
+  const [cap, setCap] = useState(55);
+  const [wheel, setWheel] = useState(80);
+
+  return (
+    <DemoShell>
+      <div className="docs-demo-row">
+        <AmbientKnob label="Dot" value={dot} onChange={setDot} />
+        <AmbientKnob label="Line" variant="line" value={line} onChange={setLine} />
+        <AmbientKnob label="Flute" variant="flute" value={flute} onChange={setFlute} />
+        <AmbientKnob label="Cap" variant="cap" value={cap} onChange={setCap} />
+        <AmbientKnob label="Wheel" variant="wheel" material="shiny" value={wheel} onChange={setWheel} />
+      </div>
+    </DemoShell>
+  );
+}
+
+export function ButtonShapesPreview() {
+  return (
+    <DemoShell>
+      <div className="docs-demo-row">
+        <AmbientButton>Play</AmbientButton>
+        <AmbientButton shape="round">On</AmbientButton>
+        <AmbientButton shape="round" material="shiny" aria-label="Metal button" />
+        <AmbientButton shape="square">FX</AmbientButton>
+      </div>
+    </DemoShell>
+  );
+}
+
 export function SliderFaderPreview() {
   const [pan, setPan] = useState(50);
   const [level, setLevel] = useState(72);
@@ -142,4 +175,46 @@ export function CompositionPreview() {
       </AmbientPanel>
     </DemoShell>
   );
+}
+
+/* Neutral demos for the grounded-counterpart comparisons: no DemoShell
+   theme — the live stage must sit under the same default lighting the
+   calibration renders use. Values mirror the referent shots
+   (ambient3d/ground_components.py). */
+export function GroundedButtonDemo() {
+  return <AmbientButton>OK</AmbientButton>;
+}
+
+export function GroundedButtonRoundDemo() {
+  return <AmbientButton shape="round">On</AmbientButton>;
+}
+
+export function GroundedButtonSquareDemo() {
+  return <AmbientButton shape="square">FX</AmbientButton>;
+}
+
+export function GroundedKnobDemo({
+  variant
+}: {
+  variant?: "dot" | "line" | "flute" | "cap" | "wheel";
+}) {
+  const [v, setV] = useState(33);
+  return (
+    <AmbientKnob aria-label="Knob" variant={variant} value={v} min={0} max={100} onChange={setV} />
+  );
+}
+
+export function GroundedSwitchDemo() {
+  const [on, setOn] = useState(false);
+  return <AmbientSwitch aria-label="Switch" checked={on} onCheckedChange={setOn} />;
+}
+
+export function GroundedFaderDemo() {
+  const [v, setV] = useState(50);
+  return <AmbientFader aria-label="Fader" value={v} onChange={setV} />;
+}
+
+export function GroundedSliderDemo() {
+  const [v, setV] = useState(50);
+  return <AmbientSlider aria-label="Slider" value={v} onChange={setV} />;
 }

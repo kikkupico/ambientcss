@@ -1,0 +1,13 @@
+{
+  "name": "@ambientcss/css-harness",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Screenshots the CSS rendering of each manifest scene so measure/compare.py can diff it against the Blender ground truth",
+  "type": "module",
+  "scripts": {
+    "render": "node render.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.57.0"
+  }
+}
