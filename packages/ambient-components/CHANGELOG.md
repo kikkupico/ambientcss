@@ -1,5 +1,81 @@
 # @ambientcss/components
 
+## 2.0.0
+
+### Major Changes
+
+- a3c92f8: **v2.0.0 — the library is re-based on the Blender-grounded rewrite.**
+
+  Every effect's coefficients are now derived from measured Cycles renders of an
+  equivalent physical scene (verified end-to-end by a render-vs-CSS comparison
+  harness), replacing the previously hand-tuned values. Computed output changes
+  throughout — anchored so the default look (key 0.9, fill 0.7) is preserved —
+  which is why this ships as a major release rather than a minor one.
+
+  The accompanying changesets carry the detailed per-effect notes: the
+  `.amb-surface` tone ladder, the swept drop shadow, the new `.amb-groove`
+  primitive and thickness vocabulary, the studio-lit `.amb-mat-shiny`
+  environment, refit chamfer/fillet bands and curved surfaces, plus the new
+  button shapes and knob variants in `@ambientcss/components`.
+
+### Minor Changes
+
+- a3c92f8: Button shapes and knob types, matching the referent lineup
+  (`ambient3d/generate.py` — the catalog's round/square keys, pads, and
+  the classic/OP-Z/OP-1/wheel knob styles):
+
+  - **AmbientButton** gains `shape`: `"pill"` (default, the wide stadium
+    transport key), `"round"` (circular key — pair with
+    `material="shiny"` for the machined metal-button look), and
+    `"square"` (EP-133-style pad: tighter corners, 3.6mm cap at thickness
+    0.8 instead of the key's 4.5mm, same 0.7mm press travel).
+  - **AmbientKnob** gains `variant`: `"dot"` (default, the grounded
+    36-rib referent), `"line"` (radial indicator line), `"flute"` (14
+    broad flutes with deep roots and a centered dot, OP-Z-style),
+    `"cap"` (fine 48-rib knurl under a smooth accent top disc,
+    OP-1-style), and `"wheel"` (bare fine knurl, no indicator). Each
+    family gets its own knurl clip silhouette and pitch-matched flank
+    shading.
+
+  Each new shape/variant has a flat-on grounded referent render
+  (`ambient3d/ground_components.py`, which now accepts a name filter
+  after `--`) compared against the live component in the docs.
+
+- a3c92f8: Components rebuilt from grounded primitives to match their richer 3D
+  referents (`ambient3d/components/*` — the design source of truth), with
+  thickness-based bodies instead of resting elevation:
+
+  - **AmbientButton**: a chamfered key cap (thickness 1) seated in a
+    clearance well — the button element is an `.amb-groove` whose lume
+    interior shows as the gap ring. Pressing sinks the cap by the
+    referent's 0.7mm travel; the chamfer bands and swept shadow shrink
+    with it.
+  - **AmbientKnob**: knob-scale body (thickness 2 = the referent's 9mm)
+    resting on the panel. The rotating face is clipped to a true
+    straight-knurl silhouette (36 trapezoid teeth via an inline SVG
+    clipPath in objectBoundingBox units, so it scales with the grid) with
+    phase-aligned per-tooth flank shading, under a smooth top disc and an
+    accent indicator dot; teeth and all rotate with the value. The
+    circular body beneath keeps the drop shadow smooth.
+  - **AmbientSwitch**: now a slide switch — a pill riding in a recessed
+    stadium `.amb-groove` track, optional LED above. Same props and ARIA.
+  - **AmbientFader**: pill thumb with a grip line (thickness 1.5, riding
+    2.2mm above the plate like the referent's stem) on the groove + lume
+    track.
+  - **AmbientSlider**: domed disc thumb gliding over a shallow concave
+    channel (groove at thickness 0.22).
+
+  Each component's docs page gains a "Grounded counterpart" section
+  comparing the live component against a flat-on render of its 3D referent
+  built at the CSS dimensions (`ambient3d/ground_components.py`).
+
+### Patch Changes
+
+- Updated dependencies [a3c92f8]
+- Updated dependencies [a3c92f8]
+- Updated dependencies [a3c92f8]
+  - @ambientcss/css@2.0.0
+
 ## 1.2.1
 
 ### Patch Changes
