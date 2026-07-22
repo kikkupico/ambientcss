@@ -25,6 +25,26 @@ def superellipse(a, b, n, segs=256):
     return pts
 
 
+def stadium(length, width, segs=256):
+    """CCW capsule profile: `length` tip-to-tip along x, `width` across y,
+    with fully semicircular ends (radius = width / 2) — the physical shape
+    of a CSS track whose border-radius is >= half its cross-axis (a
+    "pill"/stadium, straight parallel sides + round caps, not a squashed
+    ellipse). Used for elongated tracks: fader slots, slider grooves,
+    switch wells."""
+    r = width / 2.0
+    straight = max(length / 2.0 - r, 0.0)
+    half_segs = max(segs // 2, 8)
+    pts = []
+    for i in range(half_segs):
+        t = -math.pi / 2 + math.pi * i / half_segs
+        pts.append((straight + r * math.cos(t), r * math.sin(t)))
+    for i in range(half_segs):
+        t = math.pi / 2 + math.pi * i / half_segs
+        pts.append((-straight + r * math.cos(t), r * math.sin(t)))
+    return pts
+
+
 def offset_profile(pts, dist):
     """Offset a CCW profile inward by dist (outward if negative)."""
     out = []

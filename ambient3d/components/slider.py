@@ -1,17 +1,18 @@
 """Parametric slider: a shallow rounded groove in a flat tile with a
 domed disc thumb riding on the surface.
 
-The 3D counterpart of AmbientSlider: unlike the fader (a through-slot
-with a stem into a dark cavity), the slider's track is a soft concave
-channel — the physical referent of `.amb-surface-concave-h` — and the
-thumb glides over it.
+The 3D counterpart of AmbientSlider: a shallow concave channel (the
+physical referent of `.amb-surface-concave-h`) — like the fader's slot
+it reads as a dark `--amb-lume` cavity (`floor_material`), just shallower
+and without a through-slot's stem — and the thumb glides over it.
 
 State: `value` (0..1) places the thumb along the groove; `set_value`
 re-poses a built slider. Units: mm.
 """
 
 from components._common import (base_tile, boolean_cut, capped_solid,
-                                prism_object, superellipse)
+                                offset_profile, prism_object, stadium,
+                                superellipse)
 
 
 def build_slider(
@@ -25,19 +26,28 @@ def build_slider(
     thumb_d=9.0,
     thumb_h=3.2,
     value=0.5,
+    floor_material=None,  # groove floor color; falls back to plate_material
+                          # (CSS tracks sit on a dark --amb-lume interior)
     plate_material=None,
     thumb_material=None,
     location=(0.0, 0.0, 0.0),
 ):
+    groove_profile = stadium(groove_len, groove_w)
+
     plate = base_tile(name + "_Plate", base_w, base_d, base_h,
                       material=plate_material, location=location)
 
-    groove = prism_object(
-        name + "_Groove",
-        superellipse(groove_len / 2, groove_w / 2, 2.2),
-        base_h - groove_depth, base_h + 1.0,
-    )
+    groove = prism_object(name + "_Groove", groove_profile,
+                          base_h - groove_depth, base_h + 1.0)
     boolean_cut(plate, groove)
+
+    if floor_material is not None:
+        floor = prism_object(
+            name + "_Floor", offset_profile(groove_profile, -1.0),
+            0.05, base_h - groove_depth + 0.02, material=floor_material,
+        )
+        floor.parent = plate
+        floor.location = (0, 0, 0)
 
     thumb = capped_solid(
         name + "_Thumb", superellipse(thumb_d / 2, thumb_d / 2, 2.0, 128),

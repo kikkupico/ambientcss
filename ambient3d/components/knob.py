@@ -38,6 +38,8 @@ def build_knob(
     dot_frac=0.3,        # dot radius as a fraction of the cap radius
     dot_offset=0.0,      # 0 = centered dot; else offset fraction toward rim
     top_disc=False,      # smooth contrasting cap disc (OP-1 encoder style)
+    top_disc_frac=None,  # disc radius as a fraction of `radius`; None
+                          # keeps the old near-full-cap sizing (cap_r-0.15)
     value=0.5,           # 0..1 pot position
     min_angle=-135.0,    # pointer at value 0, degrees CW from 12 o'clock
     sweep=270.0,         # pointer travel in degrees
@@ -99,7 +101,8 @@ def build_knob(
     cap_r = radius - fillet
     top_z = height
     if top_disc:
-        disc_r = cap_r - 0.15
+        disc_r = radius * top_disc_frac if top_disc_frac is not None \
+            else cap_r - 0.15
         disc = capped_solid(
             name + "_Top", superellipse(disc_r, disc_r, 2.0, 128),
             0.55, fillet=0.2, chamfer=0.0,

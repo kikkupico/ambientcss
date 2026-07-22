@@ -8,7 +8,8 @@ Units: mm.
 """
 
 from components._common import (base_tile, boolean_cut, capped_solid,
-                                prism_object, superellipse)
+                                offset_profile, prism_object, stadium,
+                                superellipse)
 
 
 def build_switch(
@@ -22,25 +23,44 @@ def build_switch(
     pill_h=2.6,           # pill height above the recess floor
     value=0.0,
     led=False,            # printed indicator dot above the recess
+    tile_shape="rect",    # "rect" sharp tile or "fit" hugs the well
+                          # stadium at tile_margin (CSS: the track IS the
+                          # switch, no surrounding panel)
+    tile_margin=2.0,      # "fit" mode: tile edge beyond the well profile
+    floor_material=None,  # recess floor color; falls back to plate_material
+                          # (CSS tracks sit on a dark --amb-lume interior)
     plate_material=None,
     pill_material=None,
     led_material=None,
     location=(0.0, 0.0, 0.0),
 ):
-    plate = base_tile(name + "_Plate", base_w, base_d, base_h,
-                      material=plate_material, location=location)
+    well_profile = stadium(well_l, well_w)
 
-    well = prism_object(
-        name + "_Well",
-        superellipse(well_l / 2, well_w / 2, 2.2),
-        base_h - well_depth, base_h + 1.0,
-    )
+    if tile_shape == "fit":
+        plate = prism_object(
+            name + "_Plate", offset_profile(well_profile, -tile_margin),
+            0.0, base_h, material=plate_material, location=location,
+        )
+    else:
+        plate = base_tile(name + "_Plate", base_w, base_d, base_h,
+                          material=plate_material, location=location)
+
+    well = prism_object(name + "_Well", well_profile,
+                        base_h - well_depth, base_h + 1.0)
     boolean_cut(plate, well)
 
+    if floor_material is not None:
+        floor = prism_object(
+            name + "_Floor", offset_profile(well_profile, -1.0),
+            0.05, base_h - well_depth + 0.02, material=floor_material,
+        )
+        floor.parent = plate
+        floor.location = (0, 0, 0)
+
     pill_l = well_l * 0.52
-    pill_w = well_w - 1.4
+    pill_w = well_w * 0.78
     pill = capped_solid(
-        name + "_Pill", superellipse(pill_l / 2, pill_w / 2, 2.4),
+        name + "_Pill", stadium(pill_l, pill_w),
         well_depth + pill_h, fillet=0.8, chamfer=0.0, dome=0.25,
         material=pill_material,
     )

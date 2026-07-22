@@ -6,8 +6,11 @@ plain clearance hole (OP-1/EP-133 panels); "well" is the TP-7-style
 machined pocket — the cap sits in a countersunk recess with a shadow-gap
 ring, barely proud of the tile.
 
-Base tiles are sharp-cornered rectangles so buttons can butt side by side
-into a panel; tile size, thickness, and material are parametric.
+`tile_shape` "rect" gives a sharp-cornered rectangular tile so buttons can
+butt side by side into a panel (tile size, thickness, and material are
+parametric); "fit" hugs the cap profile at `tile_margin` instead — the
+CSS button's look, where the well IS the button and there's no
+surrounding panel.
 
 State: `value` (0..1) sinks the cap by `value * travel`; 1.0 = fully
 pressed. Requires the base (the cap alone has nothing to travel into).
@@ -30,6 +33,11 @@ def build_button(
     base=True,
     base_size=None,       # (w, d) tile; default: cap + 3mm border each side
     base_h=2.5,           # tile thickness
+    tile_shape="rect",    # "rect" sharp tile (butts panel neighbors) or
+                          # "fit" hugs the cap profile at tile_margin (the
+                          # CSS button's tight well-ring look: the well IS
+                          # the button, no surrounding panel)
+    tile_margin=2.0,      # "fit" mode: tile edge beyond the cap profile
     base_style="flush",   # "flush" clearance hole or "well" machined pocket
     clearance=0.4,        # gap between cap and hole (flush)
     seat=1.2,             # how deep the flush cap sits into the tile
@@ -69,10 +77,16 @@ def build_button(
     if not base:
         return cap
 
-    if base_size is None:
-        base_size = (width + 6.0, depth + 6.0)
-    tile = base_tile(name + "_Base", base_size[0], base_size[1], base_h,
-                     material=base_material, location=location)
+    if tile_shape == "fit":
+        tile = prism_object(
+            name + "_Base", offset_profile(cap_profile, -tile_margin),
+            0.0, base_h, material=base_material, location=location,
+        )
+    else:
+        if base_size is None:
+            base_size = (width + 6.0, depth + 6.0)
+        tile = base_tile(name + "_Base", base_size[0], base_size[1], base_h,
+                         material=base_material, location=location)
 
     if base_style == "well":
         pocket = prism_object(

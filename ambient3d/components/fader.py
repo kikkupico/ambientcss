@@ -13,7 +13,8 @@ built fader by sliding stem and cap. Units: mm.
 import math
 
 from components._common import (accent_bar, base_tile, boolean_cut,
-                                capped_solid, prism_object, superellipse)
+                                capped_solid, prism_object, stadium,
+                                superellipse)
 
 
 def build_fader(
@@ -49,7 +50,7 @@ def build_fader(
     plate = base_tile(name + "_Plate", base_w, base_d, base_h,
                       material=plate_material, location=location)
 
-    slot_profile = superellipse(slot_len / 2, slot_w / 2, 2.2)
+    slot_profile = stadium(slot_len, slot_w)
     slot = prism_object(name + "_Slot", slot_profile, -1.0, base_h + 1.0)
     boolean_cut(plate, slot)
 

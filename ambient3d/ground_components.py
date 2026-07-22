@@ -47,7 +47,7 @@ def button():
     cap, plate, dark = _mats()
     build_button(width=16 * GRID, depth=7 * GRID, height=4.5,
                  shape_n=4.5, dome=0.3, fillet=0.8,
-                 base_size=(18 * GRID, 9 * GRID), base_h=2.5,
+                 tile_shape="fit", base_h=2.5,
                  base_style="flush", seat=1.2, clearance=0.5 * GRID / 2,
                  cap_material=cap, base_material=plate)
 
@@ -55,7 +55,7 @@ def button():
 def button_round():
     cap, plate, dark = _mats()
     build_button(width=12 * GRID, height=4.5, shape_n=2.0, dome=0.3,
-                 fillet=0.8, base_size=(14 * GRID, 14 * GRID), base_h=2.5,
+                 fillet=0.8, tile_shape="fit", base_h=2.5,
                  base_style="flush", seat=1.2, clearance=0.5 * GRID / 2,
                  cap_material=cap, base_material=plate)
 
@@ -64,21 +64,30 @@ def button_square():
     # EP-133-style pad: squarer superellipse, flatter and lower cap
     cap, plate, dark = _mats()
     build_button(width=14 * GRID, height=3.6, shape_n=6.0, dome=0.15,
-                 fillet=0.8, base_size=(16 * GRID, 16 * GRID), base_h=2.5,
+                 fillet=0.8, tile_shape="fit", base_h=2.5,
                  base_style="flush", seat=1.2, clearance=0.5 * GRID / 2,
                  cap_material=cap, base_material=plate)
 
 
+# Knurl depth = (0.5 - root) * 2 * radius, root fractions taken directly from
+# AmbientKnob.tsx's KNURLS (standard .468, flute .44, fine .476), so the
+# tooth-crest-to-root depth matches the CSS clip-path teeth exactly at the
+# grounded referent's 8*GRID radius. Sharpness bumped from the (unrelated)
+# generate.py catalog default so the crest/root read as distinct facets
+# rather than a soft sinusoid, closer to the clip-path's near-trapezoidal
+# tooth (short rise/fall, flat crest and root).
 def knob():
     cap, plate, dark = _mats()
-    build_knob(radius=8 * GRID, height=9.0, ribs=36, rib_depth=0.5,
+    build_knob(radius=8 * GRID, height=9.0, ribs=36, rib_depth=2.05,
+               rib_sharpness=3.0,
                indicator="dot", dot_frac=0.12, dot_offset=0.68, value=0.33,
                body_material=cap, accent_material=dark, base=None)
 
 
 def knob_line():
     cap, plate, dark = _mats()
-    build_knob(radius=8 * GRID, height=9.0, ribs=36, rib_depth=0.5,
+    build_knob(radius=8 * GRID, height=9.0, ribs=36, rib_depth=2.05,
+               rib_sharpness=3.0,
                indicator="line", value=0.33,
                body_material=cap, accent_material=dark, base=None)
 
@@ -86,17 +95,21 @@ def knob_line():
 def knob_flute():
     # OP-Z-style: broad flutes, deep roots, centered dot
     cap, plate, dark = _mats()
-    build_knob(radius=8 * GRID, height=9.0, ribs=14, rib_depth=3.2,
+    build_knob(radius=8 * GRID, height=9.0, ribs=14, rib_depth=3.84,
                rib_sharpness=8.0, taper=0.1, indicator="dot",
                dot_frac=0.32, dot_offset=0.0, value=0.33,
                body_material=cap, accent_material=dark, base=None)
 
 
 def knob_cap():
-    # OP-1-style encoder: fine knurl, smooth contrasting top disc
+    # OP-1-style encoder: fine knurl, smooth contrasting top disc sized to
+    # the CSS cap variant's radial-gradient stop (65% of the knob radius),
+    # leaving the fine knurl visible as a rim
     cap, plate, dark = _mats()
-    build_knob(radius=8 * GRID, height=9.0, ribs=48, rib_depth=0.8,
-               indicator="none", top_disc=True, value=0.33,
+    build_knob(radius=8 * GRID, height=9.0, ribs=48, rib_depth=1.54,
+               rib_sharpness=3.0,
+               indicator="none", top_disc=True, top_disc_frac=0.65,
+               value=0.33,
                body_material=cap, accent_material=dark, top_material=dark,
                base=None)
 
@@ -104,7 +117,8 @@ def knob_cap():
 def knob_wheel():
     # machined wheel: bare fine knurl, no indicator
     cap, plate, dark = _mats()
-    build_knob(radius=8 * GRID, height=9.0, ribs=48, rib_depth=0.8,
+    build_knob(radius=8 * GRID, height=9.0, ribs=48, rib_depth=1.54,
+               rib_sharpness=3.0,
                indicator="none", fillet=0.8, chamfer=0.3, value=0.33,
                body_material=cap, base=None)
 
@@ -114,6 +128,7 @@ def switch():
     build_switch(base_w=15 * GRID, base_d=9 * GRID, base_h=2.5,
                  well_l=12 * GRID, well_w=6 * GRID,
                  well_depth=1.5, pill_h=2.6, value=0.0,
+                 tile_shape="fit", floor_material=dark,
                  plate_material=plate, pill_material=cap,
                  led_material=dark)
 
@@ -123,7 +138,7 @@ def fader():
 
     cap, plate, dark = _mats()
     obj = build_fader(base_w=32 * GRID, base_d=8 * GRID, base_h=2.5,
-                      slot_len=30 * GRID, slot_w=1.5 * GRID,
+                      slot_len=30 * GRID, slot_w=2 * GRID,
                       cap_shape="pill", cap_w=9 * GRID, cap_d=6 * GRID,
                       cap_h=7.0, value=0.5,
                       plate_material=plate, cap_material=cap,
@@ -135,9 +150,10 @@ def fader():
 def slider():
     cap, plate, dark = _mats()
     build_slider(base_w=32 * GRID, base_d=8 * GRID, base_h=2.5,
-                 groove_len=30 * GRID, groove_w=1.5 * GRID,
+                 groove_len=30 * GRID, groove_w=2 * GRID,
                  groove_depth=1.0, thumb_d=6 * GRID, thumb_h=3.2,
-                 value=0.5, plate_material=plate, thumb_material=cap)
+                 value=0.5, floor_material=dark,
+                 plate_material=plate, thumb_material=cap)
 
 
 COMPONENTS = {"button": button, "button-round": button_round,
