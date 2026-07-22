@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Ambient CSS hero frame</title>
+    <style>
+      /* Deliberately no box-sizing reset: the components have to render
+         correctly on a bare page, and @ambientcss/components now scopes
+         border-box to its own elements. apps/demo resets globally in its
+         App.css, which is what used to mask the button-cap overflow. */
+
+      /* The page IS the frame: the viewport is set to frameMm CSS px, so
+         any margin would shift the panel off the render's registration. */
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

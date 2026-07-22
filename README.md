@@ -4,7 +4,9 @@
 
 [Live Demo](https://ambientcss.vercel.app/) &nbsp;&bull;&nbsp; [Documentation](https://kikkupico.github.io/ambientcss/) &nbsp;&bull;&nbsp; [npm (@ambientcss/css)](https://www.npmjs.com/package/@ambientcss/css) &nbsp;&bull;&nbsp; [npm (@ambientcss/components)](https://www.npmjs.com/package/@ambientcss/components)
 
-![Ambient CSS demo](./ambientcss.gif)
+![A hardware panel raytraced in Blender, rotating to a flat-on view, then wiped across to reveal the same panel rendered by Ambient CSS](./ambientcss.gif)
+
+<sub>The same device, twice: raytraced in Blender ([`ambient3d`](./ambient3d)) on one side of the wipe, live DOM under `@ambientcss/css` on the other — same geometry, same light vector, `box-shadow` instead of Cycles. The faceplate is a plain `.ambient .amb-surface .amb-chamfer-2` box. Built by [`tools/hero-gif`](./tools/hero-gif); the full clip is `ambientcss.mp4`.</sub>
 
 ---
 

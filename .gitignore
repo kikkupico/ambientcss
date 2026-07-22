@@ -19,3 +19,7 @@ packages/*/dist
 *.blend1
 __pycache__/
 /tools/css-harness/out/
+
+# hero-gif: intermediate renders and staged frames; the GIF itself is tracked
+/tools/hero-gif/out/
+/tools/hero-gif/dist/

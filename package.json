@@ -14,6 +14,8 @@
     "docs:build": "pnpm --filter docs build",
     "docs:preview": "pnpm --filter docs preview",
     "api:check": "pnpm --filter @ambientcss/css api:check",
+    "hero:shot": "pnpm --filter @ambientcss/hero-gif build && pnpm --filter @ambientcss/hero-gif shot",
+    "hero:gif": "pnpm hero:shot && python3 tools/hero-gif/assemble.py",
     "release:check": "pnpm api:check && pnpm build && pnpm typecheck && pnpm docs:build",
     "release:publish:preflight": "pnpm api:check && pnpm --filter @ambientcss/css build && pnpm --filter @ambientcss/components build && pnpm --filter @ambientcss/css typecheck && pnpm --filter @ambientcss/components typecheck",
     "release:pack": "rm -rf .artifacts && mkdir -p .artifacts && (cd packages/ambient-css && pnpm pack --pack-destination ../../.artifacts) && (cd packages/ambient-components && pnpm pack --pack-destination ../../.artifacts)",

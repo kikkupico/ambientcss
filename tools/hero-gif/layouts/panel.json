@@ -1,0 +1,30 @@
+{
+  "id": "panel",
+  "note": "The hero: a hardware panel built from the component referents. Positions are millimetres from frame centre, +y up (Blender). Only components with a referent on both sides appear here. Component sizes are not specified — every one is fixed by --ambx-grid (4px = 4mm) on the CSS side and by the matching GRID multiples in ambient3d/referents.py.",
+  "frameMm": [288, 160],
+  "pxPerMm": 4,
+  "amb": {
+    "light_x": -1,
+    "light_y": -1,
+    "key_light_intensity": 0.9,
+    "fill_light_intensity": 0.7
+  },
+  "css": {
+    "note": "DOM-only theme. The referents are built from neutral calibration materials (referents.py: albedo 0.82 surfaces, 0.06 accents), so the CSS side drops the shipped hue-234/15% tint and the coral highlight — otherwise the wipe would cross a colour boundary as well as a renderer boundary. #373737 is the accent measured off the rendered frame.",
+    "lightSaturation": 0,
+    "highlightColor": "#373737"
+  },
+  "body": {
+    "note": "The device: a chamfered slab standing off the ground. This is the calibration plate (ambient3d/components/plate.py) — the most directly grounded object in the project — and its CSS peer is the plain `.ambient .amb-surface .amb-chamfer-2` box. Controls recess into its top face, so the panel reads as one machined faceplate rather than parts floating on an infinite ground.",
+    "size": [264, 136],
+    "amb": { "thickness": 2, "chamfer": 1, "chamfer_width": 2, "elevation": 0.5 }
+  },
+  "components": [
+    { "id": "screen", "kind": "screen", "x": -76, "y": 34, "size": [92, 48], "amb": { "thickness": 1 } },
+    { "id": "knob-a", "kind": "knob", "variant": "dot", "x": 8, "y": 34, "value": 0.33 },
+    { "id": "knob-b", "kind": "knob", "variant": "flute", "x": 76, "y": 34, "value": 0.7 },
+    { "id": "sld", "kind": "slider", "x": -58, "y": -34, "value": 0.5 },
+    { "id": "sw", "kind": "switch", "x": 40, "y": -34, "value": 1 },
+    { "id": "btn", "kind": "button", "variant": "square", "x": 102, "y": -34 }
+  ]
+}
