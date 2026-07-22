@@ -1,6 +1,6 @@
 """Parametric speaker grille: rounded plate with a perforation pattern.
 
-TE grilles (OP-1, EP-133) use a square grid of small holes; "hex" close
+Speaker grilles can use a square grid of small holes; "hex" close
 packing is also available. Units: mm.
 """
 
@@ -20,12 +20,12 @@ def build_grille(
     pitch=3.4,            # center-to-center hole spacing
     margin=3.5,           # hole-free border
     corner_n=5.0,         # rounding of the hole-field boundary
-    pattern="grid",       # "grid" (TE style) or "hex"
+    pattern="grid",       # "grid" or "hex"
     plate_material=None,
     backing_material=None,  # dark slab behind the holes (speaker fabric)
     location=(0.0, 0.0, 0.0),
 ):
-    # sharp flat tile; the perforated field keeps its rounded TE boundary
+    # sharp flat tile; the perforated field keeps its rounded boundary
     plate = base_tile(name + "_Plate", width, depth, height,
                       material=plate_material, location=location)
 

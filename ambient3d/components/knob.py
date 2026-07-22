@@ -1,4 +1,4 @@
-"""Parametric TE-style rotary knob.
+"""Parametric rotary knob.
 
 Geometry is generated directly with bmesh — no modifiers, no booleans — so
 every dimension is an explicit parameter and output is deterministic.
