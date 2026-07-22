@@ -69,6 +69,8 @@ const VARIANT_FAMILY: Record<AmbientKnobVariant, keyof typeof KNURL_PATHS> = {
   wheel: "fine"
 };
 
+export type AmbientKnobSize = "sm" | "md" | "lg";
+
 export type AmbientKnobProps = Omit<HTMLAttributes<HTMLDivElement>, "onChange"> & {
   value: number;
   min?: number;
@@ -77,6 +79,7 @@ export type AmbientKnobProps = Omit<HTMLAttributes<HTMLDivElement>, "onChange"> 
   label?: string;
   material?: "matte" | "shiny" | "glass";
   variant?: AmbientKnobVariant;
+  size?: AmbientKnobSize;
   onChange?: (nextValue: number) => void;
 };
 
@@ -92,6 +95,7 @@ export function AmbientKnob({
   label,
   material,
   variant = "dot",
+  size = "md",
   onChange,
   className,
   ...props
@@ -173,7 +177,7 @@ export function AmbientKnob({
     <div className={cn("ambx-stack", className)} {...props}>
       <div
         ref={knobRef}
-        className="amb-knob ambx-knob"
+        className={cn("amb-knob ambx-knob", `ambx-knob-${size}`)}
         role="slider"
         aria-label={label}
         aria-valuemin={min}

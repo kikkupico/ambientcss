@@ -113,6 +113,24 @@ body {
   text-transform: lowercase;
 }
 
+/* The README hero film. It is rendered on the calibration rig's neutral
+   ground, so on the default preset it sits on .amb-surface almost
+   seamlessly; the radius and elevation are only there to keep it reading as
+   an object once a tinted preset moves the page's surface off neutral. */
+.hero-film {
+  margin-top: 48px;
+  /* auto width/height with two maxima: the browser scales the film down
+     preserving its own aspect ratio until it fits both, so the box is always
+     exactly the film — no letterboxing inside the elevation shadow. */
+  width: auto;
+  height: auto;
+  max-width: min(720px, 84vw);
+  max-height: 38vh;
+  /* the radius comes from .amb-rounded-lg; overflow keeps the film's own
+     square corners from poking past it */
+  overflow: hidden;
+}
+
 .hero-scroll-hint {
   position: absolute;
   bottom: 80px;
@@ -311,7 +329,7 @@ body {
 .edge-swatch {
   width: clamp(80px, 12vw, 120px);
   height: clamp(80px, 12vw, 120px);
-  border-radius: 16px;
+  border-radius: var(--ambx-radius-xl);
   transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
               opacity 0.6s ease;
 }
@@ -647,7 +665,7 @@ body {
   --lip: 30px;
   position: relative;
   z-index: 1;
-  border-radius: 0 0 14px 14px;
+  border-radius: 0 0 14px 14px; /* off-scale by design: bespoke console-slab corners, not an .ambx-panel instance, see design-tokens.md */
   padding: 0 16px var(--lip);
 }
 .cord-console {
@@ -675,7 +693,7 @@ body {
    (groove-darker is a demo-local override that wins the floor colour). */
 .cord-console-well {
   --amb-thickness: 1;
-  border-radius: 12px;
+  border-radius: var(--ambx-radius-lg);
   padding: 14px 12px 12px;
 }
 /* Seven knobs on one even seven-column grid — a Dieter Rams row: equal
@@ -686,7 +704,7 @@ body {
   grid-template-columns: repeat(7, 1fr);
   align-items: start;
   justify-items: center;
-  gap: 0 6px;
+  gap: 0 calc(var(--ambx-grid) * 2);
 }
 .cord-console-hint {
   font-size: 7px;
@@ -783,8 +801,27 @@ body {
 
 @media (max-width: 600px) {
   .cordbar { width: calc(100vw - 8px); }
-  .cords { gap: 5px; padding: 0 8px; }
+  .cords { gap: 14px; padding: 0 10px; }
   .cord-name { font-size: 8px; letter-spacing: 0.06em; }
+
+  /* Seven fixed-size knobs (48px each at the default 3px grid) don't fit a
+     narrow phone's console well — shrink the whole row's grid so it stays
+     one row (the "Dieter Rams row" intent above) instead of overflowing
+     the panel or wrapping. Gap scales with the grid var (see
+     .cord-console-grid), so it shrinks proportionally too. */
+  .cord-console-grid { --ambx-grid: 2px; }
+
+  /* --ambx-label-size is only declared once at :root, referencing
+     --ambx-grid — its var() substitution is baked in there and doesn't
+     re-derive from this local grid override (a general limitation of
+     unregistered custom properties, not something scoping --ambx-grid
+     here fixes). Two-word labels ("Light X"/"Light Y") would otherwise
+     stay at the default 10px and force their column wider than the knob.
+     Set the label size directly, floored so it stays legible. */
+  .cord-console-grid .ambx-label {
+    font-size: max(6px, calc(var(--ambx-grid) * 2 + var(--ambx-grid) / 2));
+    letter-spacing: calc(var(--ambx-grid) / 4);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -840,7 +877,7 @@ body {
 .groove-channel {
   width: clamp(150px, 24vw, 240px);
   height: 28px;
-  border-radius: 999px;
+  border-radius: var(--ambx-radius-full);
   --amb-thickness: 0.4;
 }
 .groove-well {
@@ -852,7 +889,7 @@ body {
 .groove-inset {
   width: clamp(130px, 20vw, 180px);
   height: 116px;
-  border-radius: 16px;
+  border-radius: var(--ambx-radius-xl);
   --amb-thickness: 0.5;
 }
 .groove-label {

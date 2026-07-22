@@ -56,6 +56,7 @@ styled versions; `ambient3d/ground_components.py` the grounded ones):
 | `label` | `string` | - |
 | `variant` | `"dot" \| "line" \| "flute" \| "cap" \| "wheel"` | `"dot"` |
 | `material` | `"matte" \| "shiny" \| "glass"` | - |
+| `size` | `"sm" \| "md" \| "lg"` | `"md"` |
 | `onChange` | `(nextValue: number) => void` | - |
 
 Also accepts standard `HTMLAttributes<HTMLDivElement>` (except native `onChange`).

@@ -27,6 +27,7 @@ from components.grille import build_grille
 from components.slider import build_slider
 from components.switch import build_switch
 from components.panel import build_demo_panel
+from components._common import GAP_TIGHT_MM, row_layout
 
 
 def parse_args():
@@ -290,27 +291,28 @@ def main():
             ("cobalt",   dict(radius=6.5, height=6.0,  ribs=80, rib_depth=0.15,
                               value=1.0)),
         ]
-        gap = 5.0
+        # Same-family size comparison row, so the tight tier fits (was a
+        # flat, unlabeled gap=5.0 that ignored each knob's own radius).
         widths = [2 * v[1]["radius"] for v in variants]
-        total = sum(widths) + gap * (len(variants) - 1)
-        x = -total / 2
-        for preset_name, params in variants:
+        xs, total = row_layout(widths, GAP_TIGHT_MM)
+        for (preset_name, params), x in zip(variants, xs):
             body, accent = materials_for(preset_name)
-            r = params["radius"]
             build_knob(
                 name=f"Knob_{preset_name}",
                 body_material=body, accent_material=accent,
-                location=(x + r, 0, 0), **params,
+                location=(x, 0, 0), **params,
             )
-            x += 2 * r + gap
         kit.setup_studio(center=(0, 0, 4.5), extent=total * 0.40,
                          azimuth=8, elevation=16)
         stem = "knob_lineup"
 
     elif args.mode == "panel":
-        # mock device, 112x72mm, butted tiles, mixed component sizes
+        # mock device, mixed component sizes on a shared per-row chassis,
+        # rows spaced at the tight/normal/loose gap tiers (see
+        # components/panel.py); widest row runs ~200mm, so extent is wider
+        # than the panel's old butted-tile footprint (was 112mm/extent=50).
         build_demo_panel(panel_preset=args.base_preset, base_h=args.base_h)
-        kit.setup_studio(center=(0, -4, 1.5), extent=50, azimuth=8,
+        kit.setup_studio(center=(0, -4, 1.5), extent=95, azimuth=8,
                          elevation=55)
         stem = "panel"
 

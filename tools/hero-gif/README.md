@@ -59,6 +59,17 @@ plain `.ambient .amb-surface .amb-chamfer-2` box at the same thickness and
 elevation, and the screen is an `.amb-groove`. Nothing in the frame is
 bespoke to the hero.
 
+The composition is not bespoke either. Every coordinate in `panel.json` is
+built from the tight-12 / normal-20 / loose-32 mm tiers of the components'
+spacing scale — the same `GAP_*_MM` constants `ambient3d/components/_common.py`
+composes its demo device from — using each referent's *base tile* as its
+footprint, so the clearance between two controls is never tighter than the
+tier between their tiles. Two columns (a display-and-mixer strip, a
+three-row control block) sit loose apart and come to the same height by
+construction, and the body's own edge margin is one more loose slot. The
+arithmetic is written out in the file's `layout.note`; change a control and
+you re-run that arithmetic rather than nudging numbers.
+
 Four adjustments make a panel-sized frame behave like the 128 mm
 calibration frame: the key light is pushed out in proportion to the frame
 (with its energy scaled by the square, or everything renders dark); the

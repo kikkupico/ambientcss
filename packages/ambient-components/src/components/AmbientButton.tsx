@@ -8,10 +8,12 @@ import { cn } from "../lib/cn";
    - "square": a squarer, flatter pad (EP-133-style, tighter corners,
      lower cap) */
 export type AmbientButtonShape = "pill" | "round" | "square";
+export type AmbientButtonSize = "sm" | "md" | "lg";
 
 export interface AmbientButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   material?: "matte" | "shiny" | "glass";
   shape?: AmbientButtonShape;
+  size?: AmbientButtonSize;
 }
 
 export function AmbientButton({
@@ -19,6 +21,7 @@ export function AmbientButton({
   children,
   material = "matte",
   shape = "pill",
+  size = "md",
   ...props
 }: AmbientButtonProps) {
   return (
@@ -26,6 +29,7 @@ export function AmbientButton({
       type="button"
       className={cn(
         "amb-button amb-groove ambx-button",
+        `ambx-button-${size}`,
         shape === "round" && "amb-button-round",
         shape === "square" && "amb-button-square",
         className

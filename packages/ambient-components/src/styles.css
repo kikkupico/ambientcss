@@ -2,6 +2,22 @@
   --ambx-grid: 4px;
   --ambx-grid-half: calc(var(--ambx-grid) / 2);
   --ambx-grid-quarter: calc(var(--ambx-grid) / 4);
+  /* Border-radius scale: deliberately identical in px to
+     @ambientcss/css's frozen .amb-rounded/-md/-lg/-xl/-full utilities
+     (4/8/12/16/9999) — cross-layer coherence, not coincidence. Radius
+     stays fixed across size variants; only footprint scales with size. */
+  --ambx-radius-sm: calc(var(--ambx-grid) * 1);
+  --ambx-radius-md: calc(var(--ambx-grid) * 2);
+  --ambx-radius-lg: calc(var(--ambx-grid) * 3);
+  --ambx-radius-xl: calc(var(--ambx-grid) * 4);
+  --ambx-radius-full: 9999px;
+  /* Spacing/clearance scale for composing controls into a device face
+     (hardware-panel convention: a single modular pitch, tighter within a
+     functional cluster, looser between clusters/at the panel edge). Each
+     tier ~1.6-1.7x the last so they stay visually distinct at a glance. */
+  --ambx-gap-tight: calc(var(--ambx-grid) * 3);
+  --ambx-gap-normal: calc(var(--ambx-grid) * 5);
+  --ambx-gap-loose: calc(var(--ambx-grid) * 8);
   --ambx-type-1-size: calc(var(--ambx-grid) * 8);
   --ambx-type-1-line: calc(var(--ambx-grid) * 10);
   --ambx-type-2-size: calc(var(--ambx-grid) * 6);
@@ -73,16 +89,18 @@
   padding: var(--ambx-grid-half);       /* the clearance gap ring */
   --amb-thickness: 0.27;                 /* seat depth of the well */
   background-color: var(--amb-lume);
-  border-radius: calc(var(--ambx-grid) * 3 + var(--ambx-grid-half));
-  min-width: calc(var(--ambx-grid) * 16);
+  /* Well radius = cap radius + its own clearance padding (concentric
+     shapes nest by adding the gap, not by picking a second number). */
+  border-radius: calc(var(--ambx-radius-lg) + var(--ambx-grid-half));
+  min-width: var(--ambx-button-size);
 }
 
 .amb-button-cap {
   display: grid;
   place-items: center;
   width: 100%;
-  padding: calc(var(--ambx-grid) * 1.5) calc(var(--ambx-grid) * 2);
-  border-radius: calc(var(--ambx-grid) * 3);
+  padding: var(--ambx-button-cap-pad-y) var(--ambx-button-cap-pad-x);
+  border-radius: var(--ambx-radius-lg);
   text-transform: uppercase;
   font-weight: 600;
   color: var(--amb-label);
@@ -107,27 +125,30 @@
    3.6mm cap instead of the key's 4.5mm — thickness 0.8 — with the same
    0.7mm press travel). */
 .amb-button.amb-button-round {
-  min-width: calc(var(--ambx-grid) * 12);
+  min-width: var(--ambx-button-size);
   aspect-ratio: 1;
   border-radius: 50%;
 }
 
 .amb-button-round .amb-button-cap {
   height: 100%;
-  padding: var(--ambx-grid);
+  padding: var(--ambx-button-cap-inset);
   border-radius: 50%;
 }
 
 .amb-button.amb-button-square {
-  min-width: calc(var(--ambx-grid) * 14);
+  min-width: var(--ambx-button-size);
   aspect-ratio: 1;
-  border-radius: calc(var(--ambx-grid) * 2);
+  border-radius: var(--ambx-radius-md);
 }
 
 .amb-button-square .amb-button-cap {
   height: 100%;
-  padding: var(--ambx-grid);
-  border-radius: calc(var(--ambx-grid) * 1.5);
+  padding: var(--ambx-button-cap-inset);
+  /* Cap radius = well radius (var(--ambx-radius-md)) minus its own inset
+     clearance — the same concentric-nesting rule as the pill, solved the
+     other way because here the well, not the cap, sits on the scale. */
+  border-radius: calc(var(--ambx-radius-md) - var(--ambx-grid-half));
   --amb-thickness: 0.8;
 }
 
@@ -144,8 +165,8 @@
    fingers like the real thing. */
 .amb-knob {
   border-radius: 50%;
-  height: calc(var(--ambx-grid) * 16);
-  width: calc(var(--ambx-grid) * 16);
+  height: var(--ambx-knob-size);
+  width: var(--ambx-knob-size);
 }
 
 /* The body is the smooth circle at the tooth-root radius: it carries
@@ -282,8 +303,8 @@
   top: 16%;
   left: 50%;
   transform: translateX(-50%);
-  width: calc(var(--ambx-grid) * 2);
-  height: calc(var(--ambx-grid) * 2);
+  width: calc(var(--ambx-knob-size) * 0.125);
+  height: calc(var(--ambx-knob-size) * 0.125);
   border-radius: 50%;
   background: var(--amb-highlight-color);
 }
@@ -293,8 +314,8 @@
 .amb-knob-indicator-dot-center {
   top: 50%;
   transform: translate(-50%, -50%);
-  width: calc(var(--ambx-grid) * 4.5);
-  height: calc(var(--ambx-grid) * 4.5);
+  width: calc(var(--ambx-knob-size) * 0.28125);
+  height: calc(var(--ambx-knob-size) * 0.28125);
 }
 
 /* Radial indicator line (line variant): the referent's accent bar,
@@ -304,9 +325,9 @@
   top: 12%;
   left: 50%;
   transform: translateX(-50%);
-  width: calc(var(--ambx-grid) * 0.75);
+  width: var(--ambx-knob-line-width);
   height: 34%;
-  border-radius: calc(var(--ambx-grid) * 0.375);
+  border-radius: calc(var(--ambx-knob-line-width) / 2);
   background: var(--amb-highlight-color);
 }
 
@@ -320,9 +341,9 @@
    light, glowing in low light — overriding the groove's neutral floor. */
 .amb-fader {
   position: relative;
-  width: var(--ambx-grid);
+  width: var(--ambx-fader-track);
   height: calc(var(--ambx-grid) * 30);
-  border-radius: var(--ambx-grid);
+  border-radius: var(--ambx-radius-full);
   background-color: var(--amb-lume);
 }
 
@@ -331,12 +352,12 @@
    with a single grip line across the top. */
 .amb-fader-thumb {
   position: absolute;
-  width: calc(var(--ambx-grid) * 6);
-  height: calc(var(--ambx-grid) * 9);
+  width: var(--ambx-fader-thumb-w);
+  height: var(--ambx-fader-thumb-h);
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  border-radius: calc(var(--ambx-grid) * 2);
+  border-radius: var(--ambx-radius-md);
   display: grid;
   place-items: center;
   --amb-thickness: 1.5;
@@ -355,17 +376,17 @@
    gliding over it. */
 .amb-slider {
   position: relative;
-  height: calc(var(--ambx-grid) * 1.5);
+  height: var(--ambx-slider-track);
   width: calc(var(--ambx-grid) * 30);
-  border-radius: var(--ambx-grid);
+  border-radius: var(--ambx-radius-full);
   background-color: var(--amb-lume);
   --amb-thickness: 0.22;
 }
 
 .amb-slider-thumb {
   position: absolute;
-  width: calc(var(--ambx-grid) * 6);
-  height: calc(var(--ambx-grid) * 6);
+  width: var(--ambx-slider-thumb);
+  height: var(--ambx-slider-thumb);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -451,13 +472,91 @@
 }
 
 .ambx-panel {
-  border-radius: calc(var(--ambx-grid) * 4);
+  border-radius: var(--ambx-radius-xl);
   padding: calc(var(--ambx-grid) * 4);
 }
 
+/* Opt-in "device face" mode: edge margin = the loose gap tier, so a
+   panel composing a .ambx-rack of controls reads its own border as one
+   more slot in the same lattice (Rams/Braun, Teenage Engineering
+   convention). Not the default padding above, which serves general
+   containers (cards, settings panels) that aren't device faces. */
+.ambx-panel-device {
+  padding: var(--ambx-gap-loose);
+}
+
+/* Layout primitive for composing controls into a device face: pick a
+   gap tier by how tightly the controls belong together (tight = one
+   functional unit/repeated row, normal = a few related controls, loose
+   = separating distinct zones or the panel edge, see .ambx-panel-device
+   above) rather than picking an arbitrary gap per layout. */
+.ambx-rack {
+  display: flex;
+  align-items: center;
+  gap: var(--ambx-gap-normal);
+}
+
+.ambx-rack-tight {
+  gap: var(--ambx-gap-tight);
+}
+
+.ambx-rack-loose {
+  gap: var(--ambx-gap-loose);
+}
+
+.ambx-rack-column {
+  flex-direction: column;
+}
+
 .ambx-button {
-  min-width: calc(var(--ambx-grid) * 18);
   line-height: var(--ambx-type-3-line);
+  --ambx-button-size: calc(var(--ambx-grid) * 18);        /* 72px pill */
+  --ambx-button-cap-pad-x: calc(var(--ambx-grid) * 2);    /* 8px */
+  --ambx-button-cap-pad-y: calc(var(--ambx-grid) * 1.5);  /* 6px */
+  --ambx-button-cap-inset: var(--ambx-grid);              /* 4px */
+}
+
+.ambx-button-sm {
+  --ambx-button-size: calc(var(--ambx-grid) * 16);        /* 64px pill */
+  --ambx-button-cap-pad-x: calc(var(--ambx-grid) * 1.5);  /* 6px */
+  --ambx-button-cap-pad-y: var(--ambx-grid);              /* 4px */
+  --ambx-button-cap-inset: calc(var(--ambx-grid) * 0.75); /* 3px */
+}
+
+.ambx-button-md {
+  --ambx-button-size: calc(var(--ambx-grid) * 18);        /* 72px pill */
+  --ambx-button-cap-pad-x: calc(var(--ambx-grid) * 2);    /* 8px */
+  --ambx-button-cap-pad-y: calc(var(--ambx-grid) * 1.5);  /* 6px */
+  --ambx-button-cap-inset: var(--ambx-grid);              /* 4px */
+}
+
+.ambx-button-lg {
+  --ambx-button-size: calc(var(--ambx-grid) * 20);        /* 80px pill */
+  --ambx-button-cap-pad-x: calc(var(--ambx-grid) * 2.5);  /* 10px */
+  --ambx-button-cap-pad-y: calc(var(--ambx-grid) * 2);    /* 8px */
+  --ambx-button-cap-inset: calc(var(--ambx-grid) * 1.25); /* 5px */
+}
+
+/* Round/square shapes have their own min-width table per size (not a
+   ratio of the pill's — the three shapes' true md values, 72/48/56,
+   share no common factor), overridden via compound selectors so they
+   win regardless of source order relative to .ambx-button-sm/-md/-lg. */
+.amb-button-round.ambx-button-sm { --ambx-button-size: calc(var(--ambx-grid) * 10); }  /* 40px */
+.amb-button-round.ambx-button-md { --ambx-button-size: calc(var(--ambx-grid) * 12); }  /* 48px */
+.amb-button-round.ambx-button-lg { --ambx-button-size: calc(var(--ambx-grid) * 14); }  /* 56px */
+
+.amb-button-square.ambx-button-sm { --ambx-button-size: calc(var(--ambx-grid) * 12); } /* 48px */
+.amb-button-square.ambx-button-md { --ambx-button-size: calc(var(--ambx-grid) * 14); } /* 56px */
+.amb-button-square.ambx-button-lg { --ambx-button-size: calc(var(--ambx-grid) * 16); } /* 64px */
+
+.ambx-button-sm .amb-button-cap {
+  font-size: var(--ambx-label-size);
+  line-height: var(--ambx-label-line);
+}
+
+.ambx-button-lg .amb-button-cap {
+  font-size: calc(var(--ambx-grid) * 3.5);
+  line-height: calc(var(--ambx-grid) * 5);
 }
 
 .ambx-switch {
@@ -513,7 +612,13 @@
   place-items: center;
   touch-action: none;
   user-select: none;
+  --ambx-knob-size: calc(var(--ambx-grid) * 16);            /* 64px */
+  --ambx-knob-line-width: calc(var(--ambx-knob-size) * 0.046875);
 }
+
+.ambx-knob-sm { --ambx-knob-size: calc(var(--ambx-grid) * 12); } /* 48px */
+.ambx-knob-md { --ambx-knob-size: calc(var(--ambx-grid) * 16); } /* 64px */
+.ambx-knob-lg { --ambx-knob-size: calc(var(--ambx-grid) * 20); } /* 80px */
 
 .ambx-knob-rotation {
   position: absolute;
@@ -521,10 +626,29 @@
 }
 
 .ambx-fader {
-  width: calc(var(--ambx-grid) * 2);
-  border-radius: 999px;
   touch-action: none;
   user-select: none;
+  --ambx-fader-track: calc(var(--ambx-grid) * 2);    /* 8px */
+  --ambx-fader-thumb-w: calc(var(--ambx-grid) * 6);  /* 24px */
+  --ambx-fader-thumb-h: calc(var(--ambx-grid) * 9);  /* 36px */
+}
+
+.ambx-fader-sm {
+  --ambx-fader-track: calc(var(--ambx-grid) * 1.5);   /* 6px */
+  --ambx-fader-thumb-w: calc(var(--ambx-grid) * 5);   /* 20px */
+  --ambx-fader-thumb-h: calc(var(--ambx-grid) * 7.5); /* 30px */
+}
+
+.ambx-fader-md {
+  --ambx-fader-track: calc(var(--ambx-grid) * 2);    /* 8px */
+  --ambx-fader-thumb-w: calc(var(--ambx-grid) * 6);  /* 24px */
+  --ambx-fader-thumb-h: calc(var(--ambx-grid) * 9);  /* 36px */
+}
+
+.ambx-fader-lg {
+  --ambx-fader-track: calc(var(--ambx-grid) * 3);    /* 12px */
+  --ambx-fader-thumb-w: calc(var(--ambx-grid) * 8);  /* 32px */
+  --ambx-fader-thumb-h: calc(var(--ambx-grid) * 12); /* 48px */
 }
 
 .ambx-fader-thumb {
@@ -532,10 +656,25 @@
 }
 
 .ambx-slider {
-  height: calc(var(--ambx-grid) * 2);
-  border-radius: 999px;
   touch-action: none;
   user-select: none;
+  --ambx-slider-track: calc(var(--ambx-grid) * 2);  /* 8px */
+  --ambx-slider-thumb: calc(var(--ambx-grid) * 6);  /* 24px */
+}
+
+.ambx-slider-sm {
+  --ambx-slider-track: calc(var(--ambx-grid) * 1.5); /* 6px */
+  --ambx-slider-thumb: calc(var(--ambx-grid) * 5);   /* 20px */
+}
+
+.ambx-slider-md {
+  --ambx-slider-track: calc(var(--ambx-grid) * 2); /* 8px */
+  --ambx-slider-thumb: calc(var(--ambx-grid) * 6); /* 24px */
+}
+
+.ambx-slider-lg {
+  --ambx-slider-track: calc(var(--ambx-grid) * 3); /* 12px */
+  --ambx-slider-thumb: calc(var(--ambx-grid) * 8); /* 32px */
 }
 
 .ambx-slider-thumb {

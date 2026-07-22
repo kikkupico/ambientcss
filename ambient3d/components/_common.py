@@ -11,6 +11,50 @@ import bmesh
 import bpy
 
 
+# ------------------------------------------------------------ device layout ---
+
+# Spacing/clearance tiers for composing controls into a device face, mirroring
+# packages/ambient-components/src/styles.css's --ambx-gap-tight/-normal/-loose
+# (mm = px, kept in lockstep by design like amb_model.py's AMB_DEFAULTS mirrors
+# ambient.css's :root lighting defaults). Hardware-panel convention (Rams/
+# Braun, Teenage Engineering): one modular pitch, tighter within a functional
+# cluster, looser between clusters/at the panel edge — not a gap picked ad hoc
+# per layout.
+GAP_TIGHT_MM = 12.0
+GAP_NORMAL_MM = 20.0
+GAP_LOOSE_MM = 32.0
+
+
+def row_layout(widths, gap):
+    """Given a list of component widths (mm) and a gap constant, return the
+    x center-offsets for a row centered on x=0, plus the total row width."""
+    total = sum(widths) + gap * (len(widths) - 1)
+    xs = []
+    x = -total / 2
+    for w in widths:
+        xs.append(x + w / 2)
+        x += w + gap
+    return xs, total
+
+
+def grouped_row_layout(groups, gap_between):
+    """Compose several row_layout clusters into one row. `groups` is a list
+    of (widths, gap_within) pairs, one per functional cluster (tight within
+    a cluster, e.g. a bank of same-family controls); gap_between separates
+    consecutive clusters (a zone boundary, e.g. GAP_LOOSE_MM). Returns a
+    flat list of x center-offsets, one per width in group order, plus the
+    total row width."""
+    group_results = [row_layout(widths, gap_within) for widths, gap_within in groups]
+    total = sum(t for _, t in group_results) + gap_between * (len(groups) - 1)
+    xs = []
+    left = -total / 2
+    for local_xs, group_total in group_results:
+        offset = left + group_total / 2
+        xs.extend(x + offset for x in local_xs)
+        left += group_total + gap_between
+    return xs, total
+
+
 # ---------------------------------------------------------------- profiles ---
 
 def superellipse(a, b, n, segs=256):

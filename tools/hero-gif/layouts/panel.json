@@ -1,7 +1,11 @@
 {
   "id": "panel",
   "note": "The hero: a hardware panel built from the component referents. Positions are millimetres from frame centre, +y up (Blender). Only components with a referent on both sides appear here. Component sizes are not specified — every one is fixed by --ambx-grid (4px = 4mm) on the CSS side and by the matching GRID multiples in ambient3d/referents.py.",
-  "frameMm": [288, 160],
+  "layout": {
+    "note": "Documentation only — no renderer reads this. Every coordinate below is composed on the spacing scale (docs: /ambient-components/design-tokens), the same tight/normal/loose tiers ambient3d/components/_common.py GAP_*_MM compose that module's demo device from; nothing here is a hand-picked number. Footprints are the referents' base tiles (knob 64, button-square 56, button-round 48, switch 60x36, slider 128x32), so the clearance between two controls is never tighter than the tier between their tiles. The pill button is deliberately absent: its referent is 64 mm wide where the CSS pill's min-width is 72 px, and an unlabelled pill would show that 8 px as a registration error at the seam. Two columns sit LOOSE apart and come to 208 mm tall each by construction. LEFT, 128 wide: the display and mixer strip — screen 128x68, NORMAL down to three sliders stacked TIGHT (68 + 20 + 3*32 + 2*12 = 208). RIGHT, 248 wide: three rows NORMAL apart, each centred in the column — three knobs TIGHT (3*64 + 2*12 = 216), three square pads TIGHT (3*56 + 2*12 = 192), then a utility row of the switch NORMAL from a TIGHT bank of three round keys (60 + 20 + [3*48 + 2*12] = 248, the widest row and so the column's width), giving 64 + 20 + 56 + 20 + 48 = 208. Content is 128 + 32 + 248 = 408 by 208; the body adds a LOOSE edge margin all round (the ambx-panel-device rule that a device face's border is one more slot in the lattice) for 472 x 272; the frame adds 12 mm of air for the drop shadow.",
+    "gaps": { "tight": 12, "normal": 20, "loose": 32 }
+  },
+  "frameMm": [496, 296],
   "pxPerMm": 4,
   "amb": {
     "light_x": -1,
@@ -16,15 +20,26 @@
   },
   "body": {
     "note": "The device: a chamfered slab standing off the ground. This is the calibration plate (ambient3d/components/plate.py) — the most directly grounded object in the project — and its CSS peer is the plain `.ambient .amb-surface .amb-chamfer-2` box. Controls recess into its top face, so the panel reads as one machined faceplate rather than parts floating on an infinite ground.",
-    "size": [264, 136],
+    "size": [472, 272],
     "amb": { "thickness": 2, "chamfer": 1, "chamfer_width": 2, "elevation": 0.5 }
   },
   "components": [
-    { "id": "screen", "kind": "screen", "x": -76, "y": 34, "size": [92, 48], "amb": { "thickness": 1 } },
-    { "id": "knob-a", "kind": "knob", "variant": "dot", "x": 8, "y": 34, "value": 0.33 },
-    { "id": "knob-b", "kind": "knob", "variant": "flute", "x": 76, "y": 34, "value": 0.7 },
-    { "id": "sld", "kind": "slider", "x": -58, "y": -34, "value": 0.5 },
-    { "id": "sw", "kind": "switch", "x": 40, "y": -34, "value": 1 },
-    { "id": "btn", "kind": "button", "variant": "square", "x": 102, "y": -34 }
+    { "id": "screen", "kind": "screen", "x": -140, "y": 70, "size": [128, 68], "amb": { "thickness": 1 } },
+    { "id": "sld-1", "kind": "slider", "x": -140, "y": 0, "value": 0.72 },
+    { "id": "sld-2", "kind": "slider", "x": -140, "y": -44, "value": 0.4 },
+    { "id": "sld-3", "kind": "slider", "x": -140, "y": -88, "value": 0.55 },
+
+    { "id": "knob-cap", "kind": "knob", "variant": "cap", "x": 4, "y": 72, "value": 0.7 },
+    { "id": "knob-flute", "kind": "knob", "variant": "flute", "x": 80, "y": 72, "value": 0.33 },
+    { "id": "knob-dot", "kind": "knob", "variant": "dot", "x": 156, "y": 72, "value": 0.5 },
+
+    { "id": "pad-1", "kind": "button", "variant": "square", "x": 12, "y": -8 },
+    { "id": "pad-2", "kind": "button", "variant": "square", "x": 80, "y": -8 },
+    { "id": "pad-3", "kind": "button", "variant": "square", "x": 148, "y": -8 },
+
+    { "id": "sw", "kind": "switch", "x": -14, "y": -80, "value": 1 },
+    { "id": "key-1", "kind": "button", "variant": "round", "x": 60, "y": -80 },
+    { "id": "key-2", "kind": "button", "variant": "round", "x": 120, "y": -80 },
+    { "id": "key-3", "kind": "button", "variant": "round", "x": 180, "y": -80 }
   ]
 }

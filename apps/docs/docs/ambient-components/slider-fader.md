@@ -36,6 +36,7 @@ a shallow concave channel.
 | `max` | `number` | `100` |
 | `step` | `number` | `1` |
 | `label` | `string` | - |
+| `size` | `"sm" \| "md" \| "lg"` | `"md"` |
 | `onChange` | `(nextValue: number) => void` | - |
 
 ## Example: horizontal + vertical pair
