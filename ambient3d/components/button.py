@@ -4,7 +4,8 @@
 rounded-square OP-1 style key. `base_style` "flush" seats the cap in a
 plain clearance hole (OP-1/EP-133 panels); "well" is the TP-7-style
 machined pocket — the cap sits in a countersunk recess with a shadow-gap
-ring, barely proud of the tile.
+ring, barely proud of the tile. Pass `well_material` to line the pocket,
+which is what makes the ring read as a gap rather than as bare tile.
 
 `tile_shape` "rect" gives a sharp-cornered rectangular tile so buttons can
 butt side by side into a panel (tile size, thickness, and material are
@@ -43,6 +44,7 @@ def build_button(
     seat=1.2,             # how deep the flush cap sits into the tile
     well_gap=0.6,         # shadow-gap ring width around a well cap
     well_depth=1.3,       # pocket depth
+    well_material=None,   # pocket liner; None leaves the pocket bare tile
     label=None,           # printed text, or "@play"/"@stop"/"@rec"/...
     label_size=None,      # glyph height / font size in mm; auto if None
     value=0.0,            # 0..1 press state
@@ -89,13 +91,25 @@ def build_button(
                          material=base_material, location=location)
 
     if base_style == "well":
+        pocket_profile = offset_profile(cap_profile, -well_gap)
         pocket = prism_object(
-            name + "_Pocket",
-            offset_profile(cap_profile, -well_gap),
+            name + "_Pocket", pocket_profile,
             base_h - well_depth, base_h + 1.0,
         )
         boolean_cut(tile, pocket)
         cap_rest = base_h - well_depth
+        if well_material is not None:
+            # Liner filling the pocket floor, so the shadow-gap ring around
+            # the cap reads as the well's own material rather than as bare
+            # tile — the same trick build_switch uses for its recess floor.
+            # Grown past the pocket wall so it is buried in the tile at the
+            # rim and can never show a seam.
+            liner = prism_object(
+                name + "_Well", offset_profile(pocket_profile, -1.0),
+                0.05, base_h - well_depth + 0.02, material=well_material,
+            )
+            liner.parent = tile
+            liner.location = (0, 0, 0)
     else:
         hole = prism_object(
             name + "_Hole",
