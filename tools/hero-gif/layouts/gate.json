@@ -1,0 +1,20 @@
+{
+  "id": "gate",
+  "note": "De-risk gate: the single grounded knob referent, same framing as ambient3d/renders/components/knob.png. Renders on both sides so the pair can be overlaid before any panel work.",
+  "frameMm": [128, 128],
+  "pxPerMm": 4,
+  "amb": {
+    "light_x": -1,
+    "light_y": -1,
+    "key_light_intensity": 0.9,
+    "fill_light_intensity": 0.7
+  },
+  "css": {
+    "note": "Neutral, matching the referents' calibration materials, so the diff against renders/components/<name>.png measures shading fidelity rather than the shipped tint. See panel.json.",
+    "lightSaturation": 0,
+    "highlightColor": "#373737"
+  },
+  "components": [
+    { "id": "k", "kind": "knob", "variant": "dot", "x": 0, "y": 0, "value": 0.33 }
+  ]
+}

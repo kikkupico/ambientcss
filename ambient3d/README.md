@@ -42,6 +42,9 @@ To measure physical raytracing lighting and update CSS coefficients:
 # Render grounded reference components under calibrated lighting environments
 blender -b -P ground_components.py
 
+# Render the README hero panel (camera move; see tools/hero-gif to assemble)
+blender -b -P hero_panel.py
+
 # Extract lighting curves and derive CSS coefficients
 python3 calibrate.py
 ```
@@ -113,6 +116,8 @@ State changes apply pure matrix transforms to fixed geometry (`components.set_va
 - `ground_components.py` — Generates reference models for physical measurement.
 - `components/_common.py` — Superellipse geometry profiles, lofting, boolean modifiers, accent graphics.
 - `components/knob.py`, `button.py`, `fader.py`, `grille.py` — Component builders.
+- `referents.py` — The 3D referent of each `@ambientcss/components` component, built at the CSS component's dimensions in calibration materials. Shared by every scene that places them.
+- `hero_panel.py` — The README hero: a panel of referents under an orthographic camera move that ends at the calibration pose, so the last frame is pixel-comparable with the CSS. See [`tools/hero-gif`](../tools/hero-gif).
 - `derived/` — Calibration measurements, JSON outputs, and theory notes.
 - `generate.py` — Blender CLI entry point.
 

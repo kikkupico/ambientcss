@@ -17,6 +17,31 @@
   --ambx-fader-label-clearance: calc(var(--ambx-grid) * 4);
 }
 
+/* Every control sizes its moving part as a percentage of a padded box —
+   a button's cap is 100% of a well inset by the clearance ring, a knob's
+   face 100% of the knob. Under the default content-box those paddings add
+   to the percentage instead of fitting inside it, and the cap renders
+   larger than the well it sits in. Scoped to the package's own elements
+   rather than shipped as a global reset: apps that already reset globally
+   (apps/demo does) see no change, and apps that do not are no longer
+   silently broken. */
+.amb-button,
+.amb-knob,
+.amb-switch,
+.amb-fader,
+.amb-slider,
+.ambx-panel,
+.ambx-stack,
+.amb-button *,
+.amb-knob *,
+.amb-switch *,
+.amb-fader *,
+.amb-slider *,
+.ambx-panel *,
+.ambx-stack * {
+  box-sizing: border-box;
+}
+
 .amb-heading-1 {
   font-size: var(--ambx-type-1-size);
   line-height: var(--ambx-type-1-line);
