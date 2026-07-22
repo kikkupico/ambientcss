@@ -1,7 +1,7 @@
 {
   "name": "@ambientcss/hero-gif",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Renders the README hero GIF: the Blender referent panel wiped against the same panel in live CSS, pixel-aligned at the calibration rig's scale",
   "type": "module",
   "scripts": {
