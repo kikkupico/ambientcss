@@ -119,11 +119,16 @@ You can override the global light source for specific elements to simulate local
 
 AmbientCSS uses standard utility classes for border radius, which interact correctly with lighting effects.
 
-- `amb-rounded`: Small radius.
-- `amb-rounded-md`: Medium radius.
-- `amb-rounded-lg`: Large radius.
-- `amb-rounded-xl`: Extra large radius.
-- `amb-rounded-full`: Full pill/circle radius.
+- `amb-rounded`: Small radius (4px).
+- `amb-rounded-md`: Medium radius (8px).
+- `amb-rounded-lg`: Large radius (12px).
+- `amb-rounded-xl`: Extra large radius (16px).
+- `amb-rounded-full`: Full pill/circle radius (9999px).
+
+`@ambientcss/components` mirrors these exact values as `--ambx-radius-sm/-md/-lg/-xl/-full`
+tokens, so the two packages share one radius scale — see
+[Design tokens](/ambient-components/design-tokens#border-radius) for the
+full component-side scale, including sizing and spacing.
 
 ### Glow
 

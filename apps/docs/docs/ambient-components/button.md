@@ -38,12 +38,19 @@ Cap silhouettes from the referent lineup (`ambient3d/generate.py`):
 <RenderComparison slug="button-round" dir="components"><GroundedButtonRoundDemo /></RenderComparison>
 <RenderComparison slug="button-square" dir="components"><GroundedButtonSquareDemo /></RenderComparison>
 
+## Sizes
+
+`size="sm" | "md" | "lg"` scales min-width, cap padding, and label size per
+shape — `"md"` is the unchanged default. See the full per-shape table in
+[Design tokens](/ambient-components/design-tokens#sizes).
+
 ## Props
 
 | Prop | Type | Default |
 | --- | --- | --- |
 | `shape` | `"pill" \| "round" \| "square"` | `"pill"` |
 | `material` | `"matte" \| "shiny" \| "glass"` | `"matte"` |
+| `size` | `"sm" \| "md" \| "lg"` | `"md"` |
 
 Also inherits all `ButtonHTMLAttributes<HTMLButtonElement>` props.
 

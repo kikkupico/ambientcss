@@ -2,6 +2,8 @@ import { useId, useRef } from "react";
 import type { HTMLAttributes, KeyboardEvent, PointerEvent } from "react";
 import { cn } from "../lib/cn";
 
+export type AmbientFaderSize = "sm" | "md" | "lg";
+
 export type AmbientFaderProps = Omit<HTMLAttributes<HTMLDivElement>, "onChange"> & {
   value: number;
   min?: number;
@@ -9,6 +11,7 @@ export type AmbientFaderProps = Omit<HTMLAttributes<HTMLDivElement>, "onChange">
   step?: number;
   label?: string;
   material?: "matte" | "shiny" | "glass";
+  size?: AmbientFaderSize;
   onChange?: (nextValue: number) => void;
 };
 
@@ -23,6 +26,7 @@ export function AmbientFader({
   step = 1,
   label,
   material,
+  size = "md",
   onChange,
   className,
   ...props
@@ -91,7 +95,7 @@ export function AmbientFader({
   return (
     <div className={cn("ambx-stack", className)} {...props}>
       <div
-        className="amb-fader amb-groove ambx-fader"
+        className={cn("amb-fader amb-groove ambx-fader", `ambx-fader-${size}`)}
         ref={trackRef}
         role="slider"
         aria-label={label}

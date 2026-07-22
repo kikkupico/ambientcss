@@ -2,6 +2,8 @@ import { useId, useRef } from "react";
 import type { HTMLAttributes, KeyboardEvent, PointerEvent } from "react";
 import { cn } from "../lib/cn";
 
+export type AmbientSliderSize = "sm" | "md" | "lg";
+
 export type AmbientSliderProps = Omit<HTMLAttributes<HTMLDivElement>, "onChange"> & {
   value: number;
   min?: number;
@@ -9,6 +11,7 @@ export type AmbientSliderProps = Omit<HTMLAttributes<HTMLDivElement>, "onChange"
   step?: number;
   label?: string;
   material?: "matte" | "shiny" | "glass";
+  size?: AmbientSliderSize;
   onChange?: (nextValue: number) => void;
 };
 
@@ -23,6 +26,7 @@ export function AmbientSlider({
   step = 1,
   label,
   material,
+  size = "md",
   onChange,
   className,
   ...props
@@ -91,7 +95,7 @@ export function AmbientSlider({
   return (
     <div className={cn("ambx-stack", className)} {...props}>
       <div
-        className="amb-slider amb-groove ambx-slider"
+        className={cn("amb-slider amb-groove ambx-slider", `ambx-slider-${size}`)}
         ref={trackRef}
         role="slider"
         aria-label={label}
