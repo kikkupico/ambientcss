@@ -11,6 +11,12 @@ import {
   type AmbientKnobVariant,
 } from "@ambientcss/components";
 
+/* The README hero film (tools/hero-gif): the same device raytraced in
+   Blender and rendered by the CSS, wiped against each other. Imported from
+   the repo root rather than copied into the app so the demo can never show
+   a stale cut of it. */
+import heroFilm from "../../../ambientcss.mp4";
+
 /* ── Intersection observer hook ───────────────────────────────────────── */
 
 function useInView(threshold = 0.25) {
@@ -29,6 +35,24 @@ function useInView(threshold = 0.25) {
   }, [threshold]);
 
   return { ref, visible };
+}
+
+/* ── Reduced motion ───────────────────────────────────────────────────── */
+
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(
+    () => typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onChange = () => setReduced(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  return reduced;
 }
 
 /* ── Theming presets ──────────────────────────────────────────────────────
@@ -203,6 +227,10 @@ export function App() {
   const [sw1, setSw1] = useState(true);
   const [sw2, setSw2] = useState(false);
 
+  /* The hero film loops on its own; under prefers-reduced-motion it becomes
+     an ordinary paused video the visitor can start themselves. */
+  const reducedMotion = usePrefersReducedMotion();
+
   /* InView hooks for each section ----------------------------------------- */
   const orbitView = useInView(0.2);
   const elevView = useInView(0.15);
@@ -274,6 +302,16 @@ export function App() {
       <section className="hero amb-surface" ref={heroRef}>
         <div className="hero-title">ambient</div>
         <div className="hero-sub">physically based css</div>
+        <video
+          className="hero-film ambient amb-elevation-1 amb-rounded-lg"
+          src={heroFilm}
+          autoPlay={!reducedMotion}
+          controls={reducedMotion}
+          loop
+          muted
+          playsInline
+          aria-label="A hardware panel raytraced in Blender rotating to a flat-on view, then wiped across to reveal the same panel rendered by Ambient CSS"
+        />
         <div
           className="hero-scroll-hint"
           onClick={() => scrollToNextSection(heroRef)}

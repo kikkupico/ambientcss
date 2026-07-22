@@ -113,6 +113,24 @@ body {
   text-transform: lowercase;
 }
 
+/* The README hero film. It is rendered on the calibration rig's neutral
+   ground, so on the default preset it sits on .amb-surface almost
+   seamlessly; the radius and elevation are only there to keep it reading as
+   an object once a tinted preset moves the page's surface off neutral. */
+.hero-film {
+  margin-top: 48px;
+  /* auto width/height with two maxima: the browser scales the film down
+     preserving its own aspect ratio until it fits both, so the box is always
+     exactly the film — no letterboxing inside the elevation shadow. */
+  width: auto;
+  height: auto;
+  max-width: min(720px, 84vw);
+  max-height: 38vh;
+  /* the radius comes from .amb-rounded-lg; overflow keeps the film's own
+     square corners from poking past it */
+  overflow: hidden;
+}
+
 .hero-scroll-hint {
   position: absolute;
   bottom: 80px;
