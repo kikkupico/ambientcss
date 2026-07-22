@@ -95,6 +95,38 @@ Elevation controls the depth of the element and the strength of its shadow.
 <div class="ambient amb-surface amb-chamfer amb-elevation-3">Elevation 3</div>
 ```
 
+## Thickness
+
+Thickness controls the physical body height of the element — how much
+material it's cut from, grounded in the `ambient3d` rig. Like elevation, it
+scales the drop shadow; unlike elevation, it also gates the edge treatments
+(`amb-chamfer`, `amb-fillet`, `amb-groove`), which need material to cut into.
+
+- `amb-thickness-0`: Paper-thin sheet (0.15mm). Imperceptible at rest on a
+  matching surface (no edge bands, no shadow) — only elevation reveals it.
+- `amb-thickness-1`: Button-scale slab (4.5mm).
+- `amb-thickness-2`: Knob-scale body (9mm) — twice as thick as a button.
+
+```html
+<div class="ambient amb-surface amb-chamfer amb-thickness-0">Thickness 0</div>
+<div class="ambient amb-surface amb-chamfer amb-thickness-1">Thickness 1</div>
+<div class="ambient amb-surface amb-chamfer amb-thickness-2">Thickness 2</div>
+```
+
+### Thickness and edge treatments
+
+Edge treatments imply material to cut into, so `amb-chamfer` and `amb-fillet`
+default an element's thickness to 1 if nothing else sets it; the wider
+`amb-chamfer-2` and `amb-fillet-2` cuts default it to 2, since a cut can't be
+wider than the body is thick. `amb-groove` (a recess cut into the material)
+defaults thickness to 1 too. Add an explicit `amb-thickness-*` class to
+override any of these defaults:
+
+```html
+<!-- amb-chamfer alone defaults to thickness 1; this thickens the body to knob-scale -->
+<div class="ambient amb-surface amb-chamfer amb-thickness-2">Thick chamfer</div>
+```
+
 ## Lighting Direction
 
 You can override the global light source for specific elements to simulate localized lighting or different orientations.
