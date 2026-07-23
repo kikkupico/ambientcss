@@ -16,6 +16,7 @@ import {
    the repo root rather than copied into the app so the demo can never show
    a stale cut of it. */
 import heroFilm from "../../../ambientcss.mp4";
+import kubernetes3dShot from "./assets/kubernetes3d.jpg";
 
 /* ── Intersection observer hook ───────────────────────────────────────── */
 
@@ -589,6 +590,24 @@ export function App() {
             ))}
           </div>
           <div className="finale-sub" data-visible={finaleView.visible}>physically based css</div>
+
+          <a
+            className="made-with ambient amb-surface amb-chamfer amb-elevation-2"
+            data-visible={finaleView.visible}
+            href="https://kubernetes3d.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span className="made-with-label">made with ambientcss</span>
+            <img
+              className="made-with-shot amb-rounded-md"
+              src={kubernetes3dShot}
+              alt="kubernetes3d.com — Kubernetes visualized as a synth rack, built with Ambient CSS"
+              loading="lazy"
+            />
+            <span className="made-with-caption">kubernetes3d.com ↗</span>
+          </a>
+
           <div className="finale-links">
             <a
               className="finale-link amb-button amb-groove ambx-button"

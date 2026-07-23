@@ -506,6 +506,47 @@ body {
   transform: translateY(0);
 }
 
+.made-with {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: min(420px, 84vw);
+  margin: 48px auto 0;
+  padding: 20px;
+  text-decoration: none;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease 0.8s,
+              transform 0.8s ease 0.8s,
+              box-shadow 0.3s ease;
+}
+
+.made-with[data-visible="true"] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.made-with-label {
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--amb-lume);
+}
+
+.made-with-shot {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  object-position: top;
+}
+
+.made-with-caption {
+  font-size: 13px;
+  color: var(--amb-label);
+}
+
 .finale-links {
   display: flex;
   justify-content: center;
