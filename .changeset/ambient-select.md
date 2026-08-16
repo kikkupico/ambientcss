@@ -28,6 +28,12 @@ The lamp colour is `--amb-led-color`, the variable `amb-led` and
 indicator on a panel; set it per group with `color` or per key on the option.
 Unset it falls back to `--amb-highlight-color` rather than a hardcoded hue.
 
+Keys are square by default, but the size is a floor rather than a fixed width,
+so a longer legend may widen one and a vertical rail stretches the rest to
+match. For uniform keys with long names, legend them with icons and give each
+option an `ariaLabel` — which supplies both the accessible name and the hover
+title, since a glyph has neither.
+
 Single select is a `radiogroup` of `radio`s with a roving tabindex — the lit
 key owns the tab stop, and the arrows move focus and selection together, with
 Home/End. `multiple` switches to a `group` of `checkbox`es where every key is

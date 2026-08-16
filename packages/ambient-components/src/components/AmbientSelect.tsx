@@ -9,6 +9,9 @@ export type AmbientSelectOption = {
   value: string;
   /** Cap legend — a numeral in the referent, but any node works. */
   label?: ReactNode;
+  /** Accessible name, and the hover title. Needed whenever the legend is a
+   *  glyph or an icon: a key reading "*" has no name otherwise. */
+  ariaLabel?: string;
   /** Overrides the group's lamp colour for this option only. */
   color?: string;
   disabled?: boolean;
@@ -168,6 +171,8 @@ export function AmbientSelect({
             }}
             role={multiple ? "checkbox" : "radio"}
             aria-checked={on}
+            aria-label={option.ariaLabel}
+            title={option.ariaLabel}
             disabled={option.disabled}
             tabIndex={
               multiple ? 0 : index === (tabStop >= 0 ? tabStop : firstEnabled) ? 0 : -1

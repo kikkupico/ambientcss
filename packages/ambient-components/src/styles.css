@@ -591,10 +591,6 @@
   --amb-thickness: 0.27;                   /* seat depth, as .amb-button */
   background-color: var(--amb-lume);
   border-radius: calc(var(--ambx-radius-md) + var(--ambx-grid-half));
-  /* The lamp colour. Same variable .amb-led and AmbientSwitch's led prop
-     use, so one declaration lights every indicator on a panel; unset, it
-     falls back to the scene's own accent rather than to a hardcoded hue. */
-  --_ambx-sel-color: var(--amb-led-color, var(--amb-highlight-color));
 }
 
 .amb-select-horizontal {
@@ -602,11 +598,27 @@
 }
 
 .amb-select-option {
+  /* The lamp colour. Same variable .amb-led and AmbientSwitch's led prop
+     use, so one declaration lights every indicator on a panel; unset, it
+     falls back to the scene's own accent rather than to a hardcoded hue.
+
+     Resolved HERE, on the key, not on the bank: a custom property has its
+     var()s substituted on the element that declares it, so reading
+     --amb-led-color one level up would bake in the bank's colour (or the
+     fallback) and inherit that down, and a per-key colour would never be
+     seen. Same trap --amb-curve-delta is declared per element to avoid. */
+  --_ambx-sel-color: var(--amb-led-color, var(--amb-highlight-color));
   position: relative;
   cursor: pointer;
   border: none;
   padding: 0;
-  width: var(--ambx-select-size);
+  display: grid;
+  /* Square by default, but a WORD is allowed to widen it: min-width floors
+     the key at the hardware square, and the cap (a stretched grid item, so
+     it still covers the whole face) contributes its legend's width above
+     that. A bank of numerals stays a bank of numerals; a bank of mode names
+     grows to fit and, in a column, all keys stretch to the widest. */
+  min-width: var(--ambx-select-size);
   height: var(--ambx-select-size);
   border-radius: var(--ambx-radius-md);
   /* The pocket floor the lens lies on: the grounded .amb-surface tone, so
@@ -652,8 +664,9 @@
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 62%;
-  aspect-ratio: 1;
+  height: 62%;
+  aspect-ratio: 1;          /* off the HEIGHT, so a widened key keeps a
+                               round lamp rather than an overflowing one */
   border-radius: 50%;
   /* Unlit, the lens is a tinted lens body, not an off pixel: it sits
      between the floor's grounded tone and .amb-surface-darker's mid-tone
@@ -699,7 +712,7 @@
   position: relative;      /* paints above the absolutely-placed lens */
   display: grid;
   place-items: center;
-  width: 100%;
+  padding-inline: var(--ambx-select-pad);
   height: 100%;
   /* Flush with the pocket: the cap IS the key's whole visible face, so
      the floor beneath it never shows as a rim — the dark gap between keys
@@ -757,21 +770,25 @@
 
 .ambx-select {
   --ambx-select-size: calc(var(--ambx-grid) * 11);          /* 44px key */
+  --ambx-select-pad: calc(var(--ambx-grid) * 2);
   --ambx-select-label-size: calc(var(--ambx-grid) * 3.5);
 }
 
 .ambx-select-sm {
   --ambx-select-size: calc(var(--ambx-grid) * 8);           /* 32px */
+  --ambx-select-pad: calc(var(--ambx-grid) * 1.5);
   --ambx-select-label-size: calc(var(--ambx-grid) * 2.5);
 }
 
 .ambx-select-md {
   --ambx-select-size: calc(var(--ambx-grid) * 11);          /* 44px */
+  --ambx-select-pad: calc(var(--ambx-grid) * 2);
   --ambx-select-label-size: calc(var(--ambx-grid) * 3.5);
 }
 
 .ambx-select-lg {
   --ambx-select-size: calc(var(--ambx-grid) * 14);          /* 56px */
+  --ambx-select-pad: calc(var(--ambx-grid) * 2.5);
   --ambx-select-label-size: calc(var(--ambx-grid) * 4.5);
 }
 

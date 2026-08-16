@@ -6,6 +6,7 @@ import {
   AmbientFader,
   AmbientSlider,
   AmbientSwitch,
+  AmbientSelect,
   AmbientPanel,
   type AmbientTheme,
   type AmbientKnobVariant,
@@ -109,10 +110,6 @@ const LIGHT_KNOBS: KnobCfg[] = [
 
 const ORBIT_COUNT = 9;
 const ANIM_DURATION = 800; // ms for preset transitions
-
-// Each cord is a short chain of shiny ambient balls; the topmost sit behind
-// the panel so a pull pays more of them out from under its edge.
-const CHAIN_BEADS = Array.from({ length: 6 });
 
 /* ══════════════════════════════════════════════════════════════════════════
    APP
@@ -225,6 +222,8 @@ export function App() {
   const [knob2, setKnob2] = useState(30);
   const [slider1, setSlider1] = useState(50);
   const [fader1, setFader1] = useState(70);
+  const [bank, setBank] = useState("3");
+  const [armed, setArmed] = useState<string[]>(["A", "C"]);
   const [sw1, setSw1] = useState(true);
   const [sw2, setSw2] = useState(false);
 
@@ -291,7 +290,7 @@ export function App() {
     <AmbientProvider className="amb-surface" theme={theme}>
 
       {/* ── HEADER — global light control ────────────────────────────── */}
-      <PullCordSwitcher
+      <ThemeSwitcher
         theme={mergedTheme}
         activePreset={activePreset}
         onPreset={animateToPreset}
@@ -571,6 +570,28 @@ export function App() {
             <div className="component-cell" data-visible={compView.visible}>
               <AmbientButton shape="square">FX</AmbientButton>
             </div>
+            <div className="component-cell" data-visible={compView.visible}>
+              <AmbientSelect
+                size="sm"
+                options={[{ value: "1" }, { value: "2" }, { value: "3" }, { value: "4" }]}
+                value={bank}
+                onChange={(v) => setBank(v as string)}
+                color="#22d3d3"
+                label="Bank"
+              />
+            </div>
+            <div className="component-cell" data-visible={compView.visible}>
+              <AmbientSelect
+                multiple
+                size="sm"
+                orientation="horizontal"
+                options={[{ value: "A" }, { value: "B" }, { value: "C" }]}
+                value={armed}
+                onChange={(v) => setArmed(v as string[])}
+                color="#4ade80"
+                label="Arm"
+              />
+            </div>
           </div>
           <div className="comp-led-row" data-visible={compView.visible}>
             <div className="amb-led" style={{ "--amb-led-color": "#ef4444" } as React.CSSProperties} />
@@ -657,16 +678,15 @@ export function App() {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   PULL-CORD SWITCHER — the header. Five cords hang from a housing rail: one
-   per theme preset, plus a "Custom" cord. Pulling a cord activates its theme
-   and drops the cord — the lowered cord IS the current-selection indicator,
-   so only one hangs low at a time. Pulling Custom draws the light-console
-   assembly down from the rail; clicking outside (or Esc) rolls it back up.
-   Reuses the same THEME_PRESETS / LIGHT_KNOBS / re-light machinery ThemeBar
-   used to drive.
+   THEME SWITCHER — the header. A bank of lamp-lit keys on the console slab's
+   lip: one per theme preset, plus a "Custom" key. The lit lamp IS the
+   current selection, and each key lights in its own preset's indicator
+   colour, so the bank reads as the panel's status row rather than as a menu.
+   Selecting Custom drops the slab to reveal the light console; clicking
+   outside (or Esc) rolls it back up.
    ══════════════════════════════════════════════════════════════════════════ */
 
-type PullCordSwitcherProps = {
+type ThemeSwitcherProps = {
   theme: ThemePreset;
   activePreset: string;
   onPreset: (p: ThemePreset) => void;
@@ -674,13 +694,8 @@ type PullCordSwitcherProps = {
   onProp: (key: keyof AmbientTheme, value: number) => void;
 };
 
-function PullCordSwitcher({ theme, activePreset, onPreset, onCustom, onProp }: PullCordSwitcherProps) {
+function ThemeSwitcher({ theme, activePreset, onPreset, onCustom, onProp }: ThemeSwitcherProps) {
   const [consoleOpen, setConsoleOpen] = useState(false);
-  // A pull is a transient tug: the cord springs down and snaps back like a
-  // real draw cord (the persistent glow, not the position, marks the active
-  // one). tugNonce re-keys the tugged rod so its spring animation replays.
-  const [tugLabel, setTugLabel] = useState<string | null>(null);
-  const [tugNonce, setTugNonce] = useState(0);
   const rigRef = useRef<HTMLDivElement>(null);
 
   // While the console is down, a click outside the rig (or Escape) rolls the
@@ -699,11 +714,26 @@ function PullCordSwitcher({ theme, activePreset, onPreset, onCustom, onProp }: P
     };
   }, [consoleOpen]);
 
-  const tug = (label: string) => { setTugLabel(label); setTugNonce((n) => n + 1); };
-  const pullTheme = (p: ThemePreset) => { tug(p.label); onPreset(p); setConsoleOpen(false); };
-  const pullCustom = () => { tug("Custom"); onCustom(); setConsoleOpen((o) => !o); };
+  // One key per preset plus Custom, legended with the preset's glyph so every
+  // key stays the same square — a bank, not a menu. Each carries its own
+  // indicator colour, so the lit key says which scene you are in by hue as
+  // well as by position (the same --amb-led-color the LEDs use), and its name
+  // rides along as the accessible name and the hover title.
+  const keys = [
+    ...THEME_PRESETS.map((p) => ({ value: p.label, label: p.icon, ariaLabel: p.label, color: p.led })),
+    { value: "Custom", label: "\u2699", ariaLabel: "Custom", color: "#a78bfa" }
+  ];
 
-  const customActive = activePreset === "Custom";
+  const pick = (next: string) => {
+    if (next === "Custom") {
+      onCustom();
+      setConsoleOpen((o) => !o);
+      return;
+    }
+    const preset = THEME_PRESETS.find((p) => p.label === next);
+    if (preset) onPreset(preset);
+    setConsoleOpen(false);
+  };
 
   return (
     <header className="cordbar">
@@ -740,61 +770,17 @@ function PullCordSwitcher({ theme, activePreset, onPreset, onCustom, onProp }: P
           </div>
         </div>
 
-        {/* Cords hang from the slab's bottom edge. Each label is printed on the
-            panel's revealed lip; below it a chain of shiny ambient balls (drawn
-            behind the panel) ends in a glass ball. A pull slides the whole chain
-            and ball down and it springs back with almost no bounce — the
-            highlighted label marks the active one. */}
-        <div className="cords" role="group" aria-label="Theme">
-          {THEME_PRESETS.map((p) => {
-            const active = activePreset === p.label;
-            return (
-              <button
-                key={p.label}
-                type="button"
-                className={`cord${active ? " is-active" : ""}`}
-                aria-pressed={active}
-                onClick={() => pullTheme(p)}
-              >
-                <span className="cord-name">{p.icon} {p.label}</span>
-                <span
-                  key={tugLabel === p.label ? `tug-${tugNonce}` : "rest"}
-                  className={`cord-pull${tugLabel === p.label ? " is-tugging" : ""}`}
-                  aria-hidden
-                >
-                  <span className="cord-chain">
-                    {CHAIN_BEADS.map((_, i) => (
-                      <span key={i} className="cord-bead ambient amb-surface amb-mat-shiny amb-rounded-full" />
-                    ))}
-                  </span>
-                  <span className="cord-ball ambient amb-surface amb-elevation-3 amb-rounded-full amb-mat-glass" />
-                </span>
-              </button>
-            );
-          })}
-
-          {/* Custom cord — drops the slab to reveal the console. */}
-          <button
-            type="button"
-            className={`cord cord-custom${customActive ? " is-active" : ""}${consoleOpen ? " is-open" : ""}`}
-            aria-pressed={customActive}
-            aria-expanded={consoleOpen}
-            onClick={pullCustom}
-          >
-            <span className="cord-name">⚙ Custom</span>
-            <span
-              key={tugLabel === "Custom" ? `tug-${tugNonce}` : "rest"}
-              className={`cord-pull${tugLabel === "Custom" ? " is-tugging" : ""}`}
-              aria-hidden
-            >
-              <span className="cord-chain">
-                {CHAIN_BEADS.map((_, i) => (
-                  <span key={i} className="cord-bead ambient amb-surface amb-mat-shiny amb-rounded-full" />
-                ))}
-              </span>
-              <span className="cord-ball ambient amb-surface amb-elevation-3 amb-rounded-full amb-mat-glass" />
-            </span>
-          </button>
+        {/* The key bank sits on the slab's revealed lip. Selecting a key
+            lights its lamp and re-lights every scene below; the Custom key
+            also drops the slab so the console above comes into view. */}
+        <div className="theme-keys">
+          <AmbientSelect
+            orientation="horizontal"
+            options={keys}
+            value={activePreset}
+            onChange={(next) => pick(next as string)}
+            aria-label="Theme"
+          />
         </div>
       </div>
     </header>

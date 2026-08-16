@@ -57,6 +57,12 @@ scene's `--amb-highlight-color` rather than to a hardcoded hue.
 `orientation="vertical"` (the default) stacks the rail; `"horizontal"` lays it
 out as a row, and the arrow keys follow. `size` scales the key and its legend.
 
+Keys are square by default — a bank of glyphs stays a bank of glyphs — but a
+longer legend is allowed to widen one: the size is a floor, not a fixed width.
+In a vertical rail every key then stretches to the widest, so the bank stays a
+bank. If you want uniform keys with long names, legend them with icons and put
+the names in `ariaLabel`.
+
 <SelectSizesPreview />
 
 ## Props
@@ -73,8 +79,10 @@ out as a row, and the arrow keys follow. `size` scales the key and its legend.
 | `color` | `string` | `--amb-highlight-color` |
 | `label` | `string` | — |
 
-`AmbientSelectOption` is `{ value, label?, color?, disabled? }` — `label`
-takes any node and falls back to `value`.
+`AmbientSelectOption` is `{ value, label?, ariaLabel?, color?, disabled? }`.
+`label` takes any node and falls back to `value`; `ariaLabel` supplies the
+accessible name and the hover title, and is needed whenever the legend is a
+glyph or an icon, which has no name of its own.
 
 Also inherits all `HTMLAttributes<HTMLDivElement>` props.
 

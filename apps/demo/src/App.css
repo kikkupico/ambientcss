@@ -678,7 +678,7 @@ body {
    surface. The slab's upper region is the light console, parked above the
    top of the screen; pulling Custom drops the whole slab (cords and all)
    into view — the console was always just its hidden part. The active
-   cord's convex ball descends and glows.
+   theme's key stays lit in its own indicator colour.
    ========================================================================== */
 
 .cordbar {
@@ -703,7 +703,7 @@ body {
    Content is the console; padding-bottom is the lip the cord labels sit on.
    z-index 1 seats it between the chains (behind) and the labels (in front). */
 .cord-panel {
-  --lip: 30px;
+  --lip: 12px;
   position: relative;
   z-index: 1;
   border-radius: 0 0 14px 14px; /* off-scale by design: bespoke console-slab corners, not an .ambx-panel instance, see design-tokens.md */
@@ -756,94 +756,24 @@ body {
   text-align: center;
 }
 
-/* Cords hang from the slab. The label row is pulled up onto the lip. No
-   z-index here, so each cord part stacks against the slab individually:
-   labels in front of it, chains and balls behind. */
-.cords {
+/* The key bank hangs just under the slab's bottom edge, the way the cords
+   used to — so at rest the header is the slab's lip plus this row, and the
+   console above it stays parked off-screen until Custom is picked. */
+.theme-keys {
   position: relative;
+  z-index: 2;
   display: flex;
   justify-content: center;
-  gap: clamp(10px, 4vw, 40px);
-  padding: 0 18px;
-  margin-top: calc(-1 * var(--lip, 30px) + 4px);
-}
-.cord {
-  appearance: none;
-  -webkit-appearance: none;
-  background: none;
-  border: 0;
-  margin: 0;
-  padding: 0;
-  font: inherit;
-  color: var(--amb-label);
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* Label — printed on the panel's revealed lip, in front of the slab. */
-.cord-name {
-  position: relative;
-  z-index: 2;                    /* in front of the slab (z 1) */
-  font-size: 9px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  margin-bottom: 12px;           /* clears the lip so the chain hangs below it */
-  transition: color 0.2s ease;
-}
-.cord.is-active .cord-name { color: var(--amb-highlight-color); }
-.cord:focus-visible { outline: none; }
-.cord:focus-visible .cord-name {
-  color: var(--amb-highlight-color);
-  text-decoration: underline;
-}
-
-/* The pull = chain + ball, drawn BEHIND the slab (z 0). A pull slides the
-   whole group down and it retracts with almost no bounce; the panel edge is
-   the housing the chain pays out from. */
-.cord-pull {
-  position: relative;
-  z-index: 0;                    /* behind the slab (z 1) */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.cord-pull.is-tugging {
-  animation: cord-tug 0.42s cubic-bezier(0.4, 0, 0.2, 1);   /* near-bounceless */
-}
-@keyframes cord-tug {
-  0%   { transform: translateY(0); }
-  44%  { transform: translateY(20px); }   /* pays out */
-  100% { transform: translateY(0); }       /* retracts, no overshoot */
-}
-
-/* Chain of tiny shiny ambient balls. Its top is pulled up behind the panel
-   lip so only the lower balls show at rest. */
-.cord-chain {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
-  margin-top: -18px;
-}
-.cord-bead {
-  width: 7px;
-  height: 7px;
-}
-
-/* Glass ambient ball on the chain end. */
-.cord-ball {
-  width: 26px;
-  height: 26px;
-  margin-top: 1px;
+  margin-top: 6px;
 }
 
 @media (max-width: 600px) {
   .cordbar { width: calc(100vw - 8px); }
-  .cords { gap: 14px; padding: 0 10px; }
-  .cord-name { font-size: 8px; letter-spacing: 0.06em; }
+
+  /* Five word-keys don't fit a narrow phone at the sm size: shrink the
+     bank's own grid so the keys and their legends scale together, the same
+     trick the console grid below uses. */
+  .theme-keys .amb-select { --ambx-grid: 3px; }
 
   /* Seven fixed-size knobs (48px each at the default 3px grid) don't fit a
      narrow phone's console well — shrink the whole row's grid so it stays
@@ -867,7 +797,6 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .cord-assembly { transition: none; }
-  .cord-line.is-tugging { animation: none; }
 }
 
 /* ==========================================================================
