@@ -13,6 +13,14 @@ export type { AmbientButtonProps, AmbientButtonShape, AmbientButtonSize } from "
 export { AmbientSwitch } from "./components/AmbientSwitch";
 export type { AmbientSwitchProps, AmbientSwitchSize } from "./components/AmbientSwitch";
 
+export { AmbientSelect } from "./components/AmbientSelect";
+export type {
+  AmbientSelectProps,
+  AmbientSelectOption,
+  AmbientSelectSize,
+  AmbientSelectOrientation
+} from "./components/AmbientSelect";
+
 export { AmbientKnob } from "./components/AmbientKnob";
 export type { AmbientKnobProps, AmbientKnobVariant, AmbientKnobSize } from "./components/AmbientKnob";
 

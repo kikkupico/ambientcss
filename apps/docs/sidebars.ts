@@ -49,6 +49,7 @@ const sidebars: SidebarsConfig = {
         "ambient-components/panel",
         "ambient-components/button",
         "ambient-components/switch",
+        "ambient-components/select",
         "ambient-components/knob",
         "ambient-components/slider-fader",
         "ambient-components/examples"

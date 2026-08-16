@@ -558,8 +558,13 @@
     var(--amb-light-hue) var(--amb-light-saturation)
     var(--_glass-lightness) / var(--_glass-alpha)
   );
+  /* Unprefixed ONLY: the build (lightningcss, scripts/build-css.mjs)
+     autoprefixes this itself against the browser targets. A hand-written
+     -webkit- copy AFTER this line is not redundant but destructive — the
+     minifier collapses the pair to the last one it sees and ships the
+     prefixed form alone, which current Chrome no longer accepts, leaving
+     glass with no backdrop blur at all in the built package. */
   backdrop-filter: blur(var(--_glass-blur)) saturate(160%);
-  -webkit-backdrop-filter: blur(var(--_glass-blur)) saturate(160%);
   border: 1px solid hsl(
     var(--amb-light-hue) var(--amb-light-saturation) 100% /
     calc(0.1 + var(--amb-key-light-intensity) * 0.15)

@@ -5,6 +5,7 @@ import {
   AmbientKnob,
   AmbientPanel,
   AmbientProvider,
+  AmbientSelect,
   AmbientSlider,
   AmbientSwitch
 } from "@ambientcss/components";
@@ -89,6 +90,64 @@ export function SwitchPreview() {
         <AmbientSwitch label="Record" defaultChecked led="#ef4444" />
         <AmbientSwitch label="Small" size="sm" />
         <AmbientSwitch label="Large" size="lg" />
+      </div>
+    </DemoShell>
+  );
+}
+
+const BANK = [{ value: "1" }, { value: "2" }, { value: "3" }, { value: "4" }];
+
+export function SelectPreview() {
+  const [bank, setBank] = useState("3");
+
+  return (
+    <DemoShell>
+      <div className="docs-demo-row">
+        <AmbientSelect
+          label="Bank"
+          options={BANK}
+          value={bank}
+          onChange={(next) => setBank(next as string)}
+          color="#00b4dc"
+        />
+        <AmbientSelect
+          label="Accent"
+          options={BANK}
+          defaultValue="2"
+        />
+      </div>
+    </DemoShell>
+  );
+}
+
+export function SelectMultiPreview() {
+  const [tracks, setTracks] = useState<string[]>(["A", "C"]);
+
+  return (
+    <DemoShell>
+      <div className="docs-demo-stack">
+        <AmbientSelect
+          multiple
+          orientation="horizontal"
+          label="Tracks"
+          color="#4ade80"
+          options={[{ value: "A" }, { value: "B" }, { value: "C" }, { value: "D" }]}
+          value={tracks}
+          onChange={(next) => setTracks(next as string[])}
+        />
+        <p className="docs-demo-text">Armed: {tracks.length ? tracks.join(", ") : "none"}</p>
+      </div>
+    </DemoShell>
+  );
+}
+
+export function SelectSizesPreview() {
+  return (
+    <DemoShell>
+      <div className="docs-demo-row">
+        <AmbientSelect size="sm" options={BANK} defaultValue="1" color="#00b4dc" />
+        <AmbientSelect size="md" options={BANK} defaultValue="2" color="#00b4dc" />
+        <AmbientSelect size="lg" options={BANK} defaultValue="3" color="#00b4dc" />
       </div>
     </DemoShell>
   );

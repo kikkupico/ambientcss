@@ -44,6 +44,7 @@
 .amb-button,
 .amb-knob,
 .amb-switch,
+.amb-select,
 .amb-fader,
 .amb-slider,
 .ambx-panel,
@@ -51,6 +52,7 @@
 .amb-button *,
 .amb-knob *,
 .amb-switch *,
+.amb-select *,
 .amb-fader *,
 .amb-slider *,
 .ambx-panel *,
@@ -562,6 +564,215 @@
     ),
     var(--amb-highlight-color) 12%
   );
+}
+
+/* Select: a bank of lamp-lit keys in a shared rail — the hardware idiom
+   for a mode/bank selector, where the state is a lamp rather than a mark.
+   Three physical layers per option, and the ORDER is the whole trick:
+
+     1. the option itself is the pocket floor, in the grounded surface tone
+     2. .amb-select-lens is the LED's lens, a big disc lying ON that floor
+     3. .amb-select-cap is a translucent diffuser sitting OVER both
+
+   The cap is .amb-mat-glass, so its backdrop-filter blurs whatever is
+   behind it — which is the lens. That single fact produces both states
+   without a second gradient anywhere: unlit, the lens body reads as a soft
+   dark circle through the frost ("the LED you can see is there"); lit, the
+   same disc blooms into a broad radial glow with a hot centre, exactly as
+   an LED does behind a diffuser. Confirmed in the browser: backdrop-filter
+   samples a positioned SIBLING, not just an ancestor's background, so the
+   lens must paint before the cap — hence the lens is absolute and the cap
+   is position: relative rather than the other way round. */
+.amb-select {
+  display: inline-flex;
+  flex-direction: column;
+  padding: var(--ambx-grid-half);          /* the clearance gap ring */
+  gap: var(--ambx-grid-half);              /* the dark rail between keys */
+  --amb-thickness: 0.27;                   /* seat depth, as .amb-button */
+  background-color: var(--amb-lume);
+  border-radius: calc(var(--ambx-radius-md) + var(--ambx-grid-half));
+  /* The lamp colour. Same variable .amb-led and AmbientSwitch's led prop
+     use, so one declaration lights every indicator on a panel; unset, it
+     falls back to the scene's own accent rather than to a hardcoded hue. */
+  --_ambx-sel-color: var(--amb-led-color, var(--amb-highlight-color));
+}
+
+.amb-select-horizontal {
+  flex-direction: row;
+}
+
+.amb-select-option {
+  position: relative;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  width: var(--ambx-select-size);
+  height: var(--ambx-select-size);
+  border-radius: var(--ambx-radius-md);
+  /* The pocket floor the lens lies on: the grounded .amb-surface tone, so
+     an unlit key reads as a lit white diffuser rather than as a hole. */
+  background-color: hsl(
+    var(--amb-light-hue)
+    var(--amb-light-saturation)
+    calc(
+      var(--amb-key-light-intensity) * 31.5% +
+        var(--amb-fill-light-intensity) * 26.4% + 43.6%
+    )
+  );
+  transition: box-shadow 140ms ease;
+}
+
+/* Disabled dims the LAMP and the legend, not the key. Fading the whole
+   option would sink it into the dark rail, and opacity on the option makes
+   it a backdrop root — the one ancestor property that can cut the cap off
+   from the lens it is supposed to be diffusing. Fading the lens instead
+   leaves the diffuser doing its job on a lamp that simply cannot light. */
+.amb-select-option:disabled {
+  cursor: not-allowed;
+  box-shadow: none;          /* a dead lamp spills nothing onto the rail */
+}
+
+.amb-select-option:disabled .amb-select-lens {
+  opacity: 0.4;
+}
+
+.amb-select-option:disabled .amb-select-cap {
+  color: color-mix(in oklab, var(--amb-label), transparent 55%);
+}
+
+.amb-select-option:focus-visible {
+  outline-offset: var(--ambx-grid-half);
+}
+
+/* The LED's lens: a big disc, not the pinprick .amb-led is — this is the
+   lamp UNDER the key, sized so the diffused circle is legible through the
+   cap (the referent's lens reads at roughly three fifths of the key). */
+.amb-select-lens {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 62%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  /* Unlit, the lens is a tinted lens body, not an off pixel: it sits
+     between the floor's grounded tone and .amb-surface-darker's mid-tone
+     plate, and carries a trace of its own colour so an amber lamp reads
+     faintly warm while dark — 6%, enough to tell an amber lamp from a
+     cyan one up close and not enough to tint the key. Measured against
+     the referent photo, whose unlit disc dips about 5% below the
+     surrounding cap. */
+  background-color: color-mix(
+    in oklab,
+    color-mix(
+      in oklab,
+      hsl(
+        var(--amb-light-hue)
+        var(--amb-light-saturation)
+        calc(
+          var(--amb-key-light-intensity) * 31.5% +
+            var(--amb-fill-light-intensity) * 26.4% + 43.6%
+        )
+      ) 45%,
+      hsl(
+        var(--amb-light-hue)
+        var(--amb-light-saturation)
+        calc(
+          var(--amb-key-light-intensity) * 21% +
+            var(--amb-fill-light-intensity) * 17.4% + 27.3%
+        )
+      )
+    ),
+    var(--_ambx-sel-color) 6%
+  );
+  transition: background-color 140ms ease;
+}
+
+/* The diffuser cap. --_glass-blur is dialled down from the material's own
+   8 + 8*Ik (15.2px at the defaults): at that radius the lens washes out to
+   a flat tint and both states lose their circle. It is also tied to the
+   key rather than fixed — diffusion is a ratio of the lens it spreads, so
+   a flat radius would leave a small key soft and a large one hard-edged.
+   0.18 of the key puts md back at the 8px that read correctly against the
+   referent. */
+.amb-select-cap {
+  position: relative;      /* paints above the absolutely-placed lens */
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  /* Flush with the pocket: the cap IS the key's whole visible face, so
+     the floor beneath it never shows as a rim — the dark gap between keys
+     is the rail, not a ring around each one. */
+  border-radius: var(--ambx-radius-md);
+  font-weight: 600;
+  font-size: var(--ambx-select-label-size);
+  color: var(--amb-label);
+  --_glass-blur: calc(var(--ambx-select-size) * 0.18);
+}
+
+.amb-select-option:hover .amb-select-cap {
+  color: var(--amb-highlight-color);
+}
+
+/* Pressing sinks the key, and only sinks it — same rule the button follows:
+   the drop shadow shortens and the chamfer bands narrow, nothing repaints. */
+.amb-select-option:active .amb-select-cap {
+  --amb-thickness: 0.84;
+}
+
+/* Lit. The lens goes to full lamp colour and the diffuser saturates with
+   it: the cap's own tint is mixed to 35% of the lamp over the glass wash,
+   which is what the referent measures — a flooded cap that still shows the
+   lens's hot centre through it. Past ~55% the radial disappears into a
+   flat swatch and the key stops reading as lit-from-behind. */
+.amb-select-on .amb-select-lens {
+  background-color: var(--_ambx-sel-color);
+}
+
+.amb-select-on .amb-select-cap {
+  background-color: color-mix(
+    in srgb,
+    var(--_ambx-sel-color) 35%,
+    hsl(
+      var(--amb-light-hue) var(--amb-light-saturation)
+      calc(var(--amb-key-light-intensity) * 100%) /
+      calc(0.05 + var(--amb-key-light-intensity) * 0.1)
+    )
+  );
+  /* The legend is printed ink: it does not light up, it silhouettes
+     against the lamp — so it darkens toward the lamp's own hue rather
+     than staying --amb-label, which inverts to pale in a dark scene and
+     would vanish against a bright cap. */
+  color: color-mix(in oklab, var(--_ambx-sel-color), black 68%);
+}
+
+/* Light escaping around the key onto the rail. Radius is the grounded
+   emissive bloom (ambient3d/derived/notes/glow.md: 6.2px = 2 sigma of the
+   measured falloff), the same figure .amb-glow uses — only the colour is
+   the lamp's rather than --amb-lume's. */
+.amb-select-on {
+  box-shadow: 0 0 6.2px var(--_ambx-sel-color);
+}
+
+.ambx-select {
+  --ambx-select-size: calc(var(--ambx-grid) * 11);          /* 44px key */
+  --ambx-select-label-size: calc(var(--ambx-grid) * 3.5);
+}
+
+.ambx-select-sm {
+  --ambx-select-size: calc(var(--ambx-grid) * 8);           /* 32px */
+  --ambx-select-label-size: calc(var(--ambx-grid) * 2.5);
+}
+
+.ambx-select-md {
+  --ambx-select-size: calc(var(--ambx-grid) * 11);          /* 44px */
+  --ambx-select-label-size: calc(var(--ambx-grid) * 3.5);
+}
+
+.ambx-select-lg {
+  --ambx-select-size: calc(var(--ambx-grid) * 14);          /* 56px */
+  --ambx-select-label-size: calc(var(--ambx-grid) * 4.5);
 }
 
 .ambx-panel {
