@@ -104,6 +104,92 @@
   text-transform: uppercase;
   font-weight: 600;
   color: var(--amb-label);
+  /* Containing block + stacking context for the dish overlay below, so it
+     can sit above the cap's own background and below the label. */
+  position: relative;
+  isolation: isolate;
+}
+
+/* Cap dish (subtle concavity).
+
+   Real key caps are not flat: the top is scooped, so the wall on the far
+   side of the dish tilts INTO the light and the near wall tilts away.
+   Photographed reference (a dished ON key lit from above): along the light
+   axis the face starts a little off its floor at the lit rim, bottoms out
+   ~20% across, then climbs — accelerating, not linearly — to its brightest
+   at the far rim. Sampling that face and normalizing (0 = lit rim, 1 = far
+   rim) gives v = u^1.37 past the minimum; subtracting the profile's own
+   mean so the dish redistributes light rather than darkening the cap
+   overall leaves the signed stop table used below, in units of the end
+   delta: -0.42 at the lit rim, -0.73 at the floor, 0 at 62.5%, +1 at the
+   far rim. The far side overshoots more than the near side dips — a
+   grazing wall gains more than a tilted-away one loses.
+
+   AMPLITUDE is not taken from that photo (a near-black cap; absolute
+   deltas there mean nothing at .amb-surface's ~90% lightness). It reads
+   --amb-curve-delta, the grounded end delta .amb-surface-concave and
+   -convex ride (ambient3d/derived/notes/curved.md), so a concave cap and
+   a concave plate curve by the same measured amount and cannot drift
+   apart if that fit is ever re-derived. Only the AXIS and the PROFILE are
+   this file's own: the curved classes are single-axis (-concave reads
+   only --amb-light-y) and symmetric, and a cap has to follow whichever
+   light an app has set.
+
+   The overlay is painted as white/black alpha rather than as a background
+   gradient because the cap's background is already spoken for: the
+   material classes own background-image, and .amb-surface-concave's
+   `background` shorthand would wipe the shiny specular. An alpha over a
+   base of lightness L lands exactly on L + a(100 - L) for white and
+   L(1 - a) for black (the hue/saturation terms cancel in HSL lightness),
+   so the two alphas below invert the wanted delta EXACTLY for a matte cap
+   and approximately for shiny/glass, whose base is no longer plain
+   .amb-surface — the same residual .amb-mat-shiny's own comment carries. */
+.amb-button-cap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;                  /* over the cap face, under the label:
+                                   the alphas are calibrated for the
+                                   surface's lightness, and washing them
+                                   over the much darker label would fade
+                                   the glyph out at the bright rim. */
+  border-radius: inherit;
+  pointer-events: none;
+  /* Same axis convention as .amb-mat-shiny's --_shiny-angle: 0% of the
+     gradient lands on the lit edge, so the dish reorients itself with all
+     eight .amb-light-* positions instead of assuming a light from above. */
+  --_ambx-dish-angle: calc(atan2(var(--amb-light-y), var(--amb-light-x)) + 270deg);
+  /* Unitless twins of the grounded surface lightness and dish end delta
+     (percentage points), so they can divide into alphas. */
+  --_ambx-dish-l: calc(
+    var(--amb-key-light-intensity) * 31.5 +
+      var(--amb-fill-light-intensity) * 26.4 + 43.6
+  );
+  /* One curvature for all three cap silhouettes: a dish is a property of
+     the tooling, not of how big or how round the key is. Tune it — for
+     one button, or a whole panel — with @ambientcss/css's
+     --amb-curve-scale, which is the same knob the curved surface classes
+     answer to and inherits like any other variable. */
+  --_ambx-dish-d: var(--amb-curve-delta);
+  /* Alpha per unit of the stop table. The max() floors keep the divisor
+     off zero: at Ik = If = 1 the grounded surface computes past 100%
+     lightness (already clipped white), where a white overlay is a no-op
+     anyway. */
+  --_ambx-dish-up: calc(var(--_ambx-dish-d) / max(6, 100 - var(--_ambx-dish-l)));
+  --_ambx-dish-dn: calc(var(--_ambx-dish-d) / max(6, var(--_ambx-dish-l)));
+  background: linear-gradient(
+    var(--_ambx-dish-angle),
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% / calc(var(--_ambx-dish-dn) * 0.42)) 0%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% / calc(var(--_ambx-dish-dn) * 0.73)) 20%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% / calc(var(--_ambx-dish-dn) * 0.47)) 40%,
+    /* Doubled stop at the neutral crossing: a zero-length interval, so the
+       gradient never interpolates between a black and a white stop while
+       either still carries alpha. */
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% / 0) 62.5%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 62.5%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--_ambx-dish-up) * 0.44)) 80%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / var(--_ambx-dish-up)) 100%
+  );
 }
 
 .amb-button:focus {
@@ -114,6 +200,13 @@
   color: var(--amb-highlight-color);
 }
 
+/* Pressed: the cap keeps its tone and its dish, and only SINKS — thickness
+   1 -> 0.84, the referent's 0.7mm travel. The cue is entirely geometric:
+   the swept drop shadow shortens and tightens as the cap's silhouette
+   drops toward the well floor, and the chamfer bands narrow with it. A
+   key that is the same key still lights the same face, so nothing about
+   the cap's colour moves — the button reads as travel, not as a state
+   repaint. */
 .amb-button:active .amb-button-cap {
   --amb-thickness: 0.84;
 }

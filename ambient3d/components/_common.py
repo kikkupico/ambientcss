@@ -108,7 +108,12 @@ def offset_profile(pts, dist):
 
 def capped_solid(name, profile, height, fillet=0.8, chamfer=0.2, dome=0.0,
                  location=(0, 0, 0), material=None, smooth=True):
-    """Extruded profile with base chamfer, top edge fillet, flat or domed cap."""
+    """Extruded profile with base chamfer, top edge fillet, flat or curved cap.
+
+    `dome` is the cap's sagitta: positive bulges the top into a dome,
+    NEGATIVE scoops it into a dish (the concave key cap), flat at 0. Both
+    signs share the same paraboloid rings — only the apex moves.
+    """
     segs = len(profile)
     levels = [(0.0, chamfer), (chamfer, 0.0), (height - fillet, 0.0)]
     fillet_steps = 8
@@ -123,7 +128,7 @@ def capped_solid(name, profile, height, fillet=0.8, chamfer=0.2, dome=0.0,
         pts = offset_profile(profile, inset) if inset else profile
         rings.append([bm.verts.new((x, y, z)) for x, y in pts])
 
-    if dome > 0:
+    if dome:
         top_pts = offset_profile(profile, fillet)
         dome_steps = 6
         for k in range(1, dome_steps):
@@ -136,7 +141,7 @@ def capped_solid(name, profile, height, fillet=0.8, chamfer=0.2, dome=0.0,
             bm.faces.new((a[j], a[(j + 1) % segs], b[(j + 1) % segs], b[j]))
 
     bm.faces.new(list(reversed(rings[0])))
-    if dome > 0:
+    if dome:
         center = bm.verts.new((0.0, 0.0, height + dome))
         last = rings[-1]
         for j in range(segs):

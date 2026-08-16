@@ -45,6 +45,11 @@
   --amb-fillet-width: 1;
   --amb-highlight-color: coral;
   --amb-lume-hue: 17;
+  /* Depth of every curved face, as a multiple of the grounded curvature
+     (see --amb-curve-delta below): the input knob, so it inherits like an
+     ordinary variable and can be themed from :root or any subtree. 1 =
+     the measured dish. */
+  --amb-curve-scale: 1;
   --amb-mat-specular: 0;
   --amb-mat-roughness: 1;
   --amb-mat-opacity: 1;
@@ -65,6 +70,42 @@
     var(--amb-light-hue)
     var(--amb-light-saturation)
     calc((1 - var(--amb-key-light-intensity)) * 60% + 20%)
+  );
+}
+
+/* Curvature magnitude — DERIVED output, like --amb-lume and --amb-label:
+   read it, and theme it through --amb-curve-scale above rather than by
+   assigning to it.
+
+   How far a curved face departs from its flat tone at the ends of the
+   curve — the grounded end delta from ambient3d/derived/notes/curved.md,
+   which .amb-surface-concave, -concave-h and -convex all ride. Affine in
+   light contrast rather than proportional: a dish still shades when the
+   key equals the fill, so the intercept is not optional.
+
+   In POINTS OF LIGHTNESS and deliberately UNITLESS — multiply by 1% to use
+   it in a color. Unitless so it can also be DIVIDED, which is what turns it
+   into an overlay alpha over a known base (@ambientcss/components dishes
+   its button cap that way).
+
+   The universal selector is load-bearing, not laziness. A custom property's
+   var()s are substituted on the element that DECLARES it, so the same
+   expression on :root would freeze at the document's light and ignore every
+   subtree that scopes its own — an AmbientProvider, a .amb-light-* class, a
+   calibration harness frame (the compare gate caught exactly this). Declaring
+   per element re-substitutes it against whatever light that element actually
+   inherits.
+
+   The flip side is that a value assigned to --amb-curve-delta on an ancestor
+   cannot reach descendants: this rule re-declares it on each one. That is why
+   the themeable knob is the separate --amb-curve-scale, which is declared on
+   :root only and therefore inherits normally. */
+* {
+  --amb-curve-delta: calc(
+    (
+      (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
+        * 3.16 + 3.78
+    ) * var(--amb-curve-scale)
   );
 }
 
@@ -530,9 +571,11 @@
    -------------------------------------------------------------------------- */
 
 /* Curved surfaces, grounded (ambient3d/derived/notes/curved.md): stops
-   ride the grounded .amb-surface base; the end-stop delta is affine in
-   light contrast (a dish shades even at Ik = If), with the 35/65% stops
-   at 0.33 of it. R^2 0.94 over the light/intensity sweeps. */
+   ride the grounded .amb-surface base; the end-stop delta is --amb-curve-delta
+   (declared per element above, affine in light contrast — a dish shades even
+   at Ik = If), with the 35/65% stops at 0.33 of it. R^2 0.94 over the
+   light/intensity sweeps. Each class supplies its own axis and sign; the
+   magnitude is shared, so the three curves can never drift apart. */
 
 .amb-surface-concave {
   --_concave-y: max(-1, min(var(--amb-light-y), 1));
@@ -540,13 +583,7 @@
     var(--amb-key-light-intensity) * 31.5% +
       var(--amb-fill-light-intensity) * 26.4% + 43.6%
   );
-  --_concave-delta: calc(
-    var(--_concave-y) *
-      (
-        (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
-          * 3.16% + 3.78%
-      )
-  );
+  --_concave-delta: calc(var(--_concave-y) * var(--amb-curve-delta) * 1%);
   background: linear-gradient(
     hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--_surface-base) + var(--_concave-delta))) 0%,
     hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--_surface-base) + var(--_concave-delta) * 0.33)) 35%,
@@ -562,13 +599,7 @@
     var(--amb-key-light-intensity) * 31.5% +
       var(--amb-fill-light-intensity) * 26.4% + 43.6%
   );
-  --_concave-h-delta: calc(
-    var(--_concave-h-x) *
-      (
-        (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
-          * 3.16% + 3.78%
-      )
-  );
+  --_concave-h-delta: calc(var(--_concave-h-x) * var(--amb-curve-delta) * 1%);
   background: linear-gradient(
     to right,
     hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--_surface-base) + var(--_concave-h-delta))) 0%,
@@ -585,13 +616,7 @@
     var(--amb-key-light-intensity) * 31.5% +
       var(--amb-fill-light-intensity) * 26.4% + 43.6%
   );
-  --_convex-delta: calc(
-    var(--_convex-y) *
-      (
-        (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
-          * 3.16% + 3.78%
-      )
-  );
+  --_convex-delta: calc(var(--_convex-y) * var(--amb-curve-delta) * 1%);
   background: linear-gradient(
     hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--_surface-base) - var(--_convex-delta))) 0%,
     hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--_surface-base) - var(--_convex-delta) * 0.33)) 35%,

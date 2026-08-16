@@ -42,11 +42,31 @@ def _mats():
 # button's padding) and `seat` deep (thickness 0.27 = 1.2 mm).
 BUTTON_WELL = dict(base_style="well", well_gap=0.5 * GRID, well_depth=1.2)
 
+# Cap tops are DISHED, not domed: the CSS cap carries a concave face
+# (.amb-button-cap::after in the components styles.css) — the Round 7
+# direction, CSS first, referent follows.
+#
+# Depth comes from the CSS's own source: the cap dish reuses the grounded
+# curved fit, so the referent reuses the geometry that fit was measured on
+# — amb_model.SAGITTA_MM / plate width = 4/80 = 5% of the span across the
+# dish. Confirmed by rendering the round cap at 0.3/0.8/1.5/2.4mm and
+# measuring the face: 2.4mm (5% of its 48mm) spans 84.7% -> 94.4%
+# lightness, against the CSS dish's 87.2% -> 94.8%. A shallower sagitta
+# reads as flat — 0.3mm, the old dome's depth inverted, measured dead level.
+DISH_FRAC = ap.SAGITTA_MM / 80.0
+
+
+def _dish(span):
+    """Cap sagitta (negative = scooped) for a cap `span` mm across its
+    narrow axis. Every cap silhouette gets the same proportional scoop, as
+    the CSS does: curvature belongs to the tooling, not to the outline."""
+    return -DISH_FRAC * span
+
 
 def button(location=(0.0, 0.0, 0.0), value=0.0):
     cap, plate, dark = _mats()
     return build_button(width=16 * GRID, depth=7 * GRID, height=4.5,
-                        shape_n=4.5, dome=0.3, fillet=0.8,
+                        shape_n=4.5, dome=_dish(7 * GRID), fillet=0.8,
                         tile_shape="fit", base_h=2.5, **BUTTON_WELL,
                         cap_material=cap, base_material=plate,
                         well_material=dark, location=location)
@@ -54,7 +74,8 @@ def button(location=(0.0, 0.0, 0.0), value=0.0):
 
 def button_round(location=(0.0, 0.0, 0.0), value=0.0):
     cap, plate, dark = _mats()
-    return build_button(width=12 * GRID, height=4.5, shape_n=2.0, dome=0.3,
+    return build_button(width=12 * GRID, height=4.5, shape_n=2.0,
+                        dome=_dish(12 * GRID),
                         fillet=0.8, tile_shape="fit", base_h=2.5,
                         **BUTTON_WELL,
                         cap_material=cap, base_material=plate,
@@ -64,7 +85,8 @@ def button_round(location=(0.0, 0.0, 0.0), value=0.0):
 def button_square(location=(0.0, 0.0, 0.0), value=0.0):
     # EP-133-style pad: squarer superellipse, flatter and lower cap
     cap, plate, dark = _mats()
-    return build_button(width=14 * GRID, height=3.6, shape_n=6.0, dome=0.15,
+    return build_button(width=14 * GRID, height=3.6, shape_n=6.0,
+                        dome=_dish(14 * GRID),
                         fillet=0.8, tile_shape="fit", base_h=2.5,
                         **BUTTON_WELL,
                         cap_material=cap, base_material=plate,

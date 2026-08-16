@@ -18,6 +18,21 @@ a chamfered key cap seated in a clearance well, the well's gap ring showing
 around it. Pressing sinks the cap by the referent's 0.7mm travel — the
 chamfer bands and the swept shadow shrink with it.
 
+The cap top is **dished**, not flat: the far wall of the scoop tilts into
+the light and the near wall tilts away, so the face darkens just past the
+lit edge and brightens toward the far one. It reads
+[`--amb-curve-delta`](/ambient-css/global-settings#curvature---amb-curve-delta),
+the same measured curvature `amb-surface-concave` rides, and all three cap
+silhouettes get it equally — a dish belongs to the tooling, not to the
+outline. Deepen or flatten it with `--amb-curve-scale`, on one button or a
+whole panel.
+
+Pressing changes nothing about the cap's colour. It only **sinks** the cap
+by the referent's 0.7mm travel (thickness `1` to `0.84`, `0.8` to `0.64`
+for the square pad): the swept drop shadow shortens as the silhouette drops
+toward the well floor, and the chamfer bands narrow with it. The press reads
+as travel rather than as a state repaint.
+
 <RenderComparison slug="button" dir="components"><GroundedButtonDemo /></RenderComparison>
 
 ## Shapes

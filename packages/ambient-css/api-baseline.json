@@ -1,5 +1,6 @@
 {
   "selectors": [
+    "*",
     ".amb-bounce",
     ".amb-chamfer",
     ".amb-chamfer-2",
@@ -50,6 +51,8 @@
   "properties": [
     "--amb-chamfer",
     "--amb-chamfer-width",
+    "--amb-curve-delta",
+    "--amb-curve-scale",
     "--amb-elevation",
     "--amb-emit-color",
     "--amb-fill-light-intensity",

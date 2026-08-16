@@ -48,6 +48,50 @@ The actual `--amb-lume` color is computed automatically using `color-mix()` in t
 
 Common values: `17` (orange), `36` (warm amber), `190` (cyan), `270` (purple), `0` (red).
 
+## Curvature (`--amb-curve-delta`)
+
+`--amb-curve-delta` is the other derived variable, and the one you are most
+likely to read rather than set. It is how far a curved face departs from its
+flat tone at the ends of the curve — the single measured magnitude that
+`amb-surface-concave`, `amb-surface-concave-h` and `amb-surface-convex` all
+ride, so the three can never drift apart. It is affine in light contrast:
+a dish still shades when the key equals the fill.
+
+It is in **points of lightness and unitless** — multiply by `1%` to use it in
+a color, and divide it to turn it into an overlay alpha over a known base
+(this is how `@ambientcss/components` dishes its button cap):
+
+```css
+.my-dish {
+  background: linear-gradient(
+    hsl(var(--amb-light-hue) var(--amb-light-saturation)
+        calc(90% - var(--amb-curve-delta) * 1%)) 0%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation)
+        calc(90% + var(--amb-curve-delta) * 1%)) 100%
+  );
+}
+```
+
+Like `--amb-lume`, it is derived — read it, but **theme it through
+`--amb-curve-scale`** rather than by assigning to it:
+
+```css
+:root {
+  --amb-curve-scale: 1.6; /* deeper dishes and domes everywhere */
+}
+```
+
+`--amb-curve-scale` is an ordinary variable, so it inherits and can be set on
+`:root` or on any subtree. `--amb-curve-delta` itself is declared on *every*
+element, because a custom property has its `var()`s substituted on the element
+that declares it — on `:root` alone it would freeze at the document's light
+and ignore any subtree that scopes its own, whether an `AmbientProvider`, an
+`amb-light-*` class, or a pressed button cap. The side effect is that
+assigning to `--amb-curve-delta` on an ancestor will not reach descendants,
+which is exactly why the knob is a separate variable.
+
+It carries no direction: each class applies its own axis and sign.
+
 ## Bright reference preset
 
 ```css
