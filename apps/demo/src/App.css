@@ -674,11 +674,13 @@ body {
 }
 
 /* ==========================================================================
-   PULL-CORD SWITCHER (header) — cords hang from one thick slab of the
-   surface. The slab's upper region is the light console, parked above the
-   top of the screen; pulling Custom drops the whole slab (cords and all)
-   into view — the console was always just its hidden part. The active
-   theme's key stays lit in its own indicator colour.
+   THEME SWITCHER (header) — one thick slab of the surface, carrying both the
+   light console and the key bank. The slab's upper region is the console,
+   parked above the top of the screen; its bottom lip holds the key bank and
+   is the only part on screen at rest. Picking Custom drops the whole slab
+   into view — the console was always just its hidden part — so the bank
+   travels down with the panel it lives in. The active theme's key stays lit
+   in its own indicator colour.
    ========================================================================== */
 
 .cordbar {
@@ -690,7 +692,13 @@ body {
   width: min(560px, calc(100vw - 16px));
 }
 
-/* The whole slab + cords, parked up by --reveal so only the lip shows. */
+/* The slab, parked up by --reveal so only the lip (and its key bank) shows.
+   --reveal is the height of the parked region, which is exactly the console's
+   height — .cord-console reads it back rather than restating the number, so
+   the two can't drift apart. Anything added BELOW the console only grows the
+   visible resting band; anything added above or inside it changes how far the
+   slab parks (which is why the console's height stays fixed and the mobile
+   query shrinks the knobs inside it instead). */
 .cord-assembly {
   --reveal: 212px;
   position: relative;
@@ -700,20 +708,24 @@ body {
 .cord-assembly.is-open { transform: translateY(0); }
 
 /* The slab: the ground's own material, told apart by thickness + shadow.
-   Content is the console; padding-bottom is the lip the cord labels sit on.
-   z-index 1 seats it between the chains (behind) and the labels (in front). */
+   Its content is the console followed by the key bank; --lip is the slab
+   material left standing below the bank, so the bank sits ON the panel with
+   a margin under it rather than hanging off its edge. */
 .cord-panel {
   --lip: 12px;
   position: relative;
-  z-index: 1;
   border-radius: 0 0 14px 14px; /* off-scale by design: bespoke console-slab corners, not an .ambx-panel instance, see design-tokens.md */
   padding: 0 16px var(--lip);
 }
 .cord-console {
-  height: 212px;                 /* == --reveal: the region hidden up top */
+  height: var(--reveal);         /* the region parked off-screen up top */
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  /* Bottom-anchored, not centred: the console's spare height is slack we want
+     ABOVE the content, where it stays parked off-screen, rather than split
+     evenly and left as a gap between the hint and the key bank below. */
+  justify-content: flex-end;
+  padding-bottom: 18px;
   gap: 10px;
 }
 .cord-console-title {
@@ -756,24 +768,31 @@ body {
   text-align: center;
 }
 
-/* The key bank hangs just under the slab's bottom edge, the way the cords
-   used to — so at rest the header is the slab's lip plus this row, and the
-   console above it stays parked off-screen until Custom is picked. */
+/* The key bank is the slab's own bottom row, seated in the lip directly
+   below the console. At rest the header IS this row plus the lip's material
+   around it; the console above stays parked off-screen until Custom is
+   picked, and the bank then rides down inside the slab. The bank brings its
+   own dark groove (.amb-select), so it reads as recessed into the surface
+   without a second well around it. */
 .theme-keys {
-  position: relative;
-  z-index: 2;
   display: flex;
   justify-content: center;
-  margin-top: 6px;
+  /* Same --lip above the bank as the panel leaves below it, so the bank is
+     centred in the lip instead of butting against the screen edge where the
+     parked console ends. Padding below the console is free — it grows the
+     visible resting band without changing how far the slab parks. */
+  padding-top: var(--lip);
 }
 
 @media (max-width: 600px) {
   .cordbar { width: calc(100vw - 8px); }
 
-  /* Five word-keys don't fit a narrow phone at the sm size: shrink the
-     bank's own grid so the keys and their legends scale together, the same
-     trick the console grid below uses. */
-  .theme-keys .amb-select { --ambx-grid: 3px; }
+  /* The key bank deliberately gets no override here. Five glyph keys measure
+     232px, which clears even a 320px phone (280px between the panel's inline
+     padding) with room to spare — measured, not estimated. A --ambx-grid: 3px
+     rule used to shrink it on the grounds that the keys "don't fit"; they do,
+     and at 3px they came out 33px square, under the 44px touch target. Don't
+     re-add it without measuring first. */
 
   /* Seven fixed-size knobs (48px each at the default 3px grid) don't fit a
      narrow phone's console well — shrink the whole row's grid so it stays

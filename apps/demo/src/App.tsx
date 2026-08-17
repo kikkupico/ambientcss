@@ -678,12 +678,12 @@ export function App() {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   THEME SWITCHER — the header. A bank of lamp-lit keys on the console slab's
-   lip: one per theme preset, plus a "Custom" key. The lit lamp IS the
+   THEME SWITCHER — the header. A bank of lamp-lit keys seated IN the console
+   slab's lip: one per theme preset, plus a "Custom" key. The lit lamp IS the
    current selection, and each key lights in its own preset's indicator
    colour, so the bank reads as the panel's status row rather than as a menu.
-   Selecting Custom drops the slab to reveal the light console; clicking
-   outside (or Esc) rolls it back up.
+   Selecting Custom drops the slab to reveal the light console above the bank;
+   clicking outside (or Esc) rolls the whole assembly back up.
    ══════════════════════════════════════════════════════════════════════════ */
 
 type ThemeSwitcherProps = {
@@ -738,10 +738,12 @@ function ThemeSwitcher({ theme, activePreset, onPreset, onCustom, onProp }: Them
   return (
     <header className="cordbar">
       <div className={`cord-assembly${consoleOpen ? " is-open" : ""}`} ref={rigRef}>
-        {/* One thick slab of the surface itself. Its upper region is the light
-            console, parked above the top of the screen; only the bottom lip
-            shows at rest. Pulling Custom drops the whole slab into view — the
-            console was always just the hidden part of this panel. */}
+        {/* One thick slab of the surface itself, holding both the light
+            console and the key bank. Its upper region is the console, parked
+            above the top of the screen; only the bottom lip — and the bank
+            seated in it — shows at rest. Picking Custom drops the whole slab
+            into view: the console was always just the hidden part of this
+            same panel. */}
         <div className="cord-panel ambient amb-surface amb-chamfer amb-thickness-2 amb-elevation-1">
           <div className="cord-console">
             <div className="cord-console-title">
@@ -749,7 +751,7 @@ function ThemeSwitcher({ theme, activePreset, onPreset, onCustom, onProp }: Them
               <span className="cord-console-preset">Custom</span>
             </div>
             {/* Controls sit in a recessed darker well so they pop and read
-                apart from the cord labels below. */}
+                apart from the key bank below. */}
             <div className="cord-console-well ambient amb-groove groove-darker">
               <div className="cord-console-grid">
                 {LIGHT_KNOBS.map((k) => (
@@ -768,19 +770,22 @@ function ThemeSwitcher({ theme, activePreset, onPreset, onCustom, onProp }: Them
             </div>
             <div className="cord-console-hint">every scene re-lights live</div>
           </div>
-        </div>
 
-        {/* The key bank sits on the slab's revealed lip. Selecting a key
-            lights its lamp and re-lights every scene below; the Custom key
-            also drops the slab so the console above comes into view. */}
-        <div className="theme-keys">
-          <AmbientSelect
-            orientation="horizontal"
-            options={keys}
-            value={activePreset}
-            onChange={(next) => pick(next as string)}
-            aria-label="Theme"
-          />
+          {/* The key bank is seated in the slab's lip — the one part of the
+              panel that stays on screen at rest, so the bank reads as this
+              console's bottom row rather than as a bar floating under it.
+              Selecting a key lights its lamp and re-lights every scene below;
+              the Custom key also drops the slab so the console above comes
+              into view, carrying the bank down with it. */}
+          <div className="theme-keys">
+            <AmbientSelect
+              orientation="horizontal"
+              options={keys}
+              value={activePreset}
+              onChange={(next) => pick(next as string)}
+              aria-label="Theme"
+            />
+          </div>
         </div>
       </div>
     </header>
