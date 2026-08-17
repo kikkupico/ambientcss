@@ -1,9 +1,12 @@
 """The 3D referents of the @ambientcss/components React components.
 
 Each builder here is the physical counterpart of one CSS component (and of
-each button-shape / knob-type variant): the richer design the CSS component
-is modeled after, built at the CSS component's dimensions — 1 CSS px = 1 mm,
-`--ambx-grid` = 4 px = GRID mm — in neutral calibration materials.
+each button shape, and of each shape a knob's knurling/markers/indicator props
+can take): the richer design the CSS component is modeled after, built at the
+CSS component's dimensions — 1 CSS px = 1 mm, `--ambx-grid` = 4 px = GRID mm —
+in neutral calibration materials. The three exceptions are the fluted, capped
+and wheel knobs, which outlived the CSS `variant` prop that used to select
+them; they stay as 3D kit styles, and are marked as such below.
 
 Kept apart from the scenes that render them so more than one scene can place
 the same referent: `ground_components.py` renders them one per frame for the
@@ -93,10 +96,13 @@ def button_square(location=(0.0, 0.0, 0.0), value=0.0):
                         well_material=dark, location=location)
 
 
-# Knurl depth = (0.5 - root) * 2 * radius, root fractions taken directly from
-# AmbientKnob.tsx's KNURLS (standard .468, flute .44, fine .476), so the
-# tooth-crest-to-root depth matches the CSS clip-path teeth exactly at the
-# grounded referent's 8*GRID radius. Sharpness bumped from the (unrelated)
+# Knurl depth = (0.5 - root) * 2 * radius, root fractions taken from
+# AmbientKnob.tsx's KNURLS, so the tooth-crest-to-root depth matches the CSS
+# clip-path teeth exactly at the grounded referent's 8*GRID radius. Only
+# `standard` (.468) is still in that table; the flute (.44) and fine (.476)
+# rows went with the CSS `variant` prop, so the depths below that were derived
+# from them are frozen at their last CSS values and have nothing left to track.
+# Sharpness bumped from the (unrelated)
 # generate.py catalog default so the crest/root read as distinct facets
 # rather than a soft sinusoid, closer to the clip-path's near-trapezoidal
 # tooth (short rise/fall, flat crest and root).
@@ -110,11 +116,50 @@ def knob(location=(0.0, 0.0, 0.0), value=0.33):
                       location=location)
 
 
+# The rectangle indicator is a short mark near the rim, not a spoke: the CSS
+# .amb-knob-indicator-rectangle runs 0.50R to 0.84R of the knob radius (top 8%
+# + height 17% of --ambx-knob-size), so bar_inner is that near end and
+# bar_length converts the far end to the cap-radius fraction the builder takes.
 def knob_line(location=(0.0, 0.0, 0.0), value=0.33):
     cap, plate, dark = _mats()
-    return build_knob(radius=8 * GRID, height=9.0, ribs=36, rib_depth=2.05,
+    r = 8 * GRID
+    return build_knob(radius=r, height=9.0, ribs=36, rib_depth=2.05,
                       rib_sharpness=3.0,
-                      indicator="line", value=value,
+                      indicator="line", bar_inner=0.50,
+                      bar_length=0.84 * r / (r - 1.4),
+                      value=value,
+                      body_material=cap, accent_material=dark, base=None,
+                      location=location)
+
+
+# knurling={false}: ribs 0 is the builder's smooth body, the CSS
+# .amb-knob-smooth case where the knurl clip and tone are both dropped and the
+# body itself becomes the whole visible knob.
+def knob_smooth(location=(0.0, 0.0, 0.0), value=0.33):
+    cap, plate, dark = _mats()
+    r = 8 * GRID
+    return build_knob(radius=r, height=9.0, ribs=0,
+                      indicator="line", bar_inner=0.50,
+                      bar_length=0.84 * r / (r - 1.4),
+                      value=value,
+                      body_material=cap, accent_material=dark, base=None,
+                      location=location)
+
+
+# markers="full": 13 dots at 22.5deg over the 270deg sweep, ring at 1.33R and
+# dots 0.14R across — the same fractions AmbientKnob's
+# --ambx-knob-marker-radius / --ambx-knob-marker-size carry. Printed in the
+# dark plate ink, since the CSS paints them --amb-label (panel graphics) rather
+# than the accent the indicator takes.
+def knob_markers(location=(0.0, 0.0, 0.0), value=0.33):
+    cap, plate, dark = _mats()
+    r = 8 * GRID
+    return build_knob(radius=r, height=9.0, ribs=0,
+                      indicator="line", bar_inner=0.50,
+                      bar_length=0.84 * r / (r - 1.4),
+                      markers=13, marker_r=1.33, marker_d=0.14,
+                      marker_material=dark,
+                      value=value,
                       body_material=cap, accent_material=dark, base=None,
                       location=location)
 
@@ -187,6 +232,11 @@ def slider(location=(0.0, 0.0, 0.0), value=0.5):
 REFERENTS = {"button": button, "button-round": button_round,
              "button-square": button_square,
              "knob": knob, "knob-line": knob_line,
+             "knob-smooth": knob_smooth, "knob-markers": knob_markers,
+             # No CSS counterpart since AmbientKnob collapsed to
+             # knurling/markers/indicator: these stay as 3D kit styles (the
+             # --knob-style opz|op1|wheel presets) and as the reference for a
+             # future knurling union.
              "knob-flute": knob_flute, "knob-cap": knob_cap,
              "knob-wheel": knob_wheel,
              "switch": switch, "fader": fader, "slider": slider}

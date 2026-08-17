@@ -22,7 +22,12 @@ export type {
 } from "./components/AmbientSelect";
 
 export { AmbientKnob } from "./components/AmbientKnob";
-export type { AmbientKnobProps, AmbientKnobVariant, AmbientKnobSize } from "./components/AmbientKnob";
+export type {
+  AmbientKnobProps,
+  AmbientKnobMarkers,
+  AmbientKnobIndicator,
+  AmbientKnobSize
+} from "./components/AmbientKnob";
 
 export { AmbientFader } from "./components/AmbientFader";
 export type { AmbientFaderProps, AmbientFaderSize } from "./components/AmbientFader";

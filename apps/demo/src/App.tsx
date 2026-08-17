@@ -9,7 +9,7 @@ import {
   AmbientSelect,
   AmbientPanel,
   type AmbientTheme,
-  type AmbientKnobVariant,
+  type AmbientKnobIndicator,
 } from "@ambientcss/components";
 
 /* The README hero film (tools/hero-gif): the same device raytraced in
@@ -90,7 +90,7 @@ type KnobCfg = {
   key: string;
   label: string;
   prop: keyof AmbientTheme;
-  variant: AmbientKnobVariant;
+  indicator: AmbientKnobIndicator;
   min: number;
   max: number;
   step: number;
@@ -98,14 +98,18 @@ type KnobCfg = {
   to: (v: number) => number;
 };
 
+/* The two bipolar controls take the rectangle: a bar reads as a pointer
+   swinging either side of centre, which is what Light X/Y do. Everything
+   else runs 0..max and takes the dot. Markers stay off — the console row is
+   seven knobs on a 4px grid and a printed ring would not survive it. */
 const LIGHT_KNOBS: KnobCfg[] = [
-  { key: "lx",   label: "Light X", prop: "lightX",         variant: "line",  min: -100, max: 100, step: 2, value: (t) => Math.round(t.lightX * 100),  to: (v) => v / 100 },
-  { key: "ly",   label: "Light Y", prop: "lightY",         variant: "line",  min: -100, max: 100, step: 2, value: (t) => Math.round(t.lightY * 100),  to: (v) => v / 100 },
-  { key: "key",  label: "Key",     prop: "keyLight",       variant: "dot",   min: 0,    max: 100, step: 1, value: (t) => Math.round(t.keyLight * 100), to: (v) => v / 100 },
-  { key: "fill", label: "Fill",    prop: "fillLight",      variant: "dot",   min: 0,    max: 100, step: 1, value: (t) => Math.round(t.fillLight * 100), to: (v) => v / 100 },
-  { key: "hue",  label: "Hue",     prop: "lightHue",       variant: "flute", min: 0,    max: 360, step: 2, value: (t) => Math.round(t.lightHue),       to: (v) => v },
-  { key: "sat",  label: "Sat",     prop: "lightSaturation", variant: "dot",  min: 0,    max: 100, step: 1, value: (t) => Math.round(t.lightSaturation), to: (v) => v },
-  { key: "lume", label: "Lume",    prop: "lumeHue",        variant: "cap",   min: 0,    max: 360, step: 2, value: (t) => Math.round(t.lumeHue),        to: (v) => v },
+  { key: "lx",   label: "Light X", prop: "lightX",         indicator: "rectangle", min: -100, max: 100, step: 2, value: (t) => Math.round(t.lightX * 100),  to: (v) => v / 100 },
+  { key: "ly",   label: "Light Y", prop: "lightY",         indicator: "rectangle", min: -100, max: 100, step: 2, value: (t) => Math.round(t.lightY * 100),  to: (v) => v / 100 },
+  { key: "key",  label: "Key",     prop: "keyLight",       indicator: "circle",    min: 0,    max: 100, step: 1, value: (t) => Math.round(t.keyLight * 100), to: (v) => v / 100 },
+  { key: "fill", label: "Fill",    prop: "fillLight",      indicator: "circle",    min: 0,    max: 100, step: 1, value: (t) => Math.round(t.fillLight * 100), to: (v) => v / 100 },
+  { key: "hue",  label: "Hue",     prop: "lightHue",       indicator: "circle",    min: 0,    max: 360, step: 2, value: (t) => Math.round(t.lightHue),       to: (v) => v },
+  { key: "sat",  label: "Sat",     prop: "lightSaturation", indicator: "circle",   min: 0,    max: 100, step: 1, value: (t) => Math.round(t.lightSaturation), to: (v) => v },
+  { key: "lume", label: "Lume",    prop: "lumeHue",        indicator: "circle",    min: 0,    max: 360, step: 2, value: (t) => Math.round(t.lumeHue),        to: (v) => v },
 ];
 
 const ORBIT_COUNT = 9;
@@ -547,7 +551,16 @@ export function App() {
               <AmbientKnob value={knob1} onChange={setKnob1} label="Knob" />
             </div>
             <div className="component-cell" data-visible={compView.visible}>
-              <AmbientKnob value={knob2} onChange={setKnob2} variant="flute" label="Knob" />
+              {/* All three knob axes at once, against the default beside it:
+                  smooth body, printed marker ring, rectangle pointer. */}
+              <AmbientKnob
+                value={knob2}
+                onChange={setKnob2}
+                knurling={false}
+                markers="full"
+                indicator="rectangle"
+                label="Knob"
+              />
             </div>
             <div className="component-cell" data-visible={compView.visible}>
               <AmbientSlider value={slider1} min={0} max={100} onChange={setSlider1} label="Slider" />
@@ -761,7 +774,7 @@ function ThemeSwitcher({ theme, activePreset, onPreset, onCustom, onProp }: Them
                     min={k.min}
                     max={k.max}
                     step={k.step}
-                    variant={k.variant}
+                    indicator={k.indicator}
                     onChange={(v) => onProp(k.prop, k.to(v))}
                     label={k.label}
                   />

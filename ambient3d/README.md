@@ -58,6 +58,8 @@ Calculated coefficients are saved to `derived/coefficients.json` and documented 
 ### **knob** — Knurled & fluted rotary controls
 - `--radius` (6), `--height` (9), `--ribs` (48, 0 = smooth), `--rib-depth` (0.22), `--rib-sharpness` (1.4)
 - `--taper` (0), `--indicator` `line`|`dot`|`none`, `--top-disc` + `--top-preset` (smooth contrasting cap)
+- `--markers N` printed scale dots on the panel around the knob, spread over
+  the pointer sweep. Not parented to the knob, so they stay put as it turns.
 - Named style presets: `--knob-style opz|op1|wheel|classic`
 
 ### **button** — Tactile caps seated in base tiles

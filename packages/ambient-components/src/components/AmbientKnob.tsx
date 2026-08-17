@@ -1,13 +1,17 @@
 import { useId, useRef } from "react";
-import type { HTMLAttributes, KeyboardEvent, PointerEvent } from "react";
+import type { CSSProperties, HTMLAttributes, KeyboardEvent, PointerEvent } from "react";
 import { cn } from "../lib/cn";
 
-/* Straight-knurled silhouettes for the rotating face, in
-   objectBoundingBox units so the clip scales with the component. Each
-   variant family mirrors its referent's rib section
-   (ambient3d/ground_components.py): trapezoid teeth between the outer
-   radius and the tooth-root radius. The circular body underneath keeps
-   the smooth drop shadow. */
+/* Straight-knurled silhouette for the rotating face, in objectBoundingBox
+   units so the clip scales with the component. It mirrors the grounded
+   referent's rib section (ambient3d/referents.py knob(), ribs=36): trapezoid
+   teeth between the outer radius and the tooth-root radius. The circular body
+   underneath keeps the smooth drop shadow.
+
+   One knurl for now, kept in a table because the shape is a data question and
+   the referent lineup already carries broader flutes and a finer 48-rib knurl
+   we may expose later — at which point `knurling` grows from a boolean into a
+   union and this table gains rows rather than changing shape. */
 type KnurlSpec = {
   teeth: number; // rib count
   root: number; // tooth-root radius (bounding-box units; outer is 0.5)
@@ -15,13 +19,9 @@ type KnurlSpec = {
   fall: [number, number]; // crest-end and root-return pitch fractions
 };
 
-const KNURLS: Record<"standard" | "flute" | "fine", KnurlSpec> = {
-  /* 36 ribs — the grounded referent knob (dot and line variants) */
-  standard: { teeth: 36, root: 0.468, rise: 0.12, fall: [0.5, 0.62] },
-  /* 14 broad flutes with deeper roots (OP-Z-style flute variant) */
-  flute: { teeth: 14, root: 0.44, rise: 0.08, fall: [0.72, 0.8] },
-  /* 48-rib fine knurl, shallower (cap and wheel variants) */
-  fine: { teeth: 48, root: 0.476, rise: 0.12, fall: [0.5, 0.62] }
+const KNURLS: Record<"standard", KnurlSpec> = {
+  /* 36 ribs — the grounded referent knob */
+  standard: { teeth: 36, root: 0.468, rise: 0.12, fall: [0.5, 0.62] }
 };
 
 function knurlPath({ teeth, root, rise, fall }: KnurlSpec): string {
@@ -46,28 +46,24 @@ function knurlPath({ teeth, root, rise, fall }: KnurlSpec): string {
   return `M${pts.join(" L")} Z`;
 }
 
-const KNURL_PATHS = {
-  standard: knurlPath(KNURLS.standard),
-  flute: knurlPath(KNURLS.flute),
-  fine: knurlPath(KNURLS.fine)
-};
+const KNURL_PATH = knurlPath(KNURLS.standard);
 
-/* Knob types from the referent lineup (ambient3d/generate.py):
-   - "dot":   the grounded referent — 36-rib knurl, offset indicator dot
-   - "line":  same body with a radial indicator line (classic pot)
-   - "flute": 14 broad flutes, centered dot (OP-Z-style encoder)
-   - "cap":   fine knurl under a smooth accent top disc (OP-1-style)
-   - "wheel": bare fine knurl, no indicator (machined wheel — pair with
-     material="shiny") */
-export type AmbientKnobVariant = "dot" | "line" | "flute" | "cap" | "wheel";
+/* The pot's travel, shared by the value mapping, the pointer maths and the
+   marker ring — the markers have to land on the same arc the value sweeps, so
+   these are read, never restated. Degrees clockwise from 12 o'clock. */
+const MIN_ANGLE = -135;
+const SWEEP = 270;
 
-const VARIANT_FAMILY: Record<AmbientKnobVariant, keyof typeof KNURL_PATHS> = {
-  dot: "standard",
-  line: "standard",
-  flute: "flute",
-  cap: "fine",
-  wheel: "fine"
-};
+/* 12 divisions — 13 dots at 22.5deg over the 270deg sweep, the pitch measured
+   off the reference panel. */
+const MARKER_DIVISIONS = 12;
+
+/** Printed scale dots on the panel around the knob: the arc's two ends, the
+ *  full graduated ring, or nothing. */
+export type AmbientKnobMarkers = "none" | "ends" | "full";
+
+/** The pointer riding the rotating face: a radial bar or an offset dot. */
+export type AmbientKnobIndicator = "rectangle" | "circle";
 
 export type AmbientKnobSize = "sm" | "md" | "lg";
 
@@ -78,13 +74,28 @@ export type AmbientKnobProps = Omit<HTMLAttributes<HTMLDivElement>, "onChange"> 
   step?: number;
   label?: string;
   material?: "matte" | "shiny" | "glass";
-  variant?: AmbientKnobVariant;
+  /** Ribbed grip around the rotating body. Off gives a smooth turned body. */
+  knurling?: boolean;
+  /** Printed scale dots on the panel around the knob. */
+  markers?: AmbientKnobMarkers;
+  indicator?: AmbientKnobIndicator;
   size?: AmbientKnobSize;
   onChange?: (nextValue: number) => void;
 };
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
+}
+
+/* Marker angles along the sweep. "ends" is the pair the arc starts and stops
+   at — the two dots that say where the travel runs out. */
+function markerAngles(markers: AmbientKnobMarkers): number[] {
+  if (markers === "none") return [];
+  if (markers === "ends") return [MIN_ANGLE, MIN_ANGLE + SWEEP];
+  return Array.from(
+    { length: MARKER_DIVISIONS + 1 },
+    (_, i) => MIN_ANGLE + (i / MARKER_DIVISIONS) * SWEEP
+  );
 }
 
 export function AmbientKnob({
@@ -94,7 +105,9 @@ export function AmbientKnob({
   step = 1,
   label,
   material,
-  variant = "dot",
+  knurling = true,
+  markers = "none",
+  indicator = "circle",
   size = "md",
   onChange,
   className,
@@ -105,14 +118,13 @@ export function AmbientKnob({
   const draggingRef = useRef(false);
   const knobRef = useRef<HTMLDivElement>(null);
   const safeStep = step > 0 ? step : 1;
-  const family = VARIANT_FAMILY[variant];
 
   const percent = (value - min) / (max - min || 1);
-  const rotation = percent * 270 - 135;
+  const rotation = percent * SWEEP + MIN_ANGLE;
 
   // Convert pointer position to a knob angle in [-180, 180] where 0 = up,
-  // positive = clockwise. The knob's active range is [-135, 135] (270°),
-  // with the dead zone at the bottom (~135° to ~225° i.e. past ±135°).
+  // positive = clockwise. The knob's active range is the sweep, with the dead
+  // zone at the bottom (past ±135°).
   const pointerToValue = (event: PointerEvent<HTMLDivElement>) => {
     const rect = knobRef.current!.getBoundingClientRect();
     const cx = rect.left + rect.width / 2;
@@ -123,13 +135,14 @@ export function AmbientKnob({
     // Normalize to [-180, 180]
     if (angle > 180) angle -= 360;
 
+    const maxAngle = MIN_ANGLE + SWEEP;
     // Clamp dead zone based on current value position
-    if (angle < -135 || angle > 135) {
-      angle = percent >= 0.5 ? 135 : -135;
+    if (angle < MIN_ANGLE || angle > maxAngle) {
+      angle = percent >= 0.5 ? maxAngle : MIN_ANGLE;
     }
 
     const range = max - min;
-    const raw = min + ((angle + 135) / 270) * range;
+    const raw = min + ((angle - MIN_ANGLE) / SWEEP) * range;
     const snapped = Math.round(raw / safeStep) * safeStep;
     onChange?.(clamp(snapped, min, max));
   };
@@ -173,11 +186,18 @@ export function AmbientKnob({
     }
   };
 
+  const angles = markerAngles(markers);
+
   return (
     <div className={cn("ambx-stack", className)} {...props}>
       <div
         ref={knobRef}
-        className={cn("amb-knob ambx-knob", `ambx-knob-${size}`)}
+        className={cn(
+          "amb-knob ambx-knob",
+          `ambx-knob-${size}`,
+          !knurling && "amb-knob-smooth",
+          markers === "full" && "amb-knob-markers-full"
+        )}
         role="slider"
         aria-label={label}
         aria-valuemin={min}
@@ -202,29 +222,52 @@ export function AmbientKnob({
         }}
         onKeyDown={onKeyDown}
       >
-        <svg width={0} height={0} style={{ position: "absolute" }} aria-hidden focusable={false}>
-          <defs>
-            <clipPath id={clipId} clipPathUnits="objectBoundingBox">
-              <path d={KNURL_PATHS[family]} />
-            </clipPath>
-          </defs>
-        </svg>
-        <span className="amb-knob-body ambient amb-thickness-2 amb-surface" />
+        {knurling ? (
+          <svg width={0} height={0} style={{ position: "absolute" }} aria-hidden focusable={false}>
+            <defs>
+              <clipPath id={clipId} clipPathUnits="objectBoundingBox">
+                <path d={KNURL_PATH} />
+              </clipPath>
+            </defs>
+          </svg>
+        ) : null}
+        {/* The markers are panel graphics, not part of the control: they sit
+            outside the rotating layer so they stay put while the knob turns,
+            and take no pointer events so the ring does not enlarge the grab
+            area past the knob body. */}
+        {angles.length > 0 ? (
+          <span className="amb-knob-marker-ring" aria-hidden>
+            {angles.map((angle) => (
+              <span
+                key={angle}
+                className="amb-knob-marker"
+                style={{ "--amb-marker-angle": `${angle}deg` } as CSSProperties}
+              />
+            ))}
+          </span>
+        ) : null}
+        {/* `material` goes on whichever element actually paints the knob: the
+            clipped face when there is a knurl, the body when there is not.
+            A smooth knob's face paints nothing at all, so a material left
+            there would be both invisible and overridden by the reset. */}
+        <span
+          className={cn(
+            "amb-knob-body ambient amb-thickness-2 amb-surface",
+            !knurling && material && `amb-mat-${material}`
+          )}
+        />
         <div
           className={cn(
             "ambx-knob-rotation amb-knob-face",
-            family === "flute" && "amb-knob-face-flute",
-            family === "fine" && "amb-knob-face-fine",
-            variant === "cap" && "amb-knob-face-cap",
-            material && `amb-mat-${material}`
+            knurling && material && `amb-mat-${material}`
           )}
-          style={{ transform: `rotate(${rotation}deg)`, clipPath: `url(#${clipId})` }}
+          style={{
+            transform: `rotate(${rotation}deg)`,
+            ...(knurling ? { clipPath: `url(#${clipId})` } : null)
+          }}
         >
-          {variant === "dot" ? <span className="amb-knob-indicator-dot" /> : null}
-          {variant === "line" ? <span className="amb-knob-indicator-line" /> : null}
-          {variant === "flute" ? (
-            <span className="amb-knob-indicator-dot amb-knob-indicator-dot-center" />
-          ) : null}
+          {indicator === "circle" ? <span className="amb-knob-indicator-circle" /> : null}
+          {indicator === "rectangle" ? <span className="amb-knob-indicator-rectangle" /> : null}
         </div>
       </div>
       {label ? (

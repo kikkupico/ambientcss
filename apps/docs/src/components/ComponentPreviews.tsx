@@ -166,21 +166,58 @@ export function KnobPreview() {
   );
 }
 
-export function KnobVariantsPreview() {
-  const [dot, setDot] = useState(42);
-  const [line, setLine] = useState(70);
-  const [flute, setFlute] = useState(25);
-  const [cap, setCap] = useState(55);
-  const [wheel, setWheel] = useState(80);
+export function KnobKnurlingPreview() {
+  const [ribbed, setRibbed] = useState(42);
+  const [smooth, setSmooth] = useState(70);
+  const [wheel, setWheel] = useState(25);
 
   return (
     <DemoShell>
       <div className="docs-demo-row">
-        <AmbientKnob label="Dot" value={dot} onChange={setDot} />
-        <AmbientKnob label="Line" variant="line" value={line} onChange={setLine} />
-        <AmbientKnob label="Flute" variant="flute" value={flute} onChange={setFlute} />
-        <AmbientKnob label="Cap" variant="cap" value={cap} onChange={setCap} />
-        <AmbientKnob label="Wheel" variant="wheel" material="shiny" value={wheel} onChange={setWheel} />
+        <AmbientKnob label="Knurled" value={ribbed} onChange={setRibbed} />
+        <AmbientKnob label="Smooth" knurling={false} value={smooth} onChange={setSmooth} />
+        <AmbientKnob
+          label="Shiny"
+          knurling={false}
+          material="shiny"
+          value={wheel}
+          onChange={setWheel}
+        />
+      </div>
+    </DemoShell>
+  );
+}
+
+export function KnobMarkersPreview() {
+  const [none, setNone] = useState(42);
+  const [ends, setEnds] = useState(15);
+  const [full, setFull] = useState(70);
+
+  return (
+    <DemoShell>
+      <div className="docs-demo-row">
+        <AmbientKnob label="None" value={none} onChange={setNone} />
+        <AmbientKnob label="Ends" markers="ends" value={ends} onChange={setEnds} />
+        <AmbientKnob label="Full" markers="full" value={full} onChange={setFull} />
+      </div>
+    </DemoShell>
+  );
+}
+
+export function KnobIndicatorPreview() {
+  const [circle, setCircle] = useState(42);
+  const [rectangle, setRectangle] = useState(70);
+
+  return (
+    <DemoShell>
+      <div className="docs-demo-row">
+        <AmbientKnob label="Circle" value={circle} onChange={setCircle} />
+        <AmbientKnob
+          label="Rectangle"
+          indicator="rectangle"
+          value={rectangle}
+          onChange={setRectangle}
+        />
       </div>
     </DemoShell>
   );
@@ -253,13 +290,26 @@ export function GroundedButtonSquareDemo() {
 }
 
 export function GroundedKnobDemo({
-  variant
+  knurling,
+  markers,
+  indicator
 }: {
-  variant?: "dot" | "line" | "flute" | "cap" | "wheel";
+  knurling?: boolean;
+  markers?: "none" | "ends" | "full";
+  indicator?: "rectangle" | "circle";
 }) {
   const [v, setV] = useState(33);
   return (
-    <AmbientKnob aria-label="Knob" variant={variant} value={v} min={0} max={100} onChange={setV} />
+    <AmbientKnob
+      aria-label="Knob"
+      knurling={knurling}
+      markers={markers}
+      indicator={indicator}
+      value={v}
+      min={0}
+      max={100}
+      onChange={setV}
+    />
   );
 }
 

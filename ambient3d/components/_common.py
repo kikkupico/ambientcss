@@ -283,10 +283,15 @@ def label_object(name, label, size=3.2, thickness=0.2, material=None):
 
 # ------------------------------------------------------------- accent bar ---
 
-def accent_bar(name, length, width, thickness, top_z, angle=0.0, embed=0.15):
-    """Thin rounded printed bar, from local origin outward along +X."""
+def accent_bar(name, length, width, thickness, top_z, angle=0.0, embed=0.15,
+               inner=0.0):
+    """Thin rounded printed bar, from local origin outward along +X.
+
+    `inner` holds the near end off the origin, so the bar can be a short
+    radial mark out near a rim rather than a full spoke from the centre.
+    """
     bm = bmesh.new()
-    x0, x1 = 0.0, length
+    x0, x1 = inner, length
     y0, y1 = -width / 2, width / 2
     z0, z1 = top_z - embed, top_z + thickness - embed
     vs = [bm.verts.new(v) for v in (

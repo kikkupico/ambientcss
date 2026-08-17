@@ -52,6 +52,8 @@ def parse_args():
                    const="none")
     p.add_argument("--top-disc", action="store_true")
     p.add_argument("--top-preset", default=None, choices=sorted(kit.PRESETS))
+    p.add_argument("--markers", type=int, default=0,
+                   help="printed scale dots around the knob; 0 = none")
     # button
     p.add_argument("--shape", choices=["round", "square"], default="round")
     p.add_argument("--style", choices=["key", "pad", "metal"], default="key")
@@ -156,6 +158,7 @@ def main():
             body_material=body, accent_material=accent, top_material=top,
             base=base, base_h=args.base_h,
             base_material=base_material_for(args.base_preset, "bone"),
+            markers=args.markers,
             **params,
         )
         extent = max(args.radius, args.height,

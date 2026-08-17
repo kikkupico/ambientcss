@@ -59,6 +59,11 @@ FRAMES_TILT = 54        # beat B: tilt down to flat
 REFERENT_FOR = {
     ("knob", "dot"): "knob",
     ("knob", "line"): "knob-line",
+    ("knob", "smooth"): "knob-smooth",
+    ("knob", "markers"): "knob-markers",
+    # kit-only knob styles: no AmbientKnob counterpart since it collapsed to
+    # knurling/markers/indicator, so a layout using these would wipe between
+    # two different knobs. Left mapped for the generate.py catalog scenes.
     ("knob", "flute"): "knob-flute",
     ("knob", "cap"): "knob-cap",
     ("knob", "wheel"): "knob-wheel",

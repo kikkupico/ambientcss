@@ -12,7 +12,12 @@ Reference styles (see inspiration/):
 State: `value` (0..1) rotates the whole knob like a real pot. The pointer
 angle is `min_angle + value * sweep`, measured clockwise from 12 o'clock in
 top view; indicators are built pointing at 12. Mapping is stored as custom
-properties so `set_value` can re-pose a built knob. Units: mm.
+properties so `set_value` can re-pose a built knob.
+
+`markers` prints a scale ring on the panel over that same sweep. Those dots
+are the one part that does NOT turn with the knob — see `_markers`.
+
+Units: mm.
 """
 
 import math
@@ -21,7 +26,7 @@ import bmesh
 import bpy
 
 from components._common import (accent_bar, base_tile, capped_solid,
-                                superellipse)
+                                prism_object, superellipse)
 
 
 def build_knob(
@@ -37,6 +42,13 @@ def build_knob(
     indicator="line",    # "line", "dot", or "none"
     dot_frac=0.3,        # dot radius as a fraction of the cap radius
     dot_offset=0.0,      # 0 = centered dot; else offset fraction toward rim
+    bar_inner=0.0,       # "line": near end as a fraction of `radius`; 0 =
+                          # a full spoke from the centre
+    bar_length=0.85,     # "line": far end as a fraction of the cap radius
+    markers=0,           # printed scale dots around the knob; 0 = none
+    marker_r=1.33,       # ring radius as a fraction of `radius`
+    marker_d=0.14,       # dot diameter as a fraction of `radius`
+    marker_material=None,
     top_disc=False,      # smooth contrasting cap disc (OP-1 encoder style)
     top_disc_frac=None,  # disc radius as a fraction of `radius`; None
                           # keeps the old near-full-cap sizing (cap_r-0.15)
@@ -116,11 +128,12 @@ def build_knob(
     if indicator == "line":
         bar = accent_bar(
             name + "_Indicator",
-            length=cap_r * 0.85,
+            length=cap_r * bar_length,
             width=radius * 0.14,
             thickness=0.35,
             top_z=top_z,
             angle=math.radians(90),  # 12 o'clock reference
+            inner=radius * bar_inner,
         )
         bar.parent = knob
         if accent_material:
@@ -145,9 +158,47 @@ def build_knob(
                          material=base_material, location=location)
         knob.parent = tile
         knob.location = (0, 0, base_h)
+        _markers(name, markers, radius * marker_r, radius * marker_d / 2,
+                 min_angle, sweep, marker_material or accent_material,
+                 parent=tile, z=base_h, location=location)
         return tile
 
+    _markers(name, markers, radius * marker_r, radius * marker_d / 2,
+             min_angle, sweep, marker_material or accent_material,
+             parent=None, z=0.0, location=location)
     return knob
+
+
+def _markers(name, count, ring_r, dot_r, min_angle, sweep, material,
+             parent, z, location):
+    """Printed scale dots on the panel around the knob.
+
+    Deliberately NOT parented to the knob: `set_value` turns the knob about
+    its own Z, and a printed scale that turned with it would be meaningless.
+    They ride the mounting tile when there is one, and otherwise stand on the
+    panel the bare knob stands on — which means a caller that moves an
+    unbased knob afterwards leaves its markers behind.
+
+    Angles run clockwise from 12 o'clock (+Y) to match `set_value`'s pointer
+    convention, so dot i lands exactly where value i/(count-1) points.
+    """
+    if count < 2:
+        return
+    for i in range(count):
+        theta = math.radians(min_angle + sweep * i / (count - 1))
+        dot = prism_object(
+            name + f"_Marker{i}",
+            superellipse(dot_r, dot_r, 2.0, 32),
+            z - 0.05, z + 0.04,
+            material=material,
+        )
+        x = ring_r * math.sin(theta)
+        y = ring_r * math.cos(theta)
+        if parent is not None:
+            dot.parent = parent
+            dot.location = (x, y, 0)
+        else:
+            dot.location = (location[0] + x, location[1] + y, location[2])
 
 
 def set_value(obj, value):

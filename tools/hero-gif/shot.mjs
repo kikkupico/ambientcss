@@ -51,9 +51,10 @@ const REFERENTS = {
   "button-square": ["button", "square", 0],
   "knob": ["knob", "dot", 0.33],
   "knob-line": ["knob", "line", 0.33],
-  "knob-flute": ["knob", "flute", 0.33],
-  "knob-cap": ["knob", "cap", 0.33],
-  "knob-wheel": ["knob", "wheel", 0.33],
+  "knob-smooth": ["knob", "smooth", 0.33],
+  "knob-markers": ["knob", "markers", 0.33],
+  // knob-flute / -cap / -wheel are kit-only referents with no AmbientKnob
+  // counterpart, so there is no CSS half to shoot for them.
   "switch": ["switch", "", 0],
   "fader": ["fader", "", 0.5],
   "slider": ["slider", "", 0.5],
