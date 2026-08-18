@@ -1,129 +1,29 @@
-import { useId, useRef } from "react";
-import type { HTMLAttributes, KeyboardEvent, PointerEvent } from "react";
 import { cn } from "../lib/cn";
+import { AmbientTravel } from "../controls/AmbientTravel";
+import type { AmbientTravelProps } from "../controls/AmbientTravel";
+import type { AmbientMaterial } from "../core/material";
+import { FaderCap, TravelTrack } from "../parts/travel";
 
 export type AmbientFaderSize = "sm" | "md" | "lg";
 
-export type AmbientFaderProps = Omit<HTMLAttributes<HTMLDivElement>, "onChange"> & {
-  value: number;
-  min?: number;
-  max?: number;
-  step?: number;
-  label?: string;
-  material?: "matte" | "shiny" | "glass";
-  size?: AmbientFaderSize;
-  onChange?: (nextValue: number) => void;
+export type AmbientFaderProps = Omit<AmbientTravelProps, "parts" | "size" | "orientation"> & {
+  material?: AmbientMaterial | undefined;
+  size?: AmbientFaderSize | undefined;
 };
 
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, value));
-}
-
-export function AmbientFader({
-  value,
-  min = 0,
-  max = 100,
-  step = 1,
-  label,
-  material,
-  size = "md",
-  onChange,
-  className,
-  ...props
-}: AmbientFaderProps) {
-  const id = useId();
-  const trackRef = useRef<HTMLDivElement | null>(null);
-  const safeStep = step > 0 ? step : 1;
-
-  const percent = ((value - min) / (max - min || 1)) * 100;
-
-  const updateFromClientY = (clientY: number) => {
-    const track = trackRef.current;
-    if (!track) return;
-
-    const rect = track.getBoundingClientRect();
-    const ratio = 1 - (clientY - rect.top) / rect.height;
-    const nextValue = min + clamp(ratio, 0, 1) * (max - min);
-    const snapped = Math.round(nextValue / safeStep) * safeStep;
-    onChange?.(clamp(snapped, min, max));
-  };
-
-  const setValue = (nextValue: number) => {
-    const snapped = Math.round(nextValue / safeStep) * safeStep;
-    onChange?.(clamp(snapped, min, max));
-  };
-
-  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    const pageStep = safeStep * 10;
-    switch (event.key) {
-      case "ArrowUp":
-      case "ArrowRight":
-        event.preventDefault();
-        setValue(value + safeStep);
-        break;
-      case "ArrowDown":
-      case "ArrowLeft":
-        event.preventDefault();
-        setValue(value - safeStep);
-        break;
-      case "PageUp":
-        event.preventDefault();
-        setValue(value + pageStep);
-        break;
-      case "PageDown":
-        event.preventDefault();
-        setValue(value - pageStep);
-        break;
-      case "Home":
-        event.preventDefault();
-        setValue(min);
-        break;
-      case "End":
-        event.preventDefault();
-        setValue(max);
-        break;
-      default:
-        break;
-    }
-  };
-
-  const onPointerMove = (event: PointerEvent<HTMLDivElement>) => {
-    if (event.buttons !== 1) return;
-    updateFromClientY(event.clientY);
-  };
-
+/** A pill cap on a stem, riding an upright slot. Min is at the bottom,
+ *  which `AmbientTravel` already does for a vertical track. */
+export function AmbientFader({ material, size = "md", className, ...rest }: AmbientFaderProps) {
   return (
-    <div className={cn("ambx-stack", className)} {...props}>
-      <div
-        className={cn("amb-fader amb-groove ambx-fader", `ambx-fader-${size}`)}
-        ref={trackRef}
-        role="slider"
-        aria-label={label}
-        aria-labelledby={label ? id : undefined}
-        aria-valuemin={min}
-        aria-valuemax={max}
-        aria-valuenow={value}
-        aria-orientation="vertical"
-        tabIndex={0}
-        onPointerDown={(event) => {
-          event.currentTarget.setPointerCapture(event.pointerId);
-          updateFromClientY(event.clientY);
-        }}
-        onPointerMove={onPointerMove}
-        onKeyDown={onKeyDown}
-      >
-        <div
-          className={cn("amb-fader-thumb ambient amb-fillet ambx-fader-thumb", material !== "glass" && "amb-surface-concave", material && `amb-mat-${material}`)}
-          style={{ top: `${100 - percent}%` }}
-        >
-          <span className="amb-fader-gripline" />
-        </div>
-      </div>
-      {label ? (
-        <span id={id} className="ambx-label">
-          {label}
-        </span>
-      ) : null}
-    </div>
+    <AmbientTravel
+      {...rest}
+      orientation="vertical"
+      size={size}
+      className={cn("amb-fader", className)}
+      parts={{
+        base: <TravelTrack />,
+        actuator: <FaderCap material={material} />
+      }}
+    />
   );
 }

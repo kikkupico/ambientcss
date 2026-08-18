@@ -1,0 +1,424 @@
+#+TITLE: Composable Controls — kinematics in the library, paint in the app
+#+DATE: 2026-08-18
+#+STATUS: plan for v3.0.0 (breaking)
+
+* The idea in one line
+
+Split every control into a *mechanism* that the library owns and a *skin* that
+the app supplies. The mechanism knows how a thing moves, what its value is, and
+how a screen reader should hear it. The skin knows what it looks like. Today
+those two are welded together inside each ~Ambient*~ component; v3 separates
+them and re-expresses the named components as presets over the separated pieces.
+
+The load-bearing sentence, which every decision below is checked against:
+
+#+begin_quote
+The control owns kinematics, state and ARIA. The part owns paint.
+#+end_quote
+
+* Why this is the right cut, and not just a nice-sounding one
+
+Two pieces of existing code argue for it more convincingly than any argument I
+could make up.
+
+** The ~material~ comment in AmbientKnob
+
+~AmbientKnob.tsx~ carries this note:
+
+#+begin_quote
+~material~ goes on whichever element actually paints the knob: the clipped face
+when there is a knurl, the body when there is not. A smooth knob's face paints
+nothing at all, so a material left there would be both invisible and overridden
+by the reset.
+#+end_quote
+
+That is a fact about *this particular knob's construction*. A generic rotary
+control cannot possibly know it once the body is user-supplied — the user's part
+might paint on three elements, or none. So:
+
+*Generic controls carry no ~material~ prop.* Presets do, and they route it, because
+a preset knows its own parts. This is the cleanest available proof that the
+layering is real rather than cosmetic: if the generic rotary had a ~material~ prop,
+the split would be fake.
+
+The knurl clip says the same thing louder. ~KNURL_PATH~ is generated in JS, emitted
+as an inline ~<defs><clipPath>~, and applied to the rotating face via
+~clipPath: url(#id)~. A rotary mechanism has no business knowing about clip paths.
+The silhouette belongs to the part, so the part carries its own ~<defs>~ — which
+makes ~KnurledFace~ the acceptance test for the whole split.
+
+** Three identical keyboard handlers
+
+~AmbientKnob~, ~AmbientSlider~ and ~AmbientFader~ each contain the same
+Arrow/Page/Home/End switch statement, with the same ~pageStep = safeStep * 10~,
+the same ~clamp~, the same ~Math.round(v / step) * step~. It is copied three
+times because there is nowhere shared for it to live. There should be.
+
+* What already exists that this builds on
+
+- *A physics layer that is already fully composable.* ~@ambientcss/css~ is a
+  vocabulary of orthogonal classes (~.ambient~, ~.amb-surface~, ~.amb-chamfer~,
+  ~.amb-mat-shiny~ …) with a frozen, API-checked surface. Any part a user writes
+  is already able to look native. The components layer is the only place where
+  composability stops.
+- *State published as a custom property.* The knob's marker ring already does
+  exactly what this proposal generalises: each dot is positioned by an inline
+  ~--amb-marker-angle~ that CSS consumes.
+- *Geometry derived from one size property.* ~--ambx-knob-marker-radius~,
+  ~--ambx-knob-rect-width~ and the indicator sizes are all fractions of
+  ~--ambx-knob-size~. The pattern a user part needs in order to scale correctly
+  is the pattern the built-in parts already use.
+
+* What breaks in v3
+
+Breaking changes are in scope, so the design is not bent around compatibility.
+The full list, so the changeset can be honest:
+
+1. *Slider and fader thumbs move by ~transform~, not ~left~/~top~.* Inline
+   ~left~/~top~ percentages are gone; position comes from ~--ambx-percent~ and a
+   per-size ~--ambx-travel-length~. Anything overriding those properties in app
+   CSS stops working.
+2. *The knob's default pointer mapping changes from absolute angle to drag.*
+   The shipped code maps pointer position to an absolute angle with a dead zone;
+   ~knob.md~ has always documented "a vertical-drag control … drag up to
+   increase". v3 makes ~drag~ the default because it is what the docs promise,
+   what most audio software does, and the only mapping that behaves on touch.
+   The old behaviour is one prop away: ~input="angle"~.
+3. *Every control's DOM gains frame wrappers* (~[data-frame]~ elements). Deep
+   descendant selectors written against the old structure will miss.
+4. *~AmbientSwitch~ moves to the ~value~ / ~defaultValue~ / ~onChange~
+   convention*, dropping ~checked~, ~defaultChecked~ and ~onCheckedChange~.
+   Half-unifying it would be worse than either option: the "one convention"
+   claim is only true if the checked-vocabulary goes entirely.
+5. *Knob ~value~ becomes optional*, with ~defaultValue~ for uncontrolled use.
+
+Deliberately *not* broken: the ~amb-*~ class names on the default parts. They are
+documented, the CSS behind them is substantial and carefully commented, and
+renaming them would buy nothing. The markup those classes sit on changes; the
+names do not.
+
+* The frame contract
+
+A control renders up to four *frames*. A frame is a positioned box with declared
+kinematics. The user drops parts into frames; the control moves the frames.
+
+| Frame       | Kinematics                                      | Overflows box? |
+|-------------+-------------------------------------------------+----------------|
+| ~panel~     | static; painted *behind* the control            | yes            |
+| ~base~      | static; the control's own footprint             | no             |
+| ~actuator~  | *transformed by value* — the moving part        | no             |
+| ~fixture~   | static; painted *above* the actuator            | no             |
+
+Four, all optional, stacked in that z-order. "Actuator" is the hardware term for
+the part a user touches and that moves — rotor, thumb, cap and pill are all
+actuators — and using one name across families means there is one contract to
+learn rather than five.
+
+What each family typically puts where:
+
+| Frame      | Rotary          | Travel            | Press          | Latch        | Bank (per key) |
+|------------+-----------------+-------------------+----------------+--------------+----------------|
+| ~panel~    | printed scale   | printed ticks     | —              | on/off legend| —              |
+| ~base~     | seated body     | track / groove    | recessed well  | track        | bezel          |
+| ~actuator~ | rotor + pointer | thumb             | cap            | pill         | cap            |
+| ~fixture~  | fixed hub, dome | —                 | —              | —            | lamp lens      |
+
+** A frame is a box only where the control has a size of its own
+
+The tempting rule — "every frame is ~position: absolute; inset: 0~, so every part
+gets a correct box for free" — is wrong, and the existing CSS says why. A button
+takes its height from ~.amb-button-cap~ in normal flow and its width from
+~min-width~ *plus the cap's label*; ~.amb-select-option~ does the same, and its
+comment spells it out: the cap "contributes its legend's width above that. A bank
+of numerals stays a bank of numerals; a bank of mode names grows to fit." Put
+that cap in an absolutely-positioned frame and the control collapses.
+
+So the frame's layout mode is family-defined, in two cases:
+
+- *The control has its own size* (rotary, travel, latch). Frames are boxes.
+  ~panel~, ~base~ and ~fixture~ are ~inset: 0~; the ~actuator~ is ~inset: 0~ for a
+  rotary — the whole face turns — and a *thumb-sized box riding the track* for
+  travel and latch, because that is what a thumb is.
+- *The part's content sizes the control* (press, bank). Frames are
+  ~display: contents~ markers: they contribute stacking order and the
+  ~[data-frame]~ hook, and contribute nothing to layout, so the cap sizes the
+  button exactly as it does today.
+
+What survives in both cases is the actual guarantee: *the part is handed a
+correct context and never has to position itself against something it cannot
+see.*
+
+** The transform, per family — always ~transform~, never ~inset~ or ~left~/~top~
+
+- *Rotary* — ~rotate(var(--ambx-angle))~
+- *Travel* — ~translate(…)~ by ~--ambx-percent~ along ~--ambx-travel-length~
+- *Press* — the cap's ~--amb-thickness~ drops on ~:active~ (the existing sink)
+- *Latch* — the travel transform, with ~--ambx-percent~ pinned to 0 or 1
+- *Bank* — the press behaviour, per key
+
+*Insisting on ~transform~ is a behaviour change, not just a naming one.*
+~AmbientSlider~ and ~AmbientFader~ position their thumbs today with inline ~left~
+and ~top~. Moving them onto ~transform~ is what lets one animation rule cover
+every family instead of two — and it is the compositor-friendly property besides.
+
+Travel needs one extra token for this to work: a percentage ~translate~ resolves
+against the *element's own* size, not the track's, which is exactly why the
+original code reached for ~top~. So each size publishes ~--ambx-travel-length~
+and the transform multiplies the percent by it.
+
+** The escape hatch
+
+Someone will want a knob whose body stays still while only a printed pointer
+sweeps — the opposite of the built-in arrangement. They do not need a new API
+for it: they put everything in ~base~, leave ~actuator~ empty, and read
+~--ambx-angle~ themselves. The state channel is published on the control root, so
+every frame can see it. Nothing is gated behind being the moving frame.
+
+* The state channel
+
+The control publishes its state three ways, from one source. All three are the
+same data; which you reach for depends on what you are writing.
+
+** 1. CSS custom properties, on the control root
+
+| Property             | Type        | Meaning                                  |
+|----------------------+-------------+------------------------------------------|
+| ~--ambx-percent~     | ~<number>~  | normalised position, 0–1                 |
+| ~--ambx-angle~       | ~<angle>~   | rotary only; already includes the offset |
+| ~--ambx-value~       | ~<number>~  | the raw value                            |
+| ~--ambx-size~        | ~<length>~  | the control's nominal size               |
+| ~--ambx-travel-start~| ~<angle>~   | rotary sweep origin                      |
+| ~--ambx-travel-sweep~| ~<angle>~   | rotary sweep extent                      |
+| ~--ambx-detents~     | ~<number>~  | rest positions, 0 = continuous           |
+
+This is the channel that matters most for this library's identity: it means a
+part can be *pure CSS with no React state plumbing at all*. A tick ring, a value
+arc, a glow that brightens with the value — all of them become a stylesheet.
+
+Registering ~--ambx-percent~ and ~--ambx-angle~ with ~@property~ (the codebase
+already registers ~--amb-elevation~ this way) makes them interpolable, which is
+what turns the smooth-versus-stepped axis into a CSS concern rather than a JS
+animation loop.
+
+*One caveat comes with publishing state as inherited properties:* they inherit,
+which is the whole point — it is what lets any frame read ~--ambx-angle~ without
+being handed it — but it also means a control nested inside another control's
+frame silently reads its ancestor's value. The fix is one rule: ~.ambx-control~
+declares every state property at a neutral default, so each mechanism resets
+what it does not own before its own inline values land on top.
+
+** 2. Data attributes, on the control root
+
+~data-dragging~, ~data-pressed~, ~data-disabled~, ~data-at-min~, ~data-at-max~,
+~data-orientation~.
+
+These carry the discrete states that do not want to be numbers, and they let a
+part restyle itself under conditions the control detects but the part cannot.
+
+** 3. React context
+
+~useControlState()~ returns the same values typed, for parts that genuinely need
+JS — a numeric readout, a tick ring that must emit N children, an SVG whose path
+data depends on the value.
+
+*One rule to keep the three honest:* the custom properties are canonical.
+Context is a convenience view of the same state, never a second source.
+
+* The axes, made explicit
+
+** Sweep — threading a value that is currently a module constant
+
+~MIN_ANGLE = -135~ and ~SWEEP = 270~ sit at module scope in ~AmbientKnob.tsx~,
+with a comment noting they are "read, never restated" by three consumers: the
+value→rotation mapping, ~pointerToValue~, and ~markerAngles~. Making the sweep
+configurable means threading one value to all three, plus out to any user part
+that draws a scale — which is what ~--ambx-travel-start~ / ~--ambx-travel-sweep~
+are for. The published properties preserve exactly the discipline the constants
+have today: one source, three readers.
+
+~travel={{ start: -135, sweep: 270 }}~, with the shorthand ~travel={240}~ meaning
+"that sweep, centred on 12 o'clock".
+
+** Input mapping — three genuinely different mappings, not one with a parameter
+
+- ~input="drag"~ *(default in v3)* — pointer *distance* → value delta. What
+  ~knob.md~ has always described. Works at any sweep, is what most audio software
+  uses, and is the only one that behaves sanely on a phone. Holding Shift
+  engages a fine mode.
+- ~input="angle"~ — pointer position → absolute angle → value. What the code does
+  today. Requires a dead zone, and requires ~sweep < 360~.
+- ~input="delta"~ — accumulated angular delta. The endless-encoder mapping: no
+  ends, no dead zone, value can wrap or clamp independently of angle.
+
+*360° is a different mapping, not a bigger number.* At ~sweep >= 360~ absolute
+angle→value is ambiguous — 0 and max share a screen angle — and the current
+dead-zone clamp, which reads ~percent~ to decide which end to snap to, has no end
+to snap to. So the library rejects ~input="angle"~ with ~sweep >= 360~: dev
+warning, fall back to ~drag~.
+
+** Quantisation and animation are two props, not one
+
+- ~step~ — quantises the *value*. Already exists. Unchanged.
+- ~detents~ — quantises the *travel*: how many rest positions the actuator has.
+  Usually derived from ~step~, but not always: an endless encoder can have 24
+  detents per turn while its value stays continuous.
+- ~animate~ — how the actuator *moves* to a new position: ~"follow"~ (1:1 with
+  the pointer, no transition), ~"ease"~ (transition), ~"snap"~ (instant).
+
+The default is contextual — follow while dragging, ease otherwise — and it needs
+no JS, because ~data-dragging~ is already on the root:
+
+#+begin_src css
+.ambx-control [data-frame="actuator"] { transition: transform 120ms ease-out; }
+.ambx-control[data-dragging] [data-frame="actuator"] { transition: none; }
+#+end_src
+
+Two rules, three families. Transform-transition covers rotary, travel and latch —
+the three whose actuator is a box that moves. Press and bank sink by dropping
+~--amb-thickness~ on ~:active~, which is not a registered property and therefore
+not interpolable, so their travel is instant.
+
+That is the right behaviour rather than a limitation worked around: a key does
+not ease down under a finger, it goes. Registering ~--amb-thickness~ in
+~@ambientcss/css~ to make it animatable would widen the frozen API surface for a
+cue nobody wants eased, so v3 leaves it alone and says "three" instead of
+claiming "five".
+
+** Size becomes a property, because a part cannot read a class
+
+Today ~--ambx-knob-marker-radius~ and friends are declared on ~.ambx-knob-sm/md/lg~
+and derived from ~--ambx-knob-size~. A user-supplied part cannot match on those
+classes — it does not know they exist. So ~size~ (accepting ~"sm" | "md" | "lg"~,
+or any CSS length) always resolves to ~--ambx-size~ on the root, and every part —
+built-in and user-written alike — expresses itself as a fraction of it.
+~--ambx-knob-size~ survives as a family alias of the general one.
+
+* Per family
+
+** Rotary
+
+#+begin_src tsx
+<AmbientRotary
+  value={gain} onChange={setGain} min={0} max={100} step={1}
+  travel={{ start: -135, sweep: 270 }}
+  input="drag"           // "drag" | "angle" | "delta"
+  animate="follow"       // "follow" | "ease" | "snap"
+  size="md"
+  label="Gain"
+  parts={{
+    panel:    <ScaleRing count={13} />,
+    base:     <KnobBody />,
+    actuator: <><KnurledFace /><IndicatorDot /></>,
+    fixture:  <CentreCap />,
+  }}
+/>
+#+end_src
+
+Everything in ~parts~ is ordinary markup. ~KnurledFace~ happens to be a built-in
+we export, but it is not privileged — it is a component that emits a div with
+some ambient classes and its own ~<defs>~, and a user's replacement stands on
+exactly the same footing.
+
+** Travel (slider, fader, ribbon)
+
+One mechanism with an ~orientation~ prop, behind two presets. ~AmbientSlider~ and
+~AmbientFader~ are already the same 127-line file twice with X and Y swapped; the
+only real difference is which axis the pointer maths reads and which direction
+"more" means.
+
+** Press (button, key, pad)
+
+~mode="momentary" | "toggle" | "repeat"~: a transport key, a latching mute and an
+auto-repeating nudge button are the same object with three state machines and
+identical paint.
+
+** Latch (switch, rocker)
+
+Travel with two positions and a boolean value. Distinct from Press because its
+ARIA is ~role="switch"~ and its actuator genuinely travels.
+
+** Bank (select, radio group, tab bar, step sequencer)
+
+Structurally the odd one: N presses sharing a selection model, so its parts apply
+*per key* rather than once. The roving-tabindex logic, the
+radiogroup-versus-checkbox-group keyboard difference, and the WAI-ARIA
+selection-follows-focus rule that ~AmbientSelect~ already implements carefully
+all stay in the mechanism. Those eighty lines are the part nobody wants to
+re-derive in order to change what a key looks like — the strongest single
+argument for this whole proposal.
+
+* Decisions
+
+1. *Generic controls have no ~material~ prop.* Presets do. Rationale above.
+2. *The custom properties are canonical; context is a view of them.*
+3. *ARIA lives on the control root, always.* ~role~, ~aria-value*~, ~tabIndex~
+   and the keyboard handler are the mechanism's, never a part's. Parts are
+   presentational by contract: *a part must not contain a focusable element or
+   an interactive role.* In a Bank the focusable element is the key ~<button>~,
+   which the mechanism renders — the user's part goes *inside* it. A dev-only
+   check warns, so the rule is enforced rather than merely documented — and it
+   queries *inside ~[data-frame]~ subtrees only*, never from the control root,
+   because in a Bank the key ~<button>~ is the mechanism's own and sits above the
+   frames. A root-scoped query would flag every preset we ship.
+4. *Every control supports controlled and uncontrolled*, through one shared
+   ~useControllableValue~ and one prop name, ~defaultValue~.
+5. *Default parts keep their ~amb-*~ class names, and their markup changes.*
+   The names are documented and the CSS behind them is substantial; the DOM they
+   sit on is an implementation detail that v3 is free to restructure.
+6. *Parts are ~ReactNode~, not render props.* Because state travels through CSS
+   properties, an element is enough. Parts needing a JS value call
+   ~useControlState()~ from inside — which is also what proves the context works.
+7. *~sweep >= 360~ rejects ~input="angle"~.* Dev warning plus fallback to ~drag~.
+8. *A frame is a box where the control has its own size, and a
+   ~display: contents~ marker where the part's content sizes the control.*
+   Either way the part is handed a correct context; see the frame contract for
+   why one blanket rule would collapse the button and the key bank.
+
+* File layout
+
+#+begin_src text
+src/
+  core/
+    numeric.ts            clamp / snap / normalise / shared key stepping
+    controllable.ts       useControllableValue
+    context.tsx           ControlStateContext + useControlState
+    frames.tsx            <Frames>, the four-frame renderer + dev a11y check
+    useRotary.ts          angle | drag | delta mappings, sweep, dead zone
+    useTravel.ts          axis mapping, orientation, invert
+    usePress.ts           momentary | toggle | repeat
+    useLatch.ts           boolean travel
+    useBank.ts            roving tabindex, radiogroup/checkbox keyboard
+  controls/               AmbientRotary / Travel / Press / Latch / Bank
+  parts/                  the default parts, one module per family
+  components/             the presets: Knob, Slider, Fader, Button, Switch,
+                          Select — plus Provider, Panel, Rack unchanged
+#+end_src
+
+* Build order
+
+Rotary first, end to end, through to ~AmbientKnob~ rendering in the demo — it is
+the family with the clip-path part, the ~--ambx-size~ fraction geometry and the
+marker clearance, so if the frame contract survives it the other four are
+mechanical. ~pnpm release:check~ (~api:check && build && typecheck &&
+docs:build~) is the gate, and it catches the docs' ~ComponentPreviews.tsx~ usage.
+
+One thing stays a *preset* concern: ~markers="full"~ reserves layout clearance
+via ~.amb-knob-markers-full~. The generic rotary cannot know what is in its
+~panel~ frame, but ~AmbientKnob~ knows it put a ~ScaleRing~ there — consistent
+with "presets know their parts", the same rule that keeps ~material~ out of the
+mechanism.
+
+* Costs and risks
+
+- *Two ways to do everything.* Props and CSS both reach the same state. The docs
+  have to name the canonical one per task.
+- *Broken compositions become the user's problem — and still look like ours.*
+  A slot API means shipping a way to make an ugly, inaccessible control.
+  Decisions 3 and 8 are the mitigations; well-lit presets in the docs are the
+  third.
+- *Bundle size.* Hooks + mechanisms + presets + default parts is more code than
+  the current welded components. Default parts live in their own modules so an
+  app shipping only its own parts does not pay for the built-ins.
+- *Docs debt.* ~knob.md~ documents an interaction the code does not implement.
+  v3 resolves that by making the docs right and the code follow, but every new
+  axis is more doc surface.

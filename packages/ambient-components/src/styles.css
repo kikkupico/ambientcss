@@ -41,21 +41,11 @@
    rather than shipped as a global reset: apps that already reset globally
    (apps/demo does) see no change, and apps that do not are no longer
    silently broken. */
-.amb-button,
-.amb-knob,
-.amb-switch,
-.amb-select,
-.amb-fader,
-.amb-slider,
+.ambx-control,
+.ambx-control *,
 .ambx-panel,
-.ambx-stack,
-.amb-button *,
-.amb-knob *,
-.amb-switch *,
-.amb-select *,
-.amb-fader *,
-.amb-slider *,
 .ambx-panel *,
+.ambx-stack,
 .ambx-stack * {
   box-sizing: border-box;
 }
@@ -76,6 +66,250 @@
   font-size: var(--ambx-type-3-size);
   line-height: var(--ambx-type-3-line);
   letter-spacing: var(--ambx-type-tracking);
+}
+
+/* ------------------------------------------------------------------ *\
+   The control base: state channel, frames, motion.
+
+   Every control publishes its state on its own root — as custom properties
+   for parts that are pure CSS, and as data attributes for the discrete
+   conditions a part cannot detect for itself. The properties INHERIT, which
+   is the whole point (any frame can read --ambx-angle without being handed
+   it), and is also why every one of them is reset here: a control nested
+   inside another control's frame would otherwise sweep along with its
+   ancestor.
+\* ------------------------------------------------------------------ */
+
+/* Registered so they interpolate. That is what turns "smooth or stepped"
+   into a CSS question rather than a JS animation loop — the same reason
+   @ambientcss/css registers --amb-elevation. */
+@property --ambx-percent {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --ambx-angle {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
+
+.ambx-control {
+  position: relative;
+  --ambx-value: 0;
+  --ambx-percent: 0;
+  --ambx-angle: 0deg;
+  --ambx-travel-start: 0deg;
+  --ambx-travel-sweep: 0deg;
+  --ambx-detents: 0;
+}
+
+.ambx-control:focus-visible {
+  outline-offset: var(--ambx-grid-half);
+}
+
+/* A frame is a MARKER by default, not a box: it contributes paint order and
+   the [data-frame] hook and nothing to layout. That default is load-bearing
+   rather than lazy — a button takes its height from its cap in normal flow
+   and its width from min-width PLUS the cap's legend, so wrapping the cap in
+   a positioned box would collapse the control to nothing. */
+.ambx-frame {
+  display: contents;
+}
+
+/* Where the control has a size of its own, frames become boxes and hand
+   their part a correct one. A part that means to fill its frame does it at
+   `position: absolute; inset: 0` — which also blockifies it, where
+   `width/height: 100%` on a bare <span> would silently measure zero. */
+.ambx-rotary > .ambx-frame,
+.ambx-travel > .ambx-frame,
+.ambx-latch > .ambx-frame {
+  display: block;
+  position: absolute;
+  inset: 0;
+}
+
+/* The panel frame is the one allowed past the control's box — a scale ring
+   sits outside the knob it belongs to. It takes no pointer events, so
+   printing a ring never enlarges the grab area. */
+.ambx-rotary > .ambx-frame-panel,
+.ambx-travel > .ambx-frame-panel {
+  pointer-events: none;
+}
+
+/* Motion. The actuator is the only frame that moves, and it moves by
+   transform — which is what lets the two transition rules below cover every
+   family whose actuator is a box. */
+.ambx-rotary > .ambx-frame-actuator {
+  transform: rotate(var(--ambx-angle));
+}
+
+/* Follow the pointer 1:1 while dragging, ease otherwise. No JS: the root
+   already carries data-dragging. */
+.ambx-control[data-animate="auto"] > .ambx-frame-actuator,
+.ambx-control[data-animate="ease"] > .ambx-frame-actuator {
+  transition: transform 120ms ease-out;
+}
+
+.ambx-control[data-animate="auto"][data-dragging] > .ambx-frame-actuator,
+.ambx-control[data-animate="follow"] > .ambx-frame-actuator,
+.ambx-control[data-animate="snap"] > .ambx-frame-actuator {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambx-control > .ambx-frame-actuator {
+    transition: none;
+  }
+}
+
+.ambx-control[data-disabled] {
+  cursor: not-allowed;
+}
+
+/* Rotary geometry. Square, sized off one property so a user-supplied part
+   can scale with the control — a part cannot match .ambx-rotary-lg, it does
+   not know the class exists, but it can read --ambx-size. */
+.ambx-rotary {
+  display: grid;
+  place-items: center;
+  touch-action: none;
+  user-select: none;
+  width: var(--ambx-size);
+  height: var(--ambx-size);
+  --ambx-size: calc(var(--ambx-grid) * 16);                 /* 64px */
+}
+
+.ambx-rotary-sm { --ambx-size: calc(var(--ambx-grid) * 12); } /* 48px */
+.ambx-rotary-md { --ambx-size: calc(var(--ambx-grid) * 16); } /* 64px */
+.ambx-rotary-lg { --ambx-size: calc(var(--ambx-grid) * 20); } /* 80px */
+
+/* Travel geometry. Track length, track width and thumb all come off one
+   size step, and the slider's and fader's measured tables turn out to be
+   the same table — 6/8/12 track against a 20/24/32 thumb — so one set of
+   steps serves both, with the fader's pill taking the extra 1.5x height its
+   referent has. */
+.ambx-travel {
+  position: relative;
+  touch-action: none;
+  user-select: none;
+  --ambx-size: calc(var(--ambx-grid) * 6);                   /* 24px thumb */
+  --ambx-travel-track: calc(var(--ambx-grid) * 2);           /* 8px */
+  --ambx-travel-length: calc(var(--ambx-grid) * 30);         /* 120px */
+  --ambx-travel-thumb-w: var(--ambx-size);
+  --ambx-travel-thumb-h: var(--ambx-size);
+}
+
+.ambx-travel-sm {
+  --ambx-size: calc(var(--ambx-grid) * 5);                   /* 20px */
+  --ambx-travel-track: calc(var(--ambx-grid) * 1.5);         /* 6px */
+}
+
+.ambx-travel-md {
+  --ambx-size: calc(var(--ambx-grid) * 6);                   /* 24px */
+  --ambx-travel-track: calc(var(--ambx-grid) * 2);           /* 8px */
+}
+
+.ambx-travel-lg {
+  --ambx-size: calc(var(--ambx-grid) * 8);                   /* 32px */
+  --ambx-travel-track: calc(var(--ambx-grid) * 3);           /* 12px */
+}
+
+.ambx-travel-horizontal {
+  width: var(--ambx-travel-length);
+  height: var(--ambx-travel-track);
+}
+
+.ambx-travel-vertical {
+  width: var(--ambx-travel-track);
+  height: var(--ambx-travel-length);
+}
+
+/* The thumb frame is a thumb-sized box riding the track — the one case
+   where "inset: 0" would be the wrong box for the part. A percentage
+   translate resolves against the ELEMENT's size, not the track's, which is
+   why the length has to be a property the transform can multiply. */
+.ambx-travel > .ambx-frame-actuator {
+  inset: auto;
+  width: var(--ambx-travel-thumb-w);
+  height: var(--ambx-travel-thumb-h);
+}
+
+.ambx-travel-horizontal > .ambx-frame-actuator {
+  top: 50%;
+  left: 0;
+  transform: translate(-50%, -50%)
+    translateX(calc(var(--ambx-percent) * var(--ambx-travel-length)));
+}
+
+.ambx-travel-vertical > .ambx-frame-actuator {
+  top: 100%;
+  left: 50%;
+  transform: translate(-50%, -50%)
+    translateY(calc(var(--ambx-percent) * var(--ambx-travel-length) * -1));
+}
+
+/* Latch: the control IS the track, so the pill can be positioned against
+   it directly. Its travel is the track less the pill and the two end
+   clearances — stated once here rather than as an on/off pair of offsets,
+   so --ambx-percent drives it like every other actuator. */
+.ambx-latch {
+  position: relative;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  margin: 0;
+  background: none;
+  display: block;
+  width: var(--ambx-switch-w);
+  height: var(--ambx-switch-h);
+  --ambx-size: var(--ambx-switch-h);
+  --ambx-switch-w: calc(var(--ambx-grid) * 12);
+  --ambx-switch-h: calc(var(--ambx-grid) * 6);
+}
+
+.ambx-latch-sm {
+  --ambx-switch-w: calc(var(--ambx-grid) * 10);
+  --ambx-switch-h: calc(var(--ambx-grid) * 5);
+}
+
+.ambx-latch-md {
+  --ambx-switch-w: calc(var(--ambx-grid) * 12);
+  --ambx-switch-h: calc(var(--ambx-grid) * 6);
+}
+
+.ambx-latch-lg {
+  --ambx-switch-w: calc(var(--ambx-grid) * 16);
+  --ambx-switch-h: calc(var(--ambx-grid) * 8);
+}
+
+.ambx-latch > .ambx-frame-actuator {
+  inset: auto;
+  top: 50%;
+  left: 0;
+  width: calc(var(--ambx-switch-w) * 0.52);
+  height: calc(var(--ambx-switch-h) * 0.78);
+  transform: translateY(-50%)
+    translateX(
+      calc(
+        var(--ambx-switch-h) * 0.11 + var(--ambx-percent) *
+          (
+            var(--ambx-switch-w) - var(--ambx-switch-w) * 0.52 - var(--ambx-switch-h) *
+              0.22
+          )
+      )
+    );
+}
+
+/* Press and bank size their control from their cap's legend, so their
+   frames stay markers and only the well needs geometry. */
+.ambx-press {
+  --ambx-size: var(--ambx-button-size);
+}
+
+.ambx-bank {
+  --ambx-size: var(--ambx-select-size);
 }
 
 /* Button: a chamfered key cap seated in a clearance well — the referent
@@ -277,10 +511,18 @@
    markers, and the face carries one accent indicator. The face rotates
    with the value, so the ribs move under the fingers like the real thing;
    the markers do not, because they are printed on the panel. */
+/* Every knob metric is a fraction of the control's own size, so the three
+   size steps only restate that one length. Marker radius and dot size are
+   fractions of the DIAMETER: the ring sits at 1.33R and the dots measure
+   0.14R, both taken off the reference panels. --ambx-knob-size is a family
+   alias of --ambx-size, kept because these fractions read better against a
+   name that says which control they belong to. */
 .amb-knob {
   border-radius: 50%;
-  height: var(--ambx-knob-size);
-  width: var(--ambx-knob-size);
+  --ambx-knob-size: var(--ambx-size);
+  --ambx-knob-rect-width: calc(var(--ambx-knob-size) * 0.075);
+  --ambx-knob-marker-radius: calc(var(--ambx-knob-size) * 0.665);
+  --ambx-knob-marker-size: calc(var(--ambx-knob-size) * 0.07);
 }
 
 /* The body is the smooth circle at the tooth-root radius: it carries
@@ -293,18 +535,24 @@
   border-radius: 50%;
 }
 
-/* Smooth body (knurling={false}): with no teeth to stand proud there is
+/* Flush body (knurling={false}): with no teeth to stand proud there is
    no reason to hold the body back off the edge, so it takes the full
    width and becomes the whole visible knob — a turned cylinder, its rim
    read from .amb-thickness-2's edge bands. The face above it then paints
    nothing at all and exists only to carry the rotating indicator, which
    is why the knurl's tone and clip are both dropped rather than
-   overridden. */
-.amb-knob-smooth .amb-knob-body {
+   overridden.
+
+   With no ribs to catch the light, the rim needs its own cue that this is
+   a turned edge rather than a flat disc, so it takes the small base
+   chamfer the referent cuts on every knob (knob.py's `chamfer=0.35`,
+   regardless of rib count) — width 2, level-for-level with the body's
+   knob-scale thickness (.amb-chamfer-2's pairing). A knurled knob skips
+   this: its clipped silhouette already reads as machined. */
+.amb-knob-body-flush {
   inset: 0;
-}
-.amb-knob-smooth .amb-knob-face {
-  background: none;
+  --amb-chamfer: 1;
+  --amb-chamfer-width: 2;
 }
 
 /* The rotating face: clipped to the straight-knurl silhouette (the
@@ -335,8 +583,8 @@
     );
 }
 
-/* Indicators. Both ride inside .ambx-knob-rotation, so they point at 12
-   o'clock here and the rotation carries them round to the value.
+/* Indicators. Both ride in the actuator frame, so they point at 12 o'clock
+   here and the frame's rotation carries them round to the value.
 
    The circle is the grounded referent's offset dot (knob() dot_frac 0.12,
    dot_offset 0.68). */
@@ -376,8 +624,9 @@
 /* Printed scale markers. The ring is a zero-size point at the knob's
    centre and each dot is placed by rotating about that centre and pushing
    out along the rotated axis, so one angle per dot is the whole geometry —
-   and the angles come from the same sweep the value uses (AmbientKnob's
-   MIN_ANGLE/SWEEP), so a dot always lands where its value would.
+   and the angles come from the same sweep the value uses (ScaleRing reads
+   --ambx-travel-start/-sweep off the control), so a dot always lands where
+   its value would, whatever `travel` is set to.
 
    Ink is --amb-label, not --amb-highlight-color: these are printed panel
    graphics like the control's legend, not part of the control. */
@@ -406,12 +655,17 @@
 /* Tracks are grounded grooves (.amb-groove supplies the recess: lit-wall
    shadow band + far-wall bounce) with a lume interior — dark in bright
    light, glowing in low light — overriding the groove's neutral floor. */
-.amb-fader {
-  position: relative;
-  width: var(--ambx-fader-track);
-  height: calc(var(--ambx-grid) * 30);
+.amb-travel-track {
+  position: absolute;
+  inset: 0;
   border-radius: var(--ambx-radius-full);
   background-color: var(--amb-lume);
+}
+
+/* The slider's referent (slider.py) is a shallow concave channel 1mm deep
+   rather than the fader's through-slot. */
+.amb-travel-track-channel {
+  --amb-thickness: 0.22;
 }
 
 /* Fader thumb: the referent (fader.py) is a pill cap on a stem — 7mm
@@ -419,11 +673,7 @@
    with a single grip line across the top. */
 .amb-fader-thumb {
   position: absolute;
-  width: var(--ambx-fader-thumb-w);
-  height: var(--ambx-fader-thumb-h);
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+  inset: 0;
   border-radius: var(--ambx-radius-md);
   display: grid;
   place-items: center;
@@ -438,27 +688,18 @@
   background: var(--amb-lume);
 }
 
-/* Slider: the referent (slider.py) is a shallow concave channel (1mm
-   deep = thickness 0.22), not a through-slot, with a domed disc thumb
-   gliding over it. */
-.amb-slider {
-  position: relative;
-  height: var(--ambx-slider-track);
-  width: calc(var(--ambx-grid) * 30);
-  border-radius: var(--ambx-radius-full);
-  background-color: var(--amb-lume);
-  --amb-thickness: 0.22;
-}
-
+/* A domed disc gliding over the channel. */
 .amb-slider-thumb {
   position: absolute;
-  width: var(--ambx-slider-thumb);
-  height: var(--ambx-slider-thumb);
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  inset: 0;
   border-radius: 50%;
   --amb-thickness: 0.7;
+}
+
+/* The fader's pill is 1.5x its width; the slider's disc is round. Both take
+   their width from the shared travel size step. */
+.amb-fader {
+  --ambx-travel-thumb-h: calc(var(--ambx-size) * 1.5);
 }
 
 .amb-led {
@@ -483,22 +724,9 @@
    in a dark stadium recess (well 1.5mm deep = thickness 0.33; the pill
    stands 2.6mm above the recess floor = thickness 0.58), with an
    optional LED above. The pill slides, nothing presses. */
-.amb-switch {
-  cursor: pointer;
-  border: none;
-  padding: 0;
-  background: none;
-  display: inline-grid;
-  justify-items: center;
-  gap: var(--ambx-grid);
-  margin: 0;
-}
-
 .amb-switch-track {
-  position: relative;
-  display: block;
-  width: var(--ambx-switch-w);
-  height: var(--ambx-switch-h);
+  position: absolute;
+  inset: 0;
   border-radius: calc(var(--ambx-switch-h) / 2);
   background-color: var(--amb-lume);
   --amb-thickness: 0.33;
@@ -506,21 +734,17 @@
 
 .amb-switch-pill {
   position: absolute;
-  top: 50%;
-  left: 0;
-  width: calc(var(--ambx-switch-w) * 0.52);
-  height: calc(var(--ambx-switch-h) * 0.78);
+  inset: 0;
   border-radius: calc(var(--ambx-switch-h) * 0.39);
-  transform: translate(calc(var(--ambx-switch-h) * 0.11), -50%);
-  transition: transform 140ms ease;
   --amb-thickness: 0.58;
 }
 
-.amb-switch-on .amb-switch-pill {
-  transform: translate(
-    calc(var(--ambx-switch-w) - 100% - var(--ambx-switch-h) * 0.11),
-    -50%
-  );
+/* The lamp sits above the track on the tight grid pitch, one tier in from
+   the label's own clearance. */
+.ambx-switch-mount {
+  display: inline-grid;
+  justify-items: center;
+  gap: var(--ambx-grid);
 }
 
 .amb-switch:hover .amb-switch-pill {
@@ -558,11 +782,11 @@
   border-radius: calc(var(--ambx-radius-md) + var(--ambx-grid-half));
 }
 
-.amb-select-horizontal {
+.ambx-bank-horizontal.amb-select {
   flex-direction: row;
 }
 
-.amb-select-option {
+.amb-select .ambx-key {
   /* The lamp colour. Same variable .amb-led and AmbientSwitch's led prop
      use, so one declaration lights every indicator on a panel; unset, it
      falls back to the scene's own accent rather than to a hardcoded hue.
@@ -597,20 +821,20 @@
    it a backdrop root — the one ancestor property that can cut the cap off
    from the lens it is supposed to be diffusing. Fading the lens instead
    leaves the diffuser doing its job on a lamp that simply cannot light. */
-.amb-select-option:disabled {
+.amb-select .ambx-key:disabled {
   cursor: not-allowed;
   box-shadow: none;          /* a dead lamp spills nothing onto the rail */
 }
 
-.amb-select-option:disabled .amb-select-lens {
+.amb-select .ambx-key:disabled .amb-select-lens {
   opacity: 0.4;
 }
 
-.amb-select-option:disabled .amb-select-cap {
+.amb-select .ambx-key:disabled .amb-select-cap {
   color: color-mix(in oklab, var(--amb-label), transparent 55%);
 }
 
-.amb-select-option:focus-visible {
+.amb-select .ambx-key:focus-visible {
   outline-offset: var(--ambx-grid-half);
 }
 
@@ -671,13 +895,13 @@
   --_glass-blur: calc(var(--ambx-select-size) * 0.18);
 }
 
-.amb-select-option:hover .amb-select-cap {
+.amb-select .ambx-key:hover .amb-select-cap {
   color: var(--amb-highlight-color);
 }
 
 /* Pressing sinks the key, and only sinks it — same rule the button follows:
    the drop shadow shortens and the chamfer bands narrow, nothing repaints. */
-.amb-select-option:active .amb-select-cap {
+.amb-select .ambx-key:active .amb-select-cap {
   --amb-thickness: 0.84;
 }
 
@@ -686,11 +910,11 @@
    which is what the referent measures — a flooded cap that still shows the
    lens's hot centre through it. Past ~55% the radial disappears into a
    flat swatch and the key stops reading as lit-from-behind. */
-.amb-select-on .amb-select-lens {
+.amb-select .ambx-key[data-on] .amb-select-lens {
   background-color: var(--_ambx-sel-color);
 }
 
-.amb-select-on .amb-select-cap {
+.amb-select .ambx-key[data-on] .amb-select-cap {
   background-color: color-mix(
     in srgb,
     var(--_ambx-sel-color) 35%,
@@ -711,29 +935,29 @@
    emissive bloom (ambient3d/derived/notes/glow.md: 6.2px = 2 sigma of the
    measured falloff), the same figure .amb-glow uses — only the colour is
    the lamp's rather than --amb-lume's. */
-.amb-select-on {
+.amb-select .ambx-key[data-on] {
   box-shadow: 0 0 6.2px var(--_ambx-sel-color);
 }
 
-.ambx-select {
+.ambx-bank {
   --ambx-select-size: calc(var(--ambx-grid) * 11);          /* 44px key */
   --ambx-select-pad: calc(var(--ambx-grid) * 2);
   --ambx-select-label-size: calc(var(--ambx-grid) * 3.5);
 }
 
-.ambx-select-sm {
+.ambx-bank-sm {
   --ambx-select-size: calc(var(--ambx-grid) * 8);           /* 32px */
   --ambx-select-pad: calc(var(--ambx-grid) * 1.5);
   --ambx-select-label-size: calc(var(--ambx-grid) * 2.5);
 }
 
-.ambx-select-md {
+.ambx-bank-md {
   --ambx-select-size: calc(var(--ambx-grid) * 11);          /* 44px */
   --ambx-select-pad: calc(var(--ambx-grid) * 2);
   --ambx-select-label-size: calc(var(--ambx-grid) * 3.5);
 }
 
-.ambx-select-lg {
+.ambx-bank-lg {
   --ambx-select-size: calc(var(--ambx-grid) * 14);          /* 56px */
   --ambx-select-pad: calc(var(--ambx-grid) * 2.5);
   --ambx-select-label-size: calc(var(--ambx-grid) * 4.5);
@@ -776,7 +1000,7 @@
   flex-direction: column;
 }
 
-.ambx-button {
+.ambx-press {
   line-height: var(--ambx-type-3-line);
   --ambx-button-size: calc(var(--ambx-grid) * 18);        /* 72px pill */
   --ambx-button-cap-pad-x: calc(var(--ambx-grid) * 2);    /* 8px */
@@ -784,21 +1008,21 @@
   --ambx-button-cap-inset: var(--ambx-grid);              /* 4px */
 }
 
-.ambx-button-sm {
+.ambx-press-sm {
   --ambx-button-size: calc(var(--ambx-grid) * 16);        /* 64px pill */
   --ambx-button-cap-pad-x: calc(var(--ambx-grid) * 1.5);  /* 6px */
   --ambx-button-cap-pad-y: var(--ambx-grid);              /* 4px */
   --ambx-button-cap-inset: calc(var(--ambx-grid) * 0.75); /* 3px */
 }
 
-.ambx-button-md {
+.ambx-press-md {
   --ambx-button-size: calc(var(--ambx-grid) * 18);        /* 72px pill */
   --ambx-button-cap-pad-x: calc(var(--ambx-grid) * 2);    /* 8px */
   --ambx-button-cap-pad-y: calc(var(--ambx-grid) * 1.5);  /* 6px */
   --ambx-button-cap-inset: var(--ambx-grid);              /* 4px */
 }
 
-.ambx-button-lg {
+.ambx-press-lg {
   --ambx-button-size: calc(var(--ambx-grid) * 20);        /* 80px pill */
   --ambx-button-cap-pad-x: calc(var(--ambx-grid) * 2.5);  /* 10px */
   --ambx-button-cap-pad-y: calc(var(--ambx-grid) * 2);    /* 8px */
@@ -808,43 +1032,23 @@
 /* Round/square shapes have their own min-width table per size (not a
    ratio of the pill's — the three shapes' true md values, 72/48/56,
    share no common factor), overridden via compound selectors so they
-   win regardless of source order relative to .ambx-button-sm/-md/-lg. */
-.amb-button-round.ambx-button-sm { --ambx-button-size: calc(var(--ambx-grid) * 10); }  /* 40px */
-.amb-button-round.ambx-button-md { --ambx-button-size: calc(var(--ambx-grid) * 12); }  /* 48px */
-.amb-button-round.ambx-button-lg { --ambx-button-size: calc(var(--ambx-grid) * 14); }  /* 56px */
+   win regardless of source order relative to .ambx-press-sm/-md/-lg. */
+.amb-button-round.ambx-press-sm { --ambx-button-size: calc(var(--ambx-grid) * 10); }  /* 40px */
+.amb-button-round.ambx-press-md { --ambx-button-size: calc(var(--ambx-grid) * 12); }  /* 48px */
+.amb-button-round.ambx-press-lg { --ambx-button-size: calc(var(--ambx-grid) * 14); }  /* 56px */
 
-.amb-button-square.ambx-button-sm { --ambx-button-size: calc(var(--ambx-grid) * 12); } /* 48px */
-.amb-button-square.ambx-button-md { --ambx-button-size: calc(var(--ambx-grid) * 14); } /* 56px */
-.amb-button-square.ambx-button-lg { --ambx-button-size: calc(var(--ambx-grid) * 16); } /* 64px */
+.amb-button-square.ambx-press-sm { --ambx-button-size: calc(var(--ambx-grid) * 12); } /* 48px */
+.amb-button-square.ambx-press-md { --ambx-button-size: calc(var(--ambx-grid) * 14); } /* 56px */
+.amb-button-square.ambx-press-lg { --ambx-button-size: calc(var(--ambx-grid) * 16); } /* 64px */
 
-.ambx-button-sm .amb-button-cap {
+.ambx-press-sm .amb-button-cap {
   font-size: var(--ambx-label-size);
   line-height: var(--ambx-label-line);
 }
 
-.ambx-button-lg .amb-button-cap {
+.ambx-press-lg .amb-button-cap {
   font-size: calc(var(--ambx-grid) * 3.5);
   line-height: calc(var(--ambx-grid) * 5);
-}
-
-.ambx-switch {
-  --ambx-switch-w: calc(var(--ambx-grid) * 12);
-  --ambx-switch-h: calc(var(--ambx-grid) * 6);
-}
-
-.ambx-switch-sm {
-  --ambx-switch-w: calc(var(--ambx-grid) * 10);
-  --ambx-switch-h: calc(var(--ambx-grid) * 5);
-}
-
-.ambx-switch-md {
-  --ambx-switch-w: calc(var(--ambx-grid) * 12);
-  --ambx-switch-h: calc(var(--ambx-grid) * 6);
-}
-
-.ambx-switch-lg {
-  --ambx-switch-w: calc(var(--ambx-grid) * 16);
-  --ambx-switch-h: calc(var(--ambx-grid) * 8);
 }
 
 .ambx-stack {
@@ -862,37 +1066,17 @@
   color: var(--amb-label);
 }
 
-.ambx-slider + .ambx-label {
+.ambx-travel-horizontal + .ambx-label {
   margin-top: var(--ambx-slider-label-clearance);
 }
 
-.ambx-fader + .ambx-label {
+.ambx-travel-vertical + .ambx-label {
   margin-top: var(--ambx-fader-label-clearance);
 }
 
-.ambx-knob + .ambx-label {
+.ambx-rotary + .ambx-label {
   margin-top: var(--ambx-knob-label-clearance);
 }
-
-/* Every knob metric is a fraction of --ambx-knob-size, so the three sizes
-   below only restate that one length. Marker radius and dot size are in
-   fractions of the DIAMETER: the ring sits at 1.33R and the dots measure
-   0.14R, both taken off the reference panels. */
-.ambx-knob {
-  position: relative;
-  display: grid;
-  place-items: center;
-  touch-action: none;
-  user-select: none;
-  --ambx-knob-size: calc(var(--ambx-grid) * 16);            /* 64px */
-  --ambx-knob-rect-width: calc(var(--ambx-knob-size) * 0.075);
-  --ambx-knob-marker-radius: calc(var(--ambx-knob-size) * 0.665);
-  --ambx-knob-marker-size: calc(var(--ambx-knob-size) * 0.07);
-}
-
-.ambx-knob-sm { --ambx-knob-size: calc(var(--ambx-grid) * 12); } /* 48px */
-.ambx-knob-md { --ambx-knob-size: calc(var(--ambx-grid) * 16); } /* 64px */
-.ambx-knob-lg { --ambx-knob-size: calc(var(--ambx-grid) * 20); } /* 80px */
 
 /* The full ring reaches past the knob's own box, so it has to be paid for in
    layout or it collides with whatever sits beside the knob. Geometrically only
@@ -917,63 +1101,3 @@
   );
 }
 
-.ambx-knob-rotation {
-  position: absolute;
-  inset: 0;
-}
-
-.ambx-fader {
-  touch-action: none;
-  user-select: none;
-  --ambx-fader-track: calc(var(--ambx-grid) * 2);    /* 8px */
-  --ambx-fader-thumb-w: calc(var(--ambx-grid) * 6);  /* 24px */
-  --ambx-fader-thumb-h: calc(var(--ambx-grid) * 9);  /* 36px */
-}
-
-.ambx-fader-sm {
-  --ambx-fader-track: calc(var(--ambx-grid) * 1.5);   /* 6px */
-  --ambx-fader-thumb-w: calc(var(--ambx-grid) * 5);   /* 20px */
-  --ambx-fader-thumb-h: calc(var(--ambx-grid) * 7.5); /* 30px */
-}
-
-.ambx-fader-md {
-  --ambx-fader-track: calc(var(--ambx-grid) * 2);    /* 8px */
-  --ambx-fader-thumb-w: calc(var(--ambx-grid) * 6);  /* 24px */
-  --ambx-fader-thumb-h: calc(var(--ambx-grid) * 9);  /* 36px */
-}
-
-.ambx-fader-lg {
-  --ambx-fader-track: calc(var(--ambx-grid) * 3);    /* 12px */
-  --ambx-fader-thumb-w: calc(var(--ambx-grid) * 8);  /* 32px */
-  --ambx-fader-thumb-h: calc(var(--ambx-grid) * 12); /* 48px */
-}
-
-.ambx-fader-thumb {
-  transform: translate(-50%, -50%);
-}
-
-.ambx-slider {
-  touch-action: none;
-  user-select: none;
-  --ambx-slider-track: calc(var(--ambx-grid) * 2);  /* 8px */
-  --ambx-slider-thumb: calc(var(--ambx-grid) * 6);  /* 24px */
-}
-
-.ambx-slider-sm {
-  --ambx-slider-track: calc(var(--ambx-grid) * 1.5); /* 6px */
-  --ambx-slider-thumb: calc(var(--ambx-grid) * 5);   /* 20px */
-}
-
-.ambx-slider-md {
-  --ambx-slider-track: calc(var(--ambx-grid) * 2); /* 8px */
-  --ambx-slider-thumb: calc(var(--ambx-grid) * 6); /* 24px */
-}
-
-.ambx-slider-lg {
-  --ambx-slider-track: calc(var(--ambx-grid) * 3); /* 12px */
-  --ambx-slider-thumb: calc(var(--ambx-grid) * 8); /* 32px */
-}
-
-.ambx-slider-thumb {
-  transform: translate(-50%, -50%);
-}

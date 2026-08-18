@@ -74,12 +74,29 @@ function App() {
     <AmbientProvider theme={{ lightX: -1, lightY: -1, keyLight: 0.9, fillLight: 0.7 }}>
       <AmbientPanel>
         <AmbientButton>Press</AmbientButton>
-        <AmbientKnob size={80} value={0.5} />
+        <AmbientKnob label="Gain" defaultValue={50} />
       </AmbientPanel>
     </AmbientProvider>
   );
 }
 ```
+
+Each component is a **preset**: a mechanism that owns the kinematics, the value
+and the ARIA, paired with a set of parts that own the paint. Reach past the
+preset and the mechanism will wear whatever you draw:
+
+```tsx
+<AmbientRotary
+  value={gain} onChange={setGain}
+  travel={240} input="drag"
+  parts={{ base: <KnobBody flush />, actuator: <MyPointer /> }}
+/>
+```
+
+The control publishes `--ambx-percent`, `--ambx-angle` and `--ambx-size` on its
+own root, so a part can be pure CSS. See
+[Composing controls](https://kikkupico.github.io/ambientcss/ambient-components/composing).
+
 
 ---
 
@@ -88,7 +105,7 @@ function App() {
 | Package | Path | Description |
 |---|---|---|
 | [`@ambientcss/css`](./packages/ambient-css) | [`packages/ambient-css`](./packages/ambient-css) | Pure CSS lighting framework — zero dependencies, works with any framework or plain HTML |
-| [`@ambientcss/components`](./packages/ambient-components) | [`packages/ambient-components`](./packages/ambient-components) | Tactile React component library (Provider, Panel, Button, Knob, Fader, Slider, Switch) |
+| [`@ambientcss/components`](./packages/ambient-components) | [`packages/ambient-components`](./packages/ambient-components) | Tactile React component library — composable control mechanisms plus grounded hardware presets |
 | [`ambient3d`](./ambient3d) | [`ambient3d`](./ambient3d) | Parametric Blender 3D component kit & ground-truth raytracing calibration engine |
 | `docs` | [`apps/docs`](./apps/docs) | Interactive Docusaurus documentation website & live code playground |
 | `demo` | [`apps/demo`](./apps/demo) | Hardware synthesizer & audio gear live demo application |

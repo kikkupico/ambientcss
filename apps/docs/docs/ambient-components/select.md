@@ -80,6 +80,14 @@ the names in `ariaLabel`.
 | `label` | `string` | — |
 
 `AmbientSelectOption` is `{ value, label?, ariaLabel?, color?, disabled? }`.
+
+`AmbientSelect` is a preset over `AmbientBank`, whose parts apply per key
+rather than once. To change what a key looks like, pass `keyParts` — the
+lens has to sit in `base` and the cap in `actuator`, because the cap's
+`backdrop-filter` is what diffuses the lamp behind it. A key's parts can
+read their own option with `useBankKey()` and their own lit state from
+`--ambx-percent` or `useControlState()`. See
+[Composing controls](./composing).
 `label` takes any node and falls back to `value`; `ariaLabel` supplies the
 accessible name and the hover title, and is needed whenever the legend is a
 glyph or an icon, which has no name of its own.

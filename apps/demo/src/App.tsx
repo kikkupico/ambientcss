@@ -569,10 +569,10 @@ export function App() {
               <AmbientFader value={fader1} min={0} max={100} onChange={setFader1} label="Fader" />
             </div>
             <div className="component-cell" data-visible={compView.visible}>
-              <AmbientSwitch checked={sw1} onCheckedChange={setSw1} led label="Switch" />
+              <AmbientSwitch value={sw1} onChange={setSw1} led label="Switch" />
             </div>
             <div className="component-cell" data-visible={compView.visible}>
-              <AmbientSwitch checked={sw2} onCheckedChange={setSw2} led="amber" label="Switch" />
+              <AmbientSwitch value={sw2} onChange={setSw2} led="amber" label="Switch" />
             </div>
             <div className="component-cell" data-visible={compView.visible}>
               <AmbientButton>Button</AmbientButton>

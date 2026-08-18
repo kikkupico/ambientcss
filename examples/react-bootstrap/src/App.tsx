@@ -21,7 +21,7 @@ export default function App() {
               <AmbientPanel style={{ padding: 24 }}>
                 <Stack gap={3} className="align-items-center">
                   <AmbientButton>Play</AmbientButton>
-                  <AmbientSwitch label="Arm" checked={armed} onCheckedChange={setArmed} led="#ef4444" />
+                  <AmbientSwitch label="Arm" value={armed} onChange={setArmed} led="#ef4444" />
                   <AmbientKnob label="Gain" value={gain} onChange={setGain} />
                 </Stack>
               </AmbientPanel>

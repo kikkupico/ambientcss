@@ -24,9 +24,9 @@ a pill sliding in a stadium recess cut into the panel. The track is an
 
 | Prop | Type | Default | Notes |
 | --- | --- | --- | --- |
-| `checked` | `boolean` | - | Controlled state. |
-| `defaultChecked` | `boolean` | `false` | Uncontrolled initial state. |
-| `onCheckedChange` | `(checked: boolean) => void` | - | Called when toggled. |
+| `value` | `boolean` | - | Controlled state. |
+| `defaultValue` | `boolean` | `false` | Uncontrolled initial state. |
+| `onChange` | `(on: boolean) => void` | - | Called when toggled. |
 | `size` | `"sm" \| "md" \| "lg"` | `"md"` | Switch size variant. |
 | `label` | `string` | - | Optional visible label. |
 | `led` | `boolean \| string` | - | `true` for default green, string for custom color. |
@@ -38,7 +38,7 @@ Also accepts standard button props (except native `onChange`).
 ### Uncontrolled
 
 ```tsx
-<AmbientSwitch label="Power" defaultChecked />
+<AmbientSwitch label="Power" defaultValue />
 ```
 
 ### Controlled
@@ -46,11 +46,11 @@ Also accepts standard button props (except native `onChange`).
 ```tsx
 const [enabled, setEnabled] = useState(false);
 
-<AmbientSwitch checked={enabled} onCheckedChange={setEnabled} label="Bypass" />
+<AmbientSwitch value={enabled} onChange={setEnabled} label="Bypass" />
 ```
 
 ### Custom LED color
 
 ```tsx
-<AmbientSwitch label="Record" led="#ef4444" defaultChecked />
+<AmbientSwitch label="Record" led="#ef4444" defaultValue />
 ```

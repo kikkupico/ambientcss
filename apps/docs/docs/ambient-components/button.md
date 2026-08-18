@@ -66,8 +66,35 @@ shape — `"md"` is the unchanged default. See the full per-shape table in
 | `shape` | `"pill" \| "round" \| "square"` | `"pill"` |
 | `material` | `"matte" \| "shiny" \| "glass"` | `"matte"` |
 | `size` | `"sm" \| "md" \| "lg"` | `"md"` |
+| `mode` | `"momentary" \| "toggle" \| "repeat"` | `"momentary"` |
+| `onPress` | `() => void` | - |
+| `value` | `boolean` | - |
+| `defaultValue` | `boolean` | `false` |
+| `onChange` | `(on: boolean) => void` | - |
+| `repeatDelay` | `number` | `400` |
+| `repeatInterval` | `number` | `60` |
 
 Also inherits all `ButtonHTMLAttributes<HTMLButtonElement>` props.
+
+## `mode`
+
+A transport key, a latching mute and an auto-repeating nudge button are the
+same object with three state machines and identical paint.
+
+- **`momentary`** (default) — fires `onPress` (and `onClick`) on activation.
+- **`toggle`** — stays pressed in. Drive it with `value`/`onChange` or leave
+  it uncontrolled with `defaultValue`; it reports `aria-pressed`.
+- **`repeat`** — fires `onPress` on the press, then repeatedly while held,
+  after `repeatDelay` and every `repeatInterval` thereafter.
+
+```tsx
+<AmbientButton mode="toggle" value={muted} onChange={setMuted}>Mute</AmbientButton>
+<AmbientButton mode="repeat" onPress={() => setBpm((n) => n + 1)}>+</AmbientButton>
+```
+
+`AmbientButton` is a preset over `AmbientPress`. For a key that looks like
+yours, give the mechanism your own cap — see
+[Composing controls](./composing).
 
 ## Examples
 

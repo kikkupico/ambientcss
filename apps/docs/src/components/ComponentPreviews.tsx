@@ -35,7 +35,7 @@ export function ProviderPreview() {
   return (
     <DemoShell>
       <div className="docs-demo-stack">
-        <AmbientSwitch label="Warm Theme" checked={warm} onCheckedChange={setWarm} />
+        <AmbientSwitch label="Warm Theme" value={warm} onChange={setWarm} />
         <AmbientProvider
           theme={
             warm
@@ -58,7 +58,7 @@ export function PanelPreview() {
     <DemoShell>
       <AmbientPanel className="docs-demo-panel">
         <AmbientButton>Power</AmbientButton>
-        <AmbientSwitch label="Bypass" defaultChecked />
+        <AmbientSwitch label="Bypass" defaultValue />
       </AmbientPanel>
     </DemoShell>
   );
@@ -86,8 +86,8 @@ export function SwitchPreview() {
   return (
     <DemoShell>
       <div className="docs-demo-row">
-        <AmbientSwitch label="Power" checked={enabled} onCheckedChange={setEnabled} led />
-        <AmbientSwitch label="Record" defaultChecked led="#ef4444" />
+        <AmbientSwitch label="Power" value={enabled} onChange={setEnabled} led />
+        <AmbientSwitch label="Record" defaultValue led="#ef4444" />
         <AmbientSwitch label="Small" size="sm" />
         <AmbientSwitch label="Large" size="lg" />
       </div>
@@ -265,7 +265,7 @@ export function CompositionPreview() {
     <DemoShell>
       <AmbientPanel className="docs-demo-panel docs-demo-panel-grid">
         <AmbientButton>Play</AmbientButton>
-        <AmbientSwitch label="Arm" checked={armed} onCheckedChange={setArmed} led="#ef4444" />
+        <AmbientSwitch label="Arm" value={armed} onChange={setArmed} led="#ef4444" />
         <AmbientKnob label="Gain" value={gain} onChange={setGain} />
         <AmbientFader label="Level" value={level} onChange={setLevel} />
       </AmbientPanel>
@@ -315,7 +315,7 @@ export function GroundedKnobDemo({
 
 export function GroundedSwitchDemo() {
   const [on, setOn] = useState(false);
-  return <AmbientSwitch aria-label="Switch" checked={on} onCheckedChange={setOn} />;
+  return <AmbientSwitch aria-label="Switch" value={on} onChange={setOn} />;
 }
 
 export function GroundedFaderDemo() {

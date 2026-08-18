@@ -16,7 +16,7 @@ export default function App() {
       <AmbientProvider theme={{ lightHue: 220, lightSaturation: 14, lumeHue: 190, keyLight: 0.9, fillLight: 0.72 }}>
         <AmbientPanel className="flex flex-col gap-4 p-6 items-center">
           <AmbientButton>Play</AmbientButton>
-          <AmbientSwitch label="Arm" checked={armed} onCheckedChange={setArmed} led="#ef4444" />
+          <AmbientSwitch label="Arm" value={armed} onChange={setArmed} led="#ef4444" />
           <AmbientKnob label="Gain" value={gain} onChange={setGain} />
         </AmbientPanel>
       </AmbientProvider>
