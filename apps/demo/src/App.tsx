@@ -372,7 +372,7 @@ export function App() {
             {([0, 1, 2, 3] as const).map((elev, i) => (
               <div className="elevation-item" key={elev}>
                 <div
-                  className={`elevation-circle ambient amb-surface-lighter amb-elevation-${elev}`}
+                  className={`elevation-circle ambient amb-surface amb-elevation-${elev}`}
                   data-visible={elevView.visible}
                   style={{ transitionDelay: `${i * 0.08}s` }}
                 />
@@ -381,7 +381,7 @@ export function App() {
             ))}
             <div className="elevation-item">
               <div
-                className="elevation-circle ambient amb-surface-lighter amb-bounce"
+                className="elevation-circle ambient amb-surface amb-bounce"
                 data-visible={elevView.visible}
                 style={{ transitionDelay: "0.32s" }}
               />
@@ -404,7 +404,7 @@ export function App() {
             ].map(({ t, label }, i) => (
               <div className="elevation-item" key={t}>
                 <div
-                  className={`elevation-circle ambient amb-surface-lighter amb-chamfer amb-thickness-${t}`}
+                  className={`elevation-circle ambient amb-surface amb-chamfer amb-thickness-${t}`}
                   data-visible={thickView.visible}
                   style={{ transitionDelay: `${i * 0.1}s` }}
                 />

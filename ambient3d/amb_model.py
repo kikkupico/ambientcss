@@ -112,18 +112,18 @@ SHEET_PROUD_MM = 0.02     # how far an embedded sheet sits above the ground
 SAGITTA_MM = 4.0          # dish/dome depth of the curved surface variants
                           # (deep enough that its shading dominates the
                           # residual plate-wide irradiance gradient)
-DARKER_ALBEDO = 0.31      # .amb-surface-darker plate (~58% of the default
-                          # lightness at the (0.9, 0.7) defaults) — grooves
-                          # and mid-tone circle fills compose with this
-DARKEST_ALBEDO = 0.06     # .amb-surface-darkest plate (~27% of the default
-                          # lightness at the (0.9, 0.7) defaults) — the
-                          # original .amb-surface-darker tone, kept for
-                          # spots that need the deepest contrast
-LIGHTER_ALBEDO = 0.91     # .amb-surface-lighter plate (~94% of the default
-                          # lightness at the (0.9, 0.7) defaults)
-LIGHTEST_ALBEDO = 0.95    # .amb-surface-lightest plate (~96% of the default
-                          # lightness at the (0.9, 0.7) defaults) — near the
-                          # albedo-1.0 physical ceiling above GROUND_ALBEDO
+# Reference plates spanning the albedo range, rendered so the exposure law
+# can be fit across materials rather than at one grey (measure/fit.py's
+# fit_surface uses all of them at once). The CSS no longer has a class per
+# plate: it takes --amb-albedo, and each of these is what you get by setting
+# it — or, as a multiple of GROUND_ALBEDO, by setting --amb-shade.
+DARKER_ALBEDO = 0.31      # mid-tone plate — grooves and mid-tone circle
+                          # fills compose with this (--amb-shade: 0.38)
+DARKEST_ALBEDO = 0.06     # the deepest contrast the rig carries
+                          # (--amb-shade: 0.07)
+LIGHTER_ALBEDO = 0.91     # (--amb-shade: 1.11)
+LIGHTEST_ALBEDO = 0.95    # near the albedo-1.0 physical ceiling above
+                          # GROUND_ALBEDO (--amb-shade: 1.16)
 
 # Defaults mirror the :root block of packages/ambient-css/src/ambient.css.
 AMB_DEFAULTS = {

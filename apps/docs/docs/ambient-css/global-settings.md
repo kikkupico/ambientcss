@@ -18,6 +18,69 @@ If terms like key light and fill light are new, read [Guide > Concept](/guide/co
 | `--amb-light-saturation` | Light saturation | `%` value |
 | `--amb-highlight-color` | Interactive highlight color | CSS color |
 | `--amb-lume-hue` | Emissive/trim hue | `0` to `360` |
+| `--amb-albedo` | Material colour of a surface | CSS color |
+| `--amb-shade` | Multiplier on that material's reflectance | `0` to ~`1.2` |
+
+## Material colour (`--amb-albedo`, `--amb-shade`)
+
+A surface in Ambient CSS is a **material under a light**, never a fixed
+colour. `--amb-albedo` is the material half: the colour the surface would
+show under full white illumination.
+
+```css
+.console {
+  --amb-albedo: #7a3b2e;   /* an oxide-red panel */
+}
+```
+
+Everything downstream follows from it. `amb-surface` paints
+albedo × exposure; `amb-groove` cuts a recess **in that same material**, so
+a groove in a red panel is red; the curved classes paint only the shading
+and ride the panel's colour; and the components package's knobs, keys and
+faces read the same lit tone. Turn the key light down and the panel darkens
+the way that red would; give the lamp a hue and the panel takes its cast.
+
+`--amb-shade` is the tone half — a plain multiplier on the same material:
+
+```css
+.console .well { --amb-shade: 0.38; }  /* a darker recess, same material */
+```
+
+Prefer `--amb-shade` for hierarchy inside a themed panel: unlike a second
+`--amb-albedo` it composes with whatever colour is inherited, so it keeps
+working when the theme changes. Both variables inherit normally.
+
+:::note Migrating from the surface variants
+
+`amb-surface-darker`, `-darkest`, `-lighter` and `-lightest` are gone. They
+were five hardcoded albedos of the one law this replaces; the equivalent is
+`--amb-shade` at `0.38`, `0.07`, `1.11` and `1.16` on a plain
+`amb-surface`.
+
+:::
+
+## Exposure (`--amb-lit`, `--amb-exposure`)
+
+Two derived read-only outputs, like `--amb-lume`:
+
+- `--amb-exposure` — the irradiance reaching a face-on surface, where `1` is
+  full white illumination: `0.6396 · key + 0.5496 · fill`. Proportional, with
+  no floor, because *irradiance* is what the intensities are linear in
+  (sRGB lightness is not). Lights off is black.
+- `--amb-lit` — the finished tone of a flat face: albedo × shade × exposure
+  multiplied out in linear light, then given the lamp's cast. Read it
+  anywhere you need a surface to match:
+
+```css
+.my-panel-edge { border-color: var(--amb-lit); }
+```
+
+The lamp's cast is a mix toward `--amb-light-hue` at
+`--amb-light-saturation`, with the tint's own saturation set to
+`100 − s` of the surface. The less chromatic the surface, the more
+completely it takes the lamp's colour: a grey lands exactly where a
+`hsl(hue, saturation, L)` surface always did, while a crimson panel under a
+cyan lamp washes toward grey rather than rotating to green.
 
 ## Emissive color (`--amb-lume`)
 
@@ -64,13 +127,15 @@ a color, and divide it to turn it into an overlay alpha over a known base
 ```css
 .my-dish {
   background: linear-gradient(
-    hsl(var(--amb-light-hue) var(--amb-light-saturation)
-        calc(90% - var(--amb-curve-delta) * 1%)) 0%,
-    hsl(var(--amb-light-hue) var(--amb-light-saturation)
-        calc(90% + var(--amb-curve-delta) * 1%)) 100%
+    hsl(from var(--amb-lit) h s calc(l - var(--amb-curve-delta))) 0%,
+    hsl(from var(--amb-lit) h s calc(l + var(--amb-curve-delta))) 100%
   );
 }
 ```
+
+(Relative colour syntax substitutes `l` as a **number**, which is why the
+delta carries no `%` of its own. Riding `--amb-lit` is what keeps a dish on
+the panel's own `--amb-albedo`.)
 
 Like `--amb-lume`, it is derived — read it, but **theme it through
 `--amb-curve-scale`** rather than by assigning to it:

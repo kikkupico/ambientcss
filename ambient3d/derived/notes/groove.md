@@ -1,11 +1,11 @@
 # groove — grounded fit
 
-Model: `floor L% = gk * Ik + gf * If + g0; recess = 4.5mm * thickness; wall shadow: reach = Ws * recess per light component, css_blur = Bs * recess, alpha = sa * (Ik - If) + sa0; far-wall bounce (white overlay): reach = Wb * recess + Wb0, css_blur = Bb * recess, alpha = ba * Ik + bf * If + b0, clamped to [0, 1]`
+Model: `floor srgb(L) = albedo * (gk * Ik + gf * If); recess = 4.5mm * thickness; wall shadow: reach = Ws * recess per light component, css_blur = Bs * recess, alpha = sa * (Ik - If) + sa0; far-wall bounce (white overlay): reach = Wb * recess + Wb0, css_blur = Bb * recess, alpha = ba * Ik + bf * If + b0, clamped to [0, 1]`
 
-- **gk_pct**: `30.15`
-- **gf_pct**: `23.15`
-- **g0_pct**: `47.57`
-- **r2_floor**: `0.9884`
+- **gk**: `0.6623`
+- **gf**: `0.5527`
+- **r2_floor**: `0.9891`
+- **max_resid_floor_pct**: `1.322`
 - **Ws_reach_per_mm**: `0.7969`
 - **Bs_css_blur_per_mm**: `0.5924`
 - **sa_alpha_per_contrast**: `0.238`

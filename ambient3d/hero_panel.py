@@ -174,7 +174,7 @@ def build_screen(spec, body, face_z):
     """A recess in the faceplate with a dark floor — the display cutout.
     Physically a groove (components/plate.py build_groove is its calibration
     referent) lined with the accent material, which is what the CSS peer
-    `.amb-groove.amb-surface-darkest` paints."""
+    `.amb-groove` with --amb-shade: 0.07 paints."""
     w, d = spec["size"]
     recess = am.thickness_mm(ap.amb(**spec.get("amb", {})))
     x, y = spec["x"], spec["y"]

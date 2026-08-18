@@ -161,11 +161,29 @@
      gradient lands on the lit edge, so the dish reorients itself with all
      eight .amb-light-* positions instead of assuming a light from above. */
   --_ambx-dish-angle: calc(atan2(var(--amb-light-y), var(--amb-light-x)) + 270deg);
-  /* Unitless twins of the grounded surface lightness and dish end delta
-     (percentage points), so they can divide into alphas. */
+  /* Unitless twins of the cap's own surface lightness and dish end delta
+     (percentage points), so they can divide into alphas.
+
+     The lightness is rebuilt here rather than read off --amb-lit because
+     it is needed as a NUMBER, and relative colour syntax only exposes `l`
+     inside a colour function. So: the grounded exposure law (albedo x
+     exposure) with the sRGB transfer applied by hand.
+
+     That tracks --amb-shade EXACTLY — a dished cap on a darkened panel
+     gets alphas scaled for the tone it actually sits at — but it has to
+     assume the reference reflectance for the CHROMATIC part, because an
+     --amb-albedo's luminance cannot be reached as a number. On a dark
+     coloured albedo the two halves then miss in opposite directions: the
+     black half divides by too large an l and under-shades, while the
+     white half divides by too small a (100 - l) and over-lifts, so the
+     dish reads as a bright sheen rather than a curve. Set luminance with
+     --amb-shade and hue with --amb-albedo and both halves stay exact;
+     that pairing is the documented way to colour a dished component. */
   --_ambx-dish-l: calc(
-    var(--amb-key-light-intensity) * 31.5 +
-      var(--amb-fill-light-intensity) * 26.4 + 43.6
+    100 * (
+      1.055 * pow(0.82 * var(--amb-shade) * var(--amb-exposure), 0.41667)
+        - 0.055
+    )
   );
   /* One curvature for all three cap silhouettes: a dish is a property of
      the tooling, not of how big or how round the key is. Tune it — for
@@ -298,25 +316,11 @@
 .amb-knob-face {
   position: absolute;
   inset: 0;
-  background-color: hsl(
-    var(--amb-light-hue)
-    var(--amb-light-saturation)
-    calc(
-      var(--amb-key-light-intensity) * 31.5% +
-        var(--amb-fill-light-intensity) * 26.4% + 43.6%
-    )
-  );
+  background-color: var(--amb-lit);
   background-image:
     radial-gradient(
       circle,
-      hsl(
-        var(--amb-light-hue)
-        var(--amb-light-saturation)
-        calc(
-          var(--amb-key-light-intensity) * 31.5% +
-            var(--amb-fill-light-intensity) * 26.4% + 43.6%
-        )
-      ) 0 60%,
+      var(--amb-lit) 0 60%,
       transparent 61%
     ),
     repeating-conic-gradient(
@@ -522,14 +526,7 @@
 .amb-switch:hover .amb-switch-pill {
   background-color: color-mix(
     in oklab,
-    hsl(
-      var(--amb-light-hue)
-      var(--amb-light-saturation)
-      calc(
-        var(--amb-key-light-intensity) * 31.5% +
-          var(--amb-fill-light-intensity) * 26.4% + 43.6%
-      )
-    ),
+    var(--amb-lit),
     var(--amb-highlight-color) 12%
   );
 }
@@ -591,14 +588,7 @@
   border-radius: var(--ambx-radius-md);
   /* The pocket floor the lens lies on: the grounded .amb-surface tone, so
      an unlit key reads as a lit white diffuser rather than as a hole. */
-  background-color: hsl(
-    var(--amb-light-hue)
-    var(--amb-light-saturation)
-    calc(
-      var(--amb-key-light-intensity) * 31.5% +
-        var(--amb-fill-light-intensity) * 26.4% + 43.6%
-    )
-  );
+  background-color: var(--amb-lit);
   transition: box-shadow 140ms ease;
 }
 
@@ -637,8 +627,11 @@
                                round lamp rather than an overflowing one */
   border-radius: 50%;
   /* Unlit, the lens is a tinted lens body, not an off pixel: it sits
-     between the floor's grounded tone and .amb-surface-darker's mid-tone
-     plate, and carries a trace of its own colour so an amber lamp reads
+     between the floor's lit tone and the same material at 0.38 of its
+     reflectance (the mid-tone plate the rig calls DARKER_ALBEDO, taken
+     off --amb-lit in LINEAR light so it darkens the panel's own colour
+     rather than replacing it with a grey), and carries a trace of its
+     own colour so an amber lamp reads
      faintly warm while dark — 6%, enough to tell an amber lamp from a
      cyan one up close and not enough to tint the key. Measured against
      the referent photo, whose unlit disc dips about 5% below the
@@ -647,22 +640,8 @@
     in oklab,
     color-mix(
       in oklab,
-      hsl(
-        var(--amb-light-hue)
-        var(--amb-light-saturation)
-        calc(
-          var(--amb-key-light-intensity) * 31.5% +
-            var(--amb-fill-light-intensity) * 26.4% + 43.6%
-        )
-      ) 45%,
-      hsl(
-        var(--amb-light-hue)
-        var(--amb-light-saturation)
-        calc(
-          var(--amb-key-light-intensity) * 21% +
-            var(--amb-fill-light-intensity) * 17.4% + 27.3%
-        )
-      )
+      var(--amb-lit) 45%,
+      color-mix(in srgb-linear, var(--amb-lit) 37.8%, black)
     ),
     var(--_ambx-sel-color) 6%
   );

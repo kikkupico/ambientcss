@@ -45,6 +45,28 @@
   --amb-fillet-width: 1;
   --amb-highlight-color: coral;
   --amb-lume-hue: 17;
+  /* MATERIAL COLOUR — the surface's own diffuse reflectance, i.e. the
+     colour it would show under full white illumination. Any CSS colour:
+     `--amb-albedo: crimson` gives a crimson panel that still darkens with
+     the key light, still takes the light's cast, and still shades in its
+     grooves and dishes, because every surface tone in this file is
+     albedo x exposure rather than a hardcoded lightness.
+
+     The default is the reference ground the whole rig is calibrated
+     against — a linear reflectance of 0.82, spelled in srgb-linear so it
+     IS the physical number (ambient3d/amb_model.GROUND_ALBEDO) rather
+     than a gamma-encoded stand-in for it. Under the default lights it
+     lands on the same ~90% lightness the old .amb-surface painted.
+
+     It inherits, so setting it on a panel colours everything inside. */
+  --amb-albedo: color(srgb-linear 0.82 0.82 0.82);
+  /* Shade: a plain multiplier on --amb-albedo's reflectance, for tones of
+     one material rather than a different one. Unlike --amb-albedo it
+     composes with whatever colour is inherited, which is what makes it
+     the right knob for a darker well or a lighter cap inside a themed
+     panel. The tones the removed .amb-surface-* variants painted, for
+     reference: darkest 0.07, darker 0.38, lighter 1.11, lightest 1.16. */
+  --amb-shade: 1;
   /* Depth of every curved face, as a multiple of the grounded curvature
      (see --amb-curve-delta below): the input knob, so it inherits like an
      ordinary variable and can be themed from :root or any subtree. 1 =
@@ -106,6 +128,62 @@
       (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
         * 3.16 + 3.78
     ) * var(--amb-curve-scale)
+  );
+
+  /* EXPOSURE — the irradiance reaching a face-on surface, in units where 1
+     is full white illumination. DERIVED output; theme it through the two
+     light intensities.
+
+     Grounded fit (ambient3d/derived/notes/surface.md): irradiance is what
+     is linear in the light intensities, so the law is proportional, with
+     no floor — lights off is black, not a mystery grey. The five separate
+     affine-in-LIGHTNESS fits this replaces were that same law seen through
+     sRGB gamma, one linearisation per albedo, which is why each needed its
+     own intercept. Refit as exposure, ONE two-parameter law reproduces all
+     54 measured plate frames across five albedos to within 0.03 points of
+     lightness (R^2 0.9999998, against 0.996 and ~1.1 points before).
+
+     The measured box is key 0.1-1.0 at fill 0.7 and key 0.9 at fill 0-0.7;
+     everything below that is extrapolation for both models, and this one
+     extrapolates to black where the affine fits extrapolated to a lit grey
+     under no lights. Dim themes therefore sit darker here than they did. */
+  --amb-exposure: calc(
+    var(--amb-key-light-intensity) * 0.6396 +
+      var(--amb-fill-light-intensity) * 0.5496
+  );
+
+  /* Reflected light before the lamp's own colour: albedo x exposure, done
+     per channel in LINEAR light, which is the only space the multiply is
+     physics in. Over-exposure is left to clip per channel — the physical
+     blow-out — rather than being clamped away. */
+  --_amb-diffuse: color(
+    from var(--amb-albedo) srgb-linear
+    calc(r * var(--amb-shade) * var(--amb-exposure))
+    calc(g * var(--amb-shade) * var(--amb-exposure))
+    calc(b * var(--amb-shade) * var(--amb-exposure))
+  );
+
+  /* LIT COLOUR — the finished tone of a flat face under the current light.
+     DERIVED output, like --amb-lume and --amb-label: read it (the surface,
+     groove, dish and every component tone in @ambientcss/components do),
+     and theme it through --amb-albedo, --amb-shade and the lights.
+
+     The lamp's cast is a mix toward its hue at --amb-light-saturation, and
+     the tint's own saturation is (100 - s): the LESS chromatic the surface,
+     the more completely it takes the lamp's colour. On a grey that is the
+     HSL identity hsl(H,S,L) = mix(grey(L), hsl(H,100%,L), S), so neutral
+     surfaces land exactly where they always did — but a crimson panel
+     under a cyan lamp washes toward grey instead of rotating to green,
+     which is what a coloured lamp does to a colour it cannot light.
+
+     `s` and `l` are substituted as NUMBERS in relative colour syntax, so
+     it is calc(100 - s), not calc(100% - s) — the percentage spelling is
+     invalid and takes the whole declaration with it. */
+  --amb-lit: color-mix(
+    in srgb,
+    var(--_amb-diffuse),
+    hsl(from var(--_amb-diffuse) var(--amb-light-hue) calc(100 - s) l)
+      var(--amb-light-saturation)
   );
 }
 
@@ -348,80 +426,13 @@
    -------------------------------------------------------------------------- */
 
 .amb-surface {
-  /* Grounded fit (ambient3d/derived/notes/surface.md): both lights brighten
-     a surface, so lightness is affine in key AND fill intensity — the fill
-     floors it and sRGB gamma compresses the key slope. R^2 0.996 over the
-     key+fill sweeps; reproduces the old 90% at the (0.9, 0.7) defaults. */
-  background-color: hsl(
-    var(--amb-light-hue)
-    var(--amb-light-saturation)
-    calc(
-      var(--amb-key-light-intensity) * 31.5% +
-        var(--amb-fill-light-intensity) * 26.4% + 43.6%
-    )
-  );
-}
-
-.amb-surface-darker {
-  /* Grounded fit (ambient3d/derived/notes/darker.md): a mid-tone plate
-     (albedo 0.31) under the same lights — affine in both intensities
-     like .amb-surface, R^2 0.996; reproduces 58% at the (0.9, 0.7)
-     defaults. */
-  background-color: hsl(
-    var(--amb-light-hue)
-    var(--amb-light-saturation)
-    calc(
-      var(--amb-key-light-intensity) * 21% +
-        var(--amb-fill-light-intensity) * 17.4% + 27.3%
-    )
-  );
-}
-
-.amb-surface-darkest {
-  /* Grounded fit (ambient3d/derived/notes/darkest.md): a dark plate
-     (albedo 0.06 — the original .amb-surface-darker tone) under the same
-     lights — affine in both intensities like .amb-surface, R^2 0.996;
-     reproduces 27% at the (0.9, 0.7) defaults. */
-  background-color: hsl(
-    var(--amb-light-hue)
-    var(--amb-light-saturation)
-    calc(
-      var(--amb-key-light-intensity) * 10.6% +
-        var(--amb-fill-light-intensity) * 8.8% + 11%
-    )
-  );
-}
-
-.amb-surface-lighter {
-  /* Grounded fit (ambient3d/derived/notes/lighter.md): a near-white plate
-     (albedo 0.91, above the .amb-surface reference ground's 0.82) under
-     the same lights — affine in both intensities like .amb-surface,
-     R^2 0.996; reproduces 94% at the (0.9, 0.7) defaults. Headroom above
-     .amb-surface is physically narrow (a Lambertian plate caps near
-     albedo 1.0), so this and .amb-surface-lightest sit close together. */
-  background-color: hsl(
-    var(--amb-light-hue)
-    var(--amb-light-saturation)
-    calc(
-      var(--amb-key-light-intensity) * 32.8% +
-        var(--amb-fill-light-intensity) * 27.2% + 45.8%
-    )
-  );
-}
-
-.amb-surface-lightest {
-  /* Grounded fit (ambient3d/derived/notes/lightest.md): a near-white plate
-     (albedo 0.95) under the same lights — affine in both intensities
-     like .amb-surface, R^2 0.996; reproduces 96% at the (0.9, 0.7)
-     defaults. */
-  background-color: hsl(
-    var(--amb-light-hue)
-    var(--amb-light-saturation)
-    calc(
-      var(--amb-key-light-intensity) * 33.4% +
-        var(--amb-fill-light-intensity) * 27.7% + 46.7%
-    )
-  );
+  /* One line, because every surface tone in this file is now albedo x
+     exposure (see --amb-lit above). The .amb-surface-lighter, -lightest,
+     -darker and -darkest variants this replaces were five hardcoded
+     lightness fits of the same law at five fixed albedos; set --amb-albedo
+     for a different material, or --amb-shade for a different tone of the
+     one the panel already carries. */
+  background-color: var(--amb-lit);
 }
 
 /* --------------------------------------------------------------------------
@@ -442,15 +453,31 @@
      light component, alpha affine in contrast, R^2 0.95); and the far
      walls catch the key and bounce it onto the floor beside them as a
      soft brightening — the physical origin of the classic inset
-     highlight. The interior composes with --amb-lume or
-     .amb-surface-darker for track styling. */
-  background-color: hsl(
-    var(--amb-light-hue)
-    var(--amb-light-saturation)
-    calc(
-      var(--amb-key-light-intensity) * 30.2% +
-        var(--amb-fill-light-intensity) * 23.2% + 47.6%
-    )
+     highlight. The interior composes with --amb-lume, or with an
+     --amb-shade below 1, for track styling.
+
+     The floor is the SAME material as the ground around it — same
+     --amb-albedo, same --amb-shade — under its own exposure, refit from
+     those 15 frames the way .amb-surface was: the walls bounce the key
+     back in, so a recess floor takes 3.5% more key and 0.6% more fill
+     than the open ground (within 1.3 points of lightness of the affine
+     floor formula it replaces). Riding --amb-albedo is the whole point —
+     a groove cut into a crimson panel is crimson, not grey. */
+  --_amb-groove-exposure: calc(
+    var(--amb-key-light-intensity) * 0.6623 +
+      var(--amb-fill-light-intensity) * 0.5527
+  );
+  --_amb-groove-diffuse: color(
+    from var(--amb-albedo) srgb-linear
+    calc(r * var(--amb-shade) * var(--_amb-groove-exposure))
+    calc(g * var(--amb-shade) * var(--_amb-groove-exposure))
+    calc(b * var(--amb-shade) * var(--_amb-groove-exposure))
+  );
+  background-color: color-mix(
+    in srgb,
+    var(--_amb-groove-diffuse),
+    hsl(from var(--_amb-groove-diffuse) var(--amb-light-hue) calc(100 - s) l)
+      var(--amb-light-saturation)
   );
   box-shadow:
     inset calc(var(--amb-light-x) * var(--amb-thickness) * -3.6px)
@@ -580,54 +607,46 @@
    (declared per element above, affine in light contrast — a dish shades even
    at Ik = If), with the 35/65% stops at 0.33 of it. R^2 0.94 over the
    light/intensity sweeps. Each class supplies its own axis and sign; the
-   magnitude is shared, so the three curves can never drift apart. */
+   magnitude is shared, so the three curves can never drift apart.
+
+   The delta lands on `l` inside hsl(from ...), where the channel keywords
+   are NUMBERS — which is exactly why --amb-curve-delta is documented as
+   unitless points of lightness and carries no % of its own. */
 
 .amb-surface-concave {
   --_concave-y: max(-1, min(var(--amb-light-y), 1));
-  --_surface-base: calc(
-    var(--amb-key-light-intensity) * 31.5% +
-      var(--amb-fill-light-intensity) * 26.4% + 43.6%
-  );
-  --_concave-delta: calc(var(--_concave-y) * var(--amb-curve-delta) * 1%);
+  --_concave-delta: calc(var(--_concave-y) * var(--amb-curve-delta));
   background: linear-gradient(
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--_surface-base) + var(--_concave-delta))) 0%,
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--_surface-base) + var(--_concave-delta) * 0.33)) 35%,
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) var(--_surface-base)) 50%,
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--_surface-base) - var(--_concave-delta) * 0.33)) 65%,
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--_surface-base) - var(--_concave-delta))) 100%
+    hsl(from var(--amb-lit) h s calc(l + var(--_concave-delta))) 0%,
+    hsl(from var(--amb-lit) h s calc(l + var(--_concave-delta) * 0.33)) 35%,
+    hsl(from var(--amb-lit) h s l) 50%,
+    hsl(from var(--amb-lit) h s calc(l - var(--_concave-delta) * 0.33)) 65%,
+    hsl(from var(--amb-lit) h s calc(l - var(--_concave-delta))) 100%
   );
 }
 
 .amb-surface-concave-h {
   --_concave-h-x: max(-1, min(var(--amb-light-x), 1));
-  --_surface-base: calc(
-    var(--amb-key-light-intensity) * 31.5% +
-      var(--amb-fill-light-intensity) * 26.4% + 43.6%
-  );
-  --_concave-h-delta: calc(var(--_concave-h-x) * var(--amb-curve-delta) * 1%);
+  --_concave-h-delta: calc(var(--_concave-h-x) * var(--amb-curve-delta));
   background: linear-gradient(
     to right,
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--_surface-base) + var(--_concave-h-delta))) 0%,
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--_surface-base) + var(--_concave-h-delta) * 0.33)) 35%,
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) var(--_surface-base)) 50%,
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--_surface-base) - var(--_concave-h-delta) * 0.33)) 65%,
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--_surface-base) - var(--_concave-h-delta))) 100%
+    hsl(from var(--amb-lit) h s calc(l + var(--_concave-h-delta))) 0%,
+    hsl(from var(--amb-lit) h s calc(l + var(--_concave-h-delta) * 0.33)) 35%,
+    hsl(from var(--amb-lit) h s l) 50%,
+    hsl(from var(--amb-lit) h s calc(l - var(--_concave-h-delta) * 0.33)) 65%,
+    hsl(from var(--amb-lit) h s calc(l - var(--_concave-h-delta))) 100%
   );
 }
 
 .amb-surface-convex {
   --_convex-y: max(-1, min(var(--amb-light-y), 1));
-  --_surface-base: calc(
-    var(--amb-key-light-intensity) * 31.5% +
-      var(--amb-fill-light-intensity) * 26.4% + 43.6%
-  );
-  --_convex-delta: calc(var(--_convex-y) * var(--amb-curve-delta) * 1%);
+  --_convex-delta: calc(var(--_convex-y) * var(--amb-curve-delta));
   background: linear-gradient(
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--_surface-base) - var(--_convex-delta))) 0%,
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--_surface-base) - var(--_convex-delta) * 0.33)) 35%,
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) var(--_surface-base)) 50%,
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--_surface-base) + var(--_convex-delta) * 0.33)) 65%,
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) calc(var(--_surface-base) + var(--_convex-delta))) 100%
+    hsl(from var(--amb-lit) h s calc(l - var(--_convex-delta))) 0%,
+    hsl(from var(--amb-lit) h s calc(l - var(--_convex-delta) * 0.33)) 35%,
+    hsl(from var(--amb-lit) h s l) 50%,
+    hsl(from var(--amb-lit) h s calc(l + var(--_convex-delta) * 0.33)) 65%,
+    hsl(from var(--amb-lit) h s calc(l + var(--_convex-delta))) 100%
   );
 }
 

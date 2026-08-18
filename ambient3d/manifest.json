@@ -233,12 +233,13 @@
       },
       "css": {
         "classes": [
-          "amb-surface-lighter"
+          "amb-surface"
         ],
         "size": [
           80,
           80
-        ]
+        ],
+        "style": "--amb-albedo: color(srgb-linear 0.91 0.91 0.91);"
       },
       "measure": [
         "surface_lightness"
@@ -257,12 +258,13 @@
       },
       "css": {
         "classes": [
-          "amb-surface-lightest"
+          "amb-surface"
         ],
         "size": [
           80,
           80
-        ]
+        ],
+        "style": "--amb-albedo: color(srgb-linear 0.95 0.95 0.95);"
       },
       "measure": [
         "surface_lightness"
@@ -281,12 +283,13 @@
       },
       "css": {
         "classes": [
-          "amb-surface-darker"
+          "amb-surface"
         ],
         "size": [
           80,
           80
-        ]
+        ],
+        "style": "--amb-albedo: color(srgb-linear 0.31 0.31 0.31);"
       },
       "measure": [
         "surface_lightness"
@@ -305,12 +308,13 @@
       },
       "css": {
         "classes": [
-          "amb-surface-darkest"
+          "amb-surface"
         ],
         "size": [
           80,
           80
-        ]
+        ],
+        "style": "--amb-albedo: color(srgb-linear 0.06 0.06 0.06);"
       },
       "measure": [
         "surface_lightness"
@@ -1313,12 +1317,13 @@
       },
       "css": {
         "classes": [
-          "amb-surface-lighter"
+          "amb-surface"
         ],
         "size": [
           80,
           80
-        ]
+        ],
+        "style": "--amb-albedo: color(srgb-linear 0.91 0.91 0.91);"
       },
       "measure": [
         "surface_lightness"
@@ -1355,12 +1360,13 @@
       },
       "css": {
         "classes": [
-          "amb-surface-lightest"
+          "amb-surface"
         ],
         "size": [
           80,
           80
-        ]
+        ],
+        "style": "--amb-albedo: color(srgb-linear 0.95 0.95 0.95);"
       },
       "measure": [
         "surface_lightness"
@@ -1397,12 +1403,13 @@
       },
       "css": {
         "classes": [
-          "amb-surface-darker"
+          "amb-surface"
         ],
         "size": [
           80,
           80
-        ]
+        ],
+        "style": "--amb-albedo: color(srgb-linear 0.31 0.31 0.31);"
       },
       "measure": [
         "surface_lightness"
@@ -1439,12 +1446,13 @@
       },
       "css": {
         "classes": [
-          "amb-surface-darkest"
+          "amb-surface"
         ],
         "size": [
           80,
           80
-        ]
+        ],
+        "style": "--amb-albedo: color(srgb-linear 0.06 0.06 0.06);"
       },
       "measure": [
         "surface_lightness"

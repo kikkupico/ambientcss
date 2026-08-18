@@ -16,6 +16,18 @@ The default surface is flat. Use `amb-surface` for standard panels and cards.
 <div class="ambient amb-surface amb-elevation-1">Flat Surface</div>
 ```
 
+There is one flat-surface class, not a ladder of tones: the colour comes from
+`--amb-albedo` (any CSS colour) and `--amb-shade` (a multiplier on its
+reflectance), and the class lights whatever it finds.
+
+```html
+<div class="ambient amb-surface" style="--amb-albedo: #7a3b2e">Oxide panel</div>
+<div class="ambient amb-surface" style="--amb-shade: 0.38">Darker plate</div>
+```
+
+Both inherit, so setting them on a container themes everything inside it.
+See [Global Settings](./global-settings.md#material-colour---amb-albedo---amb-shade).
+
 ### Concave Surfaces
 
 Use `amb-surface-concave` for inset areas like screens, meters, or depressed buttons.

@@ -32,33 +32,67 @@ def r2(y, pred):
     return float(1 - ss_res / ss_tot) if ss_tot > 0 else 1.0
 
 
+def srgb_to_linear(c):
+    """sRGB transfer, inverted. The rendered lightness the extractors report
+    is gamma-ENCODED; the light that made it adds up linearly. Every fit that
+    wants a physical coefficient has to cross this line first."""
+    c = np.asarray(c, dtype=float)
+    return np.where(c <= 0.04045, c / 12.92, ((c + 0.055) / 1.055) ** 2.4)
+
+
+def linear_to_srgb(v):
+    v = np.clip(np.asarray(v, dtype=float), 0.0, None)
+    return np.where(v <= 0.0031308, v * 12.92, 1.055 * v ** (1 / 2.4) - 0.055)
+
+
 # ---------------------------------------------------------------- surface ---
 
 def fit_surface(m):
-    """Model (shape of .amb-surface): L% = k * Ik + f * If + floor.
-    Physically both lights brighten the surface; the old formula's Ik-only
-    proportionality is the special case f = floor = 0. Fit jointly over the
-    key-intensity and fill-intensity sweeps."""
+    """Model (shape of .amb-surface / --amb-exposure): a surface reflects
+    albedo x exposure, and EXPOSURE is what the light intensities are linear
+    in — irradiance adds up, sRGB lightness does not.
+
+    This supersedes five separate affine-in-lightness fits (surface plus the
+    lighter/lightest/darker/darkest plates). Those were one linearisation of
+    this law per albedo, each needing its own floor to absorb the gamma
+    curve; fit in linear light instead, ONE two-parameter law covers every
+    plate in the rig. Zero intercept is a result, not an assumption — the
+    free intercept comes back at 2e-5, i.e. the studio world contributes
+    nothing measurable once both lamps are off.
+
+    Fit over every matte flat-plate frame regardless of albedo."""
+    import amb_model
+
     pts = []
     for rel, entry in m.items():
-        if rel.startswith("sweeps/surface/"):
-            a = entry["amb"]
-            pts.append((a["key_light_intensity"], a["fill_light_intensity"],
-                        entry["metrics"]["surface_lightness"]["srgb_pct"]))
+        ml = entry["metrics"].get("surface_lightness")
+        if not ml:
+            continue
+        a = entry["amb"]
+        if a["mat"] != "matte" or a["surface"] != "flat" or a["emit"]:
+            continue
+        albedo = a["albedo"] or amb_model.GROUND_ALBEDO
+        pts.append((a["key_light_intensity"], a["fill_light_intensity"],
+                    albedo, ml["srgb_pct"]))
     pts.sort()
-    A = np.array([[p[0], p[1], 1.0] for p in pts])
-    L = np.array([p[2] for p in pts])
-    (k, f, floor), *_ = np.linalg.lstsq(A, L, rcond=None)
-    pred = A @ [k, f, floor]
+    A = np.array([[p[0], p[1]] for p in pts])
+    albedo = np.array([p[2] for p in pts])
+    L = np.array([p[3] for p in pts])
+    # exposure implied by each frame: linear reflected light over albedo
+    E = srgb_to_linear(L / 100.0) / albedo
+    (ek, ef), *_ = np.linalg.lstsq(A, E, rcond=None)
+    pred = linear_to_srgb(A @ [ek, ef] * albedo) * 100.0
+    (_, _, e0), *_ = np.linalg.lstsq(np.c_[A, np.ones(len(A))], E, rcond=None)
     return {
-        "model": "L% = k * key_intensity + f * fill_intensity + floor",
-        "k_pct": round(float(k), 2),
-        "f_pct": round(float(f), 2),
-        "floor_pct": round(float(floor), 2),
-        "r2": round(r2(L, pred), 5),
-        "max_resid_pct": round(float(np.abs(L - pred).max()), 3),
-        "samples": [[float(a), float(b), round(float(c), 2)]
-                    for a, b, c in pts],
+        "model": ("srgb(L) = albedo * exposure; "
+                  "exposure = ek * key_intensity + ef * fill_intensity"),
+        "ek": round(float(ek), 4),
+        "ef": round(float(ef), 4),
+        "free_intercept": round(float(e0), 6),
+        "r2": round(r2(L, pred), 7),
+        "max_resid_pct": round(float(np.abs(L - pred).max()), 4),
+        "n_frames": len(pts),
+        "albedos": sorted(set(round(float(x), 3) for x in albedo)),
     }
 
 
@@ -217,45 +251,6 @@ def fit_curved(m):
         "r2_end": round(r2(ey, eX @ [K, K0, G]), 4),
         "n_samples": len(ends),
     }
-
-
-def _fit_tinted(m, sweep_prefix, calib_name):
-    """Same affine surface model as .amb-surface, fit on a lighter/darker
-    plate (different albedo, same rig)."""
-    pts = []
-    for rel, entry in m.items():
-        if rel.startswith(sweep_prefix) or rel == calib_name:
-            a = entry["amb"]
-            pts.append((a["key_light_intensity"], a["fill_light_intensity"],
-                        entry["metrics"]["surface_lightness"]["srgb_pct"]))
-    A = np.array([[p[0], p[1], 1.0] for p in pts])
-    L = np.array([p[2] for p in pts])
-    (k, f, floor), *_ = np.linalg.lstsq(A, L, rcond=None)
-    pred = A @ [k, f, floor]
-    return {
-        "model": "L% = k * key_intensity + f * fill_intensity + floor",
-        "k_pct": round(float(k), 2),
-        "f_pct": round(float(f), 2),
-        "floor_pct": round(float(floor), 2),
-        "r2": round(r2(L, pred), 5),
-        "max_resid_pct": round(float(np.abs(L - pred).max()), 3),
-    }
-
-
-def fit_darker(m):
-    return _fit_tinted(m, "sweeps/darker/", "calib/surface_darker_default.png")
-
-
-def fit_darkest(m):
-    return _fit_tinted(m, "sweeps/darkest/", "calib/surface_darkest_default.png")
-
-
-def fit_lighter(m):
-    return _fit_tinted(m, "sweeps/lighter/", "calib/surface_lighter_default.png")
-
-
-def fit_lightest(m):
-    return _fit_tinted(m, "sweeps/lightest/", "calib/surface_lightest_default.png")
 
 
 # -------------------------------------------------------------- elevation ---
@@ -435,9 +430,15 @@ def fit_groove(m):
                 bn_reach.append((recess, d["hm_mm"]))
                 bn_sigma.append((recess, d["sigma_mm"]))
 
-    A = np.array([[p[0], p[1], 1.0] for p in floor_rows])
+    # Floor tone: the same albedo x exposure law as .amb-surface, so a
+    # groove rides --amb-albedo instead of painting an absolute grey. Its
+    # own exposure runs slightly hot — the recess walls bounce the key back
+    # onto the floor.
+    A = np.array([[p[0], p[1]] for p in floor_rows])
     L = np.array([p[2] for p in floor_rows])
-    (gk, gf, g0), *_ = np.linalg.lstsq(A, L, rcond=None)
+    Eg = srgb_to_linear(L / 100.0) / amb_model.GROUND_ALBEDO
+    (gk, gf), *_ = np.linalg.lstsq(A, Eg, rcond=None)
+    floor_pred = linear_to_srgb(A @ [gk, gf] * amb_model.GROUND_ALBEDO) * 100.0
 
     def line1(pairs):
         x = np.array([p[0] for p in pairs]); y = np.array([p[1] for p in pairs])
@@ -455,16 +456,17 @@ def fit_groove(m):
     (ba, bf, b0), *_ = np.linalg.lstsq(bX, by, rcond=None)
     br, br0, _ = line1(bn_reach)
     return {
-        "model": ("floor L% = gk * Ik + gf * If + g0; recess = 4.5mm * "
+        "model": ("floor srgb(L) = albedo * (gk * Ik + gf * If); "
+                  "recess = 4.5mm * "
                   "thickness; wall shadow: reach = Ws * recess per light "
                   "component, css_blur = Bs * recess, alpha = "
                   "sa * (Ik - If) + sa0; far-wall bounce (white overlay): "
                   "reach = Wb * recess + Wb0, css_blur = Bb * recess, "
                   "alpha = ba * Ik + bf * If + b0, clamped to [0, 1]"),
-        "gk_pct": round(float(gk), 2),
-        "gf_pct": round(float(gf), 2),
-        "g0_pct": round(float(g0), 2),
-        "r2_floor": round(r2(L, A @ [gk, gf, g0]), 4),
+        "gk": round(float(gk), 4),
+        "gf": round(float(gf), 4),
+        "r2_floor": round(r2(L, floor_pred), 4),
+        "max_resid_floor_pct": round(float(np.abs(L - floor_pred).max()), 3),
         "Ws_reach_per_mm": round(slope(sh_reach), 4),
         "Bs_css_blur_per_mm": round(2 * float(np.mean(
             [s[1] / s[0] for s in sh_sigma])), 4),
@@ -571,9 +573,7 @@ def fit_glow(m):
 
 FITTERS = {"surface": fit_surface, "chamfer": fit_chamfer,
            "fillet": fit_fillet, "shadow": fit_shadow,
-           "curved": fit_curved, "darker": fit_darker,
-           "darkest": fit_darkest, "lighter": fit_lighter,
-           "lightest": fit_lightest,
+           "curved": fit_curved,
            "shiny": fit_shiny, "glow": fit_glow,
            "groove": fit_groove}
 

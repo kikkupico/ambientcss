@@ -22,8 +22,13 @@ in the repository.
 
 ## Surface
 
-`.amb-surface` — lightness is affine in *both* light intensities: the fill
-floors it, and sRGB gamma compresses the key slope.
+`.amb-surface` — a surface reflects **albedo × exposure**, and exposure is
+what the two light intensities are linear in: irradiance adds up, sRGB
+lightness does not. Fit in linear light, one two-parameter law
+(`0.6396·key + 0.5496·fill`, no intercept — lights off is black) reproduces
+every measured plate in the rig, at every albedo, to within 0.03 points of
+lightness. That is why there is one surface class and a `--amb-albedo`
+variable rather than a class per tone.
 
 <RenderComparison slug="surface" classes="amb-surface" />
 
@@ -67,8 +72,9 @@ metrics gate the shape.
 ## Groove
 
 `.amb-groove` — negative space: a recessed slot whose depth reuses the
-thickness vocabulary. The floor stays surprisingly bright (the studio's
-overhead fill reaches in, and the walls bounce light back); the lit-side
+thickness vocabulary. The floor is the same material as the ground around
+it under its own exposure, and that exposure runs slightly *hot* (the
+studio's overhead fill reaches in, and the walls bounce light back); the lit-side
 wall casts a crisp shadow band onto the floor, and the far wall catches
 the key and bounces it back as a soft brightening — the physical origin
 of the classic inset highlight. Component tracks compose this with the
@@ -78,26 +84,47 @@ lume material.
 
 ## Curved surfaces
 
-Cylindrical dishes and domes: the gradient stops ride the grounded surface
-base, with the end-stop delta affine in light contrast.
+Cylindrical dishes and domes: the gradient stops ride the lit surface
+tone — so a dish takes the panel's own `--amb-albedo` and only the shading
+is painted — with the end-stop delta affine in light contrast.
 
 <RenderComparison slug="surface-concave" classes="amb-surface-concave" />
 <RenderComparison slug="surface-concave-h" classes="amb-surface-concave-h" />
 <RenderComparison slug="surface-convex" classes="amb-surface-convex" />
 
-## Darker surfaces
+## Other materials
 
-<RenderComparison slug="surface-darker" classes="amb-surface-darker" />
-<RenderComparison slug="surface-darkest" classes="amb-surface-darkest" />
+There is no class per tone. A plate of a different reflectance is the same
+`.amb-surface` with a different `--amb-albedo` — and these four frames are
+what makes that claim checkable: the rig rendered plates at five albedos,
+and one two-parameter exposure law reproduces all 54 of those frames to
+within 0.03 points of lightness. The CSS below is the same law, so the live
+stage and the render are computing the same thing from the same number.
 
-## Lighter surfaces
+Headroom above the reference ground is physically narrow — a Lambertian
+plate caps out near albedo 1.0 — so the two lighter plates sit close
+together compared to the darker ladder.
 
-Headroom above `.amb-surface` is physically narrow — a Lambertian plate
-caps out near albedo 1.0 — so these sit close together compared to the
-darker ladder.
-
-<RenderComparison slug="surface-lighter" classes="amb-surface-lighter" />
-<RenderComparison slug="surface-lightest" classes="amb-surface-lightest" />
+<RenderComparison
+  slug="surface-darker"
+  classes="amb-surface"
+  subjectStyle={{ ["--amb-albedo"]: "color(srgb-linear 0.31 0.31 0.31)" }}
+/>
+<RenderComparison
+  slug="surface-darkest"
+  classes="amb-surface"
+  subjectStyle={{ ["--amb-albedo"]: "color(srgb-linear 0.06 0.06 0.06)" }}
+/>
+<RenderComparison
+  slug="surface-lighter"
+  classes="amb-surface"
+  subjectStyle={{ ["--amb-albedo"]: "color(srgb-linear 0.91 0.91 0.91)" }}
+/>
+<RenderComparison
+  slug="surface-lightest"
+  classes="amb-surface"
+  subjectStyle={{ ["--amb-albedo"]: "color(srgb-linear 0.95 0.95 0.95)" }}
+/>
 
 ## Shiny
 

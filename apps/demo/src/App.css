@@ -239,6 +239,9 @@ body {
 }
 
 .elevation-circle {
+  /* A shade above the page ground, so the risers read as their own
+     material against it (this was .amb-surface-lighter). */
+  --amb-shade: 1.11;
   width: clamp(72px, 12vw, 110px);
   height: clamp(72px, 12vw, 110px);
   border-radius: 50%;
@@ -849,18 +852,16 @@ body {
 .groove-lume { background-color: var(--amb-lume); }
 
 /* .amb-groove's own floor sits within a hair of the open ground (see its
-   comment in ambient.css); pairing with .amb-surface-darker's formula
-   here gives the well/inset recesses a floor that reads as visibly
-   deeper material, not just a shadow band on the same page color. */
+   comment in ambient.css); shading the material down to the rig's
+   mid-tone plate gives the well/inset recesses a floor that reads as
+   visibly deeper material, not just a shadow band on the same page
+   colour. --amb-shade rather than a fixed colour, so the recess still
+   follows whatever --amb-albedo the page is themed with. 0.378 is the
+   rig's mid-tone plate over the reference ground, so the floor lands
+   within 0.7 points of lightness of the tone .amb-surface-darker painted
+   here — the remainder is the groove's own wall bounce. */
 .groove-darker {
-  background-color: hsl(
-    var(--amb-light-hue)
-    var(--amb-light-saturation)
-    calc(
-      var(--amb-key-light-intensity) * 21% +
-        var(--amb-fill-light-intensity) * 17.4% + 27.3%
-    )
-  );
+  --amb-shade: 0.378;
 }
 
 .groove-channel {

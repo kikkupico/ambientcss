@@ -25,22 +25,6 @@
     "n_samples": 23,
     "r2_end": 0.9397
   },
-  "darker": {
-    "f_pct": 17.4,
-    "floor_pct": 27.26,
-    "k_pct": 20.95,
-    "max_resid_pct": 0.649,
-    "model": "L% = k * key_intensity + f * fill_intensity + floor",
-    "r2": 0.99642
-  },
-  "darkest": {
-    "f_pct": 8.76,
-    "floor_pct": 11.03,
-    "k_pct": 10.56,
-    "max_resid_pct": 0.325,
-    "model": "L% = k * key_intensity + f * fill_intensity + floor",
-    "r2": 0.99649
-  },
   "fillet": {
     "model": "hl_alpha = p * Ik + pf * If + p0; sh_alpha = q * (Ik - If) + q0; offset_px = w * width",
     "n_highlight_samples": 30,
@@ -75,34 +59,18 @@
     "b0_alpha": -1.44,
     "ba_alpha_per_key": 2.019,
     "bf_alpha_per_fill": 0.795,
-    "g0_pct": 47.57,
-    "gf_pct": 23.15,
-    "gk_pct": 30.15,
-    "model": "floor L% = gk * Ik + gf * If + g0; recess = 4.5mm * thickness; wall shadow: reach = Ws * recess per light component, css_blur = Bs * recess, alpha = sa * (Ik - If) + sa0; far-wall bounce (white overlay): reach = Wb * recess + Wb0, css_blur = Bb * recess, alpha = ba * Ik + bf * If + b0, clamped to [0, 1]",
+    "gf": 0.5527,
+    "gk": 0.6623,
+    "max_resid_floor_pct": 1.322,
+    "model": "floor srgb(L) = albedo * (gk * Ik + gf * If); recess = 4.5mm * thickness; wall shadow: reach = Ws * recess per light component, css_blur = Bs * recess, alpha = sa * (Ik - If) + sa0; far-wall bounce (white overlay): reach = Wb * recess + Wb0, css_blur = Bb * recess, alpha = ba * Ik + bf * If + b0, clamped to [0, 1]",
     "n_bounce_bands": 24,
     "n_floor": 15,
     "n_shadow_bands": 26,
     "r2_bounce_alpha": 0.8549,
-    "r2_floor": 0.9884,
+    "r2_floor": 0.9891,
     "r2_shadow_alpha": 0.9528,
     "sa0_alpha": 0.308,
     "sa_alpha_per_contrast": 0.238
-  },
-  "lighter": {
-    "f_pct": 27.23,
-    "floor_pct": 45.81,
-    "k_pct": 32.81,
-    "max_resid_pct": 1.012,
-    "model": "L% = k * key_intensity + f * fill_intensity + floor",
-    "r2": 0.99646
-  },
-  "lightest": {
-    "f_pct": 27.71,
-    "floor_pct": 46.74,
-    "k_pct": 33.39,
-    "max_resid_pct": 1.034,
-    "model": "L% = k * key_intensity + f * fill_intensity + floor",
-    "r2": 0.99642
   },
   "shadow": {
     "A_offset_px_per_mm": 0.8526,
@@ -137,78 +105,19 @@
     "s_peak_per_key": 0.042
   },
   "surface": {
-    "f_pct": 26.38,
-    "floor_pct": 43.56,
-    "k_pct": 31.46,
-    "max_resid_pct": 1.115,
-    "model": "L% = k * key_intensity + f * fill_intensity + floor",
-    "r2": 0.996,
-    "samples": [
-      [
-        0.1,
-        0.7,
-        64.06
-      ],
-      [
-        0.2,
-        0.7,
-        68.03
-      ],
-      [
-        0.3,
-        0.7,
-        71.72
-      ],
-      [
-        0.4,
-        0.7,
-        75.18
-      ],
-      [
-        0.5,
-        0.7,
-        78.45
-      ],
-      [
-        0.6,
-        0.7,
-        81.54
-      ],
-      [
-        0.7,
-        0.7,
-        84.49
-      ],
-      [
-        0.8,
-        0.7,
-        87.31
-      ],
-      [
-        0.9,
-        0.0,
-        71.67
-      ],
-      [
-        0.9,
-        0.35,
-        81.52
-      ],
-      [
-        0.9,
-        0.7,
-        90.02
-      ],
-      [
-        0.9,
-        0.7,
-        90.02
-      ],
-      [
-        1.0,
-        0.7,
-        92.62
-      ]
-    ]
+    "albedos": [
+      0.06,
+      0.31,
+      0.82,
+      0.91,
+      0.95
+    ],
+    "ef": 0.5496,
+    "ek": 0.6396,
+    "free_intercept": 2.3e-05,
+    "max_resid_pct": 0.0259,
+    "model": "srgb(L) = albedo * exposure; exposure = ek * key_intensity + ef * fill_intensity",
+    "n_frames": 54,
+    "r2": 0.9999998
   }
 }

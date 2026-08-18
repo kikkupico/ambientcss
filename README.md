@@ -118,7 +118,26 @@ Custom CSS variables for granular light manipulation:
 
 ### Surfaces & Gradients
 
-`.amb-surface` `.amb-surface-darker` `.amb-surface-darkest` `.amb-surface-lighter` `.amb-surface-lightest` `.amb-surface-concave` `.amb-surface-concave-h` `.amb-surface-convex`
+`.amb-surface` `.amb-surface-concave` `.amb-surface-concave-h` `.amb-surface-convex`
+
+A surface is its **material** under the scene's light, not a fixed colour, so
+one class covers every hue and shade:
+
+```css
+.my-panel {
+  --amb-albedo: crimson;   /* the colour under full illumination */
+  --amb-shade: 1;          /* multiplier on that reflectance */
+}
+```
+
+`--amb-albedo` takes any CSS colour and both variables inherit, so a panel
+colours everything inside it — grooves, dishes and the components package's
+knobs and keys all read the same lit tone. Dim the key light and a crimson
+panel darkens like crimson; give the lamp a hue and it takes the cast.
+
+The former `.amb-surface-darker`, `-darkest`, `-lighter` and `-lightest`
+classes were five fixed albedos of this one law; the equivalent shades are
+`0.38`, `0.07`, `1.11` and `1.16`.
 
 ### Edge Cuts & Treatments
 
