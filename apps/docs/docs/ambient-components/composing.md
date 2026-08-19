@@ -119,6 +119,12 @@ defaults to `auto`: follow the pointer 1:1 while dragging, ease otherwise.
   on the knob's clipped face when it is knurled, on its body when it is not
   — and a mechanism cannot know that once the parts are yours.
 
+## Kits
+
+A set of parts that belong together is a **kit** — a named visual identity an
+app turns on once, and a third party can publish as a module. See
+[Kits](./kits).
+
 ## Just the mechanism
 
 If you want to render the markup yourself from the ground up, the hooks are

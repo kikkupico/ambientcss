@@ -2,7 +2,9 @@ import { cn } from "../lib/cn";
 import { AmbientBank } from "../controls/AmbientBank";
 import type { AmbientBankProps } from "../controls/AmbientBank";
 import type { BankOption, BankOrientation } from "../core/useBank";
-import { KeyCap, KeyLens } from "../parts/bank";
+import { useDress } from "../core/kit";
+import type { KitLook } from "../core/kit";
+import { groundedKit } from "../kits/grounded";
 
 export type AmbientSelectOption = BankOption;
 export type AmbientSelectOrientation = BankOrientation;
@@ -10,6 +12,8 @@ export type AmbientSelectSize = "sm" | "md" | "lg";
 
 export type AmbientSelectProps = Omit<AmbientBankProps, "keyParts" | "parts" | "size"> & {
   size?: AmbientSelectSize | undefined;
+  /** Look options in the active kit's vocabulary. */
+  look?: KitLook | undefined;
 };
 
 /**
@@ -23,13 +27,14 @@ export type AmbientSelectProps = Omit<AmbientBankProps, "keyParts" | "parts" | "
  * the `base` frame and the cap in `actuator`, and why swapping them would
  * put out every lamp.
  */
-export function AmbientSelect({ size = "md", className, ...rest }: AmbientSelectProps) {
+export function AmbientSelect({ size = "md", look, className, ...rest }: AmbientSelectProps) {
+  const { dress } = useDress("bank", { ...look }, groundedKit.bank!);
   return (
     <AmbientBank
       {...rest}
       size={size}
-      className={cn("amb-select amb-groove", className)}
-      keyParts={{ base: <KeyLens />, actuator: <KeyCap /> }}
+      className={cn(dress.className, className)}
+      keyParts={dress.parts}
     />
   );
 }

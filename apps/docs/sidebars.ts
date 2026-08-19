@@ -45,6 +45,7 @@ const sidebars: SidebarsConfig = {
         "ambient-components/install",
         "ambient-components/usage",
         "ambient-components/composing",
+        "ambient-components/kits",
         "ambient-components/provider",
         "ambient-components/design-tokens",
         "ambient-components/panel",

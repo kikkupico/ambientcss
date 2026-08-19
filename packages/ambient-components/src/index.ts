@@ -84,6 +84,34 @@ export { useBank } from "./core/useBank";
 export type { UseBankOptions, BankOption, BankOrientation } from "./core/useBank";
 
 /* ------------------------------------------------------------------ *\
+   Kits — a named bundle of parts, tokens and presentation defaults that
+   dresses every control below it. A kit is a plain object, so publishing
+   one is publishing a module. A kit that leaves a family undefined falls
+   through to `grounded`.
+\* ------------------------------------------------------------------ */
+
+export { AmbientKitProvider, useKit, useDress } from "./core/kit";
+export type {
+  ControlKit,
+  ControlFamily,
+  KitDress,
+  KitLook,
+  KitDefaults
+} from "./core/kit";
+
+export { groundedKit } from "./kits/grounded";
+export { consoleKit, ConsoleKnob, ConsoleToggle } from "./kits/console";
+export type { ConsoleKnobProps, ConsoleToggleProps } from "./kits/console";
+
+export {
+  ConsoleBar,
+  ConsoleMarks,
+  ConsoleWell,
+  ToggleTrack,
+  ToggleThumb
+} from "./parts/console";
+
+/* ------------------------------------------------------------------ *\
    The state channel — read the enclosing control from inside a part.
    The custom properties on the control root are canonical; these are a
    typed view of the same values, for parts that need JS.

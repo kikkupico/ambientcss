@@ -2,12 +2,16 @@ import React, { type ReactNode, useState } from "react";
 import {
   AmbientButton,
   AmbientFader,
+  AmbientKitProvider,
   AmbientKnob,
   AmbientPanel,
   AmbientProvider,
   AmbientSelect,
   AmbientSlider,
-  AmbientSwitch
+  AmbientSwitch,
+  ConsoleKnob,
+  ConsoleToggle,
+  consoleKit
 } from "@ambientcss/components";
 
 function DemoShell({ children }: { children: ReactNode }) {
@@ -269,6 +273,125 @@ export function CompositionPreview() {
         <AmbientKnob label="Gain" value={gain} onChange={setGain} />
         <AmbientFader label="Level" value={level} onChange={setLevel} />
       </AmbientPanel>
+    </DemoShell>
+  );
+}
+
+/* ── Kits ──────────────────────────────────────────────────────────────
+   The console kit's samples. Note what is NOT here: no `knurling`,
+   `markers` or `indicator` inside the provider. Those are grounded's
+   vocabulary, and passing them under another kit is exactly the case
+   `looks` warns about — a docs page should not be printing that warning
+   into the reader's console.
+
+   Everything below sits in `.docs-kit-row`, which is a fixed height rather
+   than a natural one: the console knob reserves layout room for the marks
+   printed around it and the grounded knob does not, so left to themselves
+   two rows of the same controls come out different heights and their
+   captions land on different lines. */
+
+export function KitComparisonPreview() {
+  const [level, setLevel] = useState(68);
+  const [on, setOn] = useState(true);
+
+  /* One call site, rendered twice. The props are identical and the state
+     is shared — the only difference between the columns is the kit above
+     them, which is the whole claim the page makes. */
+  const controls = (
+    <>
+      <AmbientKnob label="LEVEL" value={level} onChange={setLevel} />
+      <AmbientSwitch label="ON" value={on} onChange={setOn} />
+    </>
+  );
+
+  return (
+    <DemoShell>
+      <div className="docs-kit-columns">
+        <div className="docs-kit-column">
+          <div className="docs-kit-row">{controls}</div>
+          <p className="docs-demo-text">grounded (default)</p>
+        </div>
+        <div className="docs-kit-column">
+          <AmbientKitProvider kit={consoleKit}>
+            <div className="docs-kit-row">{controls}</div>
+          </AmbientKitProvider>
+          <p className="docs-demo-text">consoleKit</p>
+        </div>
+      </div>
+    </DemoShell>
+  );
+}
+
+export function ConsoleKitPreview() {
+  const [gain, setGain] = useState(40);
+  const [bare, setBare] = useState(72);
+  const [arm, setArm] = useState(false);
+
+  /* The bare knob gets its own column rather than standing next to the
+     marked one: a knob with the centre mark printed above it is a taller
+     box than one without, so side by side in a single row the two sit at
+     visibly different heights — which reads as a layout slip rather than
+     as the prop doing its job. */
+  return (
+    <DemoShell>
+      <AmbientKitProvider kit={consoleKit}>
+        <div className="docs-demo-stack">
+          <div className="docs-kit-columns">
+            <div className="docs-kit-column">
+              <div className="docs-kit-row">
+                <ConsoleKnob label="GAIN" value={gain} onChange={setGain} />
+                <ConsoleToggle label="ARM" value={arm} onChange={setArm} />
+              </div>
+              <p className="docs-demo-text">default</p>
+            </div>
+            <div className="docs-kit-column">
+              <div className="docs-kit-row">
+                <ConsoleKnob
+                  label="BARE"
+                  mark={false}
+                  legend={false}
+                  value={bare}
+                  onChange={setBare}
+                />
+              </div>
+              <p className="docs-demo-text">
+                <code>mark={"{false}"} legend={"{false}"}</code>
+              </p>
+            </div>
+          </div>
+          <p className="docs-demo-text">
+            Gain {gain} · Bare {bare} · {arm ? "armed" : "safe"}
+          </p>
+        </div>
+      </AmbientKitProvider>
+    </DemoShell>
+  );
+}
+
+export function KitAccentPreview() {
+  const [green, setGreen] = useState(55);
+  const [amber, setAmber] = useState(30);
+
+  return (
+    <DemoShell>
+      <AmbientKitProvider kit={consoleKit}>
+        <div className="docs-kit-columns">
+          <div className="docs-kit-column" style={{ "--ambx-accent": "#00a84d" } as React.CSSProperties}>
+            <div className="docs-kit-row">
+              <ConsoleKnob label="SEND" value={green} onChange={setGreen} />
+              <ConsoleToggle label="ON" defaultValue />
+            </div>
+            <p className="docs-demo-text">#00a84d</p>
+          </div>
+          <div className="docs-kit-column" style={{ "--ambx-accent": "#f59e0b" } as React.CSSProperties}>
+            <div className="docs-kit-row">
+              <ConsoleKnob label="SEND" value={amber} onChange={setAmber} />
+              <ConsoleToggle label="ON" defaultValue />
+            </div>
+            <p className="docs-demo-text">#f59e0b</p>
+          </div>
+        </div>
+      </AmbientKitProvider>
     </DemoShell>
   );
 }

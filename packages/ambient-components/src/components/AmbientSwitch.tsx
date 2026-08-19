@@ -3,7 +3,10 @@ import { cn } from "../lib/cn";
 import { AmbientLatch } from "../controls/AmbientLatch";
 import type { AmbientLatchProps } from "../controls/AmbientLatch";
 import { useControllableValue } from "../core/controllable";
-import { Led, SwitchPill, SwitchTrack } from "../parts/latch";
+import { useDress } from "../core/kit";
+import type { KitLook } from "../core/kit";
+import { groundedKit } from "../kits/grounded";
+import { Led } from "../parts/latch";
 
 export type AmbientSwitchSize = "sm" | "md" | "lg";
 
@@ -12,6 +15,8 @@ export type AmbientSwitchProps = Omit<AmbientLatchProps, "parts" | "size"> & {
   /** A lamp above the switch. `true` for the scene's own colour, or any
    *  CSS colour string. */
   led?: boolean | string | undefined;
+  /** Look options in the active kit's vocabulary. */
+  look?: KitLook | undefined;
 };
 
 /** A pill sliding in a dark stadium recess, with an optional lamp above.
@@ -26,14 +31,17 @@ export function AmbientSwitch({
   size = "md",
   led,
   label,
+  look,
   value,
   defaultValue,
   onChange,
+  animate,
   className,
   ...rest
 }: AmbientSwitchProps) {
   const labelId = useId();
   const [on, setOn] = useControllableValue(value, defaultValue ?? false, onChange);
+  const { dress, defaults } = useDress("latch", { ...look }, groundedKit.latch!);
 
   const control = (
     <AmbientLatch
@@ -41,9 +49,10 @@ export function AmbientSwitch({
       value={on}
       onChange={setOn}
       size={size}
+      animate={animate ?? defaults?.animate}
       aria-labelledby={label ? labelId : rest["aria-labelledby"]}
-      className={cn("amb-switch", className)}
-      parts={{ base: <SwitchTrack />, actuator: <SwitchPill /> }}
+      className={cn(dress.className, className)}
+      parts={dress.parts}
     />
   );
 

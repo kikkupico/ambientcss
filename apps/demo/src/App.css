@@ -395,6 +395,43 @@ body {
 .component-cell:nth-child(6) { transition-delay: 0.30s; }
 .component-cell:nth-child(7) { transition-delay: 0.36s; }
 
+/* Kit columns: the same two controls twice, so the pair has to read as one
+   group with a name under it rather than as four loose controls. Wider gap
+   BETWEEN the columns than inside them is what does that work. */
+.kit-stage {
+  gap: 72px;
+  align-items: flex-start;
+}
+
+/* A fixed height, not a min: the console knob reserves layout room for the
+   printed marks above and beside it, so left to themselves the two columns
+   come out different heights and the names under them sit on two different
+   lines — which reads as a layout bug rather than as two versions of the
+   same thing. */
+/* Bottom-aligned, not centred: every control's own label is the last thing
+   in its box, so hanging the boxes from their bottoms puts all four labels
+   on one line and lets the height difference show up where it really is —
+   above the console knob, where its marks are printed. */
+.kit-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 40px;
+  height: 132px;
+}
+
+/* Same treatment as .scene-hint — these are captions in the demo's own
+   voice, not code. The kit names happen to be identifiers, but setting them
+   in a monospace face would put the only monospace type in the whole page
+   under two controls. */
+.kit-name {
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  color: var(--amb-lume);
+  opacity: 0.7;
+  margin-top: 8px;
+}
+
 .comp-led-row {
   display: flex;
   justify-content: center;

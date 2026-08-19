@@ -8,6 +8,8 @@ import {
   AmbientSwitch,
   AmbientSelect,
   AmbientPanel,
+  AmbientKitProvider,
+  consoleKit,
   type AmbientTheme,
   type AmbientKnobIndicator,
 } from "@ambientcss/components";
@@ -231,6 +233,12 @@ export function App() {
   const [sw1, setSw1] = useState(true);
   const [sw2, setSw2] = useState(false);
 
+  /* The kit section drives BOTH columns off one pair of values. Turning the
+     grounded knob turns the console knob with it, which is the point: the
+     call site and the state are the same, only the kit above them differs. */
+  const [kitLevel, setKitLevel] = useState(68);
+  const [kitOn, setKitOn] = useState(true);
+
   /* The hero film loops on its own; under prefers-reduced-motion it becomes
      an ordinary paused video the visitor can start themselves. */
   const reducedMotion = usePrefersReducedMotion();
@@ -244,6 +252,7 @@ export function App() {
   const edgeView = useInView(0.2);
   const grooveView = useInView(0.2);
   const compView = useInView(0.1);
+  const kitView = useInView(0.1);
   const finaleView = useInView(0.3);
 
   /* Section refs for scroll navigation ------------------------------------ */
@@ -256,6 +265,7 @@ export function App() {
   const edgeSectionRef = useRef<HTMLElement>(null);
   const grooveSectionRef = useRef<HTMLElement>(null);
   const compSectionRef = useRef<HTMLElement>(null);
+  const kitSectionRef = useRef<HTMLElement>(null);
 
   /* Orbit: pointer/touch-driven light direction ───────────────────────── */
   const [orbitLight, setOrbitLight] = useState({ x: -1, y: -1 });
@@ -615,7 +625,39 @@ export function App() {
         <ScrollButton sectionRef={compSectionRef} />
       </section>
 
-      {/* ── 8. FINALE ────────────────────────────────────────────────── */}
+      {/* ── 8. KITS ───────────────────────────────────────────────────── */}
+      <section className="scene amb-surface" ref={kitSectionRef}>
+        <div className="scene-inner" ref={kitView.ref}>
+          <div className="scene-label">Kits</div>
+          <div className="scene-subtitle">(react only)</div>
+          <div className="scene-hint">
+            One call site, two looks — grab either knob and both follow
+          </div>
+          <div className="component-stage kit-stage">
+            <div className="component-cell" data-visible={kitView.visible}>
+              <div className="kit-row">
+                <AmbientKnob value={kitLevel} onChange={setKitLevel} label="Level" />
+                <AmbientSwitch value={kitOn} onChange={setKitOn} led label="On" />
+              </div>
+              <div className="kit-name">grounded</div>
+            </div>
+            <div className="component-cell" data-visible={kitView.visible}>
+              {/* The identical markup, one provider deeper. No prop below
+                  this line knows which kit it is being painted by. */}
+              <AmbientKitProvider kit={consoleKit}>
+                <div className="kit-row">
+                  <AmbientKnob value={kitLevel} onChange={setKitLevel} label="Level" />
+                  <AmbientSwitch value={kitOn} onChange={setKitOn} led label="On" />
+                </div>
+              </AmbientKitProvider>
+              <div className="kit-name">consoleKit</div>
+            </div>
+          </div>
+        </div>
+        <ScrollButton sectionRef={kitSectionRef} />
+      </section>
+
+      {/* ── 9. FINALE ────────────────────────────────────────────────── */}
       <section className="finale amb-surface" ref={finaleView.ref}>
         <div>
           <div className="finale-text" data-visible={finaleView.visible}>
@@ -644,7 +686,7 @@ export function App() {
 
           <div className="finale-links">
             <a
-              className="finale-link amb-button amb-groove ambx-button"
+              className="finale-link amb-button amb-groove ambx-press ambx-press-md"
               href="https://github.com/kikkupico/ambientcss"
               target="_blank"
               rel="noopener noreferrer"
@@ -657,7 +699,7 @@ export function App() {
               </span>
             </a>
             <a
-              className="finale-link amb-button amb-groove ambx-button"
+              className="finale-link amb-button amb-groove ambx-press ambx-press-md"
               href="https://kikkupico.github.io/ambientcss/"
               target="_blank"
               rel="noopener noreferrer"

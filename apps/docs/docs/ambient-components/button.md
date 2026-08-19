@@ -118,4 +118,18 @@ yours, give the mechanism your own cap — see
 
 ## Default class stack
 
-`ambient amb-button amb-chamfer amb-elevation-1 ambx-button amb-heading-3`
+A button is two elements: the well (the `<button>` itself) and the cap seated
+in it. The mechanism puts the control and size classes on the root, and the
+kit adds its own look class; the cap is a part, so its classes come from the
+kit too.
+
+| Element | Classes |
+| --- | --- |
+| well (root) | `ambx-control ambx-press ambx-press-md amb-button amb-groove` |
+| cap | `amb-button-cap ambient amb-chamfer amb-surface amb-heading-3 amb-mat-matte` |
+
+`ambx-press-md` follows `size`, `amb-mat-matte` follows `material`, and
+`shape` adds `amb-button-round` or `amb-button-square` to the root. The size
+class is what carries `--ambx-button-size` and the cap padding, so markup
+that copies this stack by hand — a link styled as a key, say — has to carry
+an `ambx-press-*` class or the cap collapses to its text.

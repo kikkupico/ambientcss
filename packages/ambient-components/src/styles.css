@@ -28,6 +28,10 @@
   --ambx-label-size: calc(var(--ambx-grid) * 2 + var(--ambx-grid-half));
   --ambx-label-line: calc(var(--ambx-grid) * 3);
   --ambx-control-label-gap: calc(var(--ambx-grid) * 2);
+  /* The panel accent a kit paints its lit states with. Defaults to the
+     scene's own highlight so a kit inherits the app's colour rather than
+     imposing one. */
+  --ambx-accent: var(--amb-highlight-color);
   --ambx-knob-label-clearance: calc(var(--ambx-grid) * 2);
   --ambx-slider-label-clearance: calc(var(--ambx-grid) * 2);
   --ambx-fader-label-clearance: calc(var(--ambx-grid) * 4);
@@ -267,6 +271,9 @@
   --ambx-size: var(--ambx-switch-h);
   --ambx-switch-w: calc(var(--ambx-grid) * 12);
   --ambx-switch-h: calc(var(--ambx-grid) * 6);
+  --ambx-latch-thumb-w: calc(var(--ambx-switch-w) * 0.52);
+  --ambx-latch-thumb-h: calc(var(--ambx-switch-h) * 0.78);
+  --ambx-latch-inset: calc(var(--ambx-switch-h) * 0.11);
 }
 
 .ambx-latch-sm {
@@ -284,19 +291,22 @@
   --ambx-switch-h: calc(var(--ambx-grid) * 8);
 }
 
+/* Stated as tokens rather than as literals in the transform, so a kit that
+   wants a round thumb on a wider track restates three lengths instead of
+   re-writing this selector. */
 .ambx-latch > .ambx-frame-actuator {
   inset: auto;
   top: 50%;
   left: 0;
-  width: calc(var(--ambx-switch-w) * 0.52);
-  height: calc(var(--ambx-switch-h) * 0.78);
+  width: var(--ambx-latch-thumb-w);
+  height: var(--ambx-latch-thumb-h);
   transform: translateY(-50%)
     translateX(
       calc(
-        var(--ambx-switch-h) * 0.11 + var(--ambx-percent) *
+        var(--ambx-latch-inset) + var(--ambx-percent) *
           (
-            var(--ambx-switch-w) - var(--ambx-switch-w) * 0.52 - var(--ambx-switch-h) *
-              0.22
+            var(--ambx-switch-w) - var(--ambx-latch-thumb-w) - 2 *
+              var(--ambx-latch-inset)
           )
       )
     );
@@ -1101,3 +1111,235 @@
   );
 }
 
+
+/* ==========================================================================
+   KIT: console
+
+   A mixer-desk visual language, measured off photographs of the real
+   controls. It dresses knobs and switches and leaves the rest to `grounded`,
+   which is what a partial third-party kit looks like.
+
+   Everything here is paint. The kit adds no behaviour and touches no
+   mechanism: the toggle's thumb travels because the latch already moves its
+   actuator frame by --ambx-percent, and the track lights because a stylesheet
+   can read that same number. If a genuinely different visual language had
+   needed new mechanism code, the v3 split would not have been clean enough.
+   ========================================================================== */
+
+/* -- console knob ---------------------------------------------------------
+   A cuboid bar standing on a flat face, housed in a circular groove cut into
+   the panel — the same construction the button uses, a groove for the
+   housing and the flat part seated in it. The bar IS the pointer, and a
+   short mark printed near one end of it says which end reads. Measured off
+   the reference: the housing ring is the button's own clearance gap and the
+   bar is 0.24 of the face it stands on. */
+.amb-console-knob {
+  border-radius: 50%;
+  /* The same gap the button leaves around its cap, and a fixed length for
+     the same reason: it is a clearance between two parts, not a feature
+     that scales with the control. */
+  --ambx-console-housing: var(--ambx-grid-half);
+  --ambx-console-face: calc(var(--ambx-size) - 2 * var(--ambx-console-housing));
+  --ambx-console-bar-width: calc(var(--ambx-console-face) * 0.24);
+  /* Just short of the face. The bar swings through every angle inside a
+     circle, so anything longer would cross the housing at the diagonals —
+     and unlike the panel graphics, which pay for their overhang in the two
+     clearance classes at the end of this block, the actuator has no margin
+     of its own to spend. */
+  --ambx-console-bar-length: calc(var(--ambx-console-face) * 0.94);
+}
+
+/* The housing: a circular groove, showing as a thin dark ring around the
+   face — the button's well, cut round. It takes the button's seat depth and
+   the button's floor colour: --amb-lume is near-black under a bright key,
+   which is what makes a clearance gap read as a gap rather than as a paler
+   ring of the same panel. */
+.amb-console-housing {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  --amb-thickness: 0.27;
+  background-color: var(--amb-lume);
+}
+
+/* The face: flat, and the panel's own surface colour. No thickness, so it
+   has no edge to catch light and casts nothing — what draws the knob's
+   outline is the dark ring of housing around it. */
+.amb-console-face {
+  position: absolute;
+  inset: var(--ambx-console-housing);
+  border-radius: 50%;
+}
+
+/* The bar rides the rotating actuator frame, so its lit edge would turn with
+   it: at 180deg the chamfer highlight would sit on the shadow side of the
+   screen and the drop shadow would fall towards the light. Rotating the
+   LIGHT the other way fixes both at once, and it is the same trick the
+   scale ring plays in reverse — the geometry is already published on the
+   root, so a stylesheet can do the trigonometry.
+
+   This outer span exists only to capture the scene's light vector: a custom
+   property cannot read itself, and `--amb-light-x: calc(var(--amb-light-x)
+   ...)` on one element is a cycle, which resolves to invalid at
+   computed-value time and takes the whole .ambient box-shadow composite
+   down with it — silently, and looking exactly like a flat rectangle. */
+.amb-console-bar {
+  position: absolute;
+  inset: 0;
+  --_ambx-console-light-x: var(--amb-light-x);
+  --_ambx-console-light-y: var(--amb-light-y);
+}
+
+/* The world light, restated in the frame's own turned coordinates: the
+   inverse rotation, [cos, sin; -sin, cos] applied to the captured vector.
+   --ambx-angle is an <angle>, which is what cos()/sin() want, so the whole
+   correction is these two lines. */
+.amb-console-bar-body {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--ambx-console-bar-width);
+  height: var(--ambx-console-bar-length);
+  margin-top: calc(var(--ambx-console-bar-length) / -2);
+  margin-left: calc(var(--ambx-console-bar-width) / -2);
+  /* A machined round-over, not a pill: the reference bar's corners are
+     barely broken. */
+  border-radius: calc(var(--ambx-size) * 0.028);
+  /* The bar is the panel's own surface colour, the same material as the
+     face it stands on, so it is not told apart by tone at all: the chamfer
+     down its long edges and the shadow it drops on the face are what read
+     as a block standing proud. */
+  --amb-light-x: calc(
+    var(--_ambx-console-light-x) * cos(var(--ambx-angle)) +
+      var(--_ambx-console-light-y) * sin(var(--ambx-angle))
+  );
+  --amb-light-y: calc(
+    var(--_ambx-console-light-y) * cos(var(--ambx-angle)) -
+      var(--_ambx-console-light-x) * sin(var(--ambx-angle))
+  );
+  /* Standing on the face, not floating above it: the block's own body casts
+     the shadow (the part carries the thickness), and elevation stays at zero
+     so the shadow hugs its shadow-side edges the way a body at rest does. */
+  --amb-elevation: 0;
+}
+
+/* The indicator: a short mark printed across the bar near one end. It is
+   ink, not geometry — no edges, no shadow — and it is inside the bar rather
+   than beside it because the bar already occupies the whole diameter it
+   would otherwise sit on. */
+.amb-console-indicator {
+  position: absolute;
+  left: 50%;
+  top: 7%;
+  width: 62%;
+  height: 7.5%;
+  transform: translateX(-50%);
+  border-radius: calc(var(--ambx-size) * 0.012);
+  background-color: color-mix(in oklab, var(--amb-lit), black 82%);
+}
+
+/* Panel graphics: the accent centre mark above the knob and the -/+ legends
+   beside it. All three sit outside the knob's own box, which is what the
+   panel frame allows — and what the two clearance classes below pay for. */
+.amb-console-marks {
+  position: absolute;
+  inset: 0;
+}
+
+.amb-console-mark {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  width: calc(var(--ambx-size) * 0.085);
+  height: calc(var(--ambx-size) * 0.2);
+  margin-bottom: calc(var(--ambx-size) * 0.07);
+  border-radius: var(--ambx-radius-sm);
+  background-color: var(--ambx-accent);
+  transform: translateX(-50%);
+}
+
+.amb-console-legend {
+  position: absolute;
+  top: 58%;
+  font-size: calc(var(--ambx-size) * 0.26);
+  line-height: 1;
+  color: var(--amb-label);
+}
+
+.amb-console-legend-min {
+  right: 100%;
+  margin-right: calc(var(--ambx-size) * 0.1);
+}
+
+.amb-console-legend-max {
+  left: 100%;
+  margin-left: calc(var(--ambx-size) * 0.1);
+}
+
+/* Clearance for graphics that overflow the control's box. The centre mark
+   only reaches upward, so unlike the grounded marker ring — which is paid
+   for on all four sides to keep the knob concentric — this one is a top
+   margin, and the knob deliberately sits low in its box because that is
+   where the mark puts it. */
+.amb-console-knob-marked {
+  margin-top: calc(var(--ambx-size) * 0.3);
+}
+
+.amb-console-knob-legended {
+  margin-inline: calc(var(--ambx-size) * 0.34);
+}
+
+/* -- console toggle -------------------------------------------------------
+   A pill track that fills with the accent as the switch travels, carrying a
+   round accent thumb inside a white ring. Track 2.06:1; the thumb takes 0.9
+   of the track height, which is a thumb that nearly fills its groove — the
+   clearance has to come down with it or a thumb that size runs off the ends
+   of its own travel. */
+.amb-console-toggle {
+  --ambx-switch-w: calc(var(--ambx-grid) * 13);
+  --ambx-switch-h: calc(var(--ambx-grid) * 6.3);
+  --ambx-latch-thumb-w: calc(var(--ambx-switch-h) * 0.9);
+  --ambx-latch-thumb-h: calc(var(--ambx-switch-h) * 0.9);
+  --ambx-latch-inset: calc(var(--ambx-switch-h) * 0.05);
+}
+
+/* The track is a pure-CSS part: it reads --ambx-percent off the control root
+   and mixes its own colour from it, so it lights and dims with the travel
+   without the mechanism knowing this element exists. */
+.amb-console-track {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--ambx-radius-full);
+  background-color: color-mix(
+    in oklab,
+    color-mix(in oklab, var(--amb-lit), black 55%),
+    var(--ambx-accent) calc(var(--ambx-percent) * 100%)
+  );
+  --amb-thickness: 0.4;
+  transition: background-color 160ms ease;
+}
+
+/* Flat-topped, but a body: `.ambient` with a thickness and NO edge
+   treatment, which is the combination that casts a drop shadow while
+   leaving the top face unbroken — the chamfer and fillet layers of the
+   composite are gated on their own properties, and neither is set here. */
+.amb-console-thumb {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background-color: color-mix(in oklab, var(--ambx-accent), white 12%);
+  /* The white ring is a BORDER, not a spread shadow. Two reasons, and the
+     second is the load-bearing one: with the package's border-box reset the
+     ring grows inward, so the thumb keeps the outer diameter measured off
+     the reference — and `box-shadow` is the property `.ambient` composites
+     the whole lighting model into, so setting it here would silently wipe
+     the drop shadow the thickness above is there to cast. */
+  border: calc(var(--ambx-latch-thumb-h) * 0.09) solid
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 99%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .amb-console-track {
+    transition: none;
+  }
+}
