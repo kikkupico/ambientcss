@@ -51,6 +51,23 @@ treatment: it says the knob turns, not where its top face stops.
 `material` applies to both elements a knurled knob paints with, so
 `material="shiny"` is the machined-metal wheel with or without the ribs.
 
+### `knurlColor`
+
+The grip ring's own colour — the one thing the ring may hold apart from the
+cap, because a dark grip round a pale cap is a real piece of hardware. Any CSS
+colour, read as an **albedo** rather than as paint: a dark knurl still takes
+the scene's exposure, the lamp's cast and the rim's own contact shading, and
+still goes dark when the lights do.
+
+```tsx
+<AmbientKnob material="brushed-round" knurlColor="#1b1b1e" />
+```
+
+It is set on the ring itself, so it wins over the albedo a micro-relief
+material would otherwise put there — the finish keeps its grain and gives up
+only its tone. The cap has no matching prop: the cap's colour is the control's
+colour, set the ordinary way with `--amb-albedo`.
+
 `AmbientRotary` still has no `material` prop and this preset does: how many
 elements a material has to reach is a fact about *this* knob's construction,
 and a mechanism cannot know it once the parts are yours.
@@ -101,9 +118,10 @@ they take `--amb-label` (the legend ink) rather than the accent colour.
 | `step` | `number` | `1` |
 | `label` | `string` | - |
 | `knurling` | `boolean` | `true` |
+| `knurlColor` | `string` (any CSS colour) | - |
 | `markers` | `"none" \| "ends" \| "full"` | `"none"` |
 | `indicator` | `"rectangle" \| "circle"` | `"circle"` |
-| `material` | `"matte" \| "shiny" \| "glass" \| "brushed" \| "rubber"` | - |
+| `material` | `"matte" \| "shiny" \| "glass" \| "brushed" \| "brushed-round" \| "rubber"` | - |
 | `size` | `"sm" \| "md" \| "lg"` | `"md"` |
 | `travel` | `number \| { start, sweep }` | `270` |
 | `input` | `"drag" \| "angle" \| "delta"` | `"drag"` |

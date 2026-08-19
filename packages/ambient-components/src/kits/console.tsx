@@ -59,7 +59,10 @@ export const consoleKit: ControlKit = {
    shared preset with this kit's look vocabulary typed — and they are how a
    kit gives its own words the same compile-time checking `knurling` gets. */
 
-export type ConsoleKnobProps = Omit<AmbientKnobProps, "look" | "material" | "knurling" | "markers" | "indicator"> & {
+export type ConsoleKnobProps = Omit<
+  AmbientKnobProps,
+  "look" | "material" | "knurling" | "knurlColor" | "markers" | "indicator"
+> & {
   /** The accent centre mark printed above the knob. */
   mark?: boolean | undefined;
   /** The −/+ legends at the ends of the travel. */

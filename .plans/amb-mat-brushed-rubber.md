@@ -186,3 +186,62 @@ means "this material's reflectance", so **the core file is untouched**.
 Circular brushing for knob caps is the natural next material, and the mechanism
 reaches it: the across-grain rule becomes tangential, and the offset becomes a
 small rotation about the cap centre rather than a translation.
+
+## 10. `.amb-mat-brushed-round`, and what it is NOT fitted to
+
+Shipped. It came out simpler than section 9 predicted: the offset stays a
+plain translation, because a fixed translation is *already* tangent to a
+circular groove everywhere except the two points where it points radially out.
+The pair therefore produces the two bright arcs and the 90-degree dark lobes
+on its own, with no rotation term and no new mechanism. The grain is stated as
+a conic gradient rather than a tile — circular grain has no translational
+period to tile — 64 jittered streaks from a fixed seed plus the exact
+per-stop inverse.
+
+**It is not measured against a crop, and nothing here should be read as if it
+were.** Its two constants stand on different footings:
+
+- `--amb-albedo: 0.49` is inherited legitimately. It is the same aluminium as
+  the linear finish, and a lathe does not change a metal's reflectance. One
+  fit, two finishes.
+- `--_grain-alpha: 0.169` is the linear metal's number reused **by eye**, and
+  the two are not comparable measurements. The linear tile's across-grain
+  period is sub-pixel (baseFrequency 2.6 over a 128-unit rect), so a large
+  part of its rendered contrast is the pixel averaging that section 8's
+  `round()` and "do not rescale `--_grain-scale`" notes exist to protect. The
+  conic streaks are several CSS pixels wide at knob radius and take none of
+  that averaging. The same alpha therefore does not mean the same amplitude;
+  it was matched against how the linear metal *looks*, and a photographic
+  refit would move it.
+
+Anyone fitting this properly should shoot a spun disc, measure RMS L\* by
+radius (the amplitude is not constant across the face — the streak pitch
+falls below the offset toward the centre and the samples decorrelate into the
+converged hotspot every spun disc has), and refit `--_grain-alpha` against the
+outer band, where the derivative is still a derivative.
+
+## 11. The sheen on both metals
+
+Also shipped, and also unfitted. A ground finish is still metal, so
+`.amb-mat-brushed` and `.amb-mat-brushed-round` now declare
+`--amb-mat-specular: 0.3` / `--amb-mat-roughness: 0.72` and paint a broad
+highlight, riding the key light alone at `0.11 * Ik + 0.04`. The rubber stays
+at specular 0.
+
+The shape is geometry rather than a coefficient, which is the part worth
+keeping if the amplitude is ever refit. An anisotropic specular from a linear
+grain is a band ACROSS the grain: the grooves smear the lamp's image along
+themselves, so the highlight is unbounded in one axis and tight in the other.
+The grain here is horizontal, so the band is horizontal, and the lamp only
+SLIDES it — `--amb-light-y` moves it, `--amb-light-x` does not, which is the
+same statement `--_grain-aniso` makes about the relief. On the spun metal the
+grain is tangential everywhere, so "across it" is radial everywhere and the
+band closes into two opposed lobes on the lamp's axis plus the convergence
+hotspot.
+
+It is painted on the host's own `background-image`, as `.amb-mat-shiny`'s
+specular is, so it gets its own amplitude instead of being scaled by the
+grain's alpha — and inherits that class's precedence: an element whose
+background image is already spoken for (`.amb-knob-face`,
+`.amb-surface-concave`, `.amb-surface-convex`) shows the relief without the
+sheen.

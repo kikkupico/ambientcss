@@ -20,6 +20,7 @@ const FULL_MARKERS = 13;
 function rotary(look: KitLook): KitDress {
   const material = look.material as AmbientMaterial | undefined;
   const knurling = look.knurling !== false;
+  const knurlColor = look.knurlColor as string | undefined;
   const markers = (look.markers as "none" | "ends" | "full" | undefined) ?? "none";
   const indicator = (look.indicator as "circle" | "rectangle" | undefined) ?? "circle";
 
@@ -33,11 +34,16 @@ function rotary(look: KitLook): KitDress {
       /* `material` goes on every element that paints. The cap always does —
          it is the knob's top face either way — and the knurl ring does too
          when there is one, so a knurled knob's rim and cap are the same
-         material rather than the rim being the only thing wearing it. */
+         material rather than the rim being the only thing wearing it.
+
+         `knurlColor` is the one thing the ring may hold on its own: a
+         two-tone knob — dark grip round a pale cap — is a real piece of
+         hardware, and the cap has no matching prop because the cap's colour
+         is the control's colour, set the ordinary way with --amb-albedo. */
       base: <KnobBody flush={!knurling} material={material} />,
       actuator: (
         <>
-          {knurling ? <KnurledFace material={material} /> : null}
+          {knurling ? <KnurledFace material={material} color={knurlColor} /> : null}
           {indicator === "circle" ? <IndicatorDot /> : <IndicatorBar />}
         </>
       )
@@ -98,7 +104,7 @@ export const groundedKit: ControlKit = {
   latch,
   bank,
   looks: {
-    rotary: ["material", "knurling", "markers", "indicator"],
+    rotary: ["material", "knurling", "knurlColor", "markers", "indicator"],
     travel: ["material", "orientation"],
     press: ["material", "shape", "children"],
     latch: [],

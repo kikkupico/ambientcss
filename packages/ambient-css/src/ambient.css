@@ -609,11 +609,24 @@
   );
 }
 
-/* MICRO-RELIEF MATERIALS — brushed aluminium and bead-blasted rubber,
-   fitted against photographed crops (.plans/amb-mat-brushed-rubber.md).
-   Both are matte in the specular sense; what they add is relief, not
-   gloss, so they compose with .amb-surface, the edge treatments and the
-   elevations like any other material.
+/* MICRO-RELIEF MATERIALS — brushed aluminium (linear and spun), and
+   bead-blasted rubber. What they add is relief, so they compose with
+   .amb-surface, the edge treatments and the elevations like any other
+   material.
+
+   TWO OF THE THREE ARE FITTED. The linear metal and the rubber are measured
+   against photographed crops (.plans/amb-mat-brushed-rubber.md); the spun
+   metal is not, and says so under its own constants below.
+
+   The rubber is matte in the specular sense. THE TWO METALS ARE NOT: a
+   ground finish is still metal, and its scattered key reads as one broad
+   sheen sitting over the grain rather than as the tight mirror band
+   .amb-mat-shiny paints. That sheen is a SEPARATE feature from the relief
+   below, painted on the host's own background-image the way every other
+   material's specular is, so it gets its own amplitude instead of being
+   scaled by the grain's fitted alpha — and it is anisotropic in the same
+   direction the grain is, which is what makes the two read as one surface.
+   The shape of each is stated with its material below.
 
    HOW THE RELIEF IS LIT. Nothing is ever transformed. The tile carries
    the RAW HEIGHT FIELD — one feTurbulence, one feComponentTransfer, no
@@ -674,14 +687,17 @@
   position: relative;
 }
 
+:where(.amb-mat-brushed-round) {
+  position: relative;
+}
+
 :where(.amb-mat-rubber) {
   position: relative;
 }
 
 .amb-mat-brushed,
+.amb-mat-brushed-round,
 .amb-mat-rubber {
-  --amb-mat-specular: 0;
-  --amb-mat-roughness: 1;
   /* isolate: the overlays must blend with THIS element's surface, not
      with whatever is painted behind it. overflow: hidden: mix-blend-mode
      is not clipped by border-radius on its own, so a rounded surface
@@ -727,6 +743,8 @@
 
 .amb-mat-brushed::before,
 .amb-mat-brushed::after,
+.amb-mat-brushed-round::before,
+.amb-mat-brushed-round::after,
 .amb-mat-rubber::before,
 .amb-mat-rubber::after {
   content: "";
@@ -752,6 +770,7 @@
 }
 
 .amb-mat-brushed::before,
+.amb-mat-brushed-round::before,
 .amb-mat-rubber::before {
   background-image: var(--_grain-tile);
   background-position: var(--_grain-x) var(--_grain-y);
@@ -759,6 +778,7 @@
 }
 
 .amb-mat-brushed::after,
+.amb-mat-brushed-round::after,
 .amb-mat-rubber::after {
   background-image: var(--_grain-tile-inv);
   background-position: calc(var(--_grain-x) * -1) calc(var(--_grain-y) * -1);
@@ -778,6 +798,10 @@
    71.4 — not a miss but the cast every surface in this file takes, and
    the reason a refit has to zero the saturation first. */
 .amb-mat-brushed {
+  /* Ground metal, not a mirror and not a matte plastic: enough specular to
+     carry a sheen, enough roughness to spread it across most of the face. */
+  --amb-mat-specular: 0.3;
+  --amb-mat-roughness: 0.72;
   --amb-albedo: color(srgb-linear 0.49 0.49 0.49);
   --_grain-tile: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22128%22%20height%3D%22128%22%3E%3Cfilter%20id%3D%22t%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20color-interpolation-filters%3D%22linearRGB%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.06%202.6%22%20numOctaves%3D%221%22%20seed%3D%223%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3CfeComponentTransfer%3E%3CfeFuncR%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3CfeFuncG%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3CfeFuncB%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3C%2FfeComponentTransfer%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url%28%23t%29%22%2F%3E%3C%2Fsvg%3E");
   --_grain-tile-inv: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22128%22%20height%3D%22128%22%3E%3Cfilter%20id%3D%22t%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20color-interpolation-filters%3D%22linearRGB%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.06%202.6%22%20numOctaves%3D%221%22%20seed%3D%223%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3CfeComponentTransfer%3E%3CfeFuncR%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3CfeFuncG%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3CfeFuncB%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3C%2FfeComponentTransfer%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url%28%23t%29%22%2F%3E%3C%2Fsvg%3E");
@@ -793,6 +817,39 @@
       max(0.001, hypot(var(--amb-light-x), var(--amb-light-y)))
   );
   --_grain-aniso: calc(0.3 + 0.7 * var(--_grain-across));
+
+  /* THE SHEEN. Anisotropic specular from a linear grain is a BAND ACROSS
+     THE GRAIN — the grooves smear the lamp's image out along themselves,
+     so one dimension of the highlight goes to infinity and the other stays
+     tight. The grain here is horizontal (the tile's baseFrequency is coarse
+     in x, fine in y), so the band is horizontal too, and its POSITION is
+     the only thing the lamp moves: --amb-light-y slides it from the top of
+     the face to the bottom, and --amb-light-x does nothing at all. That
+     last part is the anisotropy, stated as geometry rather than as a
+     coefficient — the same statement --_grain-aniso makes about the relief.
+
+     Amplitude rides the key alone, as .amb-mat-shiny's does, with a small
+     floor so the sheen survives a dim scene the way a metal face does. It
+     is a plain alpha over --amb-lit, so it lands on L + a(100 - L) and
+     cannot blow out a pale face. */
+  --_sheen-alpha: calc(var(--amb-key-light-intensity) * 0.11 + 0.04);
+  /* The band's centre, and a half-width either side of it. Written as three
+     calc()s off one position rather than as a gradient rotated to the lamp:
+     the highlight of a linear grain does not tilt, it slides. Stops that run
+     off either end are corrected back in place by the gradient itself, which
+     is what keeps the band from wrapping when the lamp is straight overhead. */
+  --_sheen-at: calc(50% + var(--amb-light-y) * 30%);
+  background-image: linear-gradient(
+    to bottom,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 0%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0)
+      calc(var(--_sheen-at) - 42%),
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / var(--_sheen-alpha))
+      var(--_sheen-at),
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0)
+      calc(var(--_sheen-at) + 42%),
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 100%
+  );
 }
 
 /* Bead-blasted elastomer: dark, isotropic, grain about 3x the
@@ -806,11 +863,135 @@
    therefore leaves a visibly darker rubber, which is the fit working
    rather than a bug. */
 .amb-mat-rubber {
+  --amb-mat-specular: 0;
+  --amb-mat-roughness: 1;
   --amb-albedo: color(srgb-linear 0.0644 0.0629 0.0629);
   --_grain-tile: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2296%22%20height%3D%2296%22%3E%3Cfilter%20id%3D%22t%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20color-interpolation-filters%3D%22linearRGB%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.9%200.9%22%20numOctaves%3D%222%22%20seed%3D%223%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3CfeComponentTransfer%3E%3CfeFuncR%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3CfeFuncG%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3CfeFuncB%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3C%2FfeComponentTransfer%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url%28%23t%29%22%2F%3E%3C%2Fsvg%3E");
   --_grain-tile-inv: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2296%22%20height%3D%2296%22%3E%3Cfilter%20id%3D%22t%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20color-interpolation-filters%3D%22linearRGB%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.9%200.9%22%20numOctaves%3D%222%22%20seed%3D%223%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3CfeComponentTransfer%3E%3CfeFuncR%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3CfeFuncG%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3CfeFuncB%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3C%2FfeComponentTransfer%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url%28%23t%29%22%2F%3E%3C%2Fsvg%3E");
   --_grain-scale: 96px;
   --_grain-alpha: 0.281;
+}
+
+/* Spun (circular-brushed) aluminium: the same metal as .amb-mat-brushed with
+   the grain turned round the centre instead of run across the face — the
+   finish a part gets on a lathe rather than under a belt, and what the top
+   cap of a hi-fi knob wears.
+
+   THE GRAIN IS A CONIC GRADIENT, not a tile. Circular grain has no
+   translational period to tile, so the pattern is stated once in the only
+   coordinate it varies in: 64 jittered streaks of angle, generated from a
+   fixed seed with the same contrast stretch the SVG tiles' feComponentTransfer
+   applies (slope 2 about mid-grey), and closed at the seam so 0deg and 360deg
+   carry the same value. --_grain-tile-inv is the exact per-stop inverse, which
+   is what the screen/multiply pair subtracts against; the two lists are
+   generated together and must be regenerated together.
+
+   THE LIGHTING IS THE SAME MECHANISM AS THE LINEAR METAL and needs nothing
+   new: the pair is still offset +/-d along the lamp, so it still evaluates the
+   directional derivative of the height field. On a circular field that
+   derivative is proportional to the TANGENTIAL component of the offset, which
+   vanishes at the two points where the offset points straight out from the
+   centre. So the shading comes out as two bright arcs with dark lobes 90deg
+   away, swinging as the lamp does — the dominant feature of every spun disc,
+   arrived at as geometry rather than painted in.
+
+   Two consequences worth stating. The tile is sized to twice the box and
+   centred, so its conic centre lands on the element's centre and the +/-2px
+   offset never drags an edge into view (the linear grain repeats instead, and
+   has no centre to place). And the angular pitch of the streaks shrinks toward
+   that centre until it passes the offset, at which point the two samples stop
+   being correlated and the derivative becomes noise: the inner tenth of the
+   face reads as a bright converged hotspot rather than as streaks. That is
+   what the referent does too, so it is left alone. */
+.amb-mat-brushed-round {
+  --amb-mat-specular: 0.3;
+  --amb-mat-roughness: 0.72;
+  /* The albedo is shared with .amb-mat-brushed because this IS that metal,
+     turned a different way — one reflectance, two finishes. The grain alpha
+     is NOT a shared fit, and the equal number is not evidence that it is:
+     the linear tile's across-grain period is sub-pixel, so most of what sets
+     its rendered contrast is the pixel averaging the round() note above
+     exists to protect, while these streaks are several pixels wide at knob
+     radius and take none of it. Same alpha, different spatial statistics.
+     It was matched BY EYE against the linear metal's apparent relief, and a
+     photographic refit would move it. */
+  --amb-albedo: color(srgb-linear 0.49 0.49 0.49);
+  --_grain-tile: conic-gradient(
+    from 0deg at 50% 50%,
+      #a4a4a4 0deg, #ffffff 2.4deg, #b0b0b0 9.6deg, #ffffff 13.3deg, #ffffff 18.4deg, #000000 24.6deg,
+      #ffffff 30.9deg, #525252 36.0deg, #ffffff 43.0deg, #000000 48.2deg, #343434 53.0deg, #1b1b1b 59.1deg,
+      #ffffff 64.2deg, #000000 69.1deg, #ebebeb 75.5deg, #737373 83.0deg, #000000 87.0deg, #ebebeb 94.1deg,
+      #ffffff 98.9deg, #ffffff 102.7deg, #7d7d7d 110.3deg, #000000 114.4deg, #000000 120.8deg, #9a9a9a 127.1deg,
+      #cfcfcf 131.9deg, #ffffff 137.1deg, #000000 142.1deg, #d9d9d9 148.1deg, #b5b5b5 154.7deg, #ffffff 158.9deg,
+      #ffffff 166.2deg, #ffffff 172.0deg, #ededed 177.4deg, #161616 182.6deg, #e2e2e2 187.6deg, #000000 195.2deg,
+      #e3e3e3 200.9deg, #000000 206.4deg, #252525 209.9deg, #5b5b5b 215.1deg, #ffffff 222.1deg, #cdcdcd 228.9deg,
+      #ffffff 234.4deg, #cacaca 239.5deg, #484848 244.5deg, #000000 250.8deg, #000000 257.1deg, #000000 260.8deg,
+      #c0c0c0 268.5deg, #ffffff 274.0deg, #535353 279.6deg, #dfdfdf 284.9deg, #f6f6f6 290.5deg, #000000 294.6deg,
+      #ffffff 299.7deg, #d1d1d1 308.1deg, #444444 312.1deg, #ffffff 318.2deg, #525252 323.4deg, #c4c4c4 328.4deg,
+      #747474 333.2deg, #000000 340.4deg, #636363 346.1deg, #8d8d8d 350.4deg, #000000 355.7deg, #a4a4a4 360deg
+  );
+  --_grain-tile-inv: conic-gradient(
+    from 0deg at 50% 50%,
+      #5b5b5b 0deg, #000000 2.4deg, #4f4f4f 9.6deg, #000000 13.3deg, #000000 18.4deg, #ffffff 24.6deg,
+      #000000 30.9deg, #adadad 36.0deg, #000000 43.0deg, #ffffff 48.2deg, #cbcbcb 53.0deg, #e4e4e4 59.1deg,
+      #000000 64.2deg, #ffffff 69.1deg, #141414 75.5deg, #8c8c8c 83.0deg, #ffffff 87.0deg, #141414 94.1deg,
+      #000000 98.9deg, #000000 102.7deg, #828282 110.3deg, #ffffff 114.4deg, #ffffff 120.8deg, #656565 127.1deg,
+      #303030 131.9deg, #000000 137.1deg, #ffffff 142.1deg, #262626 148.1deg, #4a4a4a 154.7deg, #000000 158.9deg,
+      #000000 166.2deg, #000000 172.0deg, #121212 177.4deg, #e9e9e9 182.6deg, #1d1d1d 187.6deg, #ffffff 195.2deg,
+      #1c1c1c 200.9deg, #ffffff 206.4deg, #dadada 209.9deg, #a4a4a4 215.1deg, #000000 222.1deg, #323232 228.9deg,
+      #000000 234.4deg, #353535 239.5deg, #b7b7b7 244.5deg, #ffffff 250.8deg, #ffffff 257.1deg, #ffffff 260.8deg,
+      #3f3f3f 268.5deg, #000000 274.0deg, #acacac 279.6deg, #202020 284.9deg, #090909 290.5deg, #ffffff 294.6deg,
+      #000000 299.7deg, #2e2e2e 308.1deg, #bbbbbb 312.1deg, #000000 318.2deg, #adadad 323.4deg, #3b3b3b 328.4deg,
+      #8b8b8b 333.2deg, #ffffff 340.4deg, #9c9c9c 346.1deg, #727272 350.4deg, #ffffff 355.7deg, #5b5b5b 360deg
+  );
+  /* Twice the box in BOTH axes. A single value would leave the height at
+     `auto`, which for a gradient is 100% of the box, and a conic gradient
+     drawn into a 2:1 image is an ellipse of streaks rather than a circle. */
+  --_grain-scale: 200% 200%;
+  --_grain-alpha: 0.169;
+
+  /* The sheen, in this material's own geometry: the linear metal's band
+     across the grain, wrapped round the centre. The grain is tangential
+     everywhere, so "across it" is radial everywhere, and the band becomes a
+     pair of opposed lobes lying on the lamp's own axis — plus the hotspot
+     where every streak converges. Both ride the same amplitude the linear
+     metal's band does. */
+  --_sheen-alpha: calc(var(--amb-key-light-intensity) * 0.11 + 0.04);
+  /* atan2 of the light vector is the lamp's bearing; +90deg turns it into
+     the CSS angle convention (0 = up, clockwise) pointing AT the lamp, the
+     same rotation .amb-mat-shiny's --_shiny-angle makes in reverse to point
+     away from it. */
+  --_sheen-angle: calc(atan2(var(--amb-light-y), var(--amb-light-x)) + 90deg);
+  background-image:
+    radial-gradient(
+      circle closest-side at 50% 50%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--_sheen-alpha) * 1.5)) 0%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 40%
+    ),
+    conic-gradient(
+      from var(--_sheen-angle) at 50% 50%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / var(--_sheen-alpha)) 0deg,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 62deg,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 118deg,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / var(--_sheen-alpha)) 180deg,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 242deg,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 298deg,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / var(--_sheen-alpha)) 360deg
+    );
+}
+
+/* Centred, not corner-anchored: the shared rules position the tile from the
+   top-left, which is right for something that repeats and wrong for a single
+   image whose centre has to land on the element's. The lamp offset is added
+   to that centre rather than replacing it, and the inverse layer subtracts
+   the same offset from it — which is why these two cannot be folded back
+   into --_grain-x / --_grain-y. */
+.amb-mat-brushed-round::before {
+  background-position: calc(50% + var(--_grain-x)) calc(50% + var(--_grain-y));
+}
+
+.amb-mat-brushed-round::after {
+  background-position: calc(50% - var(--_grain-x)) calc(50% - var(--_grain-y));
 }
 
 /* --------------------------------------------------------------------------

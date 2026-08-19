@@ -84,6 +84,20 @@ when it runs along it.
 <div class="ambient amb-surface amb-mat-brushed amb-elevation-1">Brushed Surface</div>
 ```
 
+### Brushed round
+
+The same aluminium spun about the element's centre instead of run across it —
+the lathe finish on a knob cap or a volume dial, so put `amb-mat-brushed-round`
+on round faces. The streaks converge to a bright hotspot at the centre, and two
+opposed arcs swing round the rim as the lamp moves, which is the tangent of a
+circular groove going to zero in exactly two places rather than an effect
+painted on.
+
+```html
+<div class="ambient amb-surface amb-mat-brushed-round amb-elevation-1"
+     style="border-radius: 50%">Spun Surface</div>
+```
+
 ### Rubber
 
 Bead-blasted elastomer: a dark, isotropic micro-relief about three times the
@@ -94,11 +108,20 @@ overmoulded caps.
 <div class="ambient amb-surface amb-mat-rubber amb-elevation-1">Rubber Surface</div>
 ```
 
-Both are matte in the specular sense — they add relief, not gloss — and both
-carry their own `--amb-albedo`, the reflectance each was calibrated at.
-Override it for a different tone, but note that the grain's amplitude is
+All three carry their own `--amb-albedo`, the reflectance each was calibrated
+at. Override it for a different tone — that is how you take a finish's relief
+and keep your own surface colour — but note that the grain's amplitude is
 fitted at the material's own tone and does not follow the tone law far from
 it: retone a long way and the relief reads too strong or too weak.
+
+The rubber is matte in the specular sense. The two metals are not: each also
+carries a broad sheen, anisotropic in its own grain's direction. On the linear
+finish that is a band across the grain, so `--amb-light-y` slides it and
+`--amb-light-x` deliberately does nothing; on the spun one it is the pair of
+lobes on the lamp's axis. The sheen rides the key light and is painted on the
+element's own background, so a component that has already spoken for
+`background-image` (`.amb-surface-concave`, `.amb-surface-convex`) keeps its
+own and shows the relief alone.
 
 Scale the relief with `--amb-grain-amount` (default `1`; `0` leaves the flat
 material). It inherits, so a panel can dial down everything inside it. A

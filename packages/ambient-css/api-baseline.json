@@ -27,6 +27,9 @@
     ".amb-light-top",
     ".amb-light-tr",
     ".amb-mat-brushed",
+    ".amb-mat-brushed-round",
+    ".amb-mat-brushed-round::after",
+    ".amb-mat-brushed-round::before",
     ".amb-mat-brushed::after",
     ".amb-mat-brushed::before",
     ".amb-mat-glass",
@@ -50,6 +53,7 @@
     ".ambient",
     ":root",
     ":where(.amb-mat-brushed)",
+    ":where(.amb-mat-brushed-round)",
     ":where(.amb-mat-rubber)"
   ],
   "properties": [

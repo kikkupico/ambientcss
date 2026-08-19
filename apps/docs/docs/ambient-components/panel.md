@@ -12,9 +12,9 @@ import { PanelPreview } from "@site/src/components/ComponentPreviews";
 
 ## Props
 
-`material` takes any of the five finishes — `"matte"`, `"shiny"`, `"glass"`,
-`"brushed"` or `"rubber"` — and defaults to `"matte"`. A panel is a plain
-surface, so it wears the two micro-relief finishes directly: their grain paints
+`material` takes any of the six finishes — `"matte"`, `"shiny"`, `"glass"`,
+`"brushed"`, `"brushed-round"` or `"rubber"` — and defaults to `"matte"`. A
+panel is a plain surface, so it wears the three micro-relief finishes directly: their grain paints
 below the panel's children, and the `overflow: hidden` they need in order to
 clip a blend to a rounded corner clips whatever hangs outside the panel too —
 a control's drop shadow right at the edge included.

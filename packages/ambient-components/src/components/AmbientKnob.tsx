@@ -19,12 +19,16 @@ export type AmbientKnobProps = Omit<AmbientRotaryProps, "parts" | "size"> & {
   material?: AmbientMaterial | undefined;
   /** Ribbed grip around the rotating body. Off gives a smooth turned body. */
   knurling?: boolean | undefined;
+  /** The grip ring's own colour, for a two-tone knob — any CSS colour, read
+   *  as an albedo, so it still takes the scene's light rather than being
+   *  painted flat. Unset, the ring is the same material as the cap. */
+  knurlColor?: string | undefined;
   markers?: AmbientKnobMarkers | undefined;
   indicator?: AmbientKnobIndicator | undefined;
   size?: AmbientKnobSize | undefined;
   /** Look options in another kit's vocabulary.
    *
-   *  The four props above are the *grounded* kit's words. A kit that dresses
+   *  The five props above are the *grounded* kit's words. A kit that dresses
    *  knobs differently has its own, and they arrive here rather than as
    *  loose props so the common path stays typed and a misspelt `knurling`
    *  is still a compile error. Kits usually ship a preset of their own that
@@ -39,6 +43,7 @@ export type AmbientKnobProps = Omit<AmbientRotaryProps, "parts" | "size"> & {
 export function AmbientKnob({
   material,
   knurling,
+  knurlColor,
   markers,
   indicator,
   look,
@@ -51,7 +56,7 @@ export function AmbientKnob({
 }: AmbientKnobProps) {
   const { dress, defaults } = useDress(
     "rotary",
-    { material, knurling, markers, indicator, ...look },
+    { material, knurling, knurlColor, markers, indicator, ...look },
     groundedKit.rotary!
   );
 

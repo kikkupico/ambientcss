@@ -118,9 +118,12 @@ export function KnobBody({
  *  needed help from the control to exist, the split would not be clean. */
 export function KnurledFace({
   material,
+  color,
   className
 }: {
   material?: AmbientMaterial | undefined;
+  /** The ribs' own colour, as an albedo. */
+  color?: string | undefined;
   className?: string | undefined;
 }) {
   const id = `amb-knurl-${useId().replace(/:/g, "")}`;
@@ -135,7 +138,16 @@ export function KnurledFace({
       </svg>
       <span
         className={cn("amb-knob-face", material && `amb-mat-${material}`, className)}
-        style={{ clipPath: `url(#${id})` }}
+        style={{
+          clipPath: `url(#${id})`,
+          /* Not a paint colour: --amb-albedo is the ribs' REFLECTANCE, so a
+             dark knurl still takes the scene's exposure, the lamp's cast and
+             the rim's own --amb-shade step, and still goes dark when the
+             lights do. Inline, so it beats the albedo a micro-relief material
+             would otherwise set on this element — an explicit colour wins
+             over the finish's own, and the finish keeps its grain. */
+          ...(color ? { "--amb-albedo": color } : null)
+        } as CSSProperties}
       />
     </>
   );

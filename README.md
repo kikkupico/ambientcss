@@ -163,12 +163,26 @@ classes were five fixed albedos of this one law; the equivalent shades are
 ### Materials & Finishes
 
 `.amb-mat-matte` `.amb-mat-shiny` `.amb-mat-glass` `.amb-mat-brushed`
-`.amb-mat-rubber`
+`.amb-mat-brushed-round` `.amb-mat-rubber`
 
-`.amb-mat-brushed` and `.amb-mat-rubber` carry a fitted micro-relief rather
-than a gloss: the tile holds a raw height field and its inverse, and only the
-offset between them tracks the light, so the bumps stay put and the shading
-crosses over them. Scale it with `--amb-grain-amount` (default `1`).
+`.amb-mat-brushed`, `.amb-mat-brushed-round` and `.amb-mat-rubber` carry a
+fitted micro-relief rather than a gloss: the tile holds a raw height field and
+its inverse, and only the offset between them tracks the light, so the bumps
+stay put and the shading crosses over them. Scale it with `--amb-grain-amount`
+(default `1`).
+
+`.amb-mat-brushed-round` is the same aluminium spun about the element's centre
+instead of run across it — the lathe finish on a knob cap — so put it on round
+faces. Its grain is a conic gradient rather than a repeating tile, and the two
+bright arcs that swing with the lamp fall out of the same offset the linear
+grain uses, because a fixed offset is tangent to a circular groove in only two
+places.
+
+Both brushed finishes also carry a broad specular sheen, painted on the host's
+own background like `.amb-mat-shiny`'s. It is anisotropic in the grain's own
+direction: a band across the grain on the linear metal (so `--amb-light-y`
+moves it and `--amb-light-x` does not), and a pair of opposed lobes on the
+lamp's axis, plus a converged hotspot, on the spun one.
 
 ### Physical Depth & Elevation
 

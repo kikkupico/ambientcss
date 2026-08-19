@@ -486,8 +486,11 @@
 
 /* Each relief material's reflectance as a ratio of the reference ground
    (--amb-albedo 0.82), so the dish above can derive its alphas at the tone
-   the face actually is: 0.49 / 0.82 and 0.0644 / 0.82. */
-.ambx-cap-tone-brushed { --_ambx-cap-tone: 0.5976; }
+   the face actually is: 0.49 / 0.82 and 0.0644 / 0.82. The two brushed
+   finishes are the same aluminium turned two different ways, so they share
+   the ratio rather than each carrying a copy of the number. */
+.ambx-cap-tone-brushed,
+.ambx-cap-tone-brushed-round { --_ambx-cap-tone: 0.5976; }
 
 .ambx-cap-tone-rubber {
   --_ambx-cap-tone: 0.0785;

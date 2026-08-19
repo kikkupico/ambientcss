@@ -64,7 +64,7 @@ shape — `"md"` is the unchanged default. See the full per-shape table in
 | Prop | Type | Default |
 | --- | --- | --- |
 | `shape` | `"pill" \| "round" \| "square"` | `"pill"` |
-| `material` | `"matte" \| "shiny" \| "glass" \| "brushed" \| "rubber"` | `"matte"` |
+| `material` | `"matte" \| "shiny" \| "glass" \| "brushed" \| "brushed-round" \| "rubber"` | `"matte"` |
 | `size` | `"sm" \| "md" \| "lg"` | `"md"` |
 | `mode` | `"momentary" \| "toggle" \| "repeat"` | `"momentary"` |
 | `onPress` | `() => void` | - |

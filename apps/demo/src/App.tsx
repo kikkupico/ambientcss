@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import {
   AmbientProvider,
   AmbientButton,
@@ -10,8 +11,8 @@ import {
   AmbientPanel,
   AmbientKitProvider,
   consoleKit,
+  ConsoleKnob,
   type AmbientTheme,
-  type AmbientKnobIndicator,
 } from "@ambientcss/components";
 
 /* The README hero film (tools/hero-gif): the same device raytraced in
@@ -85,14 +86,20 @@ const THEME_PRESETS: ThemePreset[] = [
 
 const DEFAULTS = THEME_PRESETS[0]!;
 
-/* The settings pulldown is a little lighting console: one AmbientKnob per
-   light parameter. The knobs themselves re-shade as you turn them, since
-   they're lit by the very light they control. */
-type KnobCfg = {
+/* The settings pulldown is a little lighting console, and the SHAPE of each
+   control is the argument: a light vector is a position in the plane, so
+   Light X lies along a horizontal slider and Light Y stands up a fader —
+   the pair reads as the two axes of the lamp's placement rather than as two
+   more dials. The two intensities are hardware knobs, and the three colour
+   parameters are the console kit's bar knobs, which groups them by what they
+   do without a caption saying so.
+
+   The knobs re-shade as you turn them, since they're lit by the very light
+   they control. */
+type ControlCfg = {
   key: string;
   label: string;
   prop: keyof AmbientTheme;
-  indicator: AmbientKnobIndicator;
   min: number;
   max: number;
   step: number;
@@ -100,19 +107,38 @@ type KnobCfg = {
   to: (v: number) => number;
 };
 
-/* The two bipolar controls take the rectangle: a bar reads as a pointer
-   swinging either side of centre, which is what Light X/Y do. Everything
-   else runs 0..max and takes the dot. Markers stay off — the console row is
-   seven knobs on a 4px grid and a printed ring would not survive it. */
-const LIGHT_KNOBS: KnobCfg[] = [
-  { key: "lx",   label: "Light X", prop: "lightX",         indicator: "rectangle", min: -100, max: 100, step: 2, value: (t) => Math.round(t.lightX * 100),  to: (v) => v / 100 },
-  { key: "ly",   label: "Light Y", prop: "lightY",         indicator: "rectangle", min: -100, max: 100, step: 2, value: (t) => Math.round(t.lightY * 100),  to: (v) => v / 100 },
-  { key: "key",  label: "Key",     prop: "keyLight",       indicator: "circle",    min: 0,    max: 100, step: 1, value: (t) => Math.round(t.keyLight * 100), to: (v) => v / 100 },
-  { key: "fill", label: "Fill",    prop: "fillLight",      indicator: "circle",    min: 0,    max: 100, step: 1, value: (t) => Math.round(t.fillLight * 100), to: (v) => v / 100 },
-  { key: "hue",  label: "Hue",     prop: "lightHue",       indicator: "circle",    min: 0,    max: 360, step: 2, value: (t) => Math.round(t.lightHue),       to: (v) => v },
-  { key: "sat",  label: "Sat",     prop: "lightSaturation", indicator: "circle",   min: 0,    max: 100, step: 1, value: (t) => Math.round(t.lightSaturation), to: (v) => v },
-  { key: "lume", label: "Lume",    prop: "lumeHue",        indicator: "circle",    min: 0,    max: 360, step: 2, value: (t) => Math.round(t.lumeHue),        to: (v) => v },
+/* The lamp's position: bipolar, -100..100, zero at centre.
+
+   Y IS INVERTED, and that is the whole reason it is worth spelling the two
+   axes out separately. --amb-light-y points DOWN the screen, so the lamp
+   overhead is -1; a fader whose travel ran with the property would put the
+   light above the panel when the cap is at the BOTTOM, which is exactly the
+   confusion a control shaped like the thing it moves is supposed to remove.
+   The slider needs no such flip: +x is already to the right. */
+const LIGHT_AXES: Record<"x" | "y", ControlCfg> = {
+  x: { key: "lx", label: "Light X", prop: "lightX", min: -100, max: 100, step: 2, value: (t) => Math.round(t.lightX * 100),  to: (v) => v / 100 },
+  y: { key: "ly", label: "Light Y", prop: "lightY", min: -100, max: 100, step: 2, value: (t) => Math.round(t.lightY * -100), to: (v) => -v / 100 },
+};
+
+/* The two intensities, on grounded knobs. Their grips take a dark knurl:
+   the well they sit in is darker than the panel, and a knob whose rim is
+   the panel's own pale metal reads as floating over it rather than seated
+   in it. --amb-albedo, so the ribs still take the scene's light. */
+const LEVEL_KNOBS: ControlCfg[] = [
+  { key: "key",  label: "Key",  prop: "keyLight",  min: 0, max: 100, step: 1, value: (t) => Math.round(t.keyLight * 100),  to: (v) => v / 100 },
+  { key: "fill", label: "Fill", prop: "fillLight", min: 0, max: 100, step: 1, value: (t) => Math.round(t.fillLight * 100), to: (v) => v / 100 },
 ];
+
+/* Everything chromatic, on the console kit's bar knobs. */
+const TONE_KNOBS: ControlCfg[] = [
+  { key: "hue",  label: "Hue",  prop: "lightHue",        min: 0, max: 360, step: 2, value: (t) => Math.round(t.lightHue),        to: (v) => v },
+  { key: "sat",  label: "Sat",  prop: "lightSaturation", min: 0, max: 100, step: 1, value: (t) => Math.round(t.lightSaturation), to: (v) => v },
+  { key: "lume", label: "Lume", prop: "lumeHue",         min: 0, max: 360, step: 2, value: (t) => Math.round(t.lumeHue),         to: (v) => v },
+];
+
+/* The knurl tone the console's knobs wear, dark enough to read against the
+   well's floor. A reflectance, not a paint: it still darkens with the key. */
+const DARK_KNURL = "color(srgb-linear 0.09 0.09 0.1)";
 
 const ORBIT_COUNT = 9;
 const ANIM_DURATION = 800; // ms for preset transitions
@@ -227,6 +253,7 @@ export function App() {
   const [knob1, setKnob1] = useState(65);
   const [knob2, setKnob2] = useState(30);
   const [knob3, setKnob3] = useState(48);
+  const [knob4, setKnob4] = useState(62);
   const [slider1, setSlider1] = useState(50);
   const [fader1, setFader1] = useState(70);
   const [bank, setBank] = useState("3");
@@ -461,6 +488,7 @@ export function App() {
               { mat: "shiny" as const, label: "Shiny" },
               { mat: "glass" as const, label: "Glass" },
               { mat: "brushed" as const, label: "Brushed" },
+              { mat: "brushed-round" as const, label: "Spun" },
               { mat: "rubber" as const, label: "Rubber" },
             ].map(({ mat, label }, i) => (
               <div className="surface-item" key={label}>
@@ -611,6 +639,20 @@ export function App() {
                 onChange={setKnob3}
                 material="brushed"
                 knurling={false}
+                label="Knob"
+              />
+            </div>
+            <div className="component-cell" data-visible={compView.visible}>
+              {/* The spun finish, which is what a knob cap actually wears —
+                  and the one metal a rotating part may carry, because a grain
+                  that turns about the same centre the part does looks the
+                  same at every angle. Dark knurl round a pale cap: two tones,
+                  one control. */}
+              <AmbientKnob
+                value={knob4}
+                onChange={setKnob4}
+                material="brushed-round"
+                knurlColor="color(srgb-linear 0.09 0.09 0.1)"
                 label="Knob"
               />
             </div>
@@ -812,7 +854,12 @@ function ThemeSwitcher({ theme, activePreset, onPreset, onCustom, onProp }: Them
   };
 
   return (
-    <header className="cordbar">
+    /* The slab's width is derived from the bank's, and the bank's from how
+       many keys there are — so the count is handed to the CSS rather than
+       restated there. It has to be: the slab now wears a micro-relief finish,
+       which brings `overflow: hidden`, so a sixth preset against a hardcoded
+       five would be CLIPPED rather than visibly spilling. */
+    <header className="cordbar" style={{ "--keys": keys.length } as CSSProperties}>
       <div className={`cord-assembly${consoleOpen ? " is-open" : ""}`} ref={rigRef}>
         {/* One thick slab of the surface itself, holding both the light
             console and the key bank. Its upper region is the console, parked
@@ -820,7 +867,7 @@ function ThemeSwitcher({ theme, activePreset, onPreset, onCustom, onProp }: Them
             seated in it — shows at rest. Picking Custom drops the whole slab
             into view: the console was always just the hidden part of this
             same panel. */}
-        <div className="cord-panel ambient amb-surface amb-chamfer amb-thickness-2 amb-elevation-1">
+        <div className="cord-panel ambient amb-surface amb-chamfer amb-thickness-2 amb-elevation-1 amb-mat-brushed">
           <div className="cord-console">
             <div className="cord-console-title">
               Global light
@@ -829,20 +876,69 @@ function ThemeSwitcher({ theme, activePreset, onPreset, onCustom, onProp }: Them
             {/* Controls sit in a recessed darker well so they pop and read
                 apart from the key bank below. */}
             <div className="cord-console-well ambient amb-groove groove-darker">
-              <div className="cord-console-grid">
-                {LIGHT_KNOBS.map((k) => (
-                  <AmbientKnob
-                    key={k.key}
-                    value={k.value(theme)}
-                    min={k.min}
-                    max={k.max}
-                    step={k.step}
-                    indicator={k.indicator}
-                    onChange={(v) => onProp(k.prop, k.to(v))}
-                    label={k.label}
+              {/* The lamp's placement, laid out as the vector it is: the
+                  fader stands on the left for Y, the slider runs across the
+                  top for X, and the two intensity knobs sit under the slider
+                  in the block the fader's height makes room for. */}
+              <div className="cord-console-lights">
+                <AmbientFader
+                  className="cord-fader"
+                  size="sm"
+                  value={LIGHT_AXES.y.value(theme)}
+                  min={LIGHT_AXES.y.min}
+                  max={LIGHT_AXES.y.max}
+                  step={LIGHT_AXES.y.step}
+                  onChange={(v) => onProp(LIGHT_AXES.y.prop, LIGHT_AXES.y.to(v))}
+                  label={LIGHT_AXES.y.label}
+                />
+                <div className="cord-console-stack">
+                  <AmbientSlider
+                    className="cord-slider"
+                    size="sm"
+                    value={LIGHT_AXES.x.value(theme)}
+                    min={LIGHT_AXES.x.min}
+                    max={LIGHT_AXES.x.max}
+                    step={LIGHT_AXES.x.step}
+                    onChange={(v) => onProp(LIGHT_AXES.x.prop, LIGHT_AXES.x.to(v))}
+                    label={LIGHT_AXES.x.label}
                   />
-                ))}
+                  <div className="cord-console-levels">
+                    {LEVEL_KNOBS.map((k) => (
+                      <AmbientKnob
+                        key={k.key}
+                        size="sm"
+                        knurlColor={DARK_KNURL}
+                        value={k.value(theme)}
+                        min={k.min}
+                        max={k.max}
+                        step={k.step}
+                        onChange={(v) => onProp(k.prop, k.to(v))}
+                        label={k.label}
+                      />
+                    ))}
+                  </div>
+                </div>
               </div>
+              {/* The colour of the light, in the console kit's vocabulary —
+                  a different family of control for a different kind of
+                  parameter, and the kit provider wraps only these three. */}
+              <AmbientKitProvider kit={consoleKit}>
+                <div className="cord-console-tone">
+                  {TONE_KNOBS.map((k) => (
+                    <ConsoleKnob
+                      key={k.key}
+                      size="sm"
+                      legend={false}
+                      value={k.value(theme)}
+                      min={k.min}
+                      max={k.max}
+                      step={k.step}
+                      onChange={(v) => onProp(k.prop, k.to(v))}
+                      label={k.label}
+                    />
+                  ))}
+                </div>
+              </AmbientKitProvider>
             </div>
             <div className="cord-console-hint">every scene re-lights live</div>
           </div>
