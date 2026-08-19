@@ -514,13 +514,16 @@
 }
 
 /* Knob: a knob-scale body (thickness 2 = the referent knob.py's 9mm
-   height) resting on the panel. Three independent axes, each its own prop:
-   the rotating face may carry a knurl — a repeating-conic rib pattern,
-   physically the referent's ribs catching key light on one flank and
+   height) resting on the panel — a smooth chamfered cap, and around it
+   three independent axes, each its own prop. The cap may be ringed by a
+   knurl — a rim band of ribs standing proud of its edge and a step below
+   it, physically the referent's ribs catching key light on one flank and
    shading on the other — the panel around it may carry printed scale
-   markers, and the face carries one accent indicator. The face rotates
-   with the value, so the ribs move under the fingers like the real thing;
-   the markers do not, because they are printed on the panel. */
+   markers, and the face carries one accent indicator. The knurl and the
+   indicator rotate with the value, so the ribs move under the fingers like
+   the real thing; the markers do not, because they are printed on the
+   panel, and neither does the cap, whose chamfer is lit from a fixed
+   direction and so cannot ride a turning frame. */
 /* Every knob metric is a fraction of the control's own size, so the three
    size steps only restate that one length. Marker radius and dot size are
    fractions of the DIAMETER: the ring sits at 1.33R and the dots measure
@@ -535,61 +538,73 @@
   --ambx-knob-marker-size: calc(var(--ambx-knob-size) * 0.07);
 }
 
-/* The body is the smooth circle at the tooth-root radius: it carries
-   the ambient drop shadow (kept circular — the teeth are too fine to
-   read in a penumbra) while the clipped face above it supplies the
-   knurled silhouette. */
+/* The cap: the smooth chamfered disc that is most of the knob, and the
+   element that carries the ambient drop shadow (kept circular — the knurl's
+   teeth are too fine to read in a penumbra).
+
+   Both variants take the small base chamfer the referent cuts on every knob
+   (knob.py's `chamfer=0.35`, regardless of rib count) — width 2,
+   level-for-level with the body's knob-scale thickness (.amb-chamfer-2's
+   pairing). A rim of ribs is a grip, not an edge treatment: it tells you
+   the knob turns, not where its top face stops, so the knurled knob needs
+   the chamfer just as much as the smooth one does.
+
+   knurling={false} leaves the cap flush at the full width and it becomes the
+   whole visible knob — a turned cylinder. Otherwise KnobBody insets it by the
+   knurl band (inline, from the same constant the clip path uses) so the ribs
+   ring it. */
 .amb-knob-body {
   position: absolute;
-  inset: calc(var(--ambx-grid) / 2);
-  border-radius: 50%;
-}
-
-/* Flush body (knurling={false}): with no teeth to stand proud there is
-   no reason to hold the body back off the edge, so it takes the full
-   width and becomes the whole visible knob — a turned cylinder, its rim
-   read from .amb-thickness-2's edge bands. The face above it then paints
-   nothing at all and exists only to carry the rotating indicator, which
-   is why the knurl's tone and clip are both dropped rather than
-   overridden.
-
-   With no ribs to catch the light, the rim needs its own cue that this is
-   a turned edge rather than a flat disc, so it takes the small base
-   chamfer the referent cuts on every knob (knob.py's `chamfer=0.35`,
-   regardless of rib count) — width 2, level-for-level with the body's
-   knob-scale thickness (.amb-chamfer-2's pairing). A knurled knob skips
-   this: its clipped silhouette already reads as machined. */
-.amb-knob-body-flush {
   inset: 0;
+  border-radius: 50%;
   --amb-chamfer: 1;
   --amb-chamfer-width: 2;
 }
 
-/* The rotating face: clipped to the straight-knurl silhouette (the
-   inline SVG clipPath in AmbientKnob), opaque at the knob's surface
-   color, with per-tooth flank shading — a lit leading flank and a
-   shaded trailing flank every 10deg, phase-aligned with the clip's
-   teeth (conic 0 is rotated to the +x axis where the tooth path
-   starts) — under the smooth top disc. */
+/* The rotating knurl: clipped to the toothed ANNULUS (the inline SVG
+   clipPath in KnurledFace), so it paints only the rim band outside the cap
+   and the cap's own chamfer bands survive underneath.
+
+   Two things paint it. Per-tooth flank shading — a lit flank climbing to
+   each ridge and a shaded one falling away, one pair every 7.5deg (360/48,
+   the clip's rib count), phase-aligned with the clip: conic 0 is rotated to
+   the +x axis, where the tooth curve starts in a groove, so the ridge lands
+   at 3.75deg and the lit and shaded stops at 1.875 and 5.625. And a
+   contact-occlusion band along the inner edge, where the cap overhangs the
+   band it steps down to: radial, so it survives the frame's rotation
+   unchanged, which a directional cue in a turning element could not.
+
+   The step down itself is --amb-shade, not a black wash: the rim is the same
+   material as the cap sitting lower and facing less of the sky, and shading
+   the albedo darkens it the way less light would, where an overlay would
+   drain a coloured knob toward grey. Uniform round the circumference, so it
+   too is rotation-safe. */
 .amb-knob-face {
   position: absolute;
   inset: 0;
+  --amb-shade: 0.88;
   background-color: var(--amb-lit);
   background-image:
     radial-gradient(
-      circle,
-      var(--amb-lit) 0 60%,
-      transparent 61%
+      circle closest-side,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% /
+        calc((var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
+          * 0.07 + 0.09)) 89%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% /
+        calc((var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
+          * 0.02 + 0.03)) 95%,
+      transparent 100%
     ),
     repeating-conic-gradient(
       from 90deg,
+      transparent 0deg,
       hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% /
-        calc(var(--amb-key-light-intensity) * 0.35)) 0deg 1.4deg,
-      transparent 2.2deg 4.6deg,
+        calc(var(--amb-key-light-intensity) * 0.26)) 1.875deg,
+      transparent 3.75deg,
       hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% /
         calc((var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
-          * 0.3 + 0.16)) 5deg 6.4deg,
-      transparent 7.2deg 10deg
+          * 0.24 + 0.13)) 5.625deg,
+      transparent 7.5deg
     );
 }
 

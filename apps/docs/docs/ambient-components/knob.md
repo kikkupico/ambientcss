@@ -17,8 +17,16 @@ parts supply the look. Swap either.
 
 The knob is modeled on its 3D referent (`ambient3d/components/knob.py`): a
 knob-scale body (thickness 2 — the referent's 9mm height) resting on the
-panel, with a knurled rim and an indicator dot. The whole face rotates with
-the value, ribs and all.
+panel — a smooth chamfered cap, a knurled rim around it, and an indicator
+dot. The rim and the indicator rotate with the value, ribs and all; the cap
+does not, because its chamfer is lit from a fixed direction.
+
+Both are machined the way a turned-and-knurled hardware knob is: the ribs
+stop short of the top, a bevel carries them out to the full radius, and a
+smooth chamfer and the flat cap sit above and inside it. `knob.py` takes that
+as `knurl_rim` / `cap_chamfer`, and the two rib sections are the same formula
+rather than two shapes fitted to each other — the clip path samples the
+referent's `wall_r`.
 
 <RenderComparison slug="knob" dir="components"><GroundedKnobDemo /></RenderComparison>
 
@@ -31,20 +39,21 @@ knob someone has built.
 
 ### `knurling`
 
-`true` (default) gives the grounded referent's 36-rib knurl, clipped to a
-toothed silhouette so the ribs break the outline and rotate with the value.
-`false` gives a smooth turned body: with no teeth standing proud, the body
-takes the full width and its rim is read from the thickness bands alone.
+`true` (default) rings the cap with a 48-rib knurl: the cap sits back by the
+band's width and the ribs stand proud of it, clipped to a toothed annulus so
+they break the outline and rotate with the value. `false` gives a smooth
+turned body — the cap takes the full width and becomes the whole knob.
 
-`material` applies to whichever of the two actually paints the knob, so
-`knurling={false} material="shiny"` is the machined-metal wheel. On a knurled
-knob the rib shading holds the face and a material contributes only its
-`--amb-mat-*` variables.
+Both variants chamfer the cap's edge, the treatment `knob.py` cuts on every
+knob regardless of rib count. A rim of ribs is a grip, not an edge
+treatment: it says the knob turns, not where its top face stops.
 
-That routing is the reason `AmbientRotary` has no `material` prop and this
-preset does: which element a material belongs on is a fact about *this*
-knob's construction, and a mechanism cannot know it once the parts are
-yours.
+`material` applies to both elements a knurled knob paints with, so
+`material="shiny"` is the machined-metal wheel with or without the ribs.
+
+`AmbientRotary` still has no `material` prop and this preset does: how many
+elements a material has to reach is a fact about *this* knob's construction,
+and a mechanism cannot know it once the parts are yours.
 
 <KnobKnurlingPreview />
 

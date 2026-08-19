@@ -3,6 +3,14 @@
 Geometry is generated directly with bmesh — no modifiers, no booleans — so
 every dimension is an explicit parameter and output is deterministic.
 
+The top edge comes in two constructions. By default the ribs run up through
+a `fillet` round-over, so a knurled knob is ribbed right to its top face.
+Pass `knurl_rim` instead and the knob is built the way a turned-and-knurled
+one is machined: the ribs stop short, a bevel of that radial width carries
+them out to the full radius, and a smooth `cap_chamfer` and flat cap sit
+above and inside it. That second construction is what @ambientcss/components
+draws — see referents.py knob().
+
 Reference styles (see inspiration/):
 - OP-Z: ~12 broad flutes (rib_sharpness ~3), slight taper, centered dot
 - OP-1 field encoder: fine knurl (ribs 64+, depth ~0.15), smooth
@@ -37,8 +45,17 @@ def build_knob(
     rib_depth=0.22,      # groove depth
     rib_sharpness=1.4,   # higher = narrower grooves, broader ridges
     taper=0.0,           # 0..~0.15, base narrower than top (OP-Z style)
-    fillet=1.4,          # top edge round-over radius
+    fillet=1.4,          # top edge round-over radius; ignored when knurl_rim
     chamfer=0.35,        # small chamfer at the base
+    knurl_rim=0.0,       # >0 replaces the top round-over with a knurled
+                          # BEVEL of this radial width, and the flat top face
+                          # retreats behind it — the turned-and-knurled
+                          # construction the CSS knob is built as. 0 keeps the
+                          # original knurl-runs-up-through-the-fillet shape.
+    knurl_rim_drop=None,  # that bevel's fall in z; None = as wide as it is
+                          # deep (45deg). Shallower reads as a flatter rim.
+    cap_chamfer=0.0,     # smooth (un-knurled) chamfer between the flat top
+                          # face and the knurled rim: the cap's own edge
     indicator="line",    # "line", "dot", or "none"
     dot_frac=0.3,        # dot radius as a fraction of the cap radius
     dot_offset=0.0,      # 0 = centered dot; else offset fraction toward rim
@@ -65,28 +82,56 @@ def build_knob(
 ):
     segs = max(256, ribs * 12) if ribs else 256
 
-    def wall_r(theta):
+    def wall_r(theta, rib_scale=1.0):
+        """Wall radius at `theta`, with the rib relief scaled by `rib_scale`.
+
+        `rib_scale=0` is the smooth crest circle, which is what the levels
+        above a knurled rim ride on: a turned chamfer is a true circle and
+        the knurl's grooves undercut it.
+        """
         r = radius
-        if ribs:
-            r -= rib_depth * (0.5 + 0.5 * math.cos(ribs * theta)) ** rib_sharpness
+        if ribs and rib_scale:
+            r -= (rib_depth * rib_scale
+                  * (0.5 + 0.5 * math.cos(ribs * theta)) ** rib_sharpness)
         return r
 
-    # profile levels: (z, radial inset from the knurled wall)
-    levels = [(0.0, chamfer), (chamfer, 0.0), (height - fillet, 0.0)]
-    fillet_steps = 8
-    for i in range(1, fillet_steps + 1):
-        t = (i / fillet_steps) * (math.pi / 2)
-        levels.append((height - fillet + fillet * math.sin(t),
-                       fillet * (1.0 - math.cos(t))))
+    # Profile levels: (z, radial inset from the wall, rib relief 0..1).
+    levels = [(0.0, chamfer, 1.0), (chamfer, 0.0, 1.0)]
+    if knurl_rim:
+        # Turned-and-knurled construction (the CSS knob): the ribs stop below
+        # the top face, a bevel of `knurl_rim` carries them out to the full
+        # radius, and beyond that bevel — and above it — sit a smooth chamfer
+        # and the flat cap. Seen flat-on that is exactly the component's three
+        # rings: cap, chamfer, knurl.
+        drop = knurl_rim if knurl_rim_drop is None else knurl_rim_drop
+        # The ribs die out over a short riser rather than at a seam: two rings
+        # at one z would be coincident at all `ribs` crests (the relief term is
+        # 0 there), and zero-area faces pinch the smooth shading along the very
+        # edge this construction exists to show.
+        fade = 0.1
+        wall_top = height - cap_chamfer - fade - drop
+        levels += [
+            (wall_top, 0.0, 1.0),                      # wall, knurled
+            (wall_top + drop, knurl_rim, 1.0),         # knurled bevel
+            (wall_top + drop + fade, knurl_rim, 0.0),  # ribs run out
+            (height, knurl_rim + cap_chamfer, 0.0),    # cap chamfer
+        ]
+    else:
+        levels.append((height - fillet, 0.0, 1.0))
+        fillet_steps = 8
+        for i in range(1, fillet_steps + 1):
+            t = (i / fillet_steps) * (math.pi / 2)
+            levels.append((height - fillet + fillet * math.sin(t),
+                           fillet * (1.0 - math.cos(t)), 1.0))
 
     bm = bmesh.new()
     rings = []
-    for z, inset in levels:
+    for z, inset, rib_scale in levels:
         scale = 1.0 - taper * (1.0 - z / height)
         ring = []
         for j in range(segs):
             th = 2 * math.pi * j / segs
-            r = max(wall_r(th) * scale - inset, 0.3)
+            r = max(wall_r(th, rib_scale) * scale - inset, 0.3)
             ring.append(bm.verts.new((r * math.cos(th), r * math.sin(th), z)))
         rings.append(ring)
 
@@ -110,7 +155,7 @@ def build_knob(
     if body_material:
         knob.data.materials.append(body_material)
 
-    cap_r = radius - fillet
+    cap_r = radius - knurl_rim - cap_chamfer if knurl_rim else radius - fillet
     top_z = height
     if top_disc:
         disc_r = radius * top_disc_frac if top_disc_frac is not None \

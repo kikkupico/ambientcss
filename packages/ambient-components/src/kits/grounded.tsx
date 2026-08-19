@@ -30,10 +30,11 @@ function rotary(look: KitLook): KitDress {
     parts: {
       panel:
         markers === "none" ? null : <ScaleRing count={markers === "ends" ? 2 : FULL_MARKERS} />,
-      /* `material` goes on whichever element actually paints: the clipped
-         face when there is a knurl, the body when there is not, because a
-         smooth knob's face paints nothing at all. */
-      base: <KnobBody flush={!knurling} material={!knurling ? material : undefined} />,
+      /* `material` goes on every element that paints. The cap always does —
+         it is the knob's top face either way — and the knurl ring does too
+         when there is one, so a knurled knob's rim and cap are the same
+         material rather than the rim being the only thing wearing it. */
+      base: <KnobBody flush={!knurling} material={material} />,
       actuator: (
         <>
           {knurling ? <KnurledFace material={material} /> : null}

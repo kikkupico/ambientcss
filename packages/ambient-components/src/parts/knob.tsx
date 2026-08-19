@@ -4,57 +4,85 @@ import { cn } from "../lib/cn";
 import { useControlState } from "../core/context";
 import type { AmbientMaterial } from "../core/material";
 
-/* Straight-knurled silhouette for the rotating face, in objectBoundingBox
-   units so the clip scales with the component. It mirrors the grounded
-   referent's rib section (ambient3d/referents.py knob(), ribs=36): trapezoid
-   teeth between the outer radius and the tooth-root radius. The circular body
-   underneath keeps the smooth drop shadow.
+/* The knurl: a rim band of straight ribs around the knob's cap, in
+   objectBoundingBox units so the clip scales with the component.
+
+   The knob it belongs to reads like the turned-and-knurled hardware knob it
+   is named for: a smooth chamfered cap on top, and beyond that cap's edge —
+   and a step below it — a ring of knurling standing proud of the outline.
+   So the clip is an ANNULUS, not a disc: a rippled outer contour punched
+   through by a circle at the cap's radius, filled `evenodd`, which leaves
+   the cap and its chamfer bands to paint themselves underneath.
+
+   The rib section is the referent's (ambient3d/components/knob.py `wall_r`):
+   radius falls from the crest by `depth * (0.5 + 0.5cos(N.theta))^sharpness`,
+   so ridges are broad and grooves narrow. Sampling that curve beats the old
+   four-point trapezoid — at 36 teeth a square wave silhouette reads as gear
+   teeth, which is what this replaces.
 
    One knurl for now, kept in a table because the shape is a data question and
-   the referent lineup already carries broader flutes and a finer 48-rib knurl
-   we may expose later — at which point `teeth` grows a second row rather than
-   this file changing shape. */
+   the referent lineup carries broader flutes (14 ribs) we may expose later.
+   A second row is not free, though: `teeth` is shadowed by the conic pitch in
+   .amb-knob-face (360/teeth) and `band` by that rule's radial stop, so a knurl
+   with different numbers needs its shading parameterised out of the stylesheet
+   first. Only `depth` and `sharpness` live here alone. */
 type KnurlSpec = {
   teeth: number; // rib count
-  root: number; // tooth-root radius (bounding-box units; outer is 0.5)
-  rise: number; // fraction of the pitch spent climbing to the crest
-  fall: [number, number]; // crest-end and root-return pitch fractions
+  depth: number; // crest-to-root, bounding-box units (the crest is at 0.5)
+  sharpness: number; // >1 narrows the groove and broadens the ridge
+  band: number; // rim width the ribs occupy, bounding-box units
 };
 
 const KNURLS: Record<"standard", KnurlSpec> = {
-  /* 36 ribs — the grounded referent knob */
-  standard: { teeth: 36, root: 0.468, rise: 0.12, fall: [0.5, 0.62] }
+  /* 48 ribs — the referent lineup's fine knurl (referents.py knob_cap /
+     knob_wheel) rather than the 36 of its coarse one, because a band a tenth
+     of the radius wide reads as a machined grip only if the ribs are finer
+     than it is; at 36 the same band came out a bottle cap. */
+  standard: { teeth: 48, depth: 0.009, sharpness: 1.6, band: 0.05 }
 };
 
-function knurlPath({ teeth, root, rise, fall }: KnurlSpec): string {
+/** The cap's inset: the knurl band's width, so the ribs stand proud of it.
+ *  One number, two views of the same edge — the clip's inner radius and the
+ *  body's inset have to agree or the ring floats off its cap. */
+const KNURL_BAND = KNURLS.standard.band;
+
+/* The clip's hole is a hair tighter than the cap so their antialiased edges
+   overlap instead of leaving a hairline of panel between them. */
+const SEAM = 0.005;
+
+/* Samples per tooth. The curve's extremes both land on samples: the groove
+   at the tooth's start, the ridge at its half-pitch. */
+const STEPS = 6;
+
+function knurlPath({ teeth, depth, sharpness, band }: KnurlSpec): string {
   const outer = 0.5;
-  const pitch = (Math.PI * 2) / teeth;
+  const inner = outer - band - SEAM;
+  const segs = teeth * STEPS;
   const pts: string[] = [];
-  for (let i = 0; i < teeth; i++) {
-    const a = i * pitch;
-    const tooth: Array<[number, number]> = [
-      [0, root],
-      [rise, outer],
-      [fall[0], outer],
-      [fall[1], root]
-    ];
-    for (const [frac, radius] of tooth) {
-      const t = a + frac * pitch;
-      pts.push(
-        `${(0.5 + radius * Math.cos(t)).toFixed(4)} ${(0.5 + radius * Math.sin(t)).toFixed(4)}`
-      );
-    }
+  for (let i = 0; i < segs; i++) {
+    const t = (i / segs) * Math.PI * 2;
+    const r = outer - depth * (0.5 + 0.5 * Math.cos(teeth * t)) ** sharpness;
+    pts.push(
+      `${(0.5 + r * Math.cos(t)).toFixed(4)} ${(0.5 + r * Math.sin(t)).toFixed(4)}`
+    );
   }
-  return `M${pts.join(" L")} Z`;
+  /* Second subpath: the cap-sized hole, two half arcs. Winding is irrelevant —
+     the clip fills evenodd. */
+  const l = (0.5 - inner).toFixed(4);
+  const r = (0.5 + inner).toFixed(4);
+  const hole = `M${l} 0.5 A${inner} ${inner} 0 0 0 ${r} 0.5 A${inner} ${inner} 0 0 0 ${l} 0.5 Z`;
+  return `M${pts.join(" L")} Z ${hole}`;
 }
 
 const KNURL_PATH = knurlPath(KNURLS.standard);
 
-/** The knob's body: the smooth circle that carries the drop shadow.
+/** The knob's cap: the smooth chamfered disc that is most of what you see,
+ *  and the element that carries the drop shadow.
  *
- *  `flush` takes the full width and cuts the referent's base chamfer,
- *  which is what a smooth turned knob wants; the default sits back at the
- *  tooth-root radius so a knurled face can stand proud of it. */
+ *  `flush` takes the full width, which is what a smooth turned knob wants.
+ *  The default sits back by the knurl band so a `KnurledFace` can ring it —
+ *  the same cap either way, and the chamfer the referent cuts on every knob
+ *  (knob.py's `chamfer=0.35`, regardless of rib count) either way too. */
 export function KnobBody({
   material,
   flush = false,
@@ -68,17 +96,21 @@ export function KnobBody({
     <span
       className={cn(
         "amb-knob-body ambient amb-thickness-2 amb-surface",
-        flush && "amb-knob-body-flush",
         material && `amb-mat-${material}`,
         className
       )}
+      /* Geometry, not styling: this is the clip's inner radius seen from the
+         other side, so it comes from the same constant the path does. */
+      style={flush ? undefined : { inset: `${KNURL_BAND * 100}%` }}
     />
   );
 }
 
-/** The rotating knurled face: opaque at the knob's surface colour with
- *  per-tooth flank shading, clipped to the toothed silhouette so the ribs
- *  break the outline instead of being painted inside a circle.
+/** The rotating knurl: a rim ring of ribs around the cap, clipped to the
+ *  toothed annulus so the ribs break the outline instead of being painted
+ *  inside a circle, and shaded per tooth — a lit flank climbing to each
+ *  ridge, a shaded one falling away — with a contact-occlusion band along
+ *  its inner edge where the cap overhangs it.
  *
  *  The clip is the part's own business — it generates the path, emits its
  *  own `<defs>` and references it by a local id. A rotary mechanism has no
@@ -97,7 +129,7 @@ export function KnurledFace({
       <svg width={0} height={0} style={{ position: "absolute" }} aria-hidden focusable={false}>
         <defs>
           <clipPath id={id} clipPathUnits="objectBoundingBox">
-            <path d={KNURL_PATH} />
+            <path d={KNURL_PATH} clipRule="evenodd" />
           </clipPath>
         </defs>
       </svg>

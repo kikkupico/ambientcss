@@ -114,10 +114,10 @@ defaults to `auto`: follow the pointer 1:1 while dragging, ease otherwise.
   The control root already owns the role, the tab stop and the keyboard
   handler; a second one gives you two tab stops and a conflicting role. A
   development-only check warns if a part breaks this.
-- **Mechanisms have no `material` prop; presets do.** Which element a
+- **Mechanisms have no `material` prop; presets do.** Which elements a
   material belongs on is a fact about a particular control's construction —
-  on the knob's clipped face when it is knurled, on its body when it is not
-  — and a mechanism cannot know that once the parts are yours.
+  a knurled knob paints with two, its cap and its rim; a smooth one with a
+  single body — and a mechanism cannot know that once the parts are yours.
 
 ## Kits
 

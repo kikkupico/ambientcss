@@ -96,21 +96,51 @@ def button_square(location=(0.0, 0.0, 0.0), value=0.0):
                         well_material=dark, location=location)
 
 
-# Knurl depth = (0.5 - root) * 2 * radius, root fractions taken from
-# AmbientKnob.tsx's KNURLS, so the tooth-crest-to-root depth matches the CSS
-# clip-path teeth exactly at the grounded referent's 8*GRID radius. Only
-# `standard` (.468) is still in that table; the flute (.44) and fine (.476)
-# rows went with the CSS `variant` prop, so the depths below that were derived
-# from them are frozen at their last CSS values and have nothing left to track.
-# Sharpness bumped from the (unrelated)
-# generate.py catalog default so the crest/root read as distinct facets
-# rather than a soft sinusoid, closer to the clip-path's near-trapezoidal
-# tooth (short rise/fall, flat crest and root).
+# The knurled knob, built the way the CSS component is: a smooth chamfered
+# cap with the ribs machined into a rim band beyond its edge and below it, not
+# ribs running the whole way up. Every number below is one of AmbientKnob's,
+# converted at the grounded referent's 8*GRID radius (1 CSS px = 1 mm, so the
+# knob is D = 64mm across):
+#
+#   ribs / sharpness      KNURLS.standard, unchanged — the two rib sections
+#                         are now the SAME formula, not two shapes fitted to
+#                         each other: parts/knob.tsx restates `wall_r`'s
+#                         depth * (0.5 + 0.5cos(N.theta))^sharpness.
+#   rib_depth   0.009 D   KNURLS.standard.depth, bounding-box units -> mm
+#   knurl_rim   0.05 D    KNURLS.standard.band, the width of the ribbed ring
+#                         .amb-knob-face's clip leaves outside the cap
+#   cap_chamfer 2mm       .amb-knob-body's --amb-chamfer-width: 2, at the
+#                         rig's 1px = 1mm
+#
+# How far the rim FALLS is the one thing the CSS cannot name — flat-on it says
+# only how wide the ribbed ring is. So it was swept against the ring's rendered
+# tone instead (.amb-knob-face is --amb-shade: 0.88 against the cap, and reads
+# 0.83-0.88 of it across the band): the band lightens with the fall and
+# saturates around 45deg, landing within ~2 points there, so `knurl_rim_drop`
+# is left at its default — as deep as the rim is wide.
+KNOB_R = 8 * GRID
+KNOB_D = 2 * KNOB_R
+KNOB_RIM = 0.05 * KNOB_D
+KNOB_CAP_CHAMFER = 2.0
+KNOB_RIB_DEPTH = 0.009 * KNOB_D
+# The flat top face the indicators are placed on, which the builder takes
+# fractions of: everything inside both the ribbed rim and the cap chamfer.
+KNOB_CAP_R = KNOB_R - KNOB_RIM - KNOB_CAP_CHAMFER
+
+KNOB_KNURL = dict(radius=KNOB_R, height=9.0, ribs=48,
+                  rib_depth=KNOB_RIB_DEPTH, rib_sharpness=1.6,
+                  knurl_rim=KNOB_RIM, cap_chamfer=KNOB_CAP_CHAMFER)
+
+
+# The dot indicator is .amb-knob-indicator-circle: 0.125 of the knob's size
+# across, its top edge 0.16 down from the top, so a 0.0625 D radius centred
+# 0.2775 D out. The builder takes both as fractions of the cap face.
 def knob(location=(0.0, 0.0, 0.0), value=0.33):
     cap, plate, dark = _mats()
-    return build_knob(radius=8 * GRID, height=9.0, ribs=36, rib_depth=2.05,
-                      rib_sharpness=3.0,
-                      indicator="dot", dot_frac=0.12, dot_offset=0.68,
+    return build_knob(**KNOB_KNURL,
+                      indicator="dot",
+                      dot_frac=0.0625 * KNOB_D / KNOB_CAP_R,
+                      dot_offset=0.2775 * KNOB_D / KNOB_CAP_R,
                       value=value,
                       body_material=cap, accent_material=dark, base=None,
                       location=location)
@@ -120,13 +150,13 @@ def knob(location=(0.0, 0.0, 0.0), value=0.33):
 # .amb-knob-indicator-rectangle runs 0.50R to 0.84R of the knob radius (top 8%
 # + height 17% of --ambx-knob-size), so bar_inner is that near end and
 # bar_length converts the far end to the cap-radius fraction the builder takes.
+# That far end now lands a hair PAST the cap face and onto its chamfer — which
+# is where the CSS puts it too, 0.84R against a face that stops at 0.8375R.
 def knob_line(location=(0.0, 0.0, 0.0), value=0.33):
     cap, plate, dark = _mats()
-    r = 8 * GRID
-    return build_knob(radius=r, height=9.0, ribs=36, rib_depth=2.05,
-                      rib_sharpness=3.0,
+    return build_knob(**KNOB_KNURL,
                       indicator="line", bar_inner=0.50,
-                      bar_length=0.84 * r / (r - 1.4),
+                      bar_length=0.84 * KNOB_R / KNOB_CAP_R,
                       value=value,
                       body_material=cap, accent_material=dark, base=None,
                       location=location)
