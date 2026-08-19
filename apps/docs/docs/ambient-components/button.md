@@ -64,7 +64,7 @@ shape — `"md"` is the unchanged default. See the full per-shape table in
 | Prop | Type | Default |
 | --- | --- | --- |
 | `shape` | `"pill" \| "round" \| "square"` | `"pill"` |
-| `material` | `"matte" \| "shiny" \| "glass"` | `"matte"` |
+| `material` | `"matte" \| "shiny" \| "glass" \| "brushed" \| "rubber"` | `"matte"` |
 | `size` | `"sm" \| "md" \| "lg"` | `"md"` |
 | `mode` | `"momentary" \| "toggle" \| "repeat"` | `"momentary"` |
 | `onPress` | `() => void` | - |
@@ -73,6 +73,19 @@ shape — `"md"` is the unchanged default. See the full per-shape table in
 | `onChange` | `(on: boolean) => void` | - |
 | `repeatDelay` | `number` | `400` |
 | `repeatInterval` | `number` | `60` |
+
+### Micro-relief materials
+
+`brushed` and `rubber` paint their grain into both of an element's
+pseudo-elements, and the cap already spends its own `::after` on the dish. So
+the cap gives them an inner layer instead — you get the finish, the cap keeps
+its dish, and nothing about the markup you write changes.
+
+Two knock-on effects worth knowing. The dish's overlay alphas are derived from
+the lightness they wash over, so the cap is told which material is underneath;
+without that a rubber cap takes a white wash down one side and reads as chrome.
+And `rubber` is dark enough that the stock legend colour disappears into it, so
+a rubber cap inverts its own label.
 
 Also inherits all `ButtonHTMLAttributes<HTMLButtonElement>` props.
 

@@ -72,6 +72,51 @@ A frosted glass effect with translucency and background blur. Use `amb-mat-glass
 <div class="ambient amb-surface amb-mat-glass amb-elevation-3">Glass Surface</div>
 ```
 
+### Brushed
+
+Brushed aluminium: a pale, anisotropic micro-relief fitted against a
+photographed crop. Use `amb-mat-brushed` for machined faceplates and metal
+caps. The streaks never rotate — only the light crossing them moves — so the
+finish shades most when the lamp is across the grain and goes almost smooth
+when it runs along it.
+
+```html
+<div class="ambient amb-surface amb-mat-brushed amb-elevation-1">Brushed Surface</div>
+```
+
+### Rubber
+
+Bead-blasted elastomer: a dark, isotropic micro-relief about three times the
+depth of the brushed grain. Use `amb-mat-rubber` for pads, feet, grips and
+overmoulded caps.
+
+```html
+<div class="ambient amb-surface amb-mat-rubber amb-elevation-1">Rubber Surface</div>
+```
+
+Both are matte in the specular sense — they add relief, not gloss — and both
+carry their own `--amb-albedo`, the reflectance each was calibrated at.
+Override it for a different tone, but note that the grain's amplitude is
+fitted at the material's own tone and does not follow the tone law far from
+it: retone a long way and the relief reads too strong or too weak.
+
+Scale the relief with `--amb-grain-amount` (default `1`; `0` leaves the flat
+material). It inherits, so a panel can dial down everything inside it. A
+material's own directional term is deliberately *not* this property, so
+turning the grain down never deletes the brushed anisotropy.
+
+```html
+<div class="ambient amb-surface amb-mat-rubber" style="--amb-grain-amount: 0.5">
+  Half-strength grain
+</div>
+```
+
+Two costs worth knowing before you reach for these. Each material paints its
+relief in `::before` and `::after`, so an element that already uses one of
+its own pseudo-elements needs the grain on an inner layer instead. And the
+host gets `overflow: hidden`, needed so the blend clips to a rounded corner —
+it clips real children too.
+
 ## Edge Treatments
 
 Edge treatments define how the edges of an element catch light.

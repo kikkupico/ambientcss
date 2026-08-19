@@ -26,8 +26,14 @@
     ".amb-light-tl",
     ".amb-light-top",
     ".amb-light-tr",
+    ".amb-mat-brushed",
+    ".amb-mat-brushed::after",
+    ".amb-mat-brushed::before",
     ".amb-mat-glass",
     ".amb-mat-matte",
+    ".amb-mat-rubber",
+    ".amb-mat-rubber::after",
+    ".amb-mat-rubber::before",
     ".amb-mat-shiny",
     ".amb-rounded",
     ".amb-rounded-full",
@@ -42,7 +48,9 @@
     ".amb-thickness-1",
     ".amb-thickness-2",
     ".ambient",
-    ":root"
+    ":root",
+    ":where(.amb-mat-brushed)",
+    ":where(.amb-mat-rubber)"
   ],
   "properties": [
     "--amb-albedo",
@@ -56,6 +64,7 @@
     "--amb-fill-light-intensity",
     "--amb-fillet",
     "--amb-fillet-width",
+    "--amb-grain-amount",
     "--amb-highlight-color",
     "--amb-key-light-intensity",
     "--amb-label",

@@ -278,6 +278,26 @@ body {
   margin: 0 auto;
 }
 
+/* The materials gallery carries five finishes rather than three, so it gets
+   its own track count and a swatch capped to fit one. */
+.surface-gallery.materials-gallery {
+  grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+  max-width: 980px;
+}
+
+.materials-gallery .surface-swatch {
+  width: clamp(64px, 11vw, 150px);
+  height: auto;
+  aspect-ratio: 1;
+}
+
+/* Five narrower tracks leave a narrower gap for the glass demo's circle to
+   slide into, so it travels far enough to clear the glass disc it started
+   behind and stops short of the brushed one next door. */
+.materials-gallery .moving-circle {
+  --slide-out-x: 102px;
+}
+
 .surface-item {
   display: flex;
   flex-direction: column;
@@ -705,7 +725,7 @@ body {
     transform: translateX(0);
   }
   50% {
-    transform: translateX(150px);
+    transform: translateX(var(--slide-out-x, 150px));
   }
 }
 

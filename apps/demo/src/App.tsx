@@ -226,6 +226,7 @@ export function App() {
   /* Component demo state (local dummies) ---------------------------------- */
   const [knob1, setKnob1] = useState(65);
   const [knob2, setKnob2] = useState(30);
+  const [knob3, setKnob3] = useState(48);
   const [slider1, setSlider1] = useState(50);
   const [fader1, setFader1] = useState(70);
   const [bank, setBank] = useState("3");
@@ -454,11 +455,13 @@ export function App() {
       <section className="scene amb-surface" ref={matSectionRef}>
         <div className="scene-inner" ref={matView.ref}>
           <div className="scene-label">Materials</div>
-          <div className="surface-gallery">
+          <div className="surface-gallery materials-gallery">
             {[
               { mat: "matte" as const, label: "Matte" },
               { mat: "shiny" as const, label: "Shiny" },
               { mat: "glass" as const, label: "Glass" },
+              { mat: "brushed" as const, label: "Brushed" },
+              { mat: "rubber" as const, label: "Rubber" },
             ].map(({ mat, label }, i) => (
               <div className="surface-item" key={label}>
                 <div style={{ position: "relative" }}>
@@ -467,14 +470,14 @@ export function App() {
                       className="moving-circle"
                       style={{
                         position: "absolute",
-                        width: "90px",
-                        height: "90px",
+                        width: "48px",
+                        height: "48px",
                         borderRadius: "50%",
                         background: "var(--amb-highlight-color)",
                         top: "50%",
                         left: "50%",
-                        marginTop: "-45px",
-                        marginLeft: "-45px",
+                        marginTop: "-24px",
+                        marginLeft: "-24px",
                         zIndex: 0,
                         opacity: 0.8,
                       }}
@@ -592,6 +595,24 @@ export function App() {
             </div>
             <div className="component-cell" data-visible={compView.visible}>
               <AmbientButton shape="square">FX</AmbientButton>
+            </div>
+            <div className="component-cell" data-visible={compView.visible}>
+              {/* The cap spends its own ::after on the dish, so a relief
+                  material rides an inner layer under it. */}
+              <AmbientButton shape="square" material="rubber">PAD</AmbientButton>
+            </div>
+            <div className="component-cell" data-visible={compView.visible}>
+              {/* Brushed metal never rotates its grain: turn this knob and the
+                  streaks stay put while the shading crosses them. Smooth-bodied
+                  on purpose — the knurled rim rides the rotating frame, so its
+                  grain would turn with it and say the opposite. */}
+              <AmbientKnob
+                value={knob3}
+                onChange={setKnob3}
+                material="brushed"
+                knurling={false}
+                label="Knob"
+              />
             </div>
             <div className="component-cell" data-visible={compView.visible}>
               <AmbientSelect

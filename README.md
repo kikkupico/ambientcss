@@ -162,7 +162,13 @@ classes were five fixed albedos of this one law; the equivalent shades are
 
 ### Materials & Finishes
 
-`.amb-mat-matte` `.amb-mat-shiny` `.amb-mat-glass`
+`.amb-mat-matte` `.amb-mat-shiny` `.amb-mat-glass` `.amb-mat-brushed`
+`.amb-mat-rubber`
+
+`.amb-mat-brushed` and `.amb-mat-rubber` carry a fitted micro-relief rather
+than a gloss: the tile holds a raw height field and its inverse, and only the
+offset between them tracks the light, so the bumps stay put and the shading
+crosses over them. Scale it with `--amb-grain-amount` (default `1`).
 
 ### Physical Depth & Elevation
 

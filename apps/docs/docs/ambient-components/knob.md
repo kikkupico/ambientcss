@@ -103,7 +103,7 @@ they take `--amb-label` (the legend ink) rather than the accent colour.
 | `knurling` | `boolean` | `true` |
 | `markers` | `"none" \| "ends" \| "full"` | `"none"` |
 | `indicator` | `"rectangle" \| "circle"` | `"circle"` |
-| `material` | `"matte" \| "shiny" \| "glass"` | - |
+| `material` | `"matte" \| "shiny" \| "glass" \| "brushed" \| "rubber"` | - |
 | `size` | `"sm" \| "md" \| "lg"` | `"md"` |
 | `travel` | `number \| { start, sweep }` | `270` |
 | `input` | `"drag" \| "angle" \| "delta"` | `"drag"` |

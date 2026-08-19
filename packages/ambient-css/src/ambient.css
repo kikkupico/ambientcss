@@ -75,6 +75,17 @@
   --amb-mat-specular: 0;
   --amb-mat-roughness: 1;
   --amb-mat-opacity: 1;
+  /* GRAIN AMOUNT — the consumer's knob on the micro-relief the
+     .amb-mat-brushed / .amb-mat-rubber materials carry. 1 is the fitted
+     amplitude, 0 turns the relief off and leaves the flat material,
+     above 1 exaggerates it. It inherits, so a panel can dial the grain
+     of everything inside it.
+
+     A material's own directional term is deliberately NOT this property
+     (brushed metal's lives in the private --_grain-aniso): turning the
+     grain down must not be able to delete the anisotropy that is the
+     whole of what a brushed surface is. */
+  --amb-grain-amount: 1;
   /* max(min()) instead of clamp() throughout this file: postcss-preset-env's
      clamp downlevel mangles clamp() whose middle argument is an expression
      (it drops all but the last operand), which zeroed the elevation shadow in
@@ -596,6 +607,210 @@
     var(--amb-light-hue) var(--amb-light-saturation) 100% /
     calc(0.1 + var(--amb-key-light-intensity) * 0.15)
   );
+}
+
+/* MICRO-RELIEF MATERIALS — brushed aluminium and bead-blasted rubber,
+   fitted against photographed crops (.plans/amb-mat-brushed-rubber.md).
+   Both are matte in the specular sense; what they add is relief, not
+   gloss, so they compose with .amb-surface, the edge treatments and the
+   elevations like any other material.
+
+   HOW THE RELIEF IS LIT. Nothing is ever transformed. The tile carries
+   the RAW HEIGHT FIELD — one feTurbulence, one feComponentTransfer, no
+   lighting primitive — and a second tile carries its exact inverse. One
+   is offset toward the lamp, the other away from it, so the pair
+   evaluates f(x + d*l) - f(x - d*l) ~= 2d * df/dl: the slope of the
+   surface along the light, which is what shading a bumpy surface is to
+   first order. Only background-position moves, so every bump stays on
+   the same pixel and the shading crosses over it, where a lit relief
+   rotated to follow the lamp is a photograph of a relief and visibly
+   swims across the surface.
+
+   The two tiles must be INVERSES, not complementary halves. Inverses
+   subtract where they overlap; peaks-only/valleys-only halves leave the
+   raw height field showing as brightness wherever the offsets coincide,
+   which is the swimming look again at a different angle. Measured, not
+   assumed.
+
+   Anisotropy then comes free: offsetting ALONG a brushed grain samples
+   two points at the same height, the pair cancels, and the metal goes
+   smooth. "Only the across-grain component shades it" stops being a
+   special case and becomes geometry.
+
+   WHY screen + multiply. multiply is the only mode with the right tone
+   law — multiplying in a power-law-encoded space scales linear luminance
+   by a constant factor, putting grain amplitude proportional to Y^(1/3),
+   which is what Lambertian roughness does. Over L* 36/74/93, physics
+   wants 1.00/1.73/2.09 and multiply gives 1.00/1.87/2.29, against
+   1.00/0.91/0.88 for normal and a collapse to 0.19 for soft-light at the
+   pale end where this file's default ground sits. The bright screen
+   layer is not merely the second term of the subtraction: both
+   references skew bright (bright/dark half-range 1.45 on the rubber,
+   1.11 on the aluminium), because on a dark body the diffuse floor is
+   low and what you see of the roughness is facets catching the key.
+
+   ACCEPTED LIMITS. Each overlay alpha is calibrated at its own
+   material's tone and does not follow the tone law away from it — refit
+   --_grain-alpha if you retone a material far from its reference, which
+   is why each ships an albedo rather than being a tone-agnostic overlay.
+   The signed derivative is symmetric by construction, so the references'
+   bright skew is not reproduced; the rotating build matched the skew and
+   got the relief wrong, and this is the deliberate other side of that
+   trade. Both pseudo-elements are consumed, so a control that already
+   owns one (@ambientcss/components' .amb-button-cap::after paints its
+   dish there) has to put the grain on an inner layer instead. And the
+   constants are calibrated at 1:1 CSS pixels: after the sub-pixel
+   finding below, the tile has to stay near the pixel grid it was fitted
+   on, so --_grain-scale is not a free knob. */
+
+/* Positioning the overlays, at ZERO specificity. The pseudo-elements
+   need a positioned host, but a material class must never relayout the
+   control it dresses — .amb-knob-face and .amb-knob-body are
+   `position: absolute; inset: 0`, and a plain `position: relative` here
+   would clobber them or not, depending on which stylesheet a consumer
+   happens to load second. :where() loses to every class rule in either
+   order, so a host that positions itself always keeps its own. */
+:where(.amb-mat-brushed) {
+  position: relative;
+}
+
+:where(.amb-mat-rubber) {
+  position: relative;
+}
+
+.amb-mat-brushed,
+.amb-mat-rubber {
+  --amb-mat-specular: 0;
+  --amb-mat-roughness: 1;
+  /* isolate: the overlays must blend with THIS element's surface, not
+     with whatever is painted behind it. overflow: hidden: mix-blend-mode
+     is not clipped by border-radius on its own, so a rounded surface
+     would show square corners of grain — and it clips real children too,
+     which is the price. */
+  isolation: isolate;
+  overflow: hidden;
+  /* Half the separation between the two samples. 2px is the fitted
+     baseline; see the round() note below before changing it. */
+  --_grain-offset: 2px;
+  /* OFFSETS SNAP TO WHOLE PIXELS. A fractional background-position
+     resamples the tile and erases grain about a pixel across, which for
+     grain this fine is most of it. Axis-aligned offsets happen to be
+     integers; diagonals are not, and all four corner .amb-light-*
+     presets are diagonal. Rubber's RMS L* by lamp angle, 0/45/90/135deg:
+     plain calc() gives 2.31/1.01/2.29/1.01 (consistency 0.44) and
+     round() gives 2.31/2.29/2.29/2.31 (0.99). Coarsening the grain 4x
+     also fixes it, by discarding the fidelity that was just measured;
+     round() fixes it for free, quantising the emboss DIRECTION instead,
+     which at sub-pixel grain is invisible.
+
+     The stock .amb-light-* presets are unnormalised +/-1, so they land
+     on integers with or without this — round() is what keeps an app
+     driving a continuous light vector from losing the relief. */
+  --_grain-x: round(var(--amb-light-x) * var(--_grain-offset), 1px);
+  --_grain-y: round(var(--amb-light-y) * var(--_grain-offset), 1px);
+  /* The material's own directional term, deliberately NOT spelled
+     --amb-grain-amount: a consumer writing `--amb-grain-amount: 0.6`
+     must not be able to silently delete the anisotropy that is the whole
+     of what brushed metal is. Isotropic materials leave it at 1. */
+  --_grain-aniso: 1;
+  /* Light contrast, NORMALISED TO THE CALIBRATION POINT. Relief needs
+     directional light and should wash out under a flat fill, but the
+     naive form evaluates to 0.64 at this file's default key 0.9 / fill
+     0.7 — which would silently render every material at 64% of the
+     amplitude its fitted alpha claims. Written this way it is exactly
+     1.0 there, and falls to the 0.45 floor when the fill equals the
+     key. */
+  --_grain-lit: max(0.45, min(1.5,
+    0.45 + 2.75 * (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
+  ));
+}
+
+.amb-mat-brushed::before,
+.amb-mat-brushed::after,
+.amb-mat-rubber::before,
+.amb-mat-rubber::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  /* Under the element's own content, over its background. Relief is a
+     property of the surface, so it must not wash over a label sitting on
+     it or over controls laid out inside a textured panel. The isolate
+     above is what makes this safe: it gives the negative index a
+     stacking context of its own to sit at the bottom of, instead of
+     escaping behind the surface it is meant to texture. */
+  z-index: -1;
+  background-size: var(--_grain-scale);
+  background-repeat: repeat;
+  /* Four factors, kept separate: the material's own directional term,
+     light contrast, the fitted constant, and the user's knob. */
+  opacity: calc(
+    var(--_grain-aniso) * var(--_grain-lit) *
+      var(--_grain-alpha) * var(--amb-grain-amount)
+  );
+}
+
+.amb-mat-brushed::before,
+.amb-mat-rubber::before {
+  background-image: var(--_grain-tile);
+  background-position: var(--_grain-x) var(--_grain-y);
+  mix-blend-mode: screen;
+}
+
+.amb-mat-brushed::after,
+.amb-mat-rubber::after {
+  background-image: var(--_grain-tile-inv);
+  background-position: calc(var(--_grain-x) * -1) calc(var(--_grain-y) * -1);
+  mix-blend-mode: multiply;
+}
+
+/* Brushed aluminium sheet: pale, anisotropic, very low contrast. The
+   albedo is the material's own reflectance, picked so that the surface
+   PLUS its grain lands on the crop's measured tone — mean L* 74.22
+   reference against 74.43 rendered, RMS 0.86 against 0.863. Angular
+   consistency is 0.66, and that is the anisotropy working rather than a
+   miss: 0.57 along the grain, 0.87 across it.
+
+   Those tones are fitted under NEUTRAL light, which is where this albedo
+   reproduces them (measured: L* 74.23 at --amb-light-saturation: 0).
+   Under the file's default lamp the 15%-saturation cast lands it at
+   71.4 — not a miss but the cast every surface in this file takes, and
+   the reason a refit has to zero the saturation first. */
+.amb-mat-brushed {
+  --amb-albedo: color(srgb-linear 0.49 0.49 0.49);
+  --_grain-tile: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22128%22%20height%3D%22128%22%3E%3Cfilter%20id%3D%22t%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20color-interpolation-filters%3D%22linearRGB%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.06%202.6%22%20numOctaves%3D%221%22%20seed%3D%223%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3CfeComponentTransfer%3E%3CfeFuncR%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3CfeFuncG%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3CfeFuncB%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3C%2FfeComponentTransfer%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url%28%23t%29%22%2F%3E%3C%2Fsvg%3E");
+  --_grain-tile-inv: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22128%22%20height%3D%22128%22%3E%3Cfilter%20id%3D%22t%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20color-interpolation-filters%3D%22linearRGB%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.06%202.6%22%20numOctaves%3D%221%22%20seed%3D%223%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3CfeComponentTransfer%3E%3CfeFuncR%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3CfeFuncG%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3CfeFuncB%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3C%2FfeComponentTransfer%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url%28%23t%29%22%2F%3E%3C%2Fsvg%3E");
+  --_grain-scale: 128px;
+  --_grain-alpha: 0.169;
+  /* The cost of snapping to whole pixels: at a 2px baseline the
+     across-grain offset is either 0 or 1, so brushed metal SWITCHES
+     rather than fades as the lamp swings along the grain. It therefore
+     keeps the across-grain component on its amount explicitly — the same
+     physical statement the offsets make, written out longhand. */
+  --_grain-across: calc(
+    abs(var(--amb-light-y)) /
+      max(0.001, hypot(var(--amb-light-x), var(--amb-light-y)))
+  );
+  --_grain-aniso: calc(0.3 + 0.7 * var(--_grain-across));
+}
+
+/* Bead-blasted elastomer: dark, isotropic, grain about 3x the
+   aluminium's. Mean L* 36.13 reference against 36.24 rendered, RMS 2.45
+   against 2.449, angular consistency 0.98.
+
+   The flat body alone measures L* 29.6 under neutral light: the albedo
+   is fitted so the surface PLUS its grain lands on 36, and on a body
+   this dark the screen layer gains more headroom than the multiply layer
+   loses, lifting the mean by about six points. Turning the grain off
+   therefore leaves a visibly darker rubber, which is the fit working
+   rather than a bug. */
+.amb-mat-rubber {
+  --amb-albedo: color(srgb-linear 0.0644 0.0629 0.0629);
+  --_grain-tile: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2296%22%20height%3D%2296%22%3E%3Cfilter%20id%3D%22t%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20color-interpolation-filters%3D%22linearRGB%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.9%200.9%22%20numOctaves%3D%222%22%20seed%3D%223%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3CfeComponentTransfer%3E%3CfeFuncR%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3CfeFuncG%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3CfeFuncB%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3C%2FfeComponentTransfer%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url%28%23t%29%22%2F%3E%3C%2Fsvg%3E");
+  --_grain-tile-inv: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2296%22%20height%3D%2296%22%3E%3Cfilter%20id%3D%22t%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20color-interpolation-filters%3D%22linearRGB%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.9%200.9%22%20numOctaves%3D%222%22%20seed%3D%223%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3CfeComponentTransfer%3E%3CfeFuncR%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3CfeFuncG%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3CfeFuncB%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3C%2FfeComponentTransfer%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url%28%23t%29%22%2F%3E%3C%2Fsvg%3E");
+  --_grain-scale: 96px;
+  --_grain-alpha: 0.281;
 }
 
 /* --------------------------------------------------------------------------

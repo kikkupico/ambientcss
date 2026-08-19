@@ -422,11 +422,22 @@
      white half divides by too small a (100 - l) and over-lifts, so the
      dish reads as a bright sheen rather than a curve. Set luminance with
      --amb-shade and hue with --amb-albedo and both halves stay exact;
-     that pairing is the documented way to colour a dished component. */
+     that pairing is the documented way to colour a dished component.
+
+     --_ambx-cap-tone is the one escape hatch: a cap whose face carries a
+     material with its OWN albedo (the micro-relief finishes, which paint
+     on .ambx-cap-face rather than on the cap) sets it to that albedo's
+     ratio against the reference, so the alphas are derived at the
+     lightness they actually wash over. Without it a rubber cap — face
+     L* 27.6, alphas computed for L* 90 — takes a 0.44-alpha white wash
+     down one side and reads as chrome. It multiplies --amb-shade rather
+     than replacing it, so a consumer's own shade still composes. */
   --_ambx-dish-l: calc(
     100 * (
-      1.055 * pow(0.82 * var(--amb-shade) * var(--amb-exposure), 0.41667)
-        - 0.055
+      1.055 * pow(
+        0.82 * var(--_ambx-cap-tone, 1) * var(--amb-shade) * var(--amb-exposure),
+        0.41667
+      ) - 0.055
     )
   );
   /* One curvature for all three cap silhouettes: a dish is a property of
@@ -453,6 +464,44 @@
     hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 62.5%,
     hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--_ambx-dish-up) * 0.44)) 80%,
     hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / var(--_ambx-dish-up)) 100%
+  );
+}
+
+/* The micro-relief cap face: the layer .amb-mat-brushed / .amb-mat-rubber
+   ride on when the cap itself cannot carry them, because its own ::after is
+   already the dish. Sits under the dish (same negative index, earlier in
+   paint order) and under the legend, so the grain textures the cap's face
+   without washing over either. It paints .amb-surface in its own material's
+   tone, covering the cap's, and wears the cap's chamfer itself — an inset
+   shadow belongs to the background layer of the element that declares it, so
+   an opaque face would otherwise hide the cut. The cap keeps its shadow and
+   its sink-on-press, neither of which the face touches. */
+.ambx-cap-face {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* Each relief material's reflectance as a ratio of the reference ground
+   (--amb-albedo 0.82), so the dish above can derive its alphas at the tone
+   the face actually is: 0.49 / 0.82 and 0.0644 / 0.82. */
+.ambx-cap-tone-brushed { --_ambx-cap-tone: 0.5976; }
+
+.ambx-cap-tone-rubber {
+  --_ambx-cap-tone: 0.0785;
+  /* And the legend has to invert with the face. --amb-label is derived from
+     the LIGHT rather than from the surface it lands on, which is right for
+     every cap tone in the reference range and wrong below it: on a face at
+     L* 28 the stock label computes to a 26% lightness that vanishes into it.
+     Only rubber is dark enough to cross over — brushed at L* 72 reads fine
+     with the stock label — so this rides the tone class rather than becoming
+     a general rule. It still tracks the key light, just from the other end. */
+  --amb-label: hsl(
+    var(--amb-light-hue)
+    var(--amb-light-saturation)
+    calc(var(--amb-key-light-intensity) * 12% + 74%)
   );
 }
 
