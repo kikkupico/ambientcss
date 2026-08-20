@@ -134,6 +134,54 @@ turning the grain down never deletes the brushed anisotropy.
 </div>
 ```
 
+### Colouring every material
+
+Materials aren't skinned with a colour, they're lit — so colouring one
+means reaching for the same variable a plain surface uses, not a
+material-specific prop.
+
+**Matte** and **Shiny** have no pigment of their own: they only add relief
+or gloss on top of whatever `.amb-surface` is already painting, so they
+take colour exactly the way [Flat Surfaces](#flat-surfaces) does — override
+`--amb-albedo` on the element.
+
+```html
+<div class="ambient amb-surface amb-mat-shiny" style="--amb-albedo: #7a3b2e">
+  Oxide-red shiny panel
+</div>
+```
+
+**Brushed**, **Brushed round** and **Rubber** ship a calibrated
+`--amb-albedo` of their own (the reflectance each was fitted at, above) —
+the same override replaces it outright:
+
+```html
+<div class="ambient amb-surface amb-mat-brushed" style="--amb-albedo: #24405c">
+  Steel-blue brushed panel
+</div>
+<div class="ambient amb-surface amb-mat-rubber" style="--amb-albedo: #6e1f24">
+  Crimson rubber pad
+</div>
+```
+
+**Glass is the one exception.** It's translucent rather than pigmented, so
+it has no albedo to override — `--amb-albedo` set on a glass element does
+nothing to it, because its background comes from `--amb-light-hue` /
+`--amb-light-saturation` instead, the way a real pane takes the colour of
+whatever's shining through it:
+
+```html
+<div class="ambient amb-surface amb-mat-glass"
+     style="--amb-light-hue: 280; --amb-light-saturation: 55%">
+  Violet-lit glass
+</div>
+```
+
+`--amb-shade` (see [Global Settings](./global-settings.md#material-colour---amb-albedo---amb-shade))
+composes with any of these — reach for it for a tonal step within one
+material's colour, on every finish except glass, instead of a second
+`--amb-albedo`.
+
 Two costs worth knowing before you reach for these. Each material paints its
 relief in `::before` and `::after`, so an element that already uses one of
 its own pseudo-elements needs the grain on an inner layer instead. And the

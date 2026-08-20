@@ -50,6 +50,15 @@ Prefer `--amb-shade` for hierarchy inside a themed panel: unlike a second
 `--amb-albedo` it composes with whatever colour is inherited, so it keeps
 working when the theme changes. Both variables inherit normally.
 
+Every [material](./classes.md#materials) reads `--amb-albedo` the same
+way — including `amb-mat-brushed`, `amb-mat-brushed-round` and
+`amb-mat-rubber`, each just starting from a different calibrated default —
+with one exception: `amb-mat-glass` is translucent, not pigmented, so it
+ignores `--amb-albedo` and takes its tint from `--amb-light-hue` /
+`--amb-light-saturation` instead. See
+[Colouring every material](./classes.md#colouring-every-material) for the
+full breakdown.
+
 :::note Migrating from the surface variants
 
 `amb-surface-darker`, `-darkest`, `-lighter` and `-lightest` are gone. They

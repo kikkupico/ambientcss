@@ -277,6 +277,7 @@ export function App() {
   const thickView = useInView(0.2);
   const surfView = useInView(0.2);
   const matView = useInView(0.2);
+  const matColorView = useInView(0.15);
   const edgeView = useInView(0.2);
   const grooveView = useInView(0.2);
   const compView = useInView(0.1);
@@ -290,6 +291,7 @@ export function App() {
   const thickSectionRef = useRef<HTMLElement>(null);
   const surfSectionRef = useRef<HTMLElement>(null);
   const matSectionRef = useRef<HTMLElement>(null);
+  const matColorSectionRef = useRef<HTMLElement>(null);
   const edgeSectionRef = useRef<HTMLElement>(null);
   const grooveSectionRef = useRef<HTMLElement>(null);
   const compSectionRef = useRef<HTMLElement>(null);
@@ -531,6 +533,106 @@ export function App() {
           </div>
         </div>
         <ScrollButton sectionRef={matSectionRef} />
+      </section>
+
+      {/* ── 5b. MATERIAL COLOUR ──────────────────────────────────────── */}
+      <section className="scene amb-surface" ref={matColorSectionRef}>
+        <div className="scene-inner" ref={matColorView.ref}>
+          <div className="scene-label">Material Colour</div>
+          <div className="scene-hint">--amb-albedo retints any finish — glass takes the light's hue instead</div>
+          <div className="material-color-wall">
+            {[
+              {
+                mat: "matte" as const,
+                label: "Matte",
+                round: false,
+                swatches: [
+                  { name: "Default" },
+                  { name: "Oxide", albedo: "#7a3b2e" },
+                  { name: "Steel", albedo: "#24405c" },
+                  { name: "Brass", albedo: "#8a6a1f" },
+                ],
+              },
+              {
+                mat: "shiny" as const,
+                label: "Shiny",
+                round: false,
+                swatches: [
+                  { name: "Default" },
+                  { name: "Oxide", albedo: "#7a3b2e" },
+                  { name: "Steel", albedo: "#24405c" },
+                  { name: "Brass", albedo: "#8a6a1f" },
+                ],
+              },
+              {
+                mat: "glass" as const,
+                label: "Glass",
+                round: false,
+                swatches: [
+                  { name: "Default" },
+                  { name: "Violet", hue: 280, sat: "55%" },
+                  { name: "Amber", hue: 35, sat: "60%" },
+                  { name: "Teal", hue: 175, sat: "50%" },
+                ],
+              },
+              {
+                mat: "brushed" as const,
+                label: "Brushed",
+                round: false,
+                swatches: [
+                  { name: "Default" },
+                  { name: "Oxide", albedo: "#7a3b2e" },
+                  { name: "Steel", albedo: "#24405c" },
+                  { name: "Brass", albedo: "#8a6a1f" },
+                ],
+              },
+              {
+                mat: "brushed-round" as const,
+                label: "Spun",
+                round: true,
+                swatches: [
+                  { name: "Default" },
+                  { name: "Oxide", albedo: "#7a3b2e" },
+                  { name: "Steel", albedo: "#24405c" },
+                  { name: "Black chrome", albedo: "#1a1a1a" },
+                ],
+              },
+              {
+                mat: "rubber" as const,
+                label: "Rubber",
+                round: false,
+                swatches: [
+                  { name: "Default" },
+                  { name: "Crimson", albedo: "#6e1f24" },
+                  { name: "Navy", albedo: "#1c2c4a" },
+                  { name: "Olive", albedo: "#3c4526" },
+                ],
+              },
+            ].map((group) => (
+              <div className="material-color-row" key={group.mat}>
+                <span className="material-color-row-label">{group.label}</span>
+                <div className="material-color-swatches">
+                  {group.swatches.map((sw, i) => (
+                    <div className="material-color-item" key={sw.name}>
+                      <AmbientPanel
+                        material={group.mat}
+                        className={`material-color-swatch${group.round ? " is-round" : ""}`}
+                        data-visible={matColorView.visible}
+                        style={{
+                          transitionDelay: `${i * 0.06}s`,
+                          ...("albedo" in sw ? { "--amb-albedo": sw.albedo } : {}),
+                          ...("hue" in sw ? { "--amb-light-hue": sw.hue, "--amb-light-saturation": sw.sat } : {}),
+                        } as React.CSSProperties}
+                      />
+                      <span className="material-color-name">{sw.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <ScrollButton sectionRef={matColorSectionRef} />
       </section>
 
       {/* ── 6. EDGE TREATMENTS ───────────────────────────────────────── */}

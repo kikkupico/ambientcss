@@ -331,6 +331,78 @@ body {
 }
 
 /* --------------------------------------------------------------------------
+   MATERIAL COLOUR – one row per finish, --amb-albedo (or, for glass,
+   --amb-light-hue/-saturation) swept across a shared palette
+   -------------------------------------------------------------------------- */
+
+.material-color-wall {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.material-color-row {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.material-color-row-label {
+  flex: 0 0 88px;
+  width: 88px;
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--amb-lume);
+  text-align: right;
+}
+
+.material-color-swatches {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.material-color-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.material-color-swatch {
+  width: clamp(44px, 7vw, 60px);
+  height: clamp(44px, 7vw, 60px);
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.6s ease;
+}
+
+.material-color-swatch.is-round {
+  border-radius: 50%;
+}
+
+.material-color-swatch[data-visible="false"] {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.material-color-swatch[data-visible="true"] {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.material-color-name {
+  font-size: 7px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--amb-lume);
+  opacity: 0.75;
+}
+
+/* --------------------------------------------------------------------------
    EDGE TREATMENT WALL
    -------------------------------------------------------------------------- */
 
@@ -675,6 +747,17 @@ body {
   .edge-wall {
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
+  }
+
+  .material-color-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .material-color-row-label {
+    width: auto;
+    text-align: center;
   }
 
   .theme-playground {
