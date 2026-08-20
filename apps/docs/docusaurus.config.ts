@@ -50,6 +50,11 @@ const config: Config = {
           label: "Docs"
         },
         {
+          to: "/kit-builder",
+          label: "Kit Builder",
+          position: "left"
+        },
+        {
           href: "https://ambientcss.vercel.app/",
           label: "Demo App",
           position: "right"

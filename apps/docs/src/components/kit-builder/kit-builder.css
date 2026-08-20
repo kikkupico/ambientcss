@@ -1,0 +1,604 @@
+/* The Kit Builder, styled as the thing it makes.
+ *
+ *  The page is one device: a tab per control, the control on a screen, its
+ *  parts on keys below it, and the form for whichever key is pressed. The
+ *  casing is the library's own — `.ambient` for the body, `.amb-groove` for
+ *  the two recesses — because a builder for skeuomorphic controls that came
+ *  in a flat box would be arguing with itself.
+ *
+ *  The forms stay plain HTML. Everything on the screen is the kit being
+ *  built, and a knob in the form would be a knob you cannot tell apart from
+ *  the one you are designing. */
+
+/* Width, explicitly: the page's main wrapper is a column flex container, so
+   a block with auto margins and no width shrink-wraps to its content and the
+   device would change size with whichever tab is open. */
+.kb {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 24px 20px 64px;
+}
+
+.kb-chrome {
+  display: block;
+}
+
+.kb-intro {
+  max-width: 68ch;
+  margin: 0 auto 22px;
+  text-align: center;
+}
+
+.kb-intro-title {
+  margin: 0 0 6px;
+  font-size: 2rem;
+}
+
+.kb-intro-text {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.kb-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  border: none;
+  background: transparent;
+  cursor: default;
+}
+
+.kb-device {
+  --kb-line: color-mix(in oklab, var(--amb-label), transparent 82%);
+  --kb-quiet: color-mix(in oklab, var(--amb-label), transparent 38%);
+  --kb-accent: var(--amb-highlight-color, #8ab4f8);
+  display: grid;
+  gap: 18px;
+  padding: 22px;
+  border-radius: 28px;
+  color: var(--amb-label);
+  font-size: 0.95rem;
+}
+
+/* ── The bar ──────────────────────────────────────────────────────────── */
+
+.kb-bar {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.kb-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  border-radius: 10px;
+  display: flex;
+}
+
+.kb-name-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  color: var(--amb-label);
+  font: inherit;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-align: center;
+  padding: 9px 14px;
+}
+
+.kb-name-input:focus {
+  outline: none;
+  color: var(--kb-accent);
+}
+
+.kb-key {
+  flex: 0 0 auto;
+  min-width: 52px;
+  border: 1px solid var(--kb-line);
+  border-radius: 10px;
+  background: color-mix(in oklab, var(--amb-label), transparent 94%);
+  color: var(--kb-quiet);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.kb-key:hover {
+  color: var(--amb-label);
+  border-color: var(--kb-quiet);
+}
+
+.kb-key-on {
+  color: var(--kb-accent);
+  border-color: var(--kb-accent);
+}
+
+.kb-menu-anchor {
+  position: relative;
+  display: flex;
+}
+
+.kb-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 5;
+  display: grid;
+  min-width: 232px;
+  padding: 5px;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 12px;
+  background: var(--ifm-background-surface-color);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 22%);
+}
+
+.kb-menu button {
+  border: none;
+  background: none;
+  color: var(--ifm-font-color-base);
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.kb-menu button:hover:not(:disabled) {
+  background: var(--ifm-color-emphasis-200);
+}
+
+.kb-menu button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* ── Tabs ─────────────────────────────────────────────────────────────── */
+
+.kb-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  padding: 0 4px;
+}
+
+.kb-tab {
+  border: none;
+  background: none;
+  padding: 2px 0;
+  color: var(--kb-quiet);
+  font-size: 1.02rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.kb-tab:hover {
+  color: var(--amb-label);
+}
+
+.kb-tab-on {
+  color: var(--amb-label);
+  border-bottom-color: var(--kb-accent);
+}
+
+/* ── The screen ───────────────────────────────────────────────────────── */
+
+.kb-screen {
+  border-radius: 20px;
+  padding: 32px 24px;
+  min-height: 300px;
+  display: grid;
+  place-items: center;
+  overflow-x: auto;
+}
+
+.kb-stage-scene {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+}
+
+.kb-panel {
+  display: grid;
+  gap: 32px;
+  padding: 32px;
+  justify-items: center;
+}
+
+.kb-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 32px;
+}
+
+.kb-column {
+  display: grid;
+  justify-items: center;
+  gap: 24px;
+}
+
+/* ── The part keys ────────────────────────────────────────────────────── */
+
+.kb-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.kb-chip {
+  flex: 0 0 auto;
+  width: 116px;
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  padding: 8px 8px 10px;
+  border: 1px solid var(--kb-line);
+  border-radius: 16px;
+  background: color-mix(in oklab, var(--amb-label), transparent 95%);
+  color: var(--kb-quiet);
+  cursor: pointer;
+}
+
+.kb-chip:hover {
+  border-color: var(--kb-quiet);
+  color: var(--amb-label);
+}
+
+.kb-chip-on {
+  border-color: var(--kb-accent);
+  color: var(--amb-label);
+  box-shadow: inset 0 0 0 1px var(--kb-accent);
+}
+
+/* The thumbnails are the control itself, wearing one part. They are cropped
+   to a fixed box so a row of them reads as a row — a fader is three times a
+   switch, and a strip that argued the point would be unusable. */
+.kb-chip-art {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 74px;
+  overflow: hidden;
+}
+
+.kb-thumb-scene {
+  display: grid;
+  place-items: center;
+}
+
+/* The control inside a key is a rendering, not a control: `inert` takes it
+   out of the tab order and off the hit test, and pointer-events is the belt
+   to that braces — the key underneath has to receive every click on it. */
+.kb-thumb-art {
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  transform: scale(0.78);
+}
+
+/* A fader is three times the height of a switch, so its strip gets taller
+   keys rather than a thumbnail scaled down to a smudge. */
+.kb-chips[data-tab="fader"] .kb-chip-art {
+  height: 116px;
+}
+
+.kb-chips[data-tab="fader"] .kb-thumb-art {
+  transform: scale(0.62);
+}
+
+.kb-chips[data-tab="knob"] .kb-thumb-art,
+.kb-chips[data-tab="bank"] .kb-thumb-art {
+  transform: scale(0.66);
+}
+
+.kb-chip-plus {
+  font-size: 1.6rem;
+  color: var(--kb-quiet);
+}
+
+.kb-chip-name {
+  font-size: 0.78rem;
+  line-height: 1.25;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.kb-chip-frame {
+  font-size: 0.62rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--kb-quiet);
+}
+
+.kb-chip-add {
+  border-style: dashed;
+}
+
+/* ── The form ─────────────────────────────────────────────────────────── */
+
+.kb-form {
+  border-top: 1px solid var(--kb-line);
+  padding-top: 16px;
+  display: grid;
+  gap: 14px;
+}
+
+.kb-form-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kb-form-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.kb-badge {
+  font-size: 0.64rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--kb-quiet);
+  border: 1px solid var(--kb-line);
+  border-radius: 999px;
+  padding: 2px 8px;
+  cursor: help;
+}
+
+.kb-form-head .kb-icon:first-of-type {
+  margin-left: auto;
+}
+
+.kb-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px 28px;
+  align-items: start;
+}
+
+.kb-add {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 8px;
+}
+
+.kb-add-item {
+  display: grid;
+  gap: 2px;
+  text-align: left;
+  padding: 9px 12px;
+  border: 1px solid var(--kb-line);
+  border-radius: 12px;
+  background: none;
+  color: var(--amb-label);
+  cursor: pointer;
+}
+
+.kb-add-item:hover {
+  border-color: var(--kb-accent);
+}
+
+.kb-add-item span {
+  font-size: 0.76rem;
+  color: var(--kb-quiet);
+}
+
+/* ── Field primitives ─────────────────────────────────────────────────── */
+
+.kb-field {
+  display: grid;
+  gap: 6px;
+}
+
+.kb-field-head {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.kb-field-label {
+  font-size: 0.86rem;
+  font-weight: 600;
+  flex: 0 0 auto;
+}
+
+/* The hint gives way, never the label: a label that wraps to two lines
+   while a parenthetical sits beside it reads as the broken one. */
+.kb-field-hint {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: var(--kb-quiet);
+  text-align: right;
+}
+
+.kb-segmented {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.kb-seg {
+  border: 1px solid var(--kb-line);
+  background: transparent;
+  color: var(--kb-quiet);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.kb-seg:hover {
+  border-color: var(--kb-quiet);
+  color: var(--amb-label);
+}
+
+.kb-seg-on {
+  background: var(--kb-accent);
+  border-color: var(--kb-accent);
+  color: #10151b;
+  font-weight: 600;
+}
+
+.kb-check {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  cursor: pointer;
+}
+
+.kb-check input {
+  margin-top: 3px;
+  accent-color: var(--kb-accent);
+}
+
+.kb-check-label {
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.kb-check-label .kb-field-hint {
+  display: block;
+  font-weight: 400;
+  text-align: left;
+}
+
+.kb-range {
+  width: 100%;
+  accent-color: var(--kb-accent);
+}
+
+.kb-color {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kb-color-swatch {
+  width: 44px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid var(--kb-line);
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+}
+
+.kb-color-value {
+  font-size: 0.76rem;
+  background: none;
+  color: var(--kb-quiet);
+}
+
+.kb-mini {
+  border: 1px solid var(--kb-line);
+  background: transparent;
+  color: var(--kb-quiet);
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 0.74rem;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.kb-text {
+  width: 100%;
+  border: 1px solid var(--kb-line);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.88rem;
+  background: color-mix(in oklab, var(--amb-label), transparent 94%);
+  color: var(--amb-label);
+}
+
+.kb-text:focus {
+  outline: 1px solid var(--kb-accent);
+  border-color: var(--kb-accent);
+}
+
+.kb-icon {
+  border: none;
+  background: transparent;
+  color: var(--kb-quiet);
+  font-size: 0.72rem;
+  line-height: 1;
+  padding: 6px 5px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.kb-icon:hover:not(:disabled) {
+  color: var(--kb-accent);
+  background: color-mix(in oklab, var(--amb-label), transparent 92%);
+}
+
+.kb-icon:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.kb-note {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--kb-quiet);
+}
+
+.kb-note-wide {
+  grid-column: 1 / -1;
+}
+
+.kb-note code {
+  background: color-mix(in oklab, var(--amb-label), transparent 92%);
+  border: none;
+  color: inherit;
+}
+
+/* ── The file it makes ────────────────────────────────────────────────── */
+
+.kb-code {
+  margin-top: 28px;
+  min-width: 0;
+}
+
+.kb-code-title {
+  margin: 20px 0 4px;
+  font-size: 1.1rem;
+}
+
+.kb-code .kb-note {
+  margin-bottom: 10px;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.kb-code .kb-note code {
+  margin: 0 3px;
+  background: var(--ifm-color-emphasis-200);
+}
+
+@media (max-width: 700px) {
+  .kb-device {
+    padding: 16px;
+    border-radius: 22px;
+  }
+
+  .kb-screen {
+    padding: 20px 12px;
+  }
+
+  .kb-chip {
+    width: 100px;
+  }
+}
