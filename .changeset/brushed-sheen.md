@@ -7,7 +7,7 @@ The brushed metals now carry a specular sheen
 `.amb-mat-brushed` and `.amb-mat-brushed-round` were matte in the specular
 sense — `--amb-mat-specular: 0`, relief and nothing else. A ground finish is
 still metal, so both now declare `--amb-mat-specular: 0.3` /
-`--amb-mat-roughness: 0.72` and paint a broad sheen to match. `.amb-mat-rubber`
+`--amb-mat-roughness: 0.72` and paint a broad sheen to match. `.amb-mat-blasted`
 is unchanged and stays matte.
 
 The sheen is anisotropic in each material's own grain direction, which is what

@@ -486,19 +486,18 @@ export function App() {
           <div className="scene-label">Materials</div>
           <div className="surface-gallery materials-gallery">
             {[
+              /* No --amb-albedo pins here on purpose: brushed, spun and
+                 blasted carry no colour of their own (@ambientcss/css),
+                 same as matte and shiny — this gallery is about relief and
+                 specular, not tone, so every finish sits at the one plain
+                 default. Colour is the Material Colour section's job. */
               { mat: "matte" as const, label: "Matte" },
               { mat: "shiny" as const, label: "Shiny" },
               { mat: "glass" as const, label: "Glass" },
-              /* Brushed, spun and rubber carry no --amb-albedo of their
-                 own (@ambientcss/css) — same as matte and shiny, they're
-                 just relief and specular. This gallery's job is to show
-                 each finish's calibrated look, so it pins the reference
-                 tone each was fitted at explicitly, the way any consumer
-                 reaching for that look would. */
-              { mat: "brushed" as const, label: "Brushed", albedo: "color(srgb-linear 0.49 0.49 0.49)" },
-              { mat: "brushed-round" as const, label: "Spun", albedo: "color(srgb-linear 0.49 0.49 0.49)" },
-              { mat: "rubber" as const, label: "Rubber", albedo: "color(srgb-linear 0.0644 0.0629 0.0629)" },
-            ].map(({ mat, label, albedo }, i) => (
+              { mat: "brushed" as const, label: "Brushed" },
+              { mat: "brushed-round" as const, label: "Spun" },
+              { mat: "blasted" as const, label: "Blasted" },
+            ].map(({ mat, label }, i) => (
               <div className="surface-item" key={label}>
                 <div style={{ position: "relative" }}>
                   {mat === "glass" && (
@@ -530,7 +529,6 @@ export function App() {
                       justifyContent: "center",
                       position: "relative",
                       zIndex: 1,
-                      ...(albedo ? { "--amb-albedo": albedo } : {}),
                     } as React.CSSProperties}
                   />
                 </div>
@@ -605,8 +603,8 @@ export function App() {
                 ],
               },
               {
-                mat: "rubber" as const,
-                label: "Rubber",
+                mat: "blasted" as const,
+                label: "Blasted",
                 round: false,
                 swatches: [
                   { name: "Default" },
@@ -735,13 +733,13 @@ export function App() {
             </div>
             <div className="component-cell" data-visible={compView.visible}>
               {/* The cap spends its own ::after on the dish, so a relief
-                  material rides an inner layer under it. Rubber carries no
-                  --amb-albedo of its own (@ambientcss/css), so this pins
+                  material rides an inner layer under it. Blasted carries
+                  no --amb-albedo of its own (@ambientcss/css), so this pins
                   the reference tone it was fitted at for the dark-pad
-                  look — leave it off for a pale rubber instead. */}
+                  look — leave it off for a pale finish instead. */}
               <AmbientButton
                 shape="square"
-                material="rubber"
+                material="blasted"
                 style={{ "--amb-albedo": "color(srgb-linear 0.0644 0.0629 0.0629)" } as React.CSSProperties}
               >
                 PAD

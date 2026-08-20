@@ -468,7 +468,7 @@
   );
 }
 
-/* The micro-relief cap face: the layer .amb-mat-brushed / .amb-mat-rubber
+/* The micro-relief cap face: the layer .amb-mat-brushed / .amb-mat-blasted
    ride on when the cap itself cannot carry them, because its own ::after is
    already the dish. Sits under the dish (same negative index, earlier in
    paint order) and under the legend, so the grain textures the cap's face

@@ -52,7 +52,7 @@ working when the theme changes. Both variables inherit normally.
 
 Every [material](./classes.md#materials) reads `--amb-albedo` the same
 way and none carries one of its own — `amb-mat-brushed`,
-`amb-mat-brushed-round` and `amb-mat-rubber` are relief and specular only,
+`amb-mat-brushed-round` and `amb-mat-blasted` are relief and specular only,
 exactly like `amb-mat-matte` and `amb-mat-shiny`, so all five inherit
 whatever colour the surface already has. `amb-mat-glass` is the one
 exception: it's translucent, not pigmented, so it ignores `--amb-albedo`

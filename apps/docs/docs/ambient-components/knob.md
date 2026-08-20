@@ -121,7 +121,7 @@ they take `--amb-label` (the legend ink) rather than the accent colour.
 | `knurlColor` | `string` (any CSS colour) | - |
 | `markers` | `"none" \| "ends" \| "full"` | `"none"` |
 | `indicator` | `"rectangle" \| "circle"` | `"circle"` |
-| `material` | `"matte" \| "shiny" \| "glass" \| "brushed" \| "brushed-round" \| "rubber"` | - |
+| `material` | `"matte" \| "shiny" \| "glass" \| "brushed" \| "brushed-round" \| "blasted"` | - |
 | `size` | `"sm" \| "md" \| "lg"` | `"md"` |
 | `travel` | `number \| { start, sweep }` | `270` |
 | `input` | `"drag" \| "angle" \| "delta"` | `"drag"` |

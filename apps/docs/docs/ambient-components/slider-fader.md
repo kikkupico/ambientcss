@@ -39,7 +39,7 @@ a shallow concave channel.
 | `detents` | `number` | from `step` |
 | `invert` | `boolean` | `false` |
 | `animate` | `"auto" \| "follow" \| "ease" \| "snap"` | `"auto"` |
-| `material` | `"matte" \| "shiny" \| "glass" \| "brushed" \| "brushed-round" \| "rubber"` | - |
+| `material` | `"matte" \| "shiny" \| "glass" \| "brushed" \| "brushed-round" \| "blasted"` | - |
 | `label` | `string` | - |
 | `size` | `"sm" \| "md" \| "lg"` | `"md"` |
 | `onChange` | `(nextValue: number) => void` | - |

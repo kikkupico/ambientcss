@@ -2,7 +2,7 @@
 "@ambientcss/css": minor
 ---
 
-New `.amb-mat-brushed` and `.amb-mat-rubber`: micro-relief materials
+New `.amb-mat-brushed` and `.amb-mat-blasted`: micro-relief materials
 
 Two surface finishes that add texture rather than gloss, fitted against
 photographed crops: brushed aluminium (pale, anisotropic, very low contrast)

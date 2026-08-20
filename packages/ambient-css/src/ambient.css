@@ -76,7 +76,7 @@
   --amb-mat-roughness: 1;
   --amb-mat-opacity: 1;
   /* GRAIN AMOUNT — the consumer's knob on the micro-relief the
-     .amb-mat-brushed / .amb-mat-rubber materials carry. 1 is the fitted
+     .amb-mat-brushed / .amb-mat-blasted materials carry. 1 is the fitted
      amplitude, 0 turns the relief off and leaves the flat material,
      above 1 exaggerates it. It inherits, so a panel can dial the grain
      of everything inside it.
@@ -698,13 +698,13 @@
   position: relative;
 }
 
-:where(.amb-mat-rubber) {
+:where(.amb-mat-blasted) {
   position: relative;
 }
 
 .amb-mat-brushed,
 .amb-mat-brushed-round,
-.amb-mat-rubber {
+.amb-mat-blasted {
   /* isolate: the overlays must blend with THIS element's surface, not
      with whatever is painted behind it. overflow: hidden: mix-blend-mode
      is not clipped by border-radius on its own, so a rounded surface
@@ -752,8 +752,8 @@
 .amb-mat-brushed::after,
 .amb-mat-brushed-round::before,
 .amb-mat-brushed-round::after,
-.amb-mat-rubber::before,
-.amb-mat-rubber::after {
+.amb-mat-blasted::before,
+.amb-mat-blasted::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -778,7 +778,7 @@
 
 .amb-mat-brushed::before,
 .amb-mat-brushed-round::before,
-.amb-mat-rubber::before {
+.amb-mat-blasted::before {
   background-image: var(--_grain-tile);
   background-position: var(--_grain-x) var(--_grain-y);
   mix-blend-mode: screen;
@@ -786,7 +786,7 @@
 
 .amb-mat-brushed::after,
 .amb-mat-brushed-round::after,
-.amb-mat-rubber::after {
+.amb-mat-blasted::after {
   background-image: var(--_grain-tile-inv);
   background-position: calc(var(--_grain-x) * -1) calc(var(--_grain-y) * -1);
   mix-blend-mode: multiply;
@@ -876,7 +876,7 @@
    grain off therefore leaves a visibly darker rubber at that reference
    tone, which is the fit working rather than a bug — off-reference it is
    just whatever --amb-shade says. */
-.amb-mat-rubber {
+.amb-mat-blasted {
   --amb-mat-specular: 0;
   --amb-mat-roughness: 1;
   --_grain-tile: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2296%22%20height%3D%2296%22%3E%3Cfilter%20id%3D%22t%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20color-interpolation-filters%3D%22linearRGB%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.9%200.9%22%20numOctaves%3D%222%22%20seed%3D%223%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3CfeComponentTransfer%3E%3CfeFuncR%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3CfeFuncG%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3CfeFuncB%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3C%2FfeComponentTransfer%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url%28%23t%29%22%2F%3E%3C%2Fsvg%3E");

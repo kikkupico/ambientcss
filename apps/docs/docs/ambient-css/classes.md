@@ -98,14 +98,14 @@ painted on.
      style="border-radius: 50%">Spun Surface</div>
 ```
 
-### Rubber
+### Blasted
 
 Bead-blasted elastomer: a dark, isotropic micro-relief about three times the
-depth of the brushed grain. Use `amb-mat-rubber` for pads, feet, grips and
+depth of the brushed grain. Use `amb-mat-blasted` for pads, feet, grips and
 overmoulded caps.
 
 ```html
-<div class="ambient amb-surface amb-mat-rubber amb-elevation-1">Rubber Surface</div>
+<div class="ambient amb-surface amb-mat-blasted amb-elevation-1">Blasted Surface</div>
 ```
 
 None of the three carries a `--amb-albedo` of its own — same as Matte and
@@ -114,6 +114,10 @@ surface already has (see [Colouring every material](#colouring-every-material)
 below). Each was fitted at a reference tone, though, and the grain's
 amplitude does not follow the tone law far from it: colour a finish a long
 way from its reference and the relief reads too strong or too weak.
+
+`amb-mat-blasted` was named for the finishing process (bead-blasting), not
+the substance underneath it — the same pattern `amb-mat-brushed` follows —
+so it stays a fair name for that texture on any material, not only rubber.
 
 The rubber is matte in the specular sense. The two metals are not: each also
 carries a broad sheen, anisotropic in its own grain's direction. On the linear
@@ -130,7 +134,7 @@ material's own directional term is deliberately *not* this property, so
 turning the grain down never deletes the brushed anisotropy.
 
 ```html
-<div class="ambient amb-surface amb-mat-rubber" style="--amb-grain-amount: 0.5">
+<div class="ambient amb-surface amb-mat-blasted" style="--amb-grain-amount: 0.5">
   Half-strength grain
 </div>
 ```
@@ -138,7 +142,7 @@ turning the grain down never deletes the brushed anisotropy.
 ### Colouring every material
 
 Materials aren't skinned with a colour, they're lit. None of the five —
-Matte, Shiny, Brushed, Brushed round, Rubber — carries a `--amb-albedo` of
+Matte, Shiny, Brushed, Brushed round, Blasted — carries a `--amb-albedo` of
 its own: each is relief and specular only, painted on top of whatever
 `.amb-surface` is already showing, so all five take colour exactly the way
 [Flat Surfaces](#flat-surfaces) does — override `--amb-albedo` on the
@@ -151,13 +155,13 @@ element:
 <div class="ambient amb-surface amb-mat-brushed" style="--amb-albedo: #24405c">
   Steel-blue brushed panel
 </div>
-<div class="ambient amb-surface amb-mat-rubber" style="--amb-albedo: #6e1f24">
-  Crimson rubber pad
+<div class="ambient amb-surface amb-mat-blasted" style="--amb-albedo: #6e1f24">
+  Crimson blasted pad
 </div>
 ```
 
 Left unset, all five render at whatever `--amb-albedo` they inherit — the
-reference ground by default. Brushed, Brushed round and Rubber's grain was
+reference ground by default. Brushed, Brushed round and Blasted's grain was
 fitted at a specific reference tone each (stated above); set `--amb-albedo`
 to that value for the exact calibrated look, same as any other override.
 

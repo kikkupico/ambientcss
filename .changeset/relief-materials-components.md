@@ -2,7 +2,7 @@
 "@ambientcss/components": minor
 ---
 
-`AmbientMaterial` gains `brushed` and `rubber`
+`AmbientMaterial` gains `brushed` and `blasted`
 
 The two micro-relief finishes from `@ambientcss/css` are now part of the
 material vocabulary, so every part that already took a material takes these

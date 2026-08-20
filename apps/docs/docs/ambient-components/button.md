@@ -64,7 +64,7 @@ shape — `"md"` is the unchanged default. See the full per-shape table in
 | Prop | Type | Default |
 | --- | --- | --- |
 | `shape` | `"pill" \| "round" \| "square"` | `"pill"` |
-| `material` | `"matte" \| "shiny" \| "glass" \| "brushed" \| "brushed-round" \| "rubber"` | `"matte"` |
+| `material` | `"matte" \| "shiny" \| "glass" \| "brushed" \| "brushed-round" \| "blasted"` | `"matte"` |
 | `size` | `"sm" \| "md" \| "lg"` | `"md"` |
 | `mode` | `"momentary" \| "toggle" \| "repeat"` | `"momentary"` |
 | `onPress` | `() => void` | - |
@@ -76,16 +76,19 @@ shape — `"md"` is the unchanged default. See the full per-shape table in
 
 ### Micro-relief materials
 
-`brushed` and `rubber` paint their grain into both of an element's
-pseudo-elements, and the cap already spends its own `::after` on the dish. So
-the cap gives them an inner layer instead — you get the finish, the cap keeps
-its dish, and nothing about the markup you write changes.
+`brushed`, `brushed-round` and `blasted` paint their grain into both of an
+element's pseudo-elements, and the cap already spends its own `::after` on
+the dish. So the cap gives them an inner layer instead — you get the finish,
+the cap keeps its dish, and nothing about the markup you write changes.
 
-Two knock-on effects worth knowing. The dish's overlay alphas are derived from
-the lightness they wash over, so the cap is told which material is underneath;
-without that a rubber cap takes a white wash down one side and reads as chrome.
-And `rubber` is dark enough that the stock legend colour disappears into it, so
-a rubber cap inverts its own label.
+None of the three carries a colour of its own (`@ambientcss/css`), so a cap
+you leave uncoloured renders at the reference ground, same as `matte` or
+`shiny` would. Colour one with `--amb-albedo` the ordinary way and the
+dish's own shading follows it automatically, through `--amb-shade` — there
+is no separate tone to set for the cap. One thing that does not follow
+automatically: on a cap coloured dark enough, the stock legend colour can
+disappear into it, the same way it would on a dark `matte` or `shiny` cap —
+set `--amb-label` yourself if that happens.
 
 Also inherits all `ButtonHTMLAttributes<HTMLButtonElement>` props.
 
