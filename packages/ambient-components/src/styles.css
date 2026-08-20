@@ -424,14 +424,15 @@
      --amb-shade and hue with --amb-albedo and both halves stay exact;
      that pairing is the documented way to colour a dished component.
 
-     --_ambx-cap-tone is the one escape hatch: a cap whose face carries a
-     material with its OWN albedo (the micro-relief finishes, which paint
-     on .ambx-cap-face rather than on the cap) sets it to that albedo's
-     ratio against the reference, so the alphas are derived at the
-     lightness they actually wash over. Without it a rubber cap — face
-     L* 27.6, alphas computed for L* 90 — takes a 0.44-alpha white wash
-     down one side and reads as chrome. It multiplies --amb-shade rather
-     than replacing it, so a consumer's own shade still composes. */
+     --_ambx-cap-tone is an escape hatch for a future material that ships
+     its own fixed albedo again: set it to that albedo's ratio against the
+     reference so the alphas derive at the lightness they actually wash
+     over. Nothing applies it today — the micro-relief finishes carry no
+     --amb-albedo of their own (@ambientcss/css), so a relief-faced cap's
+     .ambx-cap-face is already at the reference tone by default and takes
+     --amb-shade the same way any other dished surface does; it multiplies
+     --amb-shade rather than replacing it, so a consumer's own shade still
+     composes. */
   --_ambx-dish-l: calc(
     100 * (
       1.055 * pow(
@@ -482,30 +483,6 @@
   z-index: -1;
   border-radius: inherit;
   pointer-events: none;
-}
-
-/* Each relief material's reflectance as a ratio of the reference ground
-   (--amb-albedo 0.82), so the dish above can derive its alphas at the tone
-   the face actually is: 0.49 / 0.82 and 0.0644 / 0.82. The two brushed
-   finishes are the same aluminium turned two different ways, so they share
-   the ratio rather than each carrying a copy of the number. */
-.ambx-cap-tone-brushed,
-.ambx-cap-tone-brushed-round { --_ambx-cap-tone: 0.5976; }
-
-.ambx-cap-tone-rubber {
-  --_ambx-cap-tone: 0.0785;
-  /* And the legend has to invert with the face. --amb-label is derived from
-     the LIGHT rather than from the surface it lands on, which is right for
-     every cap tone in the reference range and wrong below it: on a face at
-     L* 28 the stock label computes to a 26% lightness that vanishes into it.
-     Only rubber is dark enough to cross over — brushed at L* 72 reads fine
-     with the stock label — so this rides the tone class rather than becoming
-     a general rule. It still tracks the key light, just from the other end. */
-  --amb-label: hsl(
-    var(--amb-light-hue)
-    var(--amb-light-saturation)
-    calc(var(--amb-key-light-intensity) * 12% + 74%)
-  );
 }
 
 .amb-button:focus {

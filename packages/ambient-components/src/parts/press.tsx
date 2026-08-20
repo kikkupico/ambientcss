@@ -14,10 +14,12 @@ import { isRelief } from "../core/material";
  *  the dish's `background` shorthand and the grain's tile would each silently
  *  win half of the other's declarations. They get `.ambx-cap-face` instead —
  *  an inner layer under the dish and under the legend, which is the inner
- *  layer @ambientcss/css's own note prescribes. The cap still needs to know
- *  which material is down there, because the dish's overlay alphas are
- *  derived from the surface lightness they are washing over; that is what
- *  `.ambx-cap-tone-*` tells it. */
+ *  layer @ambientcss/css's own note prescribes. The cap itself stays a plain
+ *  `amb-surface` when relief is down there: the dish's overlay alphas are
+ *  derived from `--amb-shade` the ordinary way, and since the relief
+ *  materials carry no `--amb-albedo` of their own any more, that derivation
+ *  is already correct for them too — no per-material tone correction to
+ *  apply. */
 export function ButtonCap({
   material = "matte",
   className,
@@ -32,7 +34,7 @@ export function ButtonCap({
     <span
       className={cn(
         "amb-button-cap ambient amb-chamfer amb-surface amb-heading-3",
-        relief ? `ambx-cap-tone-${material}` : `amb-mat-${material}`,
+        relief ? undefined : `amb-mat-${material}`,
         className
       )}
     >

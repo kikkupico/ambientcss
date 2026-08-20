@@ -664,8 +664,15 @@
 
    ACCEPTED LIMITS. Each overlay alpha is calibrated at its own
    material's tone and does not follow the tone law away from it — refit
-   --_grain-alpha if you retone a material far from its reference, which
-   is why each ships an albedo rather than being a tone-agnostic overlay.
+   --_grain-alpha if you retone a material far from its reference. These
+   three carry no --amb-albedo of their own, the same as .amb-mat-matte
+   and .amb-mat-shiny: left alone they render at whatever the surface
+   already inherits (the reference ground, by default). Set --amb-albedo
+   to the reference tone stated with each material below for the exact
+   calibrated look, or to anything else for your own colour — the grain
+   just reads a little strong or weak the further that colour's lightness
+   sits from the reference.
+
    The signed derivative is symmetric by construction, so the references'
    bright skew is not reproduced; the rotating build matched the skew and
    got the relief wrong, and this is the deliberate other side of that
@@ -785,14 +792,17 @@
   mix-blend-mode: multiply;
 }
 
-/* Brushed aluminium sheet: pale, anisotropic, very low contrast. The
-   albedo is the material's own reflectance, picked so that the surface
-   PLUS its grain lands on the crop's measured tone — mean L* 74.22
-   reference against 74.43 rendered, RMS 0.86 against 0.863. Angular
+/* Brushed aluminium sheet: pale, anisotropic, very low contrast. It carries
+   no --amb-albedo of its own — same as .amb-mat-matte and .amb-mat-shiny,
+   it renders at whatever the surface already inherits. The reference tone
+   below is what the relief was fitted AT, for a consumer who wants the
+   exact calibrated look: `--amb-albedo: color(srgb-linear 0.49 0.49 0.49)`
+   puts the surface PLUS its grain on the crop's measured tone — mean L*
+   74.22 reference against 74.43 rendered, RMS 0.86 against 0.863. Angular
    consistency is 0.66, and that is the anisotropy working rather than a
    miss: 0.57 along the grain, 0.87 across it.
 
-   Those tones are fitted under NEUTRAL light, which is where this albedo
+   Those tones are fitted under NEUTRAL light, which is where that albedo
    reproduces them (measured: L* 74.23 at --amb-light-saturation: 0).
    Under the file's default lamp the 15%-saturation cast lands it at
    71.4 — not a miss but the cast every surface in this file takes, and
@@ -802,7 +812,6 @@
      carry a sheen, enough roughness to spread it across most of the face. */
   --amb-mat-specular: 0.3;
   --amb-mat-roughness: 0.72;
-  --amb-albedo: color(srgb-linear 0.49 0.49 0.49);
   --_grain-tile: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22128%22%20height%3D%22128%22%3E%3Cfilter%20id%3D%22t%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20color-interpolation-filters%3D%22linearRGB%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.06%202.6%22%20numOctaves%3D%221%22%20seed%3D%223%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3CfeComponentTransfer%3E%3CfeFuncR%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3CfeFuncG%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3CfeFuncB%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3C%2FfeComponentTransfer%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url%28%23t%29%22%2F%3E%3C%2Fsvg%3E");
   --_grain-tile-inv: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22128%22%20height%3D%22128%22%3E%3Cfilter%20id%3D%22t%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20color-interpolation-filters%3D%22linearRGB%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.06%202.6%22%20numOctaves%3D%221%22%20seed%3D%223%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3CfeComponentTransfer%3E%3CfeFuncR%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3CfeFuncG%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3CfeFuncB%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3C%2FfeComponentTransfer%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url%28%23t%29%22%2F%3E%3C%2Fsvg%3E");
   --_grain-scale: 128px;
@@ -853,19 +862,23 @@
 }
 
 /* Bead-blasted elastomer: dark, isotropic, grain about 3x the
-   aluminium's. Mean L* 36.13 reference against 36.24 rendered, RMS 2.45
-   against 2.449, angular consistency 0.98.
+   aluminium's. Carries no --amb-albedo of its own, the same as every
+   other material here — the reference tone is `--amb-albedo:
+   color(srgb-linear 0.0644 0.0629 0.0629)`, worth setting explicitly for
+   the calibrated look: at that tone the surface PLUS its grain lands on
+   mean L* 36.13 (reference) against 36.24 (rendered), RMS 2.45 against
+   2.449, angular consistency 0.98.
 
-   The flat body alone measures L* 29.6 under neutral light: the albedo
-   is fitted so the surface PLUS its grain lands on 36, and on a body
-   this dark the screen layer gains more headroom than the multiply layer
-   loses, lifting the mean by about six points. Turning the grain off
-   therefore leaves a visibly darker rubber, which is the fit working
-   rather than a bug. */
+   The flat body alone measures L* 29.6 under neutral light at that
+   albedo: the grain is fitted so the surface PLUS its grain lands on 36,
+   and on a body this dark the screen layer gains more headroom than the
+   multiply layer loses, lifting the mean by about six points. Turning the
+   grain off therefore leaves a visibly darker rubber at that reference
+   tone, which is the fit working rather than a bug — off-reference it is
+   just whatever --amb-shade says. */
 .amb-mat-rubber {
   --amb-mat-specular: 0;
   --amb-mat-roughness: 1;
-  --amb-albedo: color(srgb-linear 0.0644 0.0629 0.0629);
   --_grain-tile: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2296%22%20height%3D%2296%22%3E%3Cfilter%20id%3D%22t%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20color-interpolation-filters%3D%22linearRGB%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.9%200.9%22%20numOctaves%3D%222%22%20seed%3D%223%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3CfeComponentTransfer%3E%3CfeFuncR%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3CfeFuncG%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3CfeFuncB%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3C%2FfeComponentTransfer%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url%28%23t%29%22%2F%3E%3C%2Fsvg%3E");
   --_grain-tile-inv: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2296%22%20height%3D%2296%22%3E%3Cfilter%20id%3D%22t%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20color-interpolation-filters%3D%22linearRGB%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.9%200.9%22%20numOctaves%3D%222%22%20seed%3D%223%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3CfeComponentTransfer%3E%3CfeFuncR%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3CfeFuncG%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3CfeFuncB%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3C%2FfeComponentTransfer%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url%28%23t%29%22%2F%3E%3C%2Fsvg%3E");
   --_grain-scale: 96px;
@@ -906,16 +919,18 @@
 .amb-mat-brushed-round {
   --amb-mat-specular: 0.3;
   --amb-mat-roughness: 0.72;
-  /* The albedo is shared with .amb-mat-brushed because this IS that metal,
-     turned a different way — one reflectance, two finishes. The grain alpha
-     is NOT a shared fit, and the equal number is not evidence that it is:
-     the linear tile's across-grain period is sub-pixel, so most of what sets
-     its rendered contrast is the pixel averaging the round() note above
-     exists to protect, while these streaks are several pixels wide at knob
-     radius and take none of it. Same alpha, different spatial statistics.
-     It was matched BY EYE against the linear metal's apparent relief, and a
-     photographic refit would move it. */
-  --amb-albedo: color(srgb-linear 0.49 0.49 0.49);
+  /* No --amb-albedo of its own, like the other two relief materials. Its
+     reference tone is the SAME as .amb-mat-brushed's — this IS that metal,
+     turned a different way, one reflectance shared by two finishes — so set
+     `--amb-albedo: color(srgb-linear 0.49 0.49 0.49)` for the calibrated
+     look on either. The grain alpha is NOT a shared fit, and the equal
+     number is not evidence that it is: the linear tile's across-grain
+     period is sub-pixel, so most of what sets its rendered contrast is the
+     pixel averaging the round() note above exists to protect, while these
+     streaks are several pixels wide at knob radius and take none of it.
+     Same alpha, different spatial statistics. It was matched BY EYE against
+     the linear metal's apparent relief, and a photographic refit would
+     move it. */
   --_grain-tile: conic-gradient(
     from 0deg at 50% 50%,
       #a4a4a4 0deg, #ffffff 2.4deg, #b0b0b0 9.6deg, #ffffff 13.3deg, #ffffff 18.4deg, #000000 24.6deg,

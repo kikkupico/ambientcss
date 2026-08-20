@@ -108,11 +108,12 @@ overmoulded caps.
 <div class="ambient amb-surface amb-mat-rubber amb-elevation-1">Rubber Surface</div>
 ```
 
-All three carry their own `--amb-albedo`, the reflectance each was calibrated
-at. Override it for a different tone — that is how you take a finish's relief
-and keep your own surface colour — but note that the grain's amplitude is
-fitted at the material's own tone and does not follow the tone law far from
-it: retone a long way and the relief reads too strong or too weak.
+None of the three carries a `--amb-albedo` of its own — same as Matte and
+Shiny, they add relief and nothing else, and take colour from whatever the
+surface already has (see [Colouring every material](#colouring-every-material)
+below). Each was fitted at a reference tone, though, and the grain's
+amplitude does not follow the tone law far from it: colour a finish a long
+way from its reference and the relief reads too strong or too weak.
 
 The rubber is matte in the specular sense. The two metals are not: each also
 carries a broad sheen, anisotropic in its own grain's direction. On the linear
@@ -136,26 +137,17 @@ turning the grain down never deletes the brushed anisotropy.
 
 ### Colouring every material
 
-Materials aren't skinned with a colour, they're lit — so colouring one
-means reaching for the same variable a plain surface uses, not a
-material-specific prop.
-
-**Matte** and **Shiny** have no pigment of their own: they only add relief
-or gloss on top of whatever `.amb-surface` is already painting, so they
-take colour exactly the way [Flat Surfaces](#flat-surfaces) does — override
-`--amb-albedo` on the element.
+Materials aren't skinned with a colour, they're lit. None of the five —
+Matte, Shiny, Brushed, Brushed round, Rubber — carries a `--amb-albedo` of
+its own: each is relief and specular only, painted on top of whatever
+`.amb-surface` is already showing, so all five take colour exactly the way
+[Flat Surfaces](#flat-surfaces) does — override `--amb-albedo` on the
+element:
 
 ```html
 <div class="ambient amb-surface amb-mat-shiny" style="--amb-albedo: #7a3b2e">
   Oxide-red shiny panel
 </div>
-```
-
-**Brushed**, **Brushed round** and **Rubber** ship a calibrated
-`--amb-albedo` of their own (the reflectance each was fitted at, above) —
-the same override replaces it outright:
-
-```html
 <div class="ambient amb-surface amb-mat-brushed" style="--amb-albedo: #24405c">
   Steel-blue brushed panel
 </div>
@@ -163,6 +155,11 @@ the same override replaces it outright:
   Crimson rubber pad
 </div>
 ```
+
+Left unset, all five render at whatever `--amb-albedo` they inherit — the
+reference ground by default. Brushed, Brushed round and Rubber's grain was
+fitted at a specific reference tone each (stated above); set `--amb-albedo`
+to that value for the exact calibrated look, same as any other override.
 
 **Glass is the one exception.** It's translucent rather than pigmented, so
 it has no albedo to override — `--amb-albedo` set on a glass element does
