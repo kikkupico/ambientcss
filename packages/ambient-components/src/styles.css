@@ -1412,9 +1412,10 @@
      the reference — and `box-shadow` is the property `.ambient` composites
      the whole lighting model into, so setting it here would silently wipe
      the drop shadow the thickness above is there to cast. The ring's ink
-     is the scene's lit albedo, not fixed near-white, so it dims and warms
-     with the lamp exactly as the panel around the switch does. */
-  border: calc(var(--ambx-latch-thumb-h) * 0.09) solid var(--amb-lit);
+     is --amb-lume: lit albedo vanished against the thumb's orange face, so
+     the ring reads as an emissive halo instead — present in bright light,
+     glowing as the scene dims. */
+  border: calc(var(--ambx-latch-thumb-h) * 0.09) solid var(--amb-lume);
 }
 
 @media (prefers-reduced-motion: reduce) {
