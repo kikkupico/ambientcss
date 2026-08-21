@@ -608,7 +608,7 @@ export function App() {
                   { name: "Default" },
                   { name: "Oxide", albedo: "#7a3b2e" },
                   { name: "Steel", albedo: "#24405c" },
-                  { name: "Black chrome", albedo: "#1a1a1a" },
+                  { name: "Black", albedo: "#1a1a1a" },
                 ],
               },
               {
