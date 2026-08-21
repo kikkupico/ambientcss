@@ -641,7 +641,10 @@
    here and the frame's rotation carries them round to the value.
 
    The circle is the grounded referent's offset dot (knob() dot_frac 0.12,
-   dot_offset 0.68). */
+   dot_offset 0.68). The ink is --amb-lume: the same emissive tone the
+   scene's lume and LEDs wear, so the pointer reads as backlit hardware
+   rather than as printed paint — bright in a bright scene, glowing when
+   the lights drop. */
 .amb-knob-indicator-circle {
   position: absolute;
   top: 16%;
@@ -650,7 +653,7 @@
   width: calc(var(--ambx-knob-size) * 0.125);
   height: calc(var(--ambx-knob-size) * 0.125);
   border-radius: 50%;
-  background: var(--amb-highlight-color);
+  background: var(--amb-lume);
 }
 
 /* The rectangle is a short radial bar out near the rim, not a spoke from
@@ -667,7 +670,7 @@
   width: var(--ambx-knob-rect-width);
   height: 17%;
   border-radius: var(--ambx-grid-quarter);
-  background: var(--amb-highlight-color);
+  background: var(--amb-lume);
 }
 
 .amb-knob:hover .amb-knob-indicator-circle,
@@ -682,8 +685,9 @@
    --ambx-travel-start/-sweep off the control), so a dot always lands where
    its value would, whatever `travel` is set to.
 
-   Ink is --amb-label, not --amb-highlight-color: these are printed panel
-   graphics like the control's legend, not part of the control. */
+   Ink is --amb-lume, matching the indicators: the scale glows with the
+   same emissive tone as the pointer, so ring and dot read as one lit
+   instrument rather than paint plus light. */
 .amb-knob-marker-ring {
   position: absolute;
   top: 50%;
@@ -701,7 +705,7 @@
   height: var(--ambx-knob-marker-size);
   margin: calc(var(--ambx-knob-marker-size) / -2);
   border-radius: 50%;
-  background: var(--amb-label);
+  background: var(--amb-lume);
   transform: rotate(var(--amb-marker-angle))
     translateY(calc(-1 * var(--ambx-knob-marker-radius)));
 }
