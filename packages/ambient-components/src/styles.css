@@ -1274,7 +1274,9 @@
 /* The indicator: a short mark printed across the bar near one end. It is
    ink, not geometry — no edges, no shadow — and it is inside the bar rather
    than beside it because the bar already occupies the whole diameter it
-   would otherwise sit on. */
+   would otherwise sit on. The ink is --amb-lume, matching the grounded
+   knob's pointer: the mark reads as backlit rather than printed, glowing
+   as the scene's lights drop. */
 .amb-console-indicator {
   position: absolute;
   left: 50%;
@@ -1283,7 +1285,7 @@
   height: 7.5%;
   transform: translateX(-50%);
   border-radius: calc(var(--ambx-size) * 0.012);
-  background-color: color-mix(in oklab, var(--amb-lit), black 82%);
+  background-color: var(--amb-lume);
 }
 
 /* Panel graphics: the accent centre mark above the knob and the -/+ legends
