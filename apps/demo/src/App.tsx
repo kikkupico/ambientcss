@@ -79,7 +79,7 @@ type ThemePreset = {
 
 const THEME_PRESETS: ThemePreset[] = [
   { label: "Day",    icon: "☀", led: "#f59e0b", lightX: -0.7, lightY: -0.7, keyLight: 0.9,  fillLight: 0.7,  lightHue: 234, lightSaturation: 5,   lumeHue: 16 },
-  { label: "Night",  icon: "☾", led: "#6366f1", lightX: 0.7,  lightY: -0.7, keyLight: 0.3,  fillLight: 0.1,  lightHue: 250, lightSaturation: 30,  lumeHue: 16 },
+  { label: "Night",  icon: "☾", led: "#6366f1", lightX: 0.7,  lightY: -0.7, keyLight: 0.125, fillLight: 0,    lightHue: 250, lightSaturation: 30,  lumeHue: 16 },
   { label: "Sci-Fi", icon: "✦", led: "#22d3d3", lightX: 0,    lightY: -0.9, keyLight: 0.2,  fillLight: 0.05, lightHue: 190, lightSaturation: 50,  lumeHue: 180 },
   { label: "Fun",    icon: "✷", led: "#ec4899", lightX: 0,    lightY: -1,   keyLight: 0.55, fillLight: 0,    lightHue: 0,   lightSaturation: 100, lumeHue: 0 },
 ];
@@ -329,7 +329,18 @@ export function App() {
   const mergedTheme = { ...DEFAULTS, ...theme };
 
   return (
-    <AmbientProvider className="amb-surface" theme={theme}>
+    <AmbientProvider className="amb-surface" theme={theme}
+      /* FUN'S FONTS: at hue 0 / sat 100 the derived label and lume tones
+         land mid-red on the red-lit surfaces and vanish. While the Fun
+         preset is active, pin both ink variables to near-black so type
+         reads against its own background. The style prop wins over the
+         theme vars by merge order in AmbientProvider, so this is a clean
+         per-preset override point. */
+      style={
+        activePreset === "Fun"
+          ? ({ "--amb-label": "hsl(0 15% 7%)", "--amb-lume": "hsl(0 15% 7%)" } as React.CSSProperties)
+          : {}
+      }>
 
       {/* ── HEADER — global light control ────────────────────────────── */}
       <ThemeSwitcher
