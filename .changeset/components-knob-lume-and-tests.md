@@ -6,4 +6,4 @@ Add a test suite for the bare mechanisms (AmbientRotary, AmbientTravel, AmbientP
 
 The knob's indicator dot, indicator bar and printed scale markers now take `--amb-lume` instead of `--amb-highlight-color` / `--amb-label`, and the console kit's bar-knob mark takes `--amb-lume` instead of darkened surface ink, so pointer and scale read as one backlit instrument: bright in a bright scene, glowing as the lights drop. Override `background` on `.amb-knob-indicator-circle`, `.amb-knob-indicator-rectangle`, `.amb-knob-marker` or `.amb-console-indicator` to restore painted ink.
 
-The console kit's toggle thumb is now an `amb-surface` wearing the scene's lit albedo instead of a fixed accent paint, so it re-shades with the lamp's position and intensity like every other body in the scene. The kit's centre mark above the knob does the same.
+The console kit's toggle thumb and the knob's centre mark keep their accent orange but now wear it as reflectance — `amb-surface` bodies with `--amb-albedo` pinned to the accent — so they shade and re-light with the scene instead of reading as flat paint.
