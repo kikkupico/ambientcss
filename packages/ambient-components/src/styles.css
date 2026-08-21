@@ -1364,26 +1364,30 @@
 
    BOTH ends of that mix are now lit reflectance rather than paint, so the
    whole base responds to the lamp:
-   - OFF: the recessed floor — the scene's lit albedo (`--amb-lit`) stepped
-     down into the groove, as before.
-   - ON: the accent worn as reflectance. There is no second --amb-lit to
-     borrow (the property bakes in one albedo), so the accent is shaded by
-     the same intensities here — mixed toward black by the mean of key and
-     fill — which tracks the scene's brightness one-to-one even though it
-     skips the linear-light exposure maths amb-surface runs. */
+   - OFF: a dark grey body — the scene's lit albedo held at 30% in linear
+     light. It sits well below the panel as a recess should but still
+     tracks the lamp, because the base colour is --amb-lit: dim the key
+     and the floor dims with it. (It briefly sat at plain --amb-lit, which
+     read flush with the panel.)
+   - ON: the accent worn as reflectance, through the SAME law the thumb's
+     face goes through. ambient.css publishes its diffuse exposure factor
+     as --amb-exposure (= key*0.6396 + fill*0.5496, applied in linear
+     light), so mixing in `srgb-linear` by that amount reproduces
+     amb-surface's shading exactly — track ON and thumb sit at the same
+     brightness, instead of the mean-of-intensities approximation that
+     left the floor visibly darker than the body it carries. */
 .amb-console-track {
   position: absolute;
   inset: 0;
   border-radius: var(--ambx-radius-full);
   --_lit-accent: color-mix(
-    in srgb,
-    var(--ambx-accent)
-      calc((var(--amb-key-light-intensity) + var(--amb-fill-light-intensity)) / 2 * 100%),
+    in srgb-linear,
+    var(--ambx-accent) calc(var(--amb-exposure) * 100%),
     black
   );
   background-color: color-mix(
     in oklab,
-    color-mix(in oklab, var(--amb-lit), black 55%),
+    color-mix(in srgb-linear, var(--amb-lit) 30%, black),
     var(--_lit-accent) calc(var(--ambx-percent) * 100%)
   );
   --amb-thickness: 0.4;

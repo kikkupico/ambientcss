@@ -681,8 +681,8 @@ export function App() {
           <div className="groove-wall">
             {[
               { cls: "groove-channel", label: "Channel", tone: "lume" },
-              { cls: "groove-well", label: "Well", tone: "darker" },
-              { cls: "groove-inset", label: "Inset", tone: "darker" },
+              { cls: "groove-well", label: "Well", tone: "plain" },
+              { cls: "groove-inset", label: "Inset", tone: "plain" },
             ].map(({ cls, label, tone }, i) => (
               <div className="groove-item" key={label}>
                 <div
@@ -999,7 +999,7 @@ function ThemeSwitcher({ theme, activePreset, onPreset, onCustom, onProp }: Them
             {/* Controls sit in a recessed darker well so they pop and read
                 apart from the key bank below. Bead-blasted, so the inset
                 reads as a different finish from the brushed slab around it. */}
-            <div className="cord-console-well ambient amb-groove groove-darker amb-mat-blasted">
+            <div className="cord-console-well ambient amb-groove amb-mat-blasted">
               {/* The lamp's placement, laid out as the vector it is: the
                   fader stands on the left for Y, the slider runs across the
                   top for X, and the two intensity knobs sit under the slider
