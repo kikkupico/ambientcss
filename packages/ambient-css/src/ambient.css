@@ -796,26 +796,125 @@
    no --amb-albedo of its own — same as .amb-mat-matte and .amb-mat-shiny,
    it renders at whatever the surface already inherits. The reference tone
    below is what the relief was fitted AT, for a consumer who wants the
-   exact calibrated look: `--amb-albedo: color(srgb-linear 0.49 0.49 0.49)`
-   puts the surface PLUS its grain on the crop's measured tone — mean L*
-   74.22 reference against 74.43 rendered, RMS 0.86 against 0.863. Angular
-   consistency is 0.66, and that is the anisotropy working rather than a
-   miss: 0.57 along the grain, 0.87 across it.
+   exact calibrated look: `--amb-albedo: color(srgb-linear 0.482 0.482 0.482)`
+   puts the surface PLUS its grain on the Blender rig's measured tone
+   (ambient3d/derived/notes/brushed.md: fit_grain solves the albedo through
+   the already-grounded surface exposure law, at mean L* 74.5 off the
+   mat_brushed_default render). Grounded on ambient3d's Blender rig now
+   (a parametric Noise-Texture/Anisotropic-BSDF metal, calibrate.py's
+   brushed_angle sweep — see ambient3d/amb_params.py's grain_material),
+   superseding the .plans/amb-mat-brushed-rubber.md photographed-crop fit:
+   mean RMS L* target 2.21 (this file's default light, key 0.9/fill 0.7),
+   anisotropy (row/col pixel-derivative ratio, screen rows = object-space Y
+   = across the grain) 7.5 — both closed-loop matched here by rendering this
+   file's own SVG turbulence tile at candidate baseFrequency/alpha pairs
+   and re-measuring with the same statistic (ambient3d/measure/metrics.py's
+   grain_texture) until it converged, since the CSS mechanism's own
+   pixel-sampling regime does not respond to baseFrequency/alpha the way
+   the Blender render does.
 
-   Those tones are fitted under NEUTRAL light, which is where that albedo
-   reproduces them (measured: L* 74.23 at --amb-light-saturation: 0).
-   Under the file's default lamp the 15%-saturation cast lands it at
-   71.4 — not a miss but the cast every surface in this file takes, and
-   the reason a refit has to zero the saturation first. */
+   BASEFREQUENCY-X 0.02 LOOKED RIGHT AND WASN'T: it hit both targets above
+   (RMS L* 2.207, close enough) but rendered as discontinuous dashes, not
+   continuous streaks — visible once tiled at this file's own 128px
+   --_grain-scale, invisible in a single untiled tile, which is why the
+   first pass missed it. Cause: stitchTiles="stitch" snaps 0.02 to the
+   nearest integral cycle count across the 128px tile, landing on 3 — only
+   3 Perlin lattice cells span the width, so with numOctaves 1 the fine
+   per-row noise (baseFrequency-y 20) exposes each cell's own smooth
+   Hermite arch as a visible seam every ~43px. More octaves does not fix
+   this: fBm halves amplitude per octave, so the fundamental (the arch)
+   still carries the majority of the energy. The fix is more cells, not
+   more detail — raised to 0.28125 (36/128, exact so stitching is a
+   no-op), re-closed-loop-matched (RMS L* 2.219 against the 2.2145 target,
+   anisotropy 7.60 against 7.50) at a slightly lower --_grain-alpha (0.47
+   -> 0.45, since more cells at the same alpha read fractionally busier).
+   Confirmed by re-tiling the candidate at --_grain-scale before accepting
+   it — a single-tile render cannot see this failure mode.
+
+   RE-SOLVED 2026-08-21, target only. Nothing above is retracted: the tile,
+   its baseFrequency and its anisotropy all stand. But blasted's
+   regrounding moved every grain entry in the manifest onto one shared
+   aluminium albedo (0.49), which re-exposed this material at a slightly
+   higher tone, so mat_brushed_default was re-rendered and its grain target
+   moved 2.2145 -> 2.5334 (+14%). Alpha was rescaled by that ratio rather
+   than re-searched: the response is linear here (measured 0.124 / 1.472 /
+   2.997 at alpha 0 / 0.45 / 0.90, so the excess over baseline doubles when
+   alpha doubles), which makes the ratio the whole answer and makes it
+   independent of the blur radius the measurement happens to use.
+   --_grain-alpha 0.45 -> 0.515, verified at x1.159 against the x1.144 the
+   target moved (tools/css-harness/ladder.mjs +
+   ambient3d/measure/panel_split.py). The reference tone above follows the same move,
+   0.468 -> 0.482.
+
+   HAND-TUNED 2026-08-21, and this is the one constant in this block chosen
+   by eye rather than fitted. The ask was blurrier grain with longer
+   streaks, and those are one lever apart: streak length is the number of
+   turbulence cells spanning the tile, blur is the across-grain frequency.
+   Moved together — tile 128px -> 512px at 8 cells across (baseFrequency-x
+   8/512 = 0.015625, exact so stitching stays a no-op), so streaks run 64px
+   instead of 3.6px; across-grain frequency 20 -> 0.9, a 1.1px period
+   instead of a 0.05px one. --_grain-alpha 0.515 -> 0.42, rescaled so the
+   grain CONTRAST does not move: 1.680 RMS L* against the old tile's 1.695.
+   (0.417 through 0.420 all measure 1.680 — that plateau is 8-bit
+   quantisation, so a third decimal on this alpha would be false
+   precision.) Only the shape changed; the fitted contrast is untouched.
+
+   THE ACROSS-GRAIN FREQUENCY LANDED AT 0.9 IN TWO STEPS. 0.35 (a 2.9px
+   period) went first and read as thick soft bands rather than brushed
+   lines. 1.0 is the value not to reach for: at exactly one cycle per CSS
+   pixel the Perlin lattice coincides with the pixel grid and every sample
+   lands on a lattice node, where gradient noise is zero by construction —
+   contrast collapses to 1.212 and the anisotropy falls back to 8.4. That
+   alignment, not the frequency's magnitude, is what the old 20 was doing
+   wrong. 0.9 snaps to 461 cycles over 512px, which stays off the grid, and
+   holds at 1.68 +/- 0.05 across every device pixel ratio tested (1, 1.11,
+   1.25, 1.5, 1.75, 2). The rule to carry forward is "avoid integer cycles
+   per device pixel", not "stay under Nyquist".
+
+   WHY THIS IS NOT A STEP AWAY FROM THE BLENDER GROUND TRUTH: the old tile
+   never delivered the anisotropy it was fitted to. brushed.md records
+   row/col 7.60 against the render's 7.4963, but measured off a real Chrome
+   raster the shipped tile reads 1.55 at dpr 1 (2.70 at dpr 2) — near
+   isotropic, which is why it read as woven cross-hatch rather than grain.
+   Its across-grain frequency was 20 cycles per CSS pixel, forty times
+   Nyquist, so what reached the screen was that grain's aliasing, and
+   aliasing carries no direction. This tile stays off the pixel grid on
+   both axes and measures 12.15 at dpr 1 (10.44 at dpr 2), which OVERSHOOTS
+   the fitted 7.4963 — deliberately: the ratio climbs as the across-grain
+   period gets finer, and the look asked for is finer than the fit. Hold
+   both facts at once. The old tile undershot by reading 1.55 while
+   claiming 7.60, and that was a defect; this one overshoots knowingly,
+   which is a choice. The intermediate 0.35 measured 7.13, the closest to
+   the fit of anything tried here, and was rejected on looks.
+
+   --_grain-scale moved 128px -> 512px, which the ACCEPTED LIMITS note near
+   the top of this section calls not a free knob. That warning is not
+   violated: what it protects is the tile rendering at 1:1 CSS pixels, and
+   a 512px background-size on a 512px tile is still 1:1. The cost is a
+   larger rasterised filter, decoded once per URL by the browser rather
+   than once per element.
+
+   SEAMS RE-CHECKED, because a bigger tile has further to wrap and the
+   2026-08-20 correction above is exactly that failure mode. Rendered
+   across two full repeats in each axis at 4x amplitude: no seam is
+   visible, and on a boundary-jump ratio (mean |dL| across the tile
+   boundary over the median column's) this tile measures 1.09, against the
+   old tile's own 1.17 and the 1.31 of the baseFrequency 0.02 tile that
+   correction rejected. Its 8 cells DO sit under the ~10-cell floor that
+   correction set; that floor was measured at a 128px tile, and at 512px
+   the cell arch it warns about does not appear. Rendered with
+   tools/css-harness/variants.mjs (specs/handtune-2026-08-21-brushed.json),
+   measured with ambient3d/measure/variant_grid.py. */
 .amb-mat-brushed {
   /* Ground metal, not a mirror and not a matte plastic: enough specular to
-     carry a sheen, enough roughness to spread it across most of the face. */
+     carry a sheen, enough roughness to spread it across most of the face.
+     Not re-grounded this pass — see --_sheen-alpha below. */
   --amb-mat-specular: 0.3;
   --amb-mat-roughness: 0.72;
-  --_grain-tile: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22128%22%20height%3D%22128%22%3E%3Cfilter%20id%3D%22t%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20color-interpolation-filters%3D%22linearRGB%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.06%202.6%22%20numOctaves%3D%221%22%20seed%3D%223%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3CfeComponentTransfer%3E%3CfeFuncR%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3CfeFuncG%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3CfeFuncB%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3C%2FfeComponentTransfer%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url%28%23t%29%22%2F%3E%3C%2Fsvg%3E");
-  --_grain-tile-inv: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22128%22%20height%3D%22128%22%3E%3Cfilter%20id%3D%22t%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20color-interpolation-filters%3D%22linearRGB%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.06%202.6%22%20numOctaves%3D%221%22%20seed%3D%223%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3CfeComponentTransfer%3E%3CfeFuncR%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3CfeFuncG%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3CfeFuncB%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3C%2FfeComponentTransfer%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url%28%23t%29%22%2F%3E%3C%2Fsvg%3E");
-  --_grain-scale: 128px;
-  --_grain-alpha: 0.169;
+  --_grain-tile: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22512%22%20height%3D%22512%22%3E%3Cfilter%20id%3D%22t%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20color-interpolation-filters%3D%22linearRGB%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.015625%200.9%22%20numOctaves%3D%221%22%20seed%3D%223%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3CfeComponentTransfer%3E%3CfeFuncR%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3CfeFuncG%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3CfeFuncB%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3C%2FfeComponentTransfer%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url(%23t)%22%2F%3E%3C%2Fsvg%3E");
+  --_grain-tile-inv: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22512%22%20height%3D%22512%22%3E%3Cfilter%20id%3D%22t%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20color-interpolation-filters%3D%22linearRGB%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.015625%200.9%22%20numOctaves%3D%221%22%20seed%3D%223%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3CfeComponentTransfer%3E%3CfeFuncR%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3CfeFuncG%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3CfeFuncB%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3C%2FfeComponentTransfer%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url(%23t)%22%2F%3E%3C%2Fsvg%3E");
+  --_grain-scale: 512px;
+  --_grain-alpha: 0.42;
   /* The cost of snapping to whole pixels: at a 2px baseline the
      across-grain offset is either 0 or 1, so brushed metal SWITCHES
      rather than fades as the lamp swings along the grain. It therefore
@@ -840,14 +939,76 @@
      Amplitude rides the key alone, as .amb-mat-shiny's does, with a small
      floor so the sheen survives a dim scene the way a metal face does. It
      is a plain alpha over --amb-lit, so it lands on L + a(100 - L) and
-     cannot blow out a pale face. */
-  --_sheen-alpha: calc(var(--amb-key-light-intensity) * 0.11 + 0.04);
+     cannot blow out a pale face.
+
+     GROUNDED now (ambient3d/derived/notes/brushed_sheen.md), in two parts
+     fit from two separate sweeps, because the sweep that gives a clean
+     AMPLITUDE read does not give a clean POSITION read. Amplitude:
+     axis_profile (a fixed vertical screen scan — cyl_profile's light
+     diagonal mostly missed this band, see the superseded note below) minus
+     its relief-only twin, MEAN excess over a key-intensity sweep — mean,
+     not peak, because the material's own fine relief noise is comparable
+     in amplitude to the sheen and only averaging separates them; this
+     stays robust regardless of the sweep's light contrast. Position: the
+     amplitude sweep's own low light contrast (key 0.3-0.9 against a fixed
+     fill 0.7 — key<fill at the low end) turns out to wash the band out
+     enough that its PEAK is argmax-of-noise, not signal — a dedicated
+     high-contrast (key 0.9, fill 0.1) sweep across 3 --amb-light-y values recovers
+     a real, clearly light-tracking peak instead (r2 0.975), confirming
+     the slide-with-light-y model this file already assumed, just at a
+     different rate. The half-width below (42%) is NOT re-grounded: the
+     high-contrast sweep's own half-max width comes out either near-zero
+     (a sharp edge-concentrated glint at the top/bottom silhouette, not a
+     broad band, at the two light_y extremes) or ~100% (no resolvable
+     peak, light straight-on) — too inconsistent across only 3 samples to
+     safely replace the existing broad-band shape, left as a flagged open
+     question rather than acted on. */
+  /* REGROUNDED 2026-08-21, and the number it is NOT fit to matters most.
+     The 0.0207/0.0103 this replaces came from a sheen sweep on the
+     calibration rig, and that rig cannot see this quantity at all: its
+     camera is orthographic (amb_params.py:426), so every view ray is
+     parallel, reflects off the flat plate in one direction and samples a
+     single point of the environment. Positional variation can only reach
+     it through perturbed normals — 24 renders across roughness x
+     anisotropy x bump strength reach a sweep RMS of 1.04 against the
+     reference crops' 16.2, and with the bump removed it is exactly 0.00.
+     The old constant measured the rig's blindness, not the material, and
+     cut the amplitude 4-5x on the strength of it.
+
+     The reference crops cannot supply a replacement target either, and
+     that is a rejection rather than a miss: 16.2 is the low-frequency RMS
+     across a photograph of a large aluminium sheet, so most of that
+     energy is scene-scale illumination falloff across a big object. A
+     240px control has no scene-scale falloff to reproduce. Measured on
+     the panel ladder (tools/css-harness/ladder.mjs, split by
+     ambient3d/measure/panel_split.py): a FULLY OPAQUE white band (alpha
+     1.0) reaches a sweep of only 6.28 for brushed and 8.29 for spun, and
+     the exposure-invariant sweep/grain RATIO tops out at 3.7 against the
+     crops' 6.5 — which rules out exposure difference as the explanation
+     and leaves non-commensurability. The target has no solution at any
+     alpha, because it is not the same quantity. Do not re-run that fit.
+
+     So this is grounded visually, on the ladder in
+     ambient3d/derived/notes/brushed_sheen.md: 0.0289 (the shipped value)
+     is invisible, 0.139 barely present, 0.30 is where the band reads as
+     brushed metal. The floor:slope proportion is the hand-authored
+     original's (0.04:0.11), kept because it encodes a real intent — the
+     sheen survives a dim scene the way a metal face does — and rescaled
+     so key 0.9 lands on 0.30. Shared verbatim with
+     .amb-mat-brushed-round: spun needs less help (its conic tile already
+     carries a sweep of 2.32 where brushed has 0.19) but reads correctly
+     at the same value, and one metal in two finishes should not carry
+     two different sheen formulas. */
+  --_sheen-alpha: calc(var(--amb-key-light-intensity) * 0.237 + 0.0863);
   /* The band's centre, and a half-width either side of it. Written as three
      calc()s off one position rather than as a gradient rotated to the lamp:
      the highlight of a linear grain does not tilt, it slides. Stops that run
      off either end are corrected back in place by the gradient itself, which
-     is what keeps the band from wrapping when the lamp is straight overhead. */
-  --_sheen-at: calc(50% + var(--amb-light-y) * 30%);
+     is what keeps the band from wrapping when the lamp is straight overhead.
+     The 54%/42% below are grounded (54% + light_y*42%, was 50% + light_y*30%);
+     the 42% half-width two lines down is a DIFFERENT, ungrounded number —
+     see the comment above. */
+  --_sheen-at: calc(54% + var(--amb-light-y) * 42%);
   background-image: linear-gradient(
     to bottom,
     hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 0%,
@@ -861,28 +1022,83 @@
   );
 }
 
-/* Bead-blasted elastomer: dark, isotropic, grain about 3x the
-   aluminium's. Carries no --amb-albedo of its own, the same as every
-   other material here — the reference tone is `--amb-albedo:
-   color(srgb-linear 0.0644 0.0629 0.0629)`, worth setting explicitly for
-   the calibrated look: at that tone the surface PLUS its grain lands on
-   mean L* 36.13 (reference) against 36.24 (rendered), RMS 2.45 against
-   2.449, angular consistency 0.98.
+/* Bead-blasted aluminium: light grey, isotropic, dense sparkle. Carries no
+   --amb-albedo of its own, the same as every other material here — the
+   reference tone is `--amb-albedo: color(srgb-linear 0.446 0.446 0.446)`,
+   worth setting explicitly for the calibrated look.
 
-   The flat body alone measures L* 29.6 under neutral light at that
-   albedo: the grain is fitted so the surface PLUS its grain lands on 36,
-   and on a body this dark the screen layer gains more headroom than the
-   multiply layer loses, lifting the mean by about six points. Turning the
-   grain off therefore leaves a visibly darker rubber at that reference
-   tone, which is the fit working rather than a bug — off-reference it is
-   just whatever --amb-shade says. */
+   REGROUNDED 2026-08-21. This block used to describe a dark ELASTOMER at
+   albedo 0.0594, which was a fossil: the material was renamed
+   .amb-mat-rubber -> .amb-mat-blasted in commit fe347b8 and the grounding
+   never followed the rename. The reference is bead-blasted aluminium, so
+   the Blender material is now a conductor (BLAST_METALLIC = 1.0) and the
+   albedo moved 0.0594 -> 0.4457, within 8% of brushed's and spun's — one
+   aluminium reflectance now shared by three finishes, not two.
+
+   --amb-mat-specular: 0 / --amb-mat-roughness: 1 are KEPT, deliberately,
+   even though the Blender material is now a metal at roughness 0.25. The
+   two scales are modelled separately: the bead craters are the height
+   field, so what is left for the BSDF is the smooth metal BETWEEN craters,
+   and that low roughness exists to make each crater glitter — which on
+   this side is the grain tile's job, not a broad highlight's. The
+   reference crop's sweep is 3.4 against its grain of 11.9, i.e. no
+   distinct highlight band to paint, so specular 0 stays correct. (With
+   specular at 0 the roughness beside it is inert anyway; it is left at 1
+   so the pair still reads as "fully matte, by decision".)
+
+   Grounded on ambient3d's Blender rig (calibrate.py's blasted_angle sweep;
+   see amb_params.py's grain_material and derived/notes/blasted.md):
+   grain RMS L* target 11.7355 (this file's default light, key 0.9/fill
+   0.7), up from the 1.27 the elastomer-era render gave — an order of
+   magnitude, since the glitter IS this material.
+
+   THAT TARGET IS NOT REACHED, and the shortfall is recorded rather than
+   tuned away. --_grain-alpha is one factor of an opacity product whose
+   other factors are all 1 for this isotropic material, so it hard-rails at
+   1.0; the target needs ~1.27. Worse, the response stays linear right up
+   to the rail, so the rail is a real ceiling and not a saturation point:
+   alpha 1.0 buys 7.6x the shipped contrast where 9.2x is wanted. And at
+   the rail the panel reads as sensor static rather than bead-blast —
+   which is derived/notes/blasted.md's scale caveat biting for real, since
+   this tile's features are ~1px where the render's craters are ~10px, so
+   equal per-pixel RMS is equal contrast at very different feature sizes.
+   Stopped at 0.85 on that visual read (ladder measured with
+   tools/css-harness/ladder.mjs + ambient3d/measure/panel_split.py): 6.3x
+   the shipped contrast, ~68% of the target, dense sparkle rather than
+   noise. Be precise about what headroom that leaves: the product clamps
+   once --_grain-lit reaches ~1.18, and --_grain-lit ranges to 1.5, so the
+   grain still fades correctly in a dim scene but stops brightening about
+   18% above the default light rather than tracking all the way up. The two levers that could close the rest are the tile's
+   own contrast stretch (feComponentTransfer slope 2) and its feature size
+   (baseFrequency 0.9 at a 96px tile); both are out of scope here and are
+   the identified next step.
+
+   HAND-TUNED 2026-08-21: --_grain-alpha 0.85 -> 0.666, asked for as
+   slightly less contrast, and it lands on an exact edge worth keeping.
+   The opacity product above clamps at 1, and 0.666 is the highest alpha
+   that never reaches it — --_grain-lit tops out at 1.50, and 1.50 x 0.666
+   = 0.999. So the headroom cost the paragraph above records is paid back:
+   the grain now tracks the light across its whole range instead of
+   stopping brightening about 18% above the default scene. (0.667 would
+   clamp, but only in the top 0.05% of the range, so the choice between
+   the two is bookkeeping rather than looks. All of this assumes
+   --amb-grain-amount at 1: a consumer who raises that knob moves the
+   clamp point down in proportion.)
+
+   The contrast that buys: 4.212 RMS L* against 0.85's 5.468, -23%, which
+   puts this at about 52% of the Blender target rather than 68%. That
+   target was already unreachable for the reasons above, so this trades a
+   shortfall that could not be closed for a light response that could.
+   Measured with tools/css-harness/variants.mjs
+   (specs/handtune-2026-08-21-blasted.json) +
+   ambient3d/measure/variant_grid.py. */
 .amb-mat-blasted {
   --amb-mat-specular: 0;
   --amb-mat-roughness: 1;
   --_grain-tile: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2296%22%20height%3D%2296%22%3E%3Cfilter%20id%3D%22t%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20color-interpolation-filters%3D%22linearRGB%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.9%200.9%22%20numOctaves%3D%222%22%20seed%3D%223%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3CfeComponentTransfer%3E%3CfeFuncR%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3CfeFuncG%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3CfeFuncB%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3C%2FfeComponentTransfer%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url%28%23t%29%22%2F%3E%3C%2Fsvg%3E");
   --_grain-tile-inv: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2296%22%20height%3D%2296%22%3E%3Cfilter%20id%3D%22t%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20color-interpolation-filters%3D%22linearRGB%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.9%200.9%22%20numOctaves%3D%222%22%20seed%3D%223%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3CfeComponentTransfer%3E%3CfeFuncR%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3CfeFuncG%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3CfeFuncB%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3C%2FfeComponentTransfer%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url%28%23t%29%22%2F%3E%3C%2Fsvg%3E");
   --_grain-scale: 96px;
-  --_grain-alpha: 0.281;
+  --_grain-alpha: 0.666;
 }
 
 /* Spun (circular-brushed) aluminium: the same metal as .amb-mat-brushed with
@@ -922,15 +1138,27 @@
   /* No --amb-albedo of its own, like the other two relief materials. Its
      reference tone is the SAME as .amb-mat-brushed's — this IS that metal,
      turned a different way, one reflectance shared by two finishes — so set
-     `--amb-albedo: color(srgb-linear 0.49 0.49 0.49)` for the calibrated
-     look on either. The grain alpha is NOT a shared fit, and the equal
-     number is not evidence that it is: the linear tile's across-grain
-     period is sub-pixel, so most of what sets its rendered contrast is the
-     pixel averaging the round() note above exists to protect, while these
+     `--amb-albedo: color(srgb-linear 0.480 0.480 0.480)` for the calibrated
+     look on either: ambient3d's Blender rig (a radial Tangent-node
+     Anisotropic BSDF over the same Noise-Texture height field brushed uses,
+     see amb_params.py's grain_material) independently fits albedo 0.4795
+     for spun against 0.4819 for brushed off its own render — the "one
+     reflectance shared by two finishes" claim confirmed to within 0.5%,
+     not just asserted (ambient3d/derived/notes/spun.md). Since 2026-08-21
+     it extends to THREE: .amb-mat-blasted's 0.4457 is within 8% of both.
+
+     The grain alpha is NOT a shared fit, and the equal number below is not
+     evidence that it is: the linear tile's across-grain period is
+     sub-pixel, so most of what sets its rendered contrast is the pixel
+     averaging the round() note above exists to protect, while these
      streaks are several pixels wide at knob radius and take none of it.
-     Same alpha, different spatial statistics. It was matched BY EYE against
-     the linear metal's apparent relief, and a photographic refit would
-     move it. */
+     Formerly matched BY EYE against the linear metal's apparent relief —
+     grounded now by rendering THIS conic-gradient tile at candidate alphas
+     and matching the Blender rig's mean RMS L* target (2.28 at this file's
+     default light) with the same statistic
+     (ambient3d/measure/metrics.py's grain_texture): the eyeballed 0.169
+     turned out to need only a 3.5% bump to 0.175 — the tile's own jittered
+     stops were left untouched, only the opacity multiplying them changed. */
   --_grain-tile: conic-gradient(
     from 0deg at 50% 50%,
       #a4a4a4 0deg, #ffffff 2.4deg, #b0b0b0 9.6deg, #ffffff 13.3deg, #ffffff 18.4deg, #000000 24.6deg,
@@ -963,15 +1191,77 @@
      `auto`, which for a gradient is 100% of the box, and a conic gradient
      drawn into a 2:1 image is an ellipse of streaks rather than a circle. */
   --_grain-scale: 200% 200%;
-  --_grain-alpha: 0.169;
+  /* RE-SOLVED 2026-08-21 by the same ratio method as brushed's, and for
+     the same reason: the shared-aluminium albedo re-exposed this material,
+     so mat_spun_default's grain target moved 2.28 -> 2.5677 (+12.6%). The
+     conic tile is unchanged — only the alpha multiplying it. Linearity
+     checked first (0.203 / 2.078 / 4.235 at alpha 0 / 0.175 / 0.35), then
+     0.175 -> 0.197, verified at x1.125 against the x1.126 wanted
+     (tools/css-harness/ladder.mjs + ambient3d/measure/panel_split.py). */
+  --_grain-alpha: 0.197;
 
   /* The sheen, in this material's own geometry: the linear metal's band
      across the grain, wrapped round the centre. The grain is tangential
      everywhere, so "across it" is radial everywhere, and the band becomes a
      pair of opposed lobes lying on the lamp's own axis — plus the hotspot
-     where every streak converges. Both ride the same amplitude the linear
-     metal's band does. */
-  --_sheen-alpha: calc(var(--amb-key-light-intensity) * 0.11 + 0.04);
+     where every streak converges.
+
+     AMPLITUDE GROUNDED (ambient3d/derived/notes/spun_sheen.md); the
+     directional SHAPE below is NOT, and this time that is a checked
+     conclusion, not just a gap. ring_profile (angular wedges of an
+     annulus, aligned to the light bearing) minus its relief-only twin
+     gives the same mean excess vs key as brushed's axis_profile does, to
+     3 decimal places — the two finishes share one Anisotropic BSDF
+     amount and specular setting in the rig, so a shared amplitude is
+     expected and is why both keep ONE shared formula below, same as
+     before. But a dedicated high-contrast sweep across 4 light bearings
+     (spun_sheen_pos, the same design that DID recover a real
+     light-tracking peak for brushed under identical contrast) finds no
+     matching peak here: the excess reads as flat across angle at every
+     bearing tested, not concentrated where a conic lobe locked to the
+     light would put it. Same rig, same camera, same extraction method,
+     different result for the two grain orientations — this rules out
+     "not enough signal" as the explanation. The conic stops' 62deg
+     half-width and the hotspot's 1.5x factor below are therefore left at
+     their prior hand-tuned shape: unconfirmed, not disconfirmed, by a
+     rig that does not resolve this finish's directionality at all. */
+  /* REGROUNDED 2026-08-21, and the number it is NOT fit to matters most.
+     The 0.0207/0.0103 this replaces came from a sheen sweep on the
+     calibration rig, and that rig cannot see this quantity at all: its
+     camera is orthographic (amb_params.py:426), so every view ray is
+     parallel, reflects off the flat plate in one direction and samples a
+     single point of the environment. Positional variation can only reach
+     it through perturbed normals — 24 renders across roughness x
+     anisotropy x bump strength reach a sweep RMS of 1.04 against the
+     reference crops' 16.2, and with the bump removed it is exactly 0.00.
+     The old constant measured the rig's blindness, not the material, and
+     cut the amplitude 4-5x on the strength of it.
+
+     The reference crops cannot supply a replacement target either, and
+     that is a rejection rather than a miss: 16.2 is the low-frequency RMS
+     across a photograph of a large aluminium sheet, so most of that
+     energy is scene-scale illumination falloff across a big object. A
+     240px control has no scene-scale falloff to reproduce. Measured on
+     the panel ladder (tools/css-harness/ladder.mjs, split by
+     ambient3d/measure/panel_split.py): a FULLY OPAQUE white band (alpha
+     1.0) reaches a sweep of only 6.28 for brushed and 8.29 for spun, and
+     the exposure-invariant sweep/grain RATIO tops out at 3.7 against the
+     crops' 6.5 — which rules out exposure difference as the explanation
+     and leaves non-commensurability. The target has no solution at any
+     alpha, because it is not the same quantity. Do not re-run that fit.
+
+     So this is grounded visually, on the ladder in
+     ambient3d/derived/notes/brushed_sheen.md: 0.0289 (the shipped value)
+     is invisible, 0.139 barely present, 0.30 is where the band reads as
+     brushed metal. The floor:slope proportion is the hand-authored
+     original's (0.04:0.11), kept because it encodes a real intent — the
+     sheen survives a dim scene the way a metal face does — and rescaled
+     so key 0.9 lands on 0.30. Shared verbatim with
+     .amb-mat-brushed-round: spun needs less help (its conic tile already
+     carries a sweep of 2.32 where brushed has 0.19) but reads correctly
+     at the same value, and one metal in two finishes should not carry
+     two different sheen formulas. */
+  --_sheen-alpha: calc(var(--amb-key-light-intensity) * 0.237 + 0.0863);
   /* atan2 of the light vector is the lamp's bearing; +90deg turns it into
      the CSS angle convention (0 = up, clockwise) pointing AT the lamp, the
      same rotation .amb-mat-shiny's --_shiny-angle makes in reverse to point

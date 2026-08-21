@@ -56,6 +56,223 @@ def calib_material(name, albedo, rough=1.0):
     return mat
 
 
+# ---- micro-relief materials (brushed / spun / blasted) -------------------
+#
+# CSS models these as two additive layers: a height-field diffuse RELIEF
+# (the screen/multiply tile pair) and, for the two lathe/belt aluminium
+# finishes only, a separate specular SHEEN. Mirrored here with a Noise
+# Texture height field (bump-mapped, anisotropically stretched to the
+# finish's grain) plus, when `sheen` is on, an Anisotropic BSDF lobe tangent
+# to that same grain. No UV map exists anywhere in this kit's geometry, so
+# every coordinate below comes from Object space (local mm, independent of
+# an object's bounding box) rather than Generated/UV.
+#
+# Period constants read as a common abrasive grit shared by the two
+# aluminium finishes (fine across the cut, long along it) and a coarser,
+# isotropic bead-blast dimple on the rubber — physically reasoned starting
+# points, tuned against a low-sample preview render before the full
+# calibration pass (see derived/notes/{brushed,spun,blasted}.md for the
+# values that stuck). They are Blender-side INPUTS, not fit outputs: what
+# gets fit is the CSS coefficients that reproduce these renders' statistics.
+GRAIN_ACROSS_MM = 2.5      # fine dimension: ridge pitch across the cut.
+                           # Pinned to the rig's 4 px/mm resolution (10
+                           # px/period), not to a real finish's grit: tried
+                           # at 0.6mm first and measured almost no
+                           # anisotropy (a 0/90deg light-angle RMS ratio of
+                           # ~1.1) because 2.4 px/period sits at the Bump
+                           # node's derivative estimate and Cycles' pixel AA
+                           # low-pass corner, which crushes the fine axis and
+                           # leaves the coarse axis untouched — an estimator
+                           # artifact, not the physics. 2.5mm (10 px/period)
+                           # measures a real ~2x std ratio between along- and
+                           # across-grain light angles; going finer than the
+                           # render can resolve just re-introduces the same
+                           # crush.
+GRAIN_ALONG_MM = 40.0      # coarse dimension: streak length along the cut
+BLAST_PERIOD_MM = 2.5      # isotropic bead-blast dimple size — same grit
+                           # pitch as the metals' across-grain ridges, for
+                           # the same resolvability reason
+GRAIN_ROUGHNESS = 0.55     # ground/lathe metal: some specular, well spread
+GRAIN_ANISO = 0.75         # strong directional highlight from the grooves
+# Bead-blasted aluminium is the one finish here that is modelled as a
+# CONDUCTOR, and the asymmetry with brushed/spun is earned by measurement
+# rather than asserted. Against the reference crop's grain RMS of 11.9 L*,
+# a fully matte dielectric (the previous build: Metallic 0, roughness 1.0)
+# saturates at 4.5 L* — and only reaches even that by driving
+# GRAIN_BUMP_DISTANCE_MM up until the plate darkens to L* 53. Metallic at
+# roughness 0.25 reaches 11.3 L* at the correct tone. The glitter IS the
+# material, and a diffuse lobe cannot produce it.
+#
+# Roughness 0.25 is low for something called "blasted" because the two
+# scales are modelled separately: the bead craters are the height field
+# below, so what is left for the BSDF is the smooth metal BETWEEN the
+# craters. Putting the roughness in both places double-counts it and
+# flattens the sparkle back out.
+BLAST_METALLIC = 1.0
+BLAST_ROUGHNESS = 0.25
+GRAIN_BUMP_STRENGTH = 1.0
+# Bump's "Distance" is the finite-difference step it samples the height
+# field at, in the same Object-space mm every other constant here uses. Its
+# tiny factory default (0.001 mm) is far below GRAIN_ACROSS_MM's period, so
+# the sampled slope of a smooth Noise Texture comes out ~0 there — this has
+# to scale with the finest grain pitch in play, not sit at Blender's default.
+# 0.4 mm (well under GRAIN_ACROSS_MM's 2.5mm ridge pitch, well over the
+# render's 0.25mm pixel pitch) was picked by rendering low-sample previews:
+# it is what made blasted's isotropic dimples read clearly on a fully matte
+# (roughness 1) surface, where bump only shows up as subtle diffuse shading
+# rather than a specular glint.
+GRAIN_BUMP_DISTANCE_MM = 0.4
+GRAIN_REPR_RADIUS_MM = 28.0  # spun: representative radius converting the
+                             # angular coordinate to an arc-length in mm, so
+                             # its along-grain period shares GRAIN_ALONG_MM's
+                             # units instead of tying pitch to plate size
+
+
+def _height_field(nt, finish):
+    """Noise-texture height field, anisotropically stretched to `finish`'s
+    grain direction, and (for brushed/spun) the tangent that direction
+    implies for the Anisotropic BSDF lobe. Returns
+    (height_output_socket, tangent_output_socket_or_None)."""
+    texco = nt.nodes.new("ShaderNodeTexCoord")
+    noise = nt.nodes.new("ShaderNodeTexNoise")
+    noise.inputs["Detail"].default_value = 2.0
+    noise.inputs["Roughness"].default_value = 0.6
+
+    if finish == "blasted":
+        mapping = nt.nodes.new("ShaderNodeMapping")
+        s = 1.0 / BLAST_PERIOD_MM
+        mapping.inputs["Scale"].default_value = (s, s, s)
+        nt.links.new(texco.outputs["Object"], mapping.inputs["Vector"])
+        nt.links.new(mapping.outputs["Vector"], noise.inputs["Vector"])
+        return noise.outputs["Factor"], None
+
+    if finish == "brushed":
+        # Grain runs along local X: coarse (long-period) frequency on X,
+        # fine (short-period) frequency on Y — mirrors the CSS tile's own
+        # baseFrequency convention ("coarse in x, fine in y", grain
+        # horizontal).
+        mapping = nt.nodes.new("ShaderNodeMapping")
+        mapping.inputs["Scale"].default_value = (
+            1.0 / GRAIN_ALONG_MM, 1.0 / GRAIN_ACROSS_MM, 1.0)
+        nt.links.new(texco.outputs["Object"], mapping.inputs["Vector"])
+        nt.links.new(mapping.outputs["Vector"], noise.inputs["Vector"])
+        tangent = nt.nodes.new("ShaderNodeCombineXYZ")
+        tangent.inputs["X"].default_value = 1.0
+        return noise.outputs["Factor"], tangent.outputs["Vector"]
+
+    if finish == "spun":
+        # Polar remap: radius (Length of the object-space position) is the
+        # ACROSS-grain axis, same fine pitch as brushed; angle * a
+        # representative radius is the ALONG-grain axis (arc length in mm),
+        # same coarse pitch as brushed — the lathe cuts circumferentially at
+        # whatever grit the belt sands linearly.
+        sep = nt.nodes.new("ShaderNodeSeparateXYZ")
+        nt.links.new(texco.outputs["Object"], sep.inputs["Vector"])
+        length = nt.nodes.new("ShaderNodeVectorMath")
+        length.operation = "LENGTH"
+        nt.links.new(texco.outputs["Object"], length.inputs[0])
+        angle = nt.nodes.new("ShaderNodeMath")
+        angle.operation = "ARCTAN2"
+        nt.links.new(sep.outputs["Y"], angle.inputs[0])
+        nt.links.new(sep.outputs["X"], angle.inputs[1])
+        arc = nt.nodes.new("ShaderNodeMath")
+        arc.operation = "MULTIPLY"
+        arc.inputs[1].default_value = GRAIN_REPR_RADIUS_MM
+        nt.links.new(angle.outputs["Value"], arc.inputs[0])
+        along = nt.nodes.new("ShaderNodeMath")
+        along.operation = "MULTIPLY"
+        along.inputs[1].default_value = 1.0 / GRAIN_ALONG_MM
+        nt.links.new(arc.outputs["Value"], along.inputs[0])
+        across = nt.nodes.new("ShaderNodeMath")
+        across.operation = "MULTIPLY"
+        across.inputs[1].default_value = 1.0 / GRAIN_ACROSS_MM
+        nt.links.new(length.outputs["Value"], across.inputs[0])
+        combine = nt.nodes.new("ShaderNodeCombineXYZ")
+        nt.links.new(along.outputs["Value"], combine.inputs["X"])
+        nt.links.new(across.outputs["Value"], combine.inputs["Y"])
+        nt.links.new(combine.outputs["Vector"], noise.inputs["Vector"])
+        tangent = nt.nodes.new("ShaderNodeTangent")
+        tangent.direction_type = "RADIAL"
+        tangent.axis = "Z"
+        return noise.outputs["Factor"], tangent.outputs["Tangent"]
+
+    raise ValueError(f"unknown grain finish '{finish}'")
+
+
+def grain_material(name, albedo, finish, sheen=True):
+    """Micro-relief aluminium plate material for `finish` in
+    brushed | spun | blasted.
+
+    `sheen=False` is the calibration variant: same metal, same height
+    field, ANISOTROPIC 0. It is used both to measure the relief's own
+    statistics (the <finish>_angle sweep) and as the reference the sheen
+    fit subtracts (the <finish>_sheen_ref sweeps), so the difference
+    `beauty - ref` isolates exactly one thing — the anisotropic reshaping
+    of the lobe. Before 2026-08-21 the reference was a DIELECTRIC while
+    the beauty variant was too, and the plan for making the beauty
+    variant metallic on its own would have made that subtraction
+    meaningless (two different materials, not one material with one term
+    switched off).
+
+    Two predicates, deliberately not one. `is_anisotropic` asks whether
+    the finish has a grain DIRECTION for a specular lobe to align to;
+    only the two belt/lathe finishes do. A single `is_metal` flag used to
+    gate both this and the roughness choice, which read as if blasted's
+    fully-matte setting followed from it not being metal.
+
+    Brushed and spun are NOT metallic, and that is measured rather than
+    assumed. Building them as conductors (Metallic 1) was tried on
+    2026-08-21 and reverted: it takes their grain RMS from a well-matched
+    2.3 L* to 8-9 against a reference grain of ~2.5, and their tone from
+    73 to 84+. It also buys nothing for the sheen, which this rig cannot
+    render at all (see the sweep note in derived/notes/brushed_sheen.md).
+    There is a structural reason too: the CSS model these renders ground
+    is `diffuse tone + relief + a separately-painted band`, and a
+    conductor has no diffuse lobe for `--amb-albedo` to correspond to.
+    Blasted is the exception, on the evidence in BLAST_METALLIC's note."""
+    is_anisotropic = finish in ("brushed", "spun")
+    mat = calib_material(
+        name, albedo,
+        rough=GRAIN_ROUGHNESS if is_anisotropic else BLAST_ROUGHNESS)
+    nt = mat.node_tree
+    bsdf = next(n for n in nt.nodes if n.type == "BSDF_PRINCIPLED")
+
+    if finish == "blasted":
+        bsdf.inputs["Metallic"].default_value = BLAST_METALLIC
+        # a conductor's lobe still needs a nonzero specular level to
+        # exist at all; calib_material zeroes it for its Lambertian base
+        for socket in ("Specular IOR Level", "Specular"):
+            if socket in bsdf.inputs:
+                bsdf.inputs[socket].default_value = 0.5
+                break
+
+    height, tangent = _height_field(nt, finish)
+    bump = nt.nodes.new("ShaderNodeBump")
+    bump.inputs["Strength"].default_value = GRAIN_BUMP_STRENGTH
+    bump.inputs["Distance"].default_value = GRAIN_BUMP_DISTANCE_MM
+    nt.links.new(height, bump.inputs["Height"])
+    nt.links.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
+
+    if is_anisotropic and sheen:
+        # calib_material zeroes specular for a "near-Lambertian neutral"
+        # base (every other material in this file wants that); the sheen
+        # variant needs it back — Anisotropic only reshapes the specular
+        # lobe, so at Specular IOR Level 0 it has nothing to reshape and
+        # the sheen silently vanishes (the first pass here missed exactly
+        # that).
+        for socket in ("Specular IOR Level", "Specular"):
+            if socket in bsdf.inputs:
+                bsdf.inputs[socket].default_value = 0.5
+                break
+        bsdf.inputs["Anisotropic"].default_value = GRAIN_ANISO
+        nt.links.new(tangent, bsdf.inputs["Tangent"])
+
+    return mat
+
+
+_GRAIN_KINDS = ("brushed", "brushed-relief", "spun", "spun-relief", "blasted")
+
+
 def material_for(a, name="PlateMat", albedo=None):
     """Plate material for an amb material kind (calibration variant)."""
     if albedo is None:
@@ -89,6 +306,9 @@ def material_for(a, name="PlateMat", albedo=None):
                     if n.type == "BSDF_PRINCIPLED")
         bsdf.inputs["Transmission Weight"].default_value = 1.0
         return mat
+    if kind in _GRAIN_KINDS:
+        finish, _, variant = kind.partition("-")
+        return grain_material(name, albedo, finish, sheen=variant != "relief")
     raise ValueError(f"unknown material kind '{kind}'")
 
 
@@ -285,7 +505,9 @@ def add_argparse_group(parser):
     group.add_argument("--amb-chamfer-width", type=float, default=None)
     group.add_argument("--amb-fillet", type=float, default=None)
     group.add_argument("--amb-fillet-width", type=float, default=None)
-    group.add_argument("--amb-mat", choices=["matte", "shiny", "glass"],
+    group.add_argument("--amb-mat",
+                       choices=["matte", "shiny", "glass",
+                                "brushed", "spun", "blasted"],
                        default=None)
     group.add_argument("--amb-emit", default=None, metavar="HEX")
     return group

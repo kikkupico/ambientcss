@@ -1,4 +1,36 @@
 {
+  "blasted": {
+    "albedo_linear": 0.4457,
+    "anisotropy_row_over_col": 1.008,
+    "max_rms_lstar": 18.4266,
+    "mean_rms_lstar": 16.5911,
+    "model": "--amb-albedo solved from the default scene's mean flat+grain tone through fit_surface's exposure law; alpha from mean RMS L* over the <name>_angle sweep; anisotropy from summed rms_drow/rms_dcol over that sweep",
+    "n_angle_frames": 8
+  },
+  "brushed": {
+    "albedo_linear": 0.4819,
+    "anisotropy_row_over_col": 7.4963,
+    "max_rms_lstar": 3.0814,
+    "mean_rms_lstar": 2.4591,
+    "model": "--amb-albedo solved from the default scene's mean flat+grain tone through fit_surface's exposure law; alpha from mean RMS L* over the <name>_angle sweep; anisotropy from summed rms_drow/rms_dcol over that sweep",
+    "n_angle_frames": 8
+  },
+  "brushed_sheen": {
+    "model": "amplitude: mean sheen excess (axis_profile minus its relief-only twin) = s * Ik + s0 (sRGB), from brushed_sheen. position: --_sheen-at's pos_frac (0=top, 1=bottom) = pos_s * light_y + pos_s0, from the high-contrast light_y sweep brushed_sheen_pos, where pos_frac is a real _band_features peak (not noise) \u2014 see the note for why the two need separate sweeps",
+    "n_pos_samples": 3,
+    "n_samples": 3,
+    "pos_fwhm_frac_at_edges": [
+      0.0064,
+      1.0032,
+      0.0128
+    ],
+    "pos_intercept": 0.5378,
+    "pos_r2": 0.975,
+    "pos_slope_per_light_y": 0.4202,
+    "r2": 0.999,
+    "s0_mean": 0.0069,
+    "s_mean_per_key": 0.0021
+  },
   "chamfer": {
     "model": "hl_alpha = p * Ik + pf * If + p0; sh_alpha = q * (Ik - If) + q0; offset_px = w * width",
     "n_highlight_samples": 30,
@@ -103,6 +135,30 @@
     "rc_rim_per_key": 0.088,
     "s0_peak": 0.306,
     "s_peak_per_key": 0.042
+  },
+  "spun": {
+    "albedo_linear": 0.4795,
+    "anisotropy_row_over_col": 0.9923,
+    "max_rms_lstar": 3.1684,
+    "mean_rms_lstar": 2.6942,
+    "model": "--amb-albedo solved from the default scene's mean flat+grain tone through fit_surface's exposure law; alpha from mean RMS L* over the <name>_angle sweep; anisotropy from summed rms_drow/rms_dcol over that sweep",
+    "n_angle_frames": 8
+  },
+  "spun_sheen": {
+    "hotspot_over_ring_ratio": 1.012,
+    "hotspot_s_per_key": 0.0025,
+    "model": "amplitude: mean sheen excess (ring_profile minus its relief-only twin) = s * Ik + s0 (sRGB), from spun_sheen; the center disk's own excess is hotspot_s * Ik + hotspot_s0. Directionality checked, not assumed: see pos_frac_by_bearing",
+    "n_samples": 3,
+    "pos_frac_by_bearing": [
+      0.213,
+      0.851,
+      0.915,
+      0.511
+    ],
+    "pos_frac_expected_if_directional": 0.5,
+    "r2": 0.9926,
+    "s0_mean": 0.0068,
+    "s_mean_per_key": 0.0022
   },
   "surface": {
     "albedos": [

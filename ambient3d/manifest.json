@@ -436,6 +436,54 @@
         "publish": true,
         "slug": "glow"
       }
+    },
+    {
+      "id": "mat_brushed_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": {
+        "mat": "brushed",
+        "albedo": 0.49
+      },
+      "measure": [
+        "grain_texture"
+      ],
+      "docs": {
+        "publish": true,
+        "slug": "mat-brushed"
+      }
+    },
+    {
+      "id": "mat_spun_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": {
+        "mat": "spun",
+        "albedo": 0.49
+      },
+      "measure": [
+        "grain_texture"
+      ],
+      "docs": {
+        "publish": true,
+        "slug": "mat-spun"
+      }
+    },
+    {
+      "id": "mat_blasted_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": {
+        "mat": "blasted",
+        "albedo": 0.49
+      },
+      "measure": [
+        "grain_texture"
+      ],
+      "docs": {
+        "publish": true,
+        "slug": "mat-blasted"
+      }
     }
   ],
   "sweeps": [
@@ -1476,6 +1524,393 @@
               0.0,
               0.35,
               0.7
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "brushed_angle",
+      "builder": "plate",
+      "amb": {
+        "mat": "brushed-relief",
+        "albedo": 0.49,
+        "key_light_intensity": 1.0,
+        "fill_light_intensity": 0.05
+      },
+      "measure": [
+        "grain_texture"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "light": [
+              [
+                1,
+                0
+              ],
+              [
+                1,
+                1
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                1
+              ],
+              [
+                -1,
+                0
+              ],
+              [
+                -1,
+                -1
+              ],
+              [
+                0,
+                -1
+              ],
+              [
+                1,
+                -1
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "spun_angle",
+      "builder": "plate",
+      "amb": {
+        "mat": "spun-relief",
+        "albedo": 0.49,
+        "key_light_intensity": 1.0,
+        "fill_light_intensity": 0.05
+      },
+      "measure": [
+        "grain_texture"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "light": [
+              [
+                1,
+                0
+              ],
+              [
+                1,
+                1
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                1
+              ],
+              [
+                -1,
+                0
+              ],
+              [
+                -1,
+                -1
+              ],
+              [
+                0,
+                -1
+              ],
+              [
+                1,
+                -1
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "blasted_angle",
+      "builder": "plate",
+      "amb": {
+        "mat": "blasted",
+        "albedo": 0.49,
+        "key_light_intensity": 1.0,
+        "fill_light_intensity": 0.05
+      },
+      "measure": [
+        "grain_texture"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "light": [
+              [
+                1,
+                0
+              ],
+              [
+                1,
+                1
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                1
+              ],
+              [
+                -1,
+                0
+              ],
+              [
+                -1,
+                -1
+              ],
+              [
+                0,
+                -1
+              ],
+              [
+                1,
+                -1
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "brushed_sheen",
+      "builder": "plate",
+      "amb": {
+        "mat": "brushed",
+        "albedo": 0.49
+      },
+      "measure": [
+        "axis_profile"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "key_light_intensity": [
+              0.3,
+              0.6,
+              0.9
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "brushed_sheen_ref",
+      "builder": "plate",
+      "amb": {
+        "mat": "brushed-relief",
+        "albedo": 0.49
+      },
+      "measure": [
+        "axis_profile"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "key_light_intensity": [
+              0.3,
+              0.6,
+              0.9
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "spun_sheen",
+      "builder": "plate",
+      "amb": {
+        "mat": "spun",
+        "albedo": 0.49
+      },
+      "measure": [
+        "ring_profile"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "key_light_intensity": [
+              0.3,
+              0.6,
+              0.9
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "spun_sheen_ref",
+      "builder": "plate",
+      "amb": {
+        "mat": "spun-relief",
+        "albedo": 0.49
+      },
+      "measure": [
+        "ring_profile"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "key_light_intensity": [
+              0.3,
+              0.6,
+              0.9
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "brushed_sheen_pos",
+      "builder": "plate",
+      "amb": {
+        "mat": "brushed",
+        "albedo": 0.49,
+        "key_light_intensity": 0.9,
+        "fill_light_intensity": 0.1
+      },
+      "measure": [
+        "axis_profile"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "light": [
+              [
+                0,
+                -1
+              ],
+              [
+                0,
+                0
+              ],
+              [
+                0,
+                1
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "brushed_sheen_pos_ref",
+      "builder": "plate",
+      "amb": {
+        "mat": "brushed-relief",
+        "albedo": 0.49,
+        "key_light_intensity": 0.9,
+        "fill_light_intensity": 0.1
+      },
+      "measure": [
+        "axis_profile"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "light": [
+              [
+                0,
+                -1
+              ],
+              [
+                0,
+                0
+              ],
+              [
+                0,
+                1
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "spun_sheen_pos",
+      "builder": "plate",
+      "amb": {
+        "mat": "spun",
+        "albedo": 0.49,
+        "key_light_intensity": 0.9,
+        "fill_light_intensity": 0.1
+      },
+      "measure": [
+        "ring_profile"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "light": [
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                0
+              ],
+              [
+                0,
+                -1
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "spun_sheen_pos_ref",
+      "builder": "plate",
+      "amb": {
+        "mat": "spun-relief",
+        "albedo": 0.49,
+        "key_light_intensity": 0.9,
+        "fill_light_intensity": 0.1
+      },
+      "measure": [
+        "ring_profile"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "light": [
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                0
+              ],
+              [
+                0,
+                -1
+              ]
             ]
           }
         }

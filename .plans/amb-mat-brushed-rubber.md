@@ -1,5 +1,17 @@
 # Plan: `amb-mat-brushed` and `amb-mat-rubber`
 
+**Superseded 2026-08-20**: the photographed-crop grounding this plan
+describes was replaced by a Blender-native fit — `amb-mat-rubber` was also
+since renamed to `amb-mat-blasted`, and `amb-mat-brushed-round` (spun,
+previously eyeballed) was grounded for the first time in the same pass. See
+`ambient3d/amb_params.py`'s `grain_material` (parametric Noise-Texture
+height field + Anisotropic BSDF, calibrate.py's `brushed_angle`/`spun_angle`/
+`blasted_angle` sweeps) and `ambient3d/derived/notes/{brushed,spun,blasted}.md`
+for the new method and fitted values. Kept below as a historical record of
+the photographic method it replaced — the mechanism (raw-height-field
+tile pair, screen+multiply, whole-pixel offset snapping) is unchanged, only
+where the fitted constants came from.
+
 Two new surface materials, peers of the existing `amb-mat-matte` / `-shiny` /
 `-glass`. Grounded on two photographed reference crops rather than eyeballed.
 

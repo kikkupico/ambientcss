@@ -12,6 +12,7 @@ verifies the shipped CSS against the renders.
 
 import json
 import os
+import re
 import sys
 
 import numpy as np
@@ -569,16 +570,240 @@ def fit_glow(m):
     }
 
 
+# ------------------------------------------------------------------ grain ---
+
+def _grain_albedo(mean_srgb_pct, key, fill, surf):
+    """Invert fit_surface's exposure law to the --amb-albedo that
+    reproduces a measured flat-plus-grain mean tone under (key, fill)."""
+    exposure = surf["ek"] * key + surf["ef"] * fill
+    return float(srgb_to_linear(mean_srgb_pct / 100.0) / exposure)
+
+
+def fit_grain(m, name):
+    """Micro-relief material (brushed | spun | blasted): reference albedo
+    (solved through fit_surface's exposure law, at the mat_<name>_default
+    scene's key/fill — the file's defaults, the point today's brushed/
+    blasted reference-tone doc comments already anchor to), overall relief
+    contrast (mean RMS L* over the <name>_angle light-azimuth sweep) and the
+    across:along anisotropy ratio: summed rms_drow / rms_dcol over that same
+    sweep — a single-frame column/row derivative ratio (screen row-to-row
+    over column-to-column; object-space Y over X for this top-down rig),
+    summed across azimuths so the frames where the relief actually shows
+    dominate the ratio. Blasted is isotropic by construction; its ratio is
+    reported purely as a control (expected close to 1) — see
+    derived/notes/blasted.md."""
+    surf = fit_surface(m)
+    default = m[f"calib/mat_{name}_default.png"]
+    g0 = default["metrics"]["grain_texture"]
+    a0 = default["amb"]
+    albedo = _grain_albedo(g0["mean_srgb_pct"], a0["key_light_intensity"],
+                           a0["fill_light_intensity"], surf)
+
+    rms, dcol_sum, drow_sum = [], 0.0, 0.0
+    for rel, entry in m.items():
+        if not rel.startswith(f"sweeps/{name}_angle/"):
+            continue
+        g = entry["metrics"]["grain_texture"]
+        rms.append(g["rms_lstar"])
+        dcol_sum += g["rms_dcol"]
+        drow_sum += g["rms_drow"]
+
+    return {
+        "model": ("--amb-albedo solved from the default scene's mean "
+                  "flat+grain tone through fit_surface's exposure law; "
+                  "alpha from mean RMS L* over the <name>_angle sweep; "
+                  "anisotropy from summed rms_drow/rms_dcol over that sweep"),
+        "albedo_linear": round(albedo, 4),
+        "mean_rms_lstar": round(float(np.mean(rms)), 4),
+        "max_rms_lstar": round(float(np.max(rms)), 4),
+        "anisotropy_row_over_col": round(drow_sum / dcol_sum, 4),
+        "n_angle_frames": len(rms),
+    }
+
+
+def fit_brushed(m):
+    return fit_grain(m, "brushed")
+
+
+def fit_spun(m):
+    return fit_grain(m, "spun")
+
+
+def fit_blasted(m):
+    return fit_grain(m, "blasted")
+
+
+def _affine_peak(peaks):
+    px = np.array([v[0] for v in peaks]); py = np.array([v[1] for v in peaks])
+    (s, s0), *_ = np.linalg.lstsq(np.stack([px, np.ones_like(px)], axis=1),
+                                  py, rcond=None)
+    return s, s0, r2(py, s * px + s0)
+
+
+def fit_sheen_axis(m):
+    """Brushed metal's sheen: the full material's axis_profile (a FIXED
+    vertical screen scan, matching the CSS band which slides but never
+    rotates) minus its relief-only twin at matching light/key, averaged
+    over the whole scan (not peak-searched) for amplitude — a single
+    column's fine relief noise is comparable to the sheen itself, and
+    MEAN excess is the one statistic that stays robust to that noise
+    regardless of the sweep's own light contrast (verified: the low- and
+    high-contrast sweeps below agree on amplitude to 3 decimal places even
+    though only the high-contrast one resolves a real peak at all).
+    Amplitude (brushed_sheen/_ref, a key-intensity sweep) and band position
+    (brushed_sheen_pos/_ref, a light_y sweep at fixed high-contrast
+    key/fill, where the low-contrast key sweep's own peaks turn out to be
+    argmax-of-noise — see the note) are fit from separate sweeps because
+    the low-contrast condition that gives a clean amplitude read does not
+    give a clean position read. Supersedes fit_sheen's cyl_profile attempt
+    (derived/notes/brushed_sheen.md's 'NOT transcribed' pass), which
+    sampled along the light diagonal and mostly missed this band."""
+    from measure.metrics import _band_features
+
+    means = []
+    prefix = "sweeps/brushed_sheen/"
+    for rel, entry in m.items():
+        if not rel.startswith(prefix):
+            continue
+        ref_rel = rel.replace(prefix, "sweeps/brushed_sheen_ref/")
+        if ref_rel not in m:
+            continue
+        a = entry["amb"]
+        prof = np.array(entry["metrics"]["axis_profile"]["profile_srgb"])
+        ref = np.array(m[ref_rel]["metrics"]["axis_profile"]["profile_srgb"])
+        means.append((a["key_light_intensity"], float((prof - ref).mean())))
+    s, s0, r2v = _affine_peak(means)
+
+    pos, wid = [], []
+    prefix = "sweeps/brushed_sheen_pos/"
+    for rel, entry in m.items():
+        if not rel.startswith(prefix):
+            continue
+        ref_rel = rel.replace(prefix, "sweeps/brushed_sheen_pos_ref/")
+        if ref_rel not in m:
+            continue
+        prof = np.array(entry["metrics"]["axis_profile"]["profile_srgb"])
+        ref = np.array(m[ref_rel]["metrics"]["axis_profile"]["profile_srgb"])
+        feat = _band_features(prof - ref)
+        pos.append((entry["amb"]["light_y"], feat["pos_frac"]))
+        wid.append(feat["fwhm_frac"])
+    ps, ps0, pr2 = _affine_peak(pos)
+
+    return {
+        "model": ("amplitude: mean sheen excess (axis_profile minus its "
+                  "relief-only twin) = s * Ik + s0 (sRGB), from "
+                  "brushed_sheen. position: --_sheen-at's pos_frac (0=top, "
+                  "1=bottom) = pos_s * light_y + pos_s0, from the "
+                  "high-contrast light_y sweep brushed_sheen_pos, where "
+                  "pos_frac is a real _band_features peak (not noise) — "
+                  "see the note for why the two need separate sweeps"),
+        "s_mean_per_key": round(float(s), 4),
+        "s0_mean": round(float(s0), 4),
+        "r2": round(float(r2v), 4),
+        "n_samples": len(means),
+        "pos_slope_per_light_y": round(float(ps), 4),
+        "pos_intercept": round(float(ps0), 4),
+        "pos_r2": round(float(pr2), 4),
+        "pos_fwhm_frac_at_edges": [round(float(v), 4) for v in wid],
+        "n_pos_samples": len(pos),
+    }
+
+
+def fit_sheen_ring(m):
+    """Spun metal's sheen: the full material's ring_profile (angular
+    wedges of an annulus, aligned to the light's own bearing) minus its
+    relief-only twin, MEAN-averaged for amplitude (same reasoning as
+    fit_sheen_axis: mean excess stays robust to the material's own noise
+    regardless of light contrast). Also checks whether the excess is
+    actually DIRECTIONAL: spun_sheen_pos/_ref renders 4 light bearings at
+    high contrast; if the excess were a real conic lobe locked to the
+    light (as the CSS assumes), pos_frac should land near 0.5 (aligned
+    with the light, by this extractor's own convention) for every
+    bearing. It does not — see pos_frac_by_bearing in the result — while
+    brushed's equivalent check (fit_sheen_axis's light_y sweep) DOES
+    confirm a light-tracking peak under the same high-contrast condition,
+    which rules out 'insufficient signal' as the explanation here: the
+    same rig, camera and extraction method resolves directionality for
+    one grain orientation and not the other. Supersedes fit_sheen's
+    cyl_profile attempt (derived/notes/spun_sheen.md's 'NOT transcribed'
+    pass): that profile is RADIAL (distance from center along the light),
+    but the CSS conic-gradient is a function of ANGLE at any radius — a
+    unit mismatch, not just an off-axis sampling problem, so its numbers
+    were not just unreliable but for the wrong quantity."""
+    from measure.metrics import _band_features
+
+    means, hotspot = [], []
+    prefix = "sweeps/spun_sheen/"
+    for rel, entry in m.items():
+        if not rel.startswith(prefix):
+            continue
+        ref_rel = rel.replace(prefix, "sweeps/spun_sheen_ref/")
+        if ref_rel not in m:
+            continue
+        a = entry["amb"]
+        ik = a["key_light_intensity"]
+        ring = np.array(entry["metrics"]["ring_profile"]["ring_srgb"])
+        ref_ring = np.array(m[ref_rel]["metrics"]["ring_profile"]["ring_srgb"])
+        ring_mean_excess = float((ring - ref_ring).mean())
+        means.append((ik, ring_mean_excess))
+
+        disk = entry["metrics"]["ring_profile"]["disk_mean_srgb"]
+        ref_disk = m[ref_rel]["metrics"]["ring_profile"]["disk_mean_srgb"]
+        hotspot.append((ik, disk - ref_disk, ring_mean_excess))
+
+    s, s0, r2v = _affine_peak(means)
+    ratio = [(v[1] / v[2]) for v in hotspot if abs(v[2]) > 1e-6]
+
+    pos_by_bearing = []
+    prefix = "sweeps/spun_sheen_pos/"
+    for rel, entry in m.items():
+        if not rel.startswith(prefix):
+            continue
+        ref_rel = rel.replace(prefix, "sweeps/spun_sheen_pos_ref/")
+        if ref_rel not in m:
+            continue
+        ring = np.array(entry["metrics"]["ring_profile"]["ring_srgb"])
+        ref_ring = np.array(m[ref_rel]["metrics"]["ring_profile"]["ring_srgb"])
+        feat = _band_features(ring - ref_ring)
+        pos_by_bearing.append(feat["pos_frac"])
+
+    return {
+        "model": ("amplitude: mean sheen excess (ring_profile minus its "
+                  "relief-only twin) = s * Ik + s0 (sRGB), from "
+                  "spun_sheen; the center disk's own excess is "
+                  "hotspot_s * Ik + hotspot_s0. Directionality checked, "
+                  "not assumed: see pos_frac_by_bearing"),
+        "s_mean_per_key": round(float(s), 4),
+        "s0_mean": round(float(s0), 4),
+        "r2": round(float(r2v), 4),
+        "n_samples": len(means),
+        "hotspot_s_per_key": round(float(np.polyfit([v[0] for v in hotspot], [v[1] for v in hotspot], 1)[0]), 5),
+        "hotspot_over_ring_ratio": round(float(np.mean(ratio)), 3) if ratio else None,
+        "pos_frac_by_bearing": [round(float(v), 3) for v in pos_by_bearing],
+        "pos_frac_expected_if_directional": 0.5,
+    }
+
+
 # ------------------------------------------------------------------- main ---
 
 FITTERS = {"surface": fit_surface, "chamfer": fit_chamfer,
            "fillet": fit_fillet, "shadow": fit_shadow,
            "curved": fit_curved,
            "shiny": fit_shiny, "glow": fit_glow,
-           "groove": fit_groove}
+           "groove": fit_groove,
+           "brushed": fit_brushed, "spun": fit_spun, "blasted": fit_blasted,
+           "brushed_sheen": fit_sheen_axis, "spun_sheen": fit_sheen_ring}
 
 
 def write_note(effect, coeffs):
+    """Rewrite only the machine-generated header of a note.
+
+    Everything from the first `## ` heading onward is hand-written prose
+    (the "Transcribed into ambient.css" sections and their dated
+    corrections) and is carried through verbatim. Before 2026-08-21 this
+    truncated the file, which silently deleted that prose from all five
+    grain notes on a routine fit run.
+    """
     lines = [f"# {effect} — grounded fit", "",
              f"Model: `{coeffs['model']}`", ""]
     for key, val in coeffs.items():
@@ -586,10 +811,19 @@ def write_note(effect, coeffs):
             continue
         lines.append(f"- **{key}**: `{json.dumps(val)}`")
     lines.append("")
+    header = "\n".join(lines)
+
     path = os.path.join(ROOT, "derived", "notes", f"{effect}.md")
     os.makedirs(os.path.dirname(path), exist_ok=True)
+    prose = ""
+    if os.path.exists(path):
+        with open(path) as fh:
+            existing = fh.read()
+        match = re.search(r"^## ", existing, flags=re.M)
+        if match:
+            prose = existing[match.start():]
     with open(path, "w") as fh:
-        fh.write("\n".join(lines))
+        fh.write(header + ("\n" + prose if prose else ""))
 
 
 def main():

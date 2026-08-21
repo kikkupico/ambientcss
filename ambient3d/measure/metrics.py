@@ -322,6 +322,56 @@ def shiny_features(excess):
     }
 
 
+def _box_blur(a, k):
+    """Fast box blur (kernel radius k px) via an integral image."""
+    if k < 1:
+        return a.copy()
+    pad = np.pad(a, k, mode="edge")
+    csum = np.cumsum(np.cumsum(pad, axis=0), axis=1)
+    csum = np.pad(csum, ((1, 0), (1, 0)), mode="constant")
+    h, w = a.shape
+    s = (csum[2 * k + 1:2 * k + 1 + h, 2 * k + 1:2 * k + 1 + w]
+         - csum[0:h, 2 * k + 1:2 * k + 1 + w]
+         - csum[2 * k + 1:2 * k + 1 + h, 0:w]
+         + csum[0:h, 0:w])
+    return s / ((2 * k + 1) ** 2)
+
+
+def grain_texture(img, meta):
+    """Micro-relief contrast on a flat plate's interior: RMS L* of the
+    high-frequency residual left after a small box-blur removes the smooth
+    shading gradient the key light casts across the plate (the rig keeps
+    that gradient under ~6% over the full 80mm plate — amb_model's LIGHT_R
+    docstring — so a few-mm blur radius clears it without touching real
+    grain, whose finest period is GRAIN_ACROSS_MM ~ 2.5mm), plus the RMS of
+    the raw column-to-column / row-to-row pixel difference — a directional
+    read of the SAME anisotropy the light-azimuth sweep gives, but off a
+    single frame: for the top-down ortho rig sx=X/sy=-Y (amb_params
+    docstring), so screen columns/rows are object-space X/Y, and a material
+    whose grain runs along local X (brushed's tangent) is fine across rows,
+    coarse across columns — the read that maps onto the CSS tile's own
+    baseFrequency x:y ratio.
+
+    The Blender-native replacement for .plans/amb-mat-brushed-rubber.md's
+    photographed-crop "RMS L* by lamp angle" table: same statistic (RMS
+    contrast of the surface, swept over lamp azimuth to read off
+    anisotropy), off a rendered frame instead of a photograph."""
+    f = Frame(img, meta)
+    interior = f.region(-25, 25, -25, 25)
+    lstar = srgb_to_lstar(interior)
+    k = max(2, int(round(2.0 * f.s)))
+    residual = lstar - _box_blur(lstar, k)
+    dx = lstar[:, 1:] - lstar[:, :-1]
+    dy = lstar[1:, :] - lstar[:-1, :]
+    return {
+        "rms_lstar": float(np.sqrt(np.mean(residual ** 2))),
+        "mean_lstar": float(lstar.mean()),
+        "mean_srgb_pct": float(interior.mean() * 100.0),
+        "rms_dcol": float(np.sqrt(np.mean(dx ** 2))),  # across columns (X)
+        "rms_drow": float(np.sqrt(np.mean(dy ** 2))),  # across rows (Y)
+    }
+
+
 def cyl_profile(img, meta):
     """Lightness profile through the dome center ALONG THE LIGHT
     DIRECTION (the axis the CSS shiny gradient runs on), plus a
@@ -362,6 +412,114 @@ def cyl_profile(img, meta):
     # as residual-only
     out["clipped"] = bool(prof.max() >= 0.995)
     return out
+
+
+def _band_features(excess):
+    """Peak/position/width of a single band anywhere in a 1-D profile (no
+    lit-edge or rim assumptions, unlike shiny_features): global argmax,
+    half-max width around it. Shared by axis_profile and ring_profile."""
+    excess = np.asarray(excess)
+    n = len(excess)
+    frac = np.arange(n) / (n - 1)
+    i = int(np.argmax(excess))
+    peak = float(excess[i])
+    above = excess >= peak / 2
+    lo, hi = i, i
+    while lo > 0 and above[lo - 1]:
+        lo -= 1
+    while hi < n - 1 and above[hi + 1]:
+        hi += 1
+    return {
+        "pos_frac": round(float(frac[i]), 4),
+        "fwhm_frac": round((hi - lo + 1) / (n - 1), 4),
+        "peak_srgb": round(peak, 4),
+    }
+
+
+def axis_profile(img, meta):
+    """Lightness profile straight down the plate's own vertical screen
+    axis (fixed: NOT derived from --amb-light-*), index 0 = top. Grounds
+    the linear metals' sheen band, which the CSS pins to a fixed screen
+    axis and only SLIDES along with --amb-light-y (`--_sheen-at`) rather
+    than rotating to track the light the way the dome's cyl_profile does
+    — sampling along the light diagonal (as cyl_profile does) mostly
+    misses a band that does not lie on that diagonal. Each row is the MEAN
+    across most of the plate's width, not a single column: the CSS band is
+    stated as x-invariant (a plain linear-gradient, no horizontal term), so
+    averaging across x is free noise reduction and is in fact required —
+    a single-column read is dominated by the material's own fine relief,
+    which is comparable in amplitude to the sheen itself. The fit subtracts
+    a relief-only reference at the matching light/key (same shape as
+    cyl_profile's use in fit_shiny), so profile_srgb here is raw, not
+    baseline-relative — see fit_sheen_axis."""
+    f = Frame(img, meta)
+    hw = f.plate_w / 2
+    strip = f.region(-0.85 * hw, 0.85 * hw, -0.98 * hw, 0.98 * hw)
+    prof = strip.mean(axis=1)          # row 0 = top, last row = bottom
+    return {"profile_srgb": [round(float(v), 4) for v in prof]}
+
+
+def ring_profile(img, meta, r_frac=0.55, r_band=0.12, n=48):
+    """Lightness averaged over ANGULAR WEDGES of an annulus spanning
+    [r_frac - r_band, r_frac + r_band] * plate half-width, parametrized by
+    angular offset from the light's own bearing (bin n//2 = 0deg = toward
+    the light; sweeps +/-180deg), plus a small-disk mean near the center.
+    Grounds the spun metal's sheen, which the CSS paints as a
+    conic-gradient — a function of ANGLE at (implicitly) every radius, not
+    of radius along one direction the way cyl_profile samples a dome.
+
+    Each bin averages every pixel in its wedge of the annulus (typically
+    hundreds), not a handful of line samples: spun's grain is RADIAL
+    (streaks run outward from center), so unlike brushed's horizontal
+    grain, sampling along one exact radius at one exact angle stays on a
+    single streak the whole way — averaging across radius alone does not
+    cross streak boundaries and barely reduces noise. Averaging over an
+    angular ARC at fixed radius does (each streak occupies a narrow
+    angular slice), and this bins pixels both across the arc AND across
+    the radial band, which is what first made a real signal separable
+    from streak-to-streak noise here. r_frac is chosen outside the
+    streaks' own converged hotspot (the inner ~10-40% of the face per the
+    CSS comment above .amb-mat-brushed-round) and inside the plate edge.
+    The fit subtracts a relief-only reference at matching light/key — see
+    fit_sheen_ring."""
+    f = Frame(img, meta)
+    hw = f.plate_w / 2
+    half = f.frame_mm / 2
+    lx, ly = f.amb["light_x"], f.amb["light_y"]
+    if lx == 0 and ly == 0:
+        lx, ly = -1.0, -1.0
+    theta_light = np.arctan2(ly, lx)
+
+    rr = int(round(half * f.s))
+    y, x = np.mgrid[-rr:f.img.shape[0] - rr, -rr:f.img.shape[1] - rr]
+    r_mm = np.hypot(x, y) / f.s
+    r_frac_px = r_mm / hw
+    annulus = (r_frac_px >= r_frac - r_band) & (r_frac_px <= r_frac + r_band)
+
+    theta = np.arctan2(y, x)
+    offset = np.mod(theta - theta_light + np.pi, 2 * np.pi) - np.pi  # [-pi, pi)
+    bin_idx = np.clip(((offset + np.pi) / (2 * np.pi) * n).astype(int), 0, n - 1)
+
+    vals = f.img[annulus]
+    bins = bin_idx[annulus]
+    sums = np.bincount(bins, weights=vals, minlength=n)
+    counts = np.bincount(bins, minlength=n)
+    ring = np.where(counts > 0, sums / np.maximum(counts, 1), np.nan)
+    # fill any empty bin (shouldn't happen at these radii) from neighbors
+    if np.isnan(ring).any():
+        good = ~np.isnan(ring)
+        ring = np.interp(np.arange(n), np.arange(n)[good], ring[good])
+
+    disk_r = 0.12 * hw * f.s
+    rr = int(round(half * f.s))
+    y, x = np.ogrid[-rr:f.img.shape[0] - rr, -rr:f.img.shape[1] - rr]
+    disk_mask = (x * x + y * y) <= disk_r * disk_r
+    disk_mean = float(f.img[disk_mask].mean())
+
+    return {
+        "ring_srgb": [round(float(v), 4) for v in ring],
+        "disk_mean_srgb": round(disk_mean, 4),
+    }
 
 
 def glow(img, meta):
@@ -494,6 +652,9 @@ EXTRACTORS = {
     "drop_shadow": drop_shadow,
     "surface_gradient": surface_gradient,
     "cyl_profile": cyl_profile,
+    "axis_profile": axis_profile,
+    "ring_profile": ring_profile,
+    "grain_texture": grain_texture,
     "glow": glow,
     "groove": groove,
 }

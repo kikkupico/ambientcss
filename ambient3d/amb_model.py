@@ -137,7 +137,9 @@ AMB_DEFAULTS = {
     "chamfer_width": 1.0,
     "fillet": 0.0,
     "fillet_width": 1.0,
-    "mat": "matte",       # matte | shiny | glass
+    "mat": "matte",       # matte | shiny | glass | brushed | spun | blasted
+                          # (+ calibration-only brushed-relief / spun-relief,
+                          # the height field alone with no aniso sheen)
     "emit": None,         # hex color for emissive plates
     "surface": "flat",    # flat | concave | concave-h | convex
     "albedo": None,       # None = ground albedo; darker plates override

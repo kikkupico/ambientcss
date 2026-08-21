@@ -735,12 +735,13 @@ export function App() {
               {/* The cap spends its own ::after on the dish, so a relief
                   material rides an inner layer under it. Blasted carries
                   no --amb-albedo of its own (@ambientcss/css), so this pins
-                  the reference tone it was fitted at for the dark-pad
-                  look — leave it off for a pale finish instead. */}
+                  the reference tone it was fitted at — bead-blasted
+                  aluminium, light grey with a dense sparkle. Leave it off
+                  to blast whatever tone the surface already carries. */}
               <AmbientButton
                 shape="square"
                 material="blasted"
-                style={{ "--amb-albedo": "color(srgb-linear 0.0644 0.0629 0.0629)" } as React.CSSProperties}
+                style={{ "--amb-albedo": "color(srgb-linear 0.446 0.446 0.446)" } as React.CSSProperties}
               >
                 PAD
               </AmbientButton>

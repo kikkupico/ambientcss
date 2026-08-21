@@ -1,0 +1,14 @@
+{
+  "mat": "brushed", "cols": 4, "w": 240, "h": 240, "dpr": 1,
+  "out": "out/handtune-brushed.png",
+  "variants": [
+    { "label": "A previous 128 x36c y20", "tile": { "size": 128, "bf": "0.28125 20" },
+      "vars": { "--_grain-alpha": "0.515", "--_sheen-alpha": "0" } },
+    { "label": "B fine 256 x16c y0.5", "tile": { "size": 256, "bf": "0.0625 0.5" },
+      "vars": { "--_grain-alpha": "0.424", "--_sheen-alpha": "0" } },
+    { "label": "C long 512 x12c y0.5", "tile": { "size": 512, "bf": "0.0234375 0.5" },
+      "vars": { "--_grain-alpha": "0.405", "--_sheen-alpha": "0" } },
+    { "label": "D chosen 512 x8c y0.35", "tile": { "size": 512, "bf": "0.015625 0.35" },
+      "vars": { "--_grain-alpha": "0.426", "--_sheen-alpha": "0" } }
+  ]
+}

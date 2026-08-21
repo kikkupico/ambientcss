@@ -1,0 +1,16 @@
+{
+  "mat": "brushed", "cols": 5, "w": 240, "h": 240, "dpr": 1,
+  "out": "out/handtune-brushed-freq.png",
+  "variants": [
+    { "label": "y0.35 2.9px", "tile": { "size": 512, "bf": "0.015625 0.35" },
+      "vars": { "--_grain-alpha": "0.426", "--_sheen-alpha": "0" } },
+    { "label": "y0.5 2.0px", "tile": { "size": 512, "bf": "0.015625 0.5" },
+      "vars": { "--_grain-alpha": "0.426", "--_sheen-alpha": "0" } },
+    { "label": "y0.7 1.4px", "tile": { "size": 512, "bf": "0.015625 0.7" },
+      "vars": { "--_grain-alpha": "0.426", "--_sheen-alpha": "0" } },
+    { "label": "y0.9 1.1px SHIPPED", "tile": { "size": 512, "bf": "0.015625 0.9" },
+      "vars": { "--_grain-alpha": "0.42", "--_sheen-alpha": "0" } },
+    { "label": "y1.0 1.0px COLLAPSES", "tile": { "size": 512, "bf": "0.015625 1" },
+      "vars": { "--_grain-alpha": "0.426", "--_sheen-alpha": "0" } }
+  ]
+}

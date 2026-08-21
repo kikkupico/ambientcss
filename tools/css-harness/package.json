@@ -2,10 +2,12 @@
   "name": "@ambientcss/css-harness",
   "private": true,
   "version": "0.0.0",
-  "description": "Screenshots the CSS rendering of each manifest scene so measure/compare.py can diff it against the Blender ground truth",
+  "description": "Screenshots the CSS rendering of each manifest scene so measure/compare.py can diff it against the Blender ground truth; ladder.mjs renders a parameter ladder for the closed-loop fits in ambient3d/derived/notes/, and variants.mjs renders whole-tile variants for the hand-tuned finishes",
   "type": "module",
   "scripts": {
-    "render": "node render.mjs"
+    "render": "node render.mjs",
+    "ladder": "node ladder.mjs",
+    "variants": "node variants.mjs"
   },
   "devDependencies": {
     "playwright": "1.57.0"
