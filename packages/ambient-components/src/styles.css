@@ -1304,7 +1304,11 @@
   height: calc(var(--ambx-size) * 0.2);
   margin-bottom: calc(var(--ambx-size) * 0.07);
   border-radius: var(--ambx-radius-sm);
-  background-color: var(--ambx-accent);
+  /* amb-surface's lit albedo, restated because this sheet loads
+     independently of ambient.css and rule order is not guaranteed — the
+     mark is a little body of panel material, so it re-shades with the
+     scene's light instead of wearing the accent. */
+  background-color: var(--amb-lit);
   transform: translateX(-50%);
 }
 
@@ -1372,13 +1376,17 @@
 /* Flat-topped, but a body: `.ambient` with a thickness and NO edge
    treatment, which is the combination that casts a drop shadow while
    leaving the top face unbroken — the chamfer and fillet layers of the
-   composite are gated on their own properties, and neither is set here. */
+   composite are gated on their own properties, and neither is set here.
+   The face is `amb-surface`'s lit albedo (restated here because this sheet
+   loads independently of ambient.css, so rule order is not guaranteed),
+   not the accent it used to be — the thumb is hardware under the scene's
+   light, and re-shades with it. */
 .amb-console-thumb {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background-color: color-mix(in oklab, var(--ambx-accent), white 12%);
-  /* The white ring is a BORDER, not a spread shadow. Two reasons, and the
+  background-color: var(--amb-lit);
+  /* The ring is a BORDER, not a spread shadow. Two reasons, and the
      second is the load-bearing one: with the package's border-box reset the
      ring grows inward, so the thumb keeps the outer diameter measured off
      the reference — and `box-shadow` is the property `.ambient` composites
