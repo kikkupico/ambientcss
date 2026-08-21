@@ -259,8 +259,6 @@ export function App() {
   const [bank, setBank] = useState("3");
   const [armed, setArmed] = useState<string[]>(["A", "C"]);
   const [sw1, setSw1] = useState(true);
-  const [sw2, setSw2] = useState(false);
-
   /* The kit section drives BOTH columns off one pair of values. Turning the
      grounded knob turns the console knob with it, which is the point: the
      call site and the state are the same, only the kit above them differs. */
@@ -718,9 +716,6 @@ export function App() {
             </div>
             <div className="component-cell" data-visible={compView.visible}>
               <AmbientSwitch value={sw1} onChange={setSw1} led label="Switch" />
-            </div>
-            <div className="component-cell" data-visible={compView.visible}>
-              <AmbientSwitch value={sw2} onChange={setSw2} led="amber" label="Switch" />
             </div>
             <div className="component-cell" data-visible={compView.visible}>
               <AmbientButton>Button</AmbientButton>
