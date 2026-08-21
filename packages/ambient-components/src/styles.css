@@ -1360,15 +1360,31 @@
 
 /* The track is a pure-CSS part: it reads --ambx-percent off the control root
    and mixes its own colour from it, so it lights and dims with the travel
-   without the mechanism knowing this element exists. */
+   without the mechanism knowing this element exists.
+
+   BOTH ends of that mix are now lit reflectance rather than paint, so the
+   whole base responds to the lamp:
+   - OFF: the recessed floor — the scene's lit albedo (`--amb-lit`) stepped
+     down into the groove, as before.
+   - ON: the accent worn as reflectance. There is no second --amb-lit to
+     borrow (the property bakes in one albedo), so the accent is shaded by
+     the same intensities here — mixed toward black by the mean of key and
+     fill — which tracks the scene's brightness one-to-one even though it
+     skips the linear-light exposure maths amb-surface runs. */
 .amb-console-track {
   position: absolute;
   inset: 0;
   border-radius: var(--ambx-radius-full);
+  --_lit-accent: color-mix(
+    in srgb,
+    var(--ambx-accent)
+      calc((var(--amb-key-light-intensity) + var(--amb-fill-light-intensity)) / 2 * 100%),
+    black
+  );
   background-color: color-mix(
     in oklab,
     color-mix(in oklab, var(--amb-lit), black 55%),
-    var(--ambx-accent) calc(var(--ambx-percent) * 100%)
+    var(--_lit-accent) calc(var(--ambx-percent) * 100%)
   );
   --amb-thickness: 0.4;
   transition: background-color 160ms ease;
@@ -1395,9 +1411,10 @@
      ring grows inward, so the thumb keeps the outer diameter measured off
      the reference — and `box-shadow` is the property `.ambient` composites
      the whole lighting model into, so setting it here would silently wipe
-     the drop shadow the thickness above is there to cast. */
-  border: calc(var(--ambx-latch-thumb-h) * 0.09) solid
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) 99%);
+     the drop shadow the thickness above is there to cast. The ring's ink
+     is the scene's lit albedo, not fixed near-white, so it dims and warms
+     with the lamp exactly as the panel around the switch does. */
+  border: calc(var(--ambx-latch-thumb-h) * 0.09) solid var(--amb-lit);
 }
 
 @media (prefers-reduced-motion: reduce) {
