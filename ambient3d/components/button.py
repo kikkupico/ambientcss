@@ -29,7 +29,8 @@ def build_button(
     depth=None,           # cap depth; defaults to width
     height=4.2,           # cap height
     shape_n=2.0,          # 2.0 round, >=4 rounded square
-    dome=0.5,             # cap dome height, 0 = flat
+    dome=0.5,             # cap sagitta: >0 domed, 0 flat, <0 dished
+                          # (the concave key cap)
     fillet=1.1,
     base=True,
     base_size=None,       # (w, d) tile; default: cap + 3mm border each side
@@ -73,8 +74,13 @@ def build_button(
         lab = label_object(name + "_Label", label, size=size,
                            material=label_material)
         lab.parent = cap
-        # sink into the cap so only a hair of relief shows: printed, not embossed
-        lab.location = (0, 0, height + dome - 0.06)
+        # sink into the cap so only a hair of relief shows: printed, not
+        # embossed. A dome's apex is its high point, but a DISH's surface
+        # rises away from the apex — a label parked there would bury its
+        # glyphs — so on a dish the label rides the paraboloid at the radius
+        # the glyphs actually occupy (~0.6 of the cap) instead.
+        cap_z = height + dome * (1.0 if dome >= 0 else 1.0 - 0.6 ** 2)
+        lab.location = (0, 0, cap_z - 0.06)
 
     if not base:
         return cap

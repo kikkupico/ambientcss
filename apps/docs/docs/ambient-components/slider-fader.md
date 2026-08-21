@@ -31,13 +31,27 @@ a shallow concave channel.
 
 | Prop | Type | Default |
 | --- | --- | --- |
-| `value` | `number` | required |
+| `value` | `number` | - |
+| `defaultValue` | `number` | `min` |
 | `min` | `number` | `0` |
 | `max` | `number` | `100` |
 | `step` | `number` | `1` |
+| `detents` | `number` | from `step` |
+| `invert` | `boolean` | `false` |
+| `animate` | `"auto" \| "follow" \| "ease" \| "snap"` | `"auto"` |
+| `material` | `"matte" \| "shiny" \| "glass" \| "brushed" \| "brushed-round" \| "blasted"` | - |
 | `label` | `string` | - |
 | `size` | `"sm" \| "md" \| "lg"` | `"md"` |
 | `onChange` | `(nextValue: number) => void` | - |
+
+Pass `value` for a controlled control or `defaultValue` for an uncontrolled
+one; `onChange` fires either way.
+
+Both are presets over `AmbientTravel`, which is one mechanism with an
+`orientation`: a horizontal track runs min-at-the-left, an upright one runs
+min-at-the-bottom, because that is how a fader is built. `invert` flips
+either. To change how one looks, give `AmbientTravel` your own parts — see
+[Composing controls](./composing).
 
 ## Example: horizontal + vertical pair
 

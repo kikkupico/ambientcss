@@ -1,9 +1,12 @@
 """The 3D referents of the @ambientcss/components React components.
 
 Each builder here is the physical counterpart of one CSS component (and of
-each button-shape / knob-type variant): the richer design the CSS component
-is modeled after, built at the CSS component's dimensions — 1 CSS px = 1 mm,
-`--ambx-grid` = 4 px = GRID mm — in neutral calibration materials.
+each button shape, and of each shape a knob's knurling/markers/indicator props
+can take): the richer design the CSS component is modeled after, built at the
+CSS component's dimensions — 1 CSS px = 1 mm, `--ambx-grid` = 4 px = GRID mm —
+in neutral calibration materials. The three exceptions are the fluted, capped
+and wheel knobs, which outlived the CSS `variant` prop that used to select
+them; they stay as 3D kit styles, and are marked as such below.
 
 Kept apart from the scenes that render them so more than one scene can place
 the same referent: `ground_components.py` renders them one per frame for the
@@ -42,11 +45,31 @@ def _mats():
 # button's padding) and `seat` deep (thickness 0.27 = 1.2 mm).
 BUTTON_WELL = dict(base_style="well", well_gap=0.5 * GRID, well_depth=1.2)
 
+# Cap tops are DISHED, not domed: the CSS cap carries a concave face
+# (.amb-button-cap::after in the components styles.css) — the Round 7
+# direction, CSS first, referent follows.
+#
+# Depth comes from the CSS's own source: the cap dish reuses the grounded
+# curved fit, so the referent reuses the geometry that fit was measured on
+# — amb_model.SAGITTA_MM / plate width = 4/80 = 5% of the span across the
+# dish. Confirmed by rendering the round cap at 0.3/0.8/1.5/2.4mm and
+# measuring the face: 2.4mm (5% of its 48mm) spans 84.7% -> 94.4%
+# lightness, against the CSS dish's 87.2% -> 94.8%. A shallower sagitta
+# reads as flat — 0.3mm, the old dome's depth inverted, measured dead level.
+DISH_FRAC = ap.SAGITTA_MM / 80.0
+
+
+def _dish(span):
+    """Cap sagitta (negative = scooped) for a cap `span` mm across its
+    narrow axis. Every cap silhouette gets the same proportional scoop, as
+    the CSS does: curvature belongs to the tooling, not to the outline."""
+    return -DISH_FRAC * span
+
 
 def button(location=(0.0, 0.0, 0.0), value=0.0):
     cap, plate, dark = _mats()
     return build_button(width=16 * GRID, depth=7 * GRID, height=4.5,
-                        shape_n=4.5, dome=0.3, fillet=0.8,
+                        shape_n=4.5, dome=_dish(7 * GRID), fillet=0.8,
                         tile_shape="fit", base_h=2.5, **BUTTON_WELL,
                         cap_material=cap, base_material=plate,
                         well_material=dark, location=location)
@@ -54,7 +77,8 @@ def button(location=(0.0, 0.0, 0.0), value=0.0):
 
 def button_round(location=(0.0, 0.0, 0.0), value=0.0):
     cap, plate, dark = _mats()
-    return build_button(width=12 * GRID, height=4.5, shape_n=2.0, dome=0.3,
+    return build_button(width=12 * GRID, height=4.5, shape_n=2.0,
+                        dome=_dish(12 * GRID),
                         fillet=0.8, tile_shape="fit", base_h=2.5,
                         **BUTTON_WELL,
                         cap_material=cap, base_material=plate,
@@ -64,35 +88,108 @@ def button_round(location=(0.0, 0.0, 0.0), value=0.0):
 def button_square(location=(0.0, 0.0, 0.0), value=0.0):
     # EP-133-style pad: squarer superellipse, flatter and lower cap
     cap, plate, dark = _mats()
-    return build_button(width=14 * GRID, height=3.6, shape_n=6.0, dome=0.15,
+    return build_button(width=14 * GRID, height=3.6, shape_n=6.0,
+                        dome=_dish(14 * GRID),
                         fillet=0.8, tile_shape="fit", base_h=2.5,
                         **BUTTON_WELL,
                         cap_material=cap, base_material=plate,
                         well_material=dark, location=location)
 
 
-# Knurl depth = (0.5 - root) * 2 * radius, root fractions taken directly from
-# AmbientKnob.tsx's KNURLS (standard .468, flute .44, fine .476), so the
-# tooth-crest-to-root depth matches the CSS clip-path teeth exactly at the
-# grounded referent's 8*GRID radius. Sharpness bumped from the (unrelated)
-# generate.py catalog default so the crest/root read as distinct facets
-# rather than a soft sinusoid, closer to the clip-path's near-trapezoidal
-# tooth (short rise/fall, flat crest and root).
+# The knurled knob, built the way the CSS component is: a smooth chamfered
+# cap with the ribs machined into a rim band beyond its edge and below it, not
+# ribs running the whole way up. Every number below is one of AmbientKnob's,
+# converted at the grounded referent's 8*GRID radius (1 CSS px = 1 mm, so the
+# knob is D = 64mm across):
+#
+#   ribs / sharpness      KNURLS.standard, unchanged — the two rib sections
+#                         are now the SAME formula, not two shapes fitted to
+#                         each other: parts/knob.tsx restates `wall_r`'s
+#                         depth * (0.5 + 0.5cos(N.theta))^sharpness.
+#   rib_depth   0.009 D   KNURLS.standard.depth, bounding-box units -> mm
+#   knurl_rim   0.05 D    KNURLS.standard.band, the width of the ribbed ring
+#                         .amb-knob-face's clip leaves outside the cap
+#   cap_chamfer 2mm       .amb-knob-body's --amb-chamfer-width: 2, at the
+#                         rig's 1px = 1mm
+#
+# How far the rim FALLS is the one thing the CSS cannot name — flat-on it says
+# only how wide the ribbed ring is. So it was swept against the ring's rendered
+# tone instead (.amb-knob-face is --amb-shade: 0.88 against the cap, and reads
+# 0.83-0.88 of it across the band): the band lightens with the fall and
+# saturates around 45deg, landing within ~2 points there, so `knurl_rim_drop`
+# is left at its default — as deep as the rim is wide.
+KNOB_R = 8 * GRID
+KNOB_D = 2 * KNOB_R
+KNOB_RIM = 0.05 * KNOB_D
+KNOB_CAP_CHAMFER = 2.0
+KNOB_RIB_DEPTH = 0.009 * KNOB_D
+# The flat top face the indicators are placed on, which the builder takes
+# fractions of: everything inside both the ribbed rim and the cap chamfer.
+KNOB_CAP_R = KNOB_R - KNOB_RIM - KNOB_CAP_CHAMFER
+
+KNOB_KNURL = dict(radius=KNOB_R, height=9.0, ribs=48,
+                  rib_depth=KNOB_RIB_DEPTH, rib_sharpness=1.6,
+                  knurl_rim=KNOB_RIM, cap_chamfer=KNOB_CAP_CHAMFER)
+
+
+# The dot indicator is .amb-knob-indicator-circle: 0.125 of the knob's size
+# across, its top edge 0.16 down from the top, so a 0.0625 D radius centred
+# 0.2775 D out. The builder takes both as fractions of the cap face.
 def knob(location=(0.0, 0.0, 0.0), value=0.33):
     cap, plate, dark = _mats()
-    return build_knob(radius=8 * GRID, height=9.0, ribs=36, rib_depth=2.05,
-                      rib_sharpness=3.0,
-                      indicator="dot", dot_frac=0.12, dot_offset=0.68,
+    return build_knob(**KNOB_KNURL,
+                      indicator="dot",
+                      dot_frac=0.0625 * KNOB_D / KNOB_CAP_R,
+                      dot_offset=0.2775 * KNOB_D / KNOB_CAP_R,
                       value=value,
                       body_material=cap, accent_material=dark, base=None,
                       location=location)
 
 
+# The rectangle indicator is a short mark near the rim, not a spoke: the CSS
+# .amb-knob-indicator-rectangle runs 0.50R to 0.84R of the knob radius (top 8%
+# + height 17% of --ambx-knob-size), so bar_inner is that near end and
+# bar_length converts the far end to the cap-radius fraction the builder takes.
+# That far end now lands a hair PAST the cap face and onto its chamfer — which
+# is where the CSS puts it too, 0.84R against a face that stops at 0.8375R.
 def knob_line(location=(0.0, 0.0, 0.0), value=0.33):
     cap, plate, dark = _mats()
-    return build_knob(radius=8 * GRID, height=9.0, ribs=36, rib_depth=2.05,
-                      rib_sharpness=3.0,
-                      indicator="line", value=value,
+    return build_knob(**KNOB_KNURL,
+                      indicator="line", bar_inner=0.50,
+                      bar_length=0.84 * KNOB_R / KNOB_CAP_R,
+                      value=value,
+                      body_material=cap, accent_material=dark, base=None,
+                      location=location)
+
+
+# knurling={false}: ribs 0 is the builder's smooth body, the CSS
+# .amb-knob-smooth case where the knurl clip and tone are both dropped and the
+# body itself becomes the whole visible knob.
+def knob_smooth(location=(0.0, 0.0, 0.0), value=0.33):
+    cap, plate, dark = _mats()
+    r = 8 * GRID
+    return build_knob(radius=r, height=9.0, ribs=0,
+                      indicator="line", bar_inner=0.50,
+                      bar_length=0.84 * r / (r - 1.4),
+                      value=value,
+                      body_material=cap, accent_material=dark, base=None,
+                      location=location)
+
+
+# markers="full": 13 dots at 22.5deg over the 270deg sweep, ring at 1.33R and
+# dots 0.14R across — the same fractions AmbientKnob's
+# --ambx-knob-marker-radius / --ambx-knob-marker-size carry. Printed in the
+# dark plate ink, since the CSS paints them --amb-label (panel graphics) rather
+# than the accent the indicator takes.
+def knob_markers(location=(0.0, 0.0, 0.0), value=0.33):
+    cap, plate, dark = _mats()
+    r = 8 * GRID
+    return build_knob(radius=r, height=9.0, ribs=0,
+                      indicator="line", bar_inner=0.50,
+                      bar_length=0.84 * r / (r - 1.4),
+                      markers=13, marker_r=1.33, marker_d=0.14,
+                      marker_material=dark,
+                      value=value,
                       body_material=cap, accent_material=dark, base=None,
                       location=location)
 
@@ -165,6 +262,11 @@ def slider(location=(0.0, 0.0, 0.0), value=0.5):
 REFERENTS = {"button": button, "button-round": button_round,
              "button-square": button_square,
              "knob": knob, "knob-line": knob_line,
+             "knob-smooth": knob_smooth, "knob-markers": knob_markers,
+             # No CSS counterpart since AmbientKnob collapsed to
+             # knurling/markers/indicator: these stay as 3D kit styles (the
+             # --knob-style opz|op1|wheel presets) and as the reference for a
+             # future knurling union.
              "knob-flute": knob_flute, "knob-cap": knob_cap,
              "knob-wheel": knob_wheel,
              "switch": switch, "fader": fader, "slider": slider}

@@ -1,5 +1,10 @@
-import type { ButtonHTMLAttributes } from "react";
 import { cn } from "../lib/cn";
+import { AmbientPress } from "../controls/AmbientPress";
+import type { AmbientPressProps } from "../controls/AmbientPress";
+import { useDress } from "../core/kit";
+import type { KitLook } from "../core/kit";
+import { groundedKit } from "../kits/grounded";
+import type { AmbientMaterial } from "../core/material";
 
 /* Cap silhouettes from the referent lineup (ambient3d/generate.py):
    - "pill":   the default wide stadium key (transport-key style)
@@ -10,40 +15,31 @@ import { cn } from "../lib/cn";
 export type AmbientButtonShape = "pill" | "round" | "square";
 export type AmbientButtonSize = "sm" | "md" | "lg";
 
-export interface AmbientButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  material?: "matte" | "shiny" | "glass";
-  shape?: AmbientButtonShape;
-  size?: AmbientButtonSize;
-}
+export type AmbientButtonProps = Omit<AmbientPressProps, "parts" | "size"> & {
+  material?: AmbientMaterial | undefined;
+  shape?: AmbientButtonShape | undefined;
+  size?: AmbientButtonSize | undefined;
+  /** Look options in the active kit's vocabulary. */
+  look?: KitLook | undefined;
+};
 
+/** A key cap seated in a clearance well. */
 export function AmbientButton({
   className,
   children,
+  look,
   material = "matte",
   shape = "pill",
   size = "md",
-  ...props
+  ...rest
 }: AmbientButtonProps) {
+  const { dress } = useDress("press", { material, shape, children, ...look }, groundedKit.press!);
   return (
-    <button
-      type="button"
-      className={cn(
-        "amb-button amb-groove ambx-button",
-        `ambx-button-${size}`,
-        shape === "round" && "amb-button-round",
-        shape === "square" && "amb-button-square",
-        className
-      )}
-      {...props}
-    >
-      <span
-        className={cn(
-          "amb-button-cap ambient amb-chamfer amb-surface amb-heading-3",
-          material === "matte" ? "amb-mat-matte" : material === "shiny" ? "amb-mat-shiny" : "amb-mat-glass"
-        )}
-      >
-        {children}
-      </span>
-    </button>
+    <AmbientPress
+      {...rest}
+      size={size}
+      className={cn(dress.className, className)}
+      parts={dress.parts}
+    />
   );
 }

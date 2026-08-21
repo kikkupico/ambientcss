@@ -2,11 +2,16 @@ import React, { type ReactNode, useState } from "react";
 import {
   AmbientButton,
   AmbientFader,
+  AmbientKitProvider,
   AmbientKnob,
   AmbientPanel,
   AmbientProvider,
+  AmbientSelect,
   AmbientSlider,
-  AmbientSwitch
+  AmbientSwitch,
+  ConsoleKnob,
+  ConsoleToggle,
+  consoleKit
 } from "@ambientcss/components";
 
 function DemoShell({ children }: { children: ReactNode }) {
@@ -34,7 +39,7 @@ export function ProviderPreview() {
   return (
     <DemoShell>
       <div className="docs-demo-stack">
-        <AmbientSwitch label="Warm Theme" checked={warm} onCheckedChange={setWarm} />
+        <AmbientSwitch label="Warm Theme" value={warm} onChange={setWarm} />
         <AmbientProvider
           theme={
             warm
@@ -57,7 +62,7 @@ export function PanelPreview() {
     <DemoShell>
       <AmbientPanel className="docs-demo-panel">
         <AmbientButton>Power</AmbientButton>
-        <AmbientSwitch label="Bypass" defaultChecked />
+        <AmbientSwitch label="Bypass" defaultValue />
       </AmbientPanel>
     </DemoShell>
   );
@@ -85,10 +90,68 @@ export function SwitchPreview() {
   return (
     <DemoShell>
       <div className="docs-demo-row">
-        <AmbientSwitch label="Power" checked={enabled} onCheckedChange={setEnabled} led />
-        <AmbientSwitch label="Record" defaultChecked led="#ef4444" />
+        <AmbientSwitch label="Power" value={enabled} onChange={setEnabled} led />
+        <AmbientSwitch label="Record" defaultValue led="#ef4444" />
         <AmbientSwitch label="Small" size="sm" />
         <AmbientSwitch label="Large" size="lg" />
+      </div>
+    </DemoShell>
+  );
+}
+
+const BANK = [{ value: "1" }, { value: "2" }, { value: "3" }, { value: "4" }];
+
+export function SelectPreview() {
+  const [bank, setBank] = useState("3");
+
+  return (
+    <DemoShell>
+      <div className="docs-demo-row">
+        <AmbientSelect
+          label="Bank"
+          options={BANK}
+          value={bank}
+          onChange={(next) => setBank(next as string)}
+          color="#00b4dc"
+        />
+        <AmbientSelect
+          label="Accent"
+          options={BANK}
+          defaultValue="2"
+        />
+      </div>
+    </DemoShell>
+  );
+}
+
+export function SelectMultiPreview() {
+  const [tracks, setTracks] = useState<string[]>(["A", "C"]);
+
+  return (
+    <DemoShell>
+      <div className="docs-demo-stack">
+        <AmbientSelect
+          multiple
+          orientation="horizontal"
+          label="Tracks"
+          color="#4ade80"
+          options={[{ value: "A" }, { value: "B" }, { value: "C" }, { value: "D" }]}
+          value={tracks}
+          onChange={(next) => setTracks(next as string[])}
+        />
+        <p className="docs-demo-text">Armed: {tracks.length ? tracks.join(", ") : "none"}</p>
+      </div>
+    </DemoShell>
+  );
+}
+
+export function SelectSizesPreview() {
+  return (
+    <DemoShell>
+      <div className="docs-demo-row">
+        <AmbientSelect size="sm" options={BANK} defaultValue="1" color="#00b4dc" />
+        <AmbientSelect size="md" options={BANK} defaultValue="2" color="#00b4dc" />
+        <AmbientSelect size="lg" options={BANK} defaultValue="3" color="#00b4dc" />
       </div>
     </DemoShell>
   );
@@ -107,21 +170,58 @@ export function KnobPreview() {
   );
 }
 
-export function KnobVariantsPreview() {
-  const [dot, setDot] = useState(42);
-  const [line, setLine] = useState(70);
-  const [flute, setFlute] = useState(25);
-  const [cap, setCap] = useState(55);
-  const [wheel, setWheel] = useState(80);
+export function KnobKnurlingPreview() {
+  const [ribbed, setRibbed] = useState(42);
+  const [smooth, setSmooth] = useState(70);
+  const [wheel, setWheel] = useState(25);
 
   return (
     <DemoShell>
       <div className="docs-demo-row">
-        <AmbientKnob label="Dot" value={dot} onChange={setDot} />
-        <AmbientKnob label="Line" variant="line" value={line} onChange={setLine} />
-        <AmbientKnob label="Flute" variant="flute" value={flute} onChange={setFlute} />
-        <AmbientKnob label="Cap" variant="cap" value={cap} onChange={setCap} />
-        <AmbientKnob label="Wheel" variant="wheel" material="shiny" value={wheel} onChange={setWheel} />
+        <AmbientKnob label="Knurled" value={ribbed} onChange={setRibbed} />
+        <AmbientKnob label="Smooth" knurling={false} value={smooth} onChange={setSmooth} />
+        <AmbientKnob
+          label="Shiny"
+          knurling={false}
+          material="shiny"
+          value={wheel}
+          onChange={setWheel}
+        />
+      </div>
+    </DemoShell>
+  );
+}
+
+export function KnobMarkersPreview() {
+  const [none, setNone] = useState(42);
+  const [ends, setEnds] = useState(15);
+  const [full, setFull] = useState(70);
+
+  return (
+    <DemoShell>
+      <div className="docs-demo-row">
+        <AmbientKnob label="None" value={none} onChange={setNone} />
+        <AmbientKnob label="Ends" markers="ends" value={ends} onChange={setEnds} />
+        <AmbientKnob label="Full" markers="full" value={full} onChange={setFull} />
+      </div>
+    </DemoShell>
+  );
+}
+
+export function KnobIndicatorPreview() {
+  const [circle, setCircle] = useState(42);
+  const [rectangle, setRectangle] = useState(70);
+
+  return (
+    <DemoShell>
+      <div className="docs-demo-row">
+        <AmbientKnob label="Circle" value={circle} onChange={setCircle} />
+        <AmbientKnob
+          label="Rectangle"
+          indicator="rectangle"
+          value={rectangle}
+          onChange={setRectangle}
+        />
       </div>
     </DemoShell>
   );
@@ -169,10 +269,129 @@ export function CompositionPreview() {
     <DemoShell>
       <AmbientPanel className="docs-demo-panel docs-demo-panel-grid">
         <AmbientButton>Play</AmbientButton>
-        <AmbientSwitch label="Arm" checked={armed} onCheckedChange={setArmed} led="#ef4444" />
+        <AmbientSwitch label="Arm" value={armed} onChange={setArmed} led="#ef4444" />
         <AmbientKnob label="Gain" value={gain} onChange={setGain} />
         <AmbientFader label="Level" value={level} onChange={setLevel} />
       </AmbientPanel>
+    </DemoShell>
+  );
+}
+
+/* ── Kits ──────────────────────────────────────────────────────────────
+   The console kit's samples. Note what is NOT here: no `knurling`,
+   `markers` or `indicator` inside the provider. Those are grounded's
+   vocabulary, and passing them under another kit is exactly the case
+   `looks` warns about — a docs page should not be printing that warning
+   into the reader's console.
+
+   Everything below sits in `.docs-kit-row`, which is a fixed height rather
+   than a natural one: the console knob reserves layout room for the marks
+   printed around it and the grounded knob does not, so left to themselves
+   two rows of the same controls come out different heights and their
+   captions land on different lines. */
+
+export function KitComparisonPreview() {
+  const [level, setLevel] = useState(68);
+  const [on, setOn] = useState(true);
+
+  /* One call site, rendered twice. The props are identical and the state
+     is shared — the only difference between the columns is the kit above
+     them, which is the whole claim the page makes. */
+  const controls = (
+    <>
+      <AmbientKnob label="LEVEL" value={level} onChange={setLevel} />
+      <AmbientSwitch label="ON" value={on} onChange={setOn} />
+    </>
+  );
+
+  return (
+    <DemoShell>
+      <div className="docs-kit-columns">
+        <div className="docs-kit-column">
+          <div className="docs-kit-row">{controls}</div>
+          <p className="docs-demo-text">grounded (default)</p>
+        </div>
+        <div className="docs-kit-column">
+          <AmbientKitProvider kit={consoleKit}>
+            <div className="docs-kit-row">{controls}</div>
+          </AmbientKitProvider>
+          <p className="docs-demo-text">consoleKit</p>
+        </div>
+      </div>
+    </DemoShell>
+  );
+}
+
+export function ConsoleKitPreview() {
+  const [gain, setGain] = useState(40);
+  const [bare, setBare] = useState(72);
+  const [arm, setArm] = useState(false);
+
+  /* The bare knob gets its own column rather than standing next to the
+     marked one: a knob with the centre mark printed above it is a taller
+     box than one without, so side by side in a single row the two sit at
+     visibly different heights — which reads as a layout slip rather than
+     as the prop doing its job. */
+  return (
+    <DemoShell>
+      <AmbientKitProvider kit={consoleKit}>
+        <div className="docs-demo-stack">
+          <div className="docs-kit-columns">
+            <div className="docs-kit-column">
+              <div className="docs-kit-row">
+                <ConsoleKnob label="GAIN" value={gain} onChange={setGain} />
+                <ConsoleToggle label="ARM" value={arm} onChange={setArm} />
+              </div>
+              <p className="docs-demo-text">default</p>
+            </div>
+            <div className="docs-kit-column">
+              <div className="docs-kit-row">
+                <ConsoleKnob
+                  label="BARE"
+                  mark={false}
+                  legend={false}
+                  value={bare}
+                  onChange={setBare}
+                />
+              </div>
+              <p className="docs-demo-text">
+                <code>mark={"{false}"} legend={"{false}"}</code>
+              </p>
+            </div>
+          </div>
+          <p className="docs-demo-text">
+            Gain {gain} · Bare {bare} · {arm ? "armed" : "safe"}
+          </p>
+        </div>
+      </AmbientKitProvider>
+    </DemoShell>
+  );
+}
+
+export function KitAccentPreview() {
+  const [green, setGreen] = useState(55);
+  const [amber, setAmber] = useState(30);
+
+  return (
+    <DemoShell>
+      <AmbientKitProvider kit={consoleKit}>
+        <div className="docs-kit-columns">
+          <div className="docs-kit-column" style={{ "--ambx-accent": "#00a84d" } as React.CSSProperties}>
+            <div className="docs-kit-row">
+              <ConsoleKnob label="SEND" value={green} onChange={setGreen} />
+              <ConsoleToggle label="ON" defaultValue />
+            </div>
+            <p className="docs-demo-text">#00a84d</p>
+          </div>
+          <div className="docs-kit-column" style={{ "--ambx-accent": "#f59e0b" } as React.CSSProperties}>
+            <div className="docs-kit-row">
+              <ConsoleKnob label="SEND" value={amber} onChange={setAmber} />
+              <ConsoleToggle label="ON" defaultValue />
+            </div>
+            <p className="docs-demo-text">#f59e0b</p>
+          </div>
+        </div>
+      </AmbientKitProvider>
     </DemoShell>
   );
 }
@@ -194,19 +413,32 @@ export function GroundedButtonSquareDemo() {
 }
 
 export function GroundedKnobDemo({
-  variant
+  knurling,
+  markers,
+  indicator
 }: {
-  variant?: "dot" | "line" | "flute" | "cap" | "wheel";
+  knurling?: boolean;
+  markers?: "none" | "ends" | "full";
+  indicator?: "rectangle" | "circle";
 }) {
   const [v, setV] = useState(33);
   return (
-    <AmbientKnob aria-label="Knob" variant={variant} value={v} min={0} max={100} onChange={setV} />
+    <AmbientKnob
+      aria-label="Knob"
+      knurling={knurling}
+      markers={markers}
+      indicator={indicator}
+      value={v}
+      min={0}
+      max={100}
+      onChange={setV}
+    />
   );
 }
 
 export function GroundedSwitchDemo() {
   const [on, setOn] = useState(false);
-  return <AmbientSwitch aria-label="Switch" checked={on} onCheckedChange={setOn} />;
+  return <AmbientSwitch aria-label="Switch" value={on} onChange={setOn} />;
 }
 
 export function GroundedFaderDemo() {

@@ -22,8 +22,13 @@ in the repository.
 
 ## Surface
 
-`.amb-surface` — lightness is affine in *both* light intensities: the fill
-floors it, and sRGB gamma compresses the key slope.
+`.amb-surface` — a surface reflects **albedo × exposure**, and exposure is
+what the two light intensities are linear in: irradiance adds up, sRGB
+lightness does not. Fit in linear light, one two-parameter law
+(`0.6396·key + 0.5496·fill`, no intercept — lights off is black) reproduces
+every measured plate in the rig, at every albedo, to within 0.03 points of
+lightness. That is why there is one surface class and a `--amb-albedo`
+variable rather than a class per tone.
 
 <RenderComparison slug="surface" classes="amb-surface" />
 
@@ -67,8 +72,9 @@ metrics gate the shape.
 ## Groove
 
 `.amb-groove` — negative space: a recessed slot whose depth reuses the
-thickness vocabulary. The floor stays surprisingly bright (the studio's
-overhead fill reaches in, and the walls bounce light back); the lit-side
+thickness vocabulary. The floor is the same material as the ground around
+it under its own exposure, and that exposure runs slightly *hot* (the
+studio's overhead fill reaches in, and the walls bounce light back); the lit-side
 wall casts a crisp shadow band onto the floor, and the far wall catches
 the key and bounces it back as a soft brightening — the physical origin
 of the classic inset highlight. Component tracks compose this with the
@@ -78,26 +84,47 @@ lume material.
 
 ## Curved surfaces
 
-Cylindrical dishes and domes: the gradient stops ride the grounded surface
-base, with the end-stop delta affine in light contrast.
+Cylindrical dishes and domes: the gradient stops ride the lit surface
+tone — so a dish takes the panel's own `--amb-albedo` and only the shading
+is painted — with the end-stop delta affine in light contrast.
 
 <RenderComparison slug="surface-concave" classes="amb-surface-concave" />
 <RenderComparison slug="surface-concave-h" classes="amb-surface-concave-h" />
 <RenderComparison slug="surface-convex" classes="amb-surface-convex" />
 
-## Darker surfaces
+## Other materials
 
-<RenderComparison slug="surface-darker" classes="amb-surface-darker" />
-<RenderComparison slug="surface-darkest" classes="amb-surface-darkest" />
+There is no class per tone. A plate of a different reflectance is the same
+`.amb-surface` with a different `--amb-albedo` — and these four frames are
+what makes that claim checkable: the rig rendered plates at five albedos,
+and one two-parameter exposure law reproduces all 54 of those frames to
+within 0.03 points of lightness. The CSS below is the same law, so the live
+stage and the render are computing the same thing from the same number.
 
-## Lighter surfaces
+Headroom above the reference ground is physically narrow — a Lambertian
+plate caps out near albedo 1.0 — so the two lighter plates sit close
+together compared to the darker ladder.
 
-Headroom above `.amb-surface` is physically narrow — a Lambertian plate
-caps out near albedo 1.0 — so these sit close together compared to the
-darker ladder.
-
-<RenderComparison slug="surface-lighter" classes="amb-surface-lighter" />
-<RenderComparison slug="surface-lightest" classes="amb-surface-lightest" />
+<RenderComparison
+  slug="surface-darker"
+  classes="amb-surface"
+  subjectStyle={{ ["--amb-albedo"]: "color(srgb-linear 0.31 0.31 0.31)" }}
+/>
+<RenderComparison
+  slug="surface-darkest"
+  classes="amb-surface"
+  subjectStyle={{ ["--amb-albedo"]: "color(srgb-linear 0.06 0.06 0.06)" }}
+/>
+<RenderComparison
+  slug="surface-lighter"
+  classes="amb-surface"
+  subjectStyle={{ ["--amb-albedo"]: "color(srgb-linear 0.91 0.91 0.91)" }}
+/>
+<RenderComparison
+  slug="surface-lightest"
+  classes="amb-surface"
+  subjectStyle={{ ["--amb-albedo"]: "color(srgb-linear 0.95 0.95 0.95)" }}
+/>
 
 ## Shiny
 
@@ -112,6 +139,121 @@ the top and a gentle floor grade at the bottom, riding the fill light and
 never flipping with the key.
 
 <RenderComparison slug="mat-shiny" classes="amb-mat-shiny amb-surface" size={[40, 40]} />
+
+## Brushed, spun and blasted metal
+
+`.amb-mat-brushed`, `.amb-mat-brushed-round` (spun) and `.amb-mat-blasted` —
+micro-relief materials, not gradients painted on: a Noise-Texture height
+field bump-maps a Principled BSDF in the Blender rig (Object-space
+coordinates, anisotropically stretched to the finish's grain — a hardcoded
+tangent for brushed's straight belt-sanded lines, Blender's built-in radial
+Tangent node for spun's lathe-turned circles), with an Anisotropic BSDF lobe
+riding the same grain on the two directional finishes for their sheen. The CSS
+mirrors that split: a raw-height-field SVG tile pair (screen + multiply,
+offset opposite ways along the light so the pair evaluates the directional
+derivative) for the relief, plus a separate gradient for the sheen.
+
+Reference albedo is independently fit for each finish by solving the
+already-grounded `.amb-surface` exposure law against the render's own mean
+tone — brushed and spun land within 0.5% of each other (0.4819 vs 0.4795),
+which is the "one reflectance, two finishes" claim confirmed rather than
+just asserted. It now extends to three: blasted was regrounded as
+bead-blasted **aluminium** at 0.4457, within 8% of the other two.
+
+Blasted used to be described here as a dark, fully matte elastomer with no
+anisotropic term. That was a fossil — the material was renamed from
+`.amb-mat-rubber` and its grounding never followed, leaving it at an
+albedo of 0.0594. It is now a conductor in the rig, and its grain target
+rose an order of magnitude (1.27 → 11.74 RMS L\*) because the glitter *is*
+the material: a dielectric was tried first and saturates at 4.5, reaching
+even that only by darkening the plate 19 L\* below its measured tone. The
+CSS side does **not** reach the new target — its overlay alpha hard-rails
+at 1.0 where ~1.27 would be needed, and at the rail the tile reads as
+sensor static rather than bead-blast. It ships at 0.666, ~52% of target.
+That value was picked by eye for lower contrast and turns out to sit on an
+exact edge: the overlay's opacity is a product that saturates at 1, and
+0.666 is the highest alpha that never reaches it. At the earlier 0.85 the
+material stopped brightening about 18% short of the top of its lighting
+range, so asking for less contrast and restoring the light response were
+the same move. The remaining shortfall is recorded in
+`ambient3d/derived/notes/blasted.md` rather than tuned away. Its
+`--amb-mat-specular: 0` is kept deliberately: the reference crop's
+low-frequency sweep is 3.4 against a grain of 11.9, so there is no
+highlight band to paint.
+
+A grounded number can also fail to reach the screen, which is its own kind
+of ungrounding. Brushed's anisotropy — the ratio of across-grain to
+along-grain pixel derivative, 7.50 on the rig — was matched on the CSS side
+at 7.60 and shipped on that basis. Measured off an actual Chrome raster it
+reads **1.55**: near isotropic. The tile asked for 20 turbulence cycles per
+CSS pixel, forty times the sampling rate, and `feTurbulence` rasterises at
+device resolution — so what reached the screen was that grain's aliasing,
+and aliasing has no direction. The finish read as a woven cross-hatch. The
+tile has since been hand-retuned for long, fine streaks (a 512px tile, eight
+cells across, a 1.1px across-grain period) at unchanged contrast, and now
+measures 12.15 — an overshoot rather than a match, because the requested
+look is finer than the fit, and one that is chosen rather than accidental.
+
+The sharper form of the lesson is worth stating: the failure was not that
+the frequency was high but that it was an **integer number of cycles per
+pixel**. At that alignment the noise function's lattice coincides with the
+sampling grid and every sample lands on a lattice node, where gradient noise
+is zero by construction — so the tile renders far weaker and far less
+directional than it specifies. A closed-loop CSS fit therefore has to be
+measured in the regime it ships in, at more than one device pixel ratio, and
+the anisotropy figure is the one here that moves with it.
+
+The sheen's **amplitude is the one thing on this page the rig cannot
+measure**, and saying so is the honest result
+(`ambient3d/derived/notes/{brushed,spun}_sheen.md`). The calibration camera
+is orthographic, so every view ray is parallel and reflects off a flat
+plate into a single point of the environment: a broad positional highlight
+simply cannot form. 24 renders across roughness, anisotropy and bump
+strength top out at a low-frequency sweep of 1.04 against a reference
+photograph's 16.2, and with the bump removed the sweep is exactly 0.00 —
+the relief was the only source of spatial variation in the frame. An
+earlier pass measured that blindness and cut the sheen 4-5x on the
+strength of it, to an alpha of ~0.029 at full key: effectively invisible.
+That cut is reverted.
+
+The reference photographs cannot supply a replacement number either, and
+that is a rejection rather than a miss: their sweep is dominated by
+scene-scale illumination falloff across a large sheet, which a small
+control has nothing to reproduce. A fully opaque white band on the CSS
+side reaches only 6.5 against the photograph's 16.2, and the
+exposure-invariant sweep/grain ratio fails the same way — so the target has
+no solution at any alpha, because it is not the same quantity. The shipped
+amplitude is therefore fit **visually** against the crops, keeping the
+original's floor-to-slope proportion so the sheen still survives a dim
+scene. Grounding is split by quantity on purpose: relief amplitude and
+anisotropy from the rig, sweep amplitude and grain shape by eye.
+
+Brushed's band *position* is genuinely grounded — the rig resolves position
+fine, it is amplitude it is blind to — and confirmed to slide with the
+light the way the CSS assumed, just at a different rate. Its half-width,
+and spun's whole conic-lobe shape, stay hand-tuned. An earlier pass called
+spun's lack of directionality "a checked result" on the grounds that the
+same sweep recovered a clean peak for brushed; that claim is **withdrawn**,
+since the orthographic argument applies to both finishes and brushed's peak
+arrived through perturbed normals that spun's radial grain has no
+equivalent of. The shape is unmeasurable on this rig, not disconfirmed by
+it.
+
+<RenderComparison
+  slug="mat-brushed"
+  classes="amb-mat-brushed amb-surface"
+  subjectStyle={{ ["--amb-albedo"]: "color(srgb-linear 0.482 0.482 0.482)" }}
+/>
+<RenderComparison
+  slug="mat-spun"
+  classes="amb-mat-brushed-round amb-surface"
+  subjectStyle={{ ["--amb-albedo"]: "color(srgb-linear 0.480 0.480 0.480)" }}
+/>
+<RenderComparison
+  slug="mat-blasted"
+  classes="amb-mat-blasted amb-surface"
+  subjectStyle={{ ["--amb-albedo"]: "color(srgb-linear 0.446 0.446 0.446)" }}
+/>
 
 ## Glow
 

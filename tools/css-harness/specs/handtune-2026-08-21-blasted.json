@@ -1,0 +1,11 @@
+{
+  "mat": "blasted", "cols": 5, "w": 240, "h": 240, "dpr": 1,
+  "out": "out/handtune-blasted.png",
+  "variants": [
+    { "label": "baseline alpha 0", "vars": { "--_grain-alpha": "0" } },
+    { "label": "D quiet 0.60", "vars": { "--_grain-alpha": "0.60" } },
+    { "label": "C shipped 0.666", "vars": { "--_grain-alpha": "0.666" } },
+    { "label": "B eased 0.75", "vars": { "--_grain-alpha": "0.75" } },
+    { "label": "A previous 0.85", "vars": { "--_grain-alpha": "0.85" } }
+  ]
+}

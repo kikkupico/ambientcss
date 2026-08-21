@@ -74,12 +74,29 @@ function App() {
     <AmbientProvider theme={{ lightX: -1, lightY: -1, keyLight: 0.9, fillLight: 0.7 }}>
       <AmbientPanel>
         <AmbientButton>Press</AmbientButton>
-        <AmbientKnob size={80} value={0.5} />
+        <AmbientKnob label="Gain" defaultValue={50} />
       </AmbientPanel>
     </AmbientProvider>
   );
 }
 ```
+
+Each component is a **preset**: a mechanism that owns the kinematics, the value
+and the ARIA, paired with a set of parts that own the paint. Reach past the
+preset and the mechanism will wear whatever you draw:
+
+```tsx
+<AmbientRotary
+  value={gain} onChange={setGain}
+  travel={240} input="drag"
+  parts={{ base: <KnobBody flush />, actuator: <MyPointer /> }}
+/>
+```
+
+The control publishes `--ambx-percent`, `--ambx-angle` and `--ambx-size` on its
+own root, so a part can be pure CSS. See
+[Composing controls](https://kikkupico.github.io/ambientcss/ambient-components/composing).
+
 
 ---
 
@@ -88,7 +105,7 @@ function App() {
 | Package | Path | Description |
 |---|---|---|
 | [`@ambientcss/css`](./packages/ambient-css) | [`packages/ambient-css`](./packages/ambient-css) | Pure CSS lighting framework — zero dependencies, works with any framework or plain HTML |
-| [`@ambientcss/components`](./packages/ambient-components) | [`packages/ambient-components`](./packages/ambient-components) | Tactile React component library (Provider, Panel, Button, Knob, Fader, Slider, Switch) |
+| [`@ambientcss/components`](./packages/ambient-components) | [`packages/ambient-components`](./packages/ambient-components) | Tactile React component library — composable control mechanisms plus grounded hardware presets |
 | [`ambient3d`](./ambient3d) | [`ambient3d`](./ambient3d) | Parametric Blender 3D component kit & ground-truth raytracing calibration engine |
 | `docs` | [`apps/docs`](./apps/docs) | Interactive Docusaurus documentation website & live code playground |
 | `demo` | [`apps/demo`](./apps/demo) | Hardware synthesizer & audio gear live demo application |
@@ -118,7 +135,26 @@ Custom CSS variables for granular light manipulation:
 
 ### Surfaces & Gradients
 
-`.amb-surface` `.amb-surface-darker` `.amb-surface-darkest` `.amb-surface-lighter` `.amb-surface-lightest` `.amb-surface-concave` `.amb-surface-concave-h` `.amb-surface-convex`
+`.amb-surface` `.amb-surface-concave` `.amb-surface-concave-h` `.amb-surface-convex`
+
+A surface is its **material** under the scene's light, not a fixed colour, so
+one class covers every hue and shade:
+
+```css
+.my-panel {
+  --amb-albedo: crimson;   /* the colour under full illumination */
+  --amb-shade: 1;          /* multiplier on that reflectance */
+}
+```
+
+`--amb-albedo` takes any CSS colour and both variables inherit, so a panel
+colours everything inside it — grooves, dishes and the components package's
+knobs and keys all read the same lit tone. Dim the key light and a crimson
+panel darkens like crimson; give the lamp a hue and it takes the cast.
+
+The former `.amb-surface-darker`, `-darkest`, `-lighter` and `-lightest`
+classes were five fixed albedos of this one law; the equivalent shades are
+`0.38`, `0.07`, `1.11` and `1.16`.
 
 ### Edge Cuts & Treatments
 
@@ -126,7 +162,27 @@ Custom CSS variables for granular light manipulation:
 
 ### Materials & Finishes
 
-`.amb-mat-matte` `.amb-mat-shiny` `.amb-mat-glass`
+`.amb-mat-matte` `.amb-mat-shiny` `.amb-mat-glass` `.amb-mat-brushed`
+`.amb-mat-brushed-round` `.amb-mat-blasted`
+
+`.amb-mat-brushed`, `.amb-mat-brushed-round` and `.amb-mat-blasted` carry a
+fitted micro-relief rather than a gloss: the tile holds a raw height field and
+its inverse, and only the offset between them tracks the light, so the bumps
+stay put and the shading crosses over them. Scale it with `--amb-grain-amount`
+(default `1`).
+
+`.amb-mat-brushed-round` is the same aluminium spun about the element's centre
+instead of run across it — the lathe finish on a knob cap — so put it on round
+faces. Its grain is a conic gradient rather than a repeating tile, and the two
+bright arcs that swing with the lamp fall out of the same offset the linear
+grain uses, because a fixed offset is tangent to a circular groove in only two
+places.
+
+Both brushed finishes also carry a broad specular sheen, painted on the host's
+own background like `.amb-mat-shiny`'s. It is anisotropic in the grain's own
+direction: a band across the grain on the linear metal (so `--amb-light-y`
+moves it and `--amb-light-x` does not), and a pair of opposed lobes on the
+lamp's axis, plus a converged hotspot, on the spun one.
 
 ### Physical Depth & Elevation
 

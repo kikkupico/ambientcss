@@ -12,7 +12,14 @@ import { PanelPreview } from "@site/src/components/ComponentPreviews";
 
 ## Props
 
-Inherits all `HTMLAttributes<HTMLDivElement>` props. There is no `size` prop:
+`material` takes any of the six finishes — `"matte"`, `"shiny"`, `"glass"`,
+`"brushed"`, `"brushed-round"` or `"blasted"` — and defaults to `"matte"`. A
+panel is a plain surface, so it wears the three micro-relief finishes directly: their grain paints
+below the panel's children, and the `overflow: hidden` they need in order to
+clip a blend to a rounded corner clips whatever hangs outside the panel too —
+a control's drop shadow right at the edge included.
+
+Otherwise inherits all `HTMLAttributes<HTMLDivElement>` props. There is no `size` prop:
 unlike the fixed-footprint controls (button, knob, slider, fader, switch), a
 panel is a free-form container that sizes to its own content or parent, so
 `size` would conflate "control size" with "content density."

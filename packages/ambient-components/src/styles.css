@@ -28,6 +28,10 @@
   --ambx-label-size: calc(var(--ambx-grid) * 2 + var(--ambx-grid-half));
   --ambx-label-line: calc(var(--ambx-grid) * 3);
   --ambx-control-label-gap: calc(var(--ambx-grid) * 2);
+  /* The panel accent a kit paints its lit states with. Defaults to the
+     scene's own highlight so a kit inherits the app's colour rather than
+     imposing one. */
+  --ambx-accent: var(--amb-highlight-color);
   --ambx-knob-label-clearance: calc(var(--ambx-grid) * 2);
   --ambx-slider-label-clearance: calc(var(--ambx-grid) * 2);
   --ambx-fader-label-clearance: calc(var(--ambx-grid) * 4);
@@ -41,19 +45,11 @@
    rather than shipped as a global reset: apps that already reset globally
    (apps/demo does) see no change, and apps that do not are no longer
    silently broken. */
-.amb-button,
-.amb-knob,
-.amb-switch,
-.amb-fader,
-.amb-slider,
+.ambx-control,
+.ambx-control *,
 .ambx-panel,
-.ambx-stack,
-.amb-button *,
-.amb-knob *,
-.amb-switch *,
-.amb-fader *,
-.amb-slider *,
 .ambx-panel *,
+.ambx-stack,
 .ambx-stack * {
   box-sizing: border-box;
 }
@@ -74,6 +70,256 @@
   font-size: var(--ambx-type-3-size);
   line-height: var(--ambx-type-3-line);
   letter-spacing: var(--ambx-type-tracking);
+}
+
+/* ------------------------------------------------------------------ *\
+   The control base: state channel, frames, motion.
+
+   Every control publishes its state on its own root — as custom properties
+   for parts that are pure CSS, and as data attributes for the discrete
+   conditions a part cannot detect for itself. The properties INHERIT, which
+   is the whole point (any frame can read --ambx-angle without being handed
+   it), and is also why every one of them is reset here: a control nested
+   inside another control's frame would otherwise sweep along with its
+   ancestor.
+\* ------------------------------------------------------------------ */
+
+/* Registered so they interpolate. That is what turns "smooth or stepped"
+   into a CSS question rather than a JS animation loop — the same reason
+   @ambientcss/css registers --amb-elevation. */
+@property --ambx-percent {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --ambx-angle {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
+
+.ambx-control {
+  position: relative;
+  --ambx-value: 0;
+  --ambx-percent: 0;
+  --ambx-angle: 0deg;
+  --ambx-travel-start: 0deg;
+  --ambx-travel-sweep: 0deg;
+  --ambx-detents: 0;
+}
+
+.ambx-control:focus-visible {
+  outline-offset: var(--ambx-grid-half);
+}
+
+/* A frame is a MARKER by default, not a box: it contributes paint order and
+   the [data-frame] hook and nothing to layout. That default is load-bearing
+   rather than lazy — a button takes its height from its cap in normal flow
+   and its width from min-width PLUS the cap's legend, so wrapping the cap in
+   a positioned box would collapse the control to nothing. */
+.ambx-frame {
+  display: contents;
+}
+
+/* Where the control has a size of its own, frames become boxes and hand
+   their part a correct one. A part that means to fill its frame does it at
+   `position: absolute; inset: 0` — which also blockifies it, where
+   `width/height: 100%` on a bare <span> would silently measure zero. */
+.ambx-rotary > .ambx-frame,
+.ambx-travel > .ambx-frame,
+.ambx-latch > .ambx-frame {
+  display: block;
+  position: absolute;
+  inset: 0;
+}
+
+/* The panel frame is the one allowed past the control's box — a scale ring
+   sits outside the knob it belongs to. It takes no pointer events, so
+   printing a ring never enlarges the grab area. */
+.ambx-rotary > .ambx-frame-panel,
+.ambx-travel > .ambx-frame-panel {
+  pointer-events: none;
+}
+
+/* Motion. The actuator is the only frame that moves, and it moves by
+   transform — which is what lets the two transition rules below cover every
+   family whose actuator is a box. */
+.ambx-rotary > .ambx-frame-actuator {
+  transform: rotate(var(--ambx-angle));
+}
+
+/* Follow the pointer 1:1 while dragging, ease otherwise. No JS: the root
+   already carries data-dragging. */
+.ambx-control[data-animate="auto"] > .ambx-frame-actuator,
+.ambx-control[data-animate="ease"] > .ambx-frame-actuator {
+  transition: transform 120ms ease-out;
+}
+
+.ambx-control[data-animate="auto"][data-dragging] > .ambx-frame-actuator,
+.ambx-control[data-animate="follow"] > .ambx-frame-actuator,
+.ambx-control[data-animate="snap"] > .ambx-frame-actuator {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambx-control > .ambx-frame-actuator {
+    transition: none;
+  }
+}
+
+.ambx-control[data-disabled] {
+  cursor: not-allowed;
+}
+
+/* Rotary geometry. Square, sized off one property so a user-supplied part
+   can scale with the control — a part cannot match .ambx-rotary-lg, it does
+   not know the class exists, but it can read --ambx-size. */
+.ambx-rotary {
+  display: grid;
+  place-items: center;
+  touch-action: none;
+  user-select: none;
+  width: var(--ambx-size);
+  height: var(--ambx-size);
+  --ambx-size: calc(var(--ambx-grid) * 16);                 /* 64px */
+}
+
+.ambx-rotary-sm { --ambx-size: calc(var(--ambx-grid) * 12); } /* 48px */
+.ambx-rotary-md { --ambx-size: calc(var(--ambx-grid) * 16); } /* 64px */
+.ambx-rotary-lg { --ambx-size: calc(var(--ambx-grid) * 20); } /* 80px */
+
+/* Travel geometry. Track length, track width and thumb all come off one
+   size step, and the slider's and fader's measured tables turn out to be
+   the same table — 6/8/12 track against a 20/24/32 thumb — so one set of
+   steps serves both, with the fader's pill taking the extra 1.5x height its
+   referent has. */
+.ambx-travel {
+  position: relative;
+  touch-action: none;
+  user-select: none;
+  --ambx-size: calc(var(--ambx-grid) * 6);                   /* 24px thumb */
+  --ambx-travel-track: calc(var(--ambx-grid) * 2);           /* 8px */
+  --ambx-travel-length: calc(var(--ambx-grid) * 30);         /* 120px */
+  --ambx-travel-thumb-w: var(--ambx-size);
+  --ambx-travel-thumb-h: var(--ambx-size);
+}
+
+.ambx-travel-sm {
+  --ambx-size: calc(var(--ambx-grid) * 5);                   /* 20px */
+  --ambx-travel-track: calc(var(--ambx-grid) * 1.5);         /* 6px */
+}
+
+.ambx-travel-md {
+  --ambx-size: calc(var(--ambx-grid) * 6);                   /* 24px */
+  --ambx-travel-track: calc(var(--ambx-grid) * 2);           /* 8px */
+}
+
+.ambx-travel-lg {
+  --ambx-size: calc(var(--ambx-grid) * 8);                   /* 32px */
+  --ambx-travel-track: calc(var(--ambx-grid) * 3);           /* 12px */
+}
+
+.ambx-travel-horizontal {
+  width: var(--ambx-travel-length);
+  height: var(--ambx-travel-track);
+}
+
+.ambx-travel-vertical {
+  width: var(--ambx-travel-track);
+  height: var(--ambx-travel-length);
+}
+
+/* The thumb frame is a thumb-sized box riding the track — the one case
+   where "inset: 0" would be the wrong box for the part. A percentage
+   translate resolves against the ELEMENT's size, not the track's, which is
+   why the length has to be a property the transform can multiply. */
+.ambx-travel > .ambx-frame-actuator {
+  inset: auto;
+  width: var(--ambx-travel-thumb-w);
+  height: var(--ambx-travel-thumb-h);
+}
+
+.ambx-travel-horizontal > .ambx-frame-actuator {
+  top: 50%;
+  left: 0;
+  transform: translate(-50%, -50%)
+    translateX(calc(var(--ambx-percent) * var(--ambx-travel-length)));
+}
+
+.ambx-travel-vertical > .ambx-frame-actuator {
+  top: 100%;
+  left: 50%;
+  transform: translate(-50%, -50%)
+    translateY(calc(var(--ambx-percent) * var(--ambx-travel-length) * -1));
+}
+
+/* Latch: the control IS the track, so the pill can be positioned against
+   it directly. Its travel is the track less the pill and the two end
+   clearances — stated once here rather than as an on/off pair of offsets,
+   so --ambx-percent drives it like every other actuator. */
+.ambx-latch {
+  position: relative;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  margin: 0;
+  background: none;
+  display: block;
+  width: var(--ambx-switch-w);
+  height: var(--ambx-switch-h);
+  --ambx-size: var(--ambx-switch-h);
+  --ambx-switch-w: calc(var(--ambx-grid) * 12);
+  --ambx-switch-h: calc(var(--ambx-grid) * 6);
+  --ambx-latch-thumb-w: calc(var(--ambx-switch-w) * 0.52);
+  --ambx-latch-thumb-h: calc(var(--ambx-switch-h) * 0.78);
+  --ambx-latch-inset: calc(var(--ambx-switch-h) * 0.11);
+}
+
+.ambx-latch-sm {
+  --ambx-switch-w: calc(var(--ambx-grid) * 10);
+  --ambx-switch-h: calc(var(--ambx-grid) * 5);
+}
+
+.ambx-latch-md {
+  --ambx-switch-w: calc(var(--ambx-grid) * 12);
+  --ambx-switch-h: calc(var(--ambx-grid) * 6);
+}
+
+.ambx-latch-lg {
+  --ambx-switch-w: calc(var(--ambx-grid) * 16);
+  --ambx-switch-h: calc(var(--ambx-grid) * 8);
+}
+
+/* Stated as tokens rather than as literals in the transform, so a kit that
+   wants a round thumb on a wider track restates three lengths instead of
+   re-writing this selector. */
+.ambx-latch > .ambx-frame-actuator {
+  inset: auto;
+  top: 50%;
+  left: 0;
+  width: var(--ambx-latch-thumb-w);
+  height: var(--ambx-latch-thumb-h);
+  transform: translateY(-50%)
+    translateX(
+      calc(
+        var(--ambx-latch-inset) + var(--ambx-percent) *
+          (
+            var(--ambx-switch-w) - var(--ambx-latch-thumb-w) - 2 *
+              var(--ambx-latch-inset)
+          )
+      )
+    );
+}
+
+/* Press and bank size their control from their cap's legend, so their
+   frames stay markers and only the well needs geometry. */
+.ambx-press {
+  --ambx-size: var(--ambx-button-size);
+}
+
+.ambx-bank {
+  --ambx-size: var(--ambx-select-size);
 }
 
 /* Button: a chamfered key cap seated in a clearance well — the referent
@@ -104,6 +350,139 @@
   text-transform: uppercase;
   font-weight: 600;
   color: var(--amb-label);
+  /* Containing block + stacking context for the dish overlay below, so it
+     can sit above the cap's own background and below the label. */
+  position: relative;
+  isolation: isolate;
+}
+
+/* Cap dish (subtle concavity).
+
+   Real key caps are not flat: the top is scooped, so the wall on the far
+   side of the dish tilts INTO the light and the near wall tilts away.
+   Photographed reference (a dished ON key lit from above): along the light
+   axis the face starts a little off its floor at the lit rim, bottoms out
+   ~20% across, then climbs — accelerating, not linearly — to its brightest
+   at the far rim. Sampling that face and normalizing (0 = lit rim, 1 = far
+   rim) gives v = u^1.37 past the minimum; subtracting the profile's own
+   mean so the dish redistributes light rather than darkening the cap
+   overall leaves the signed stop table used below, in units of the end
+   delta: -0.42 at the lit rim, -0.73 at the floor, 0 at 62.5%, +1 at the
+   far rim. The far side overshoots more than the near side dips — a
+   grazing wall gains more than a tilted-away one loses.
+
+   AMPLITUDE is not taken from that photo (a near-black cap; absolute
+   deltas there mean nothing at .amb-surface's ~90% lightness). It reads
+   --amb-curve-delta, the grounded end delta .amb-surface-concave and
+   -convex ride (ambient3d/derived/notes/curved.md), so a concave cap and
+   a concave plate curve by the same measured amount and cannot drift
+   apart if that fit is ever re-derived. Only the AXIS and the PROFILE are
+   this file's own: the curved classes are single-axis (-concave reads
+   only --amb-light-y) and symmetric, and a cap has to follow whichever
+   light an app has set.
+
+   The overlay is painted as white/black alpha rather than as a background
+   gradient because the cap's background is already spoken for: the
+   material classes own background-image, and .amb-surface-concave's
+   `background` shorthand would wipe the shiny specular. An alpha over a
+   base of lightness L lands exactly on L + a(100 - L) for white and
+   L(1 - a) for black (the hue/saturation terms cancel in HSL lightness),
+   so the two alphas below invert the wanted delta EXACTLY for a matte cap
+   and approximately for shiny/glass, whose base is no longer plain
+   .amb-surface — the same residual .amb-mat-shiny's own comment carries. */
+.amb-button-cap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;                  /* over the cap face, under the label:
+                                   the alphas are calibrated for the
+                                   surface's lightness, and washing them
+                                   over the much darker label would fade
+                                   the glyph out at the bright rim. */
+  border-radius: inherit;
+  pointer-events: none;
+  /* Same axis convention as .amb-mat-shiny's --_shiny-angle: 0% of the
+     gradient lands on the lit edge, so the dish reorients itself with all
+     eight .amb-light-* positions instead of assuming a light from above. */
+  --_ambx-dish-angle: calc(atan2(var(--amb-light-y), var(--amb-light-x)) + 270deg);
+  /* Unitless twins of the cap's own surface lightness and dish end delta
+     (percentage points), so they can divide into alphas.
+
+     The lightness is rebuilt here rather than read off --amb-lit because
+     it is needed as a NUMBER, and relative colour syntax only exposes `l`
+     inside a colour function. So: the grounded exposure law (albedo x
+     exposure) with the sRGB transfer applied by hand.
+
+     That tracks --amb-shade EXACTLY — a dished cap on a darkened panel
+     gets alphas scaled for the tone it actually sits at — but it has to
+     assume the reference reflectance for the CHROMATIC part, because an
+     --amb-albedo's luminance cannot be reached as a number. On a dark
+     coloured albedo the two halves then miss in opposite directions: the
+     black half divides by too large an l and under-shades, while the
+     white half divides by too small a (100 - l) and over-lifts, so the
+     dish reads as a bright sheen rather than a curve. Set luminance with
+     --amb-shade and hue with --amb-albedo and both halves stay exact;
+     that pairing is the documented way to colour a dished component.
+
+     --_ambx-cap-tone is an escape hatch for a future material that ships
+     its own fixed albedo again: set it to that albedo's ratio against the
+     reference so the alphas derive at the lightness they actually wash
+     over. Nothing applies it today — the micro-relief finishes carry no
+     --amb-albedo of their own (@ambientcss/css), so a relief-faced cap's
+     .ambx-cap-face is already at the reference tone by default and takes
+     --amb-shade the same way any other dished surface does; it multiplies
+     --amb-shade rather than replacing it, so a consumer's own shade still
+     composes. */
+  --_ambx-dish-l: calc(
+    100 * (
+      1.055 * pow(
+        0.82 * var(--_ambx-cap-tone, 1) * var(--amb-shade) * var(--amb-exposure),
+        0.41667
+      ) - 0.055
+    )
+  );
+  /* One curvature for all three cap silhouettes: a dish is a property of
+     the tooling, not of how big or how round the key is. Tune it — for
+     one button, or a whole panel — with @ambientcss/css's
+     --amb-curve-scale, which is the same knob the curved surface classes
+     answer to and inherits like any other variable. */
+  --_ambx-dish-d: var(--amb-curve-delta);
+  /* Alpha per unit of the stop table. The max() floors keep the divisor
+     off zero: at Ik = If = 1 the grounded surface computes past 100%
+     lightness (already clipped white), where a white overlay is a no-op
+     anyway. */
+  --_ambx-dish-up: calc(var(--_ambx-dish-d) / max(6, 100 - var(--_ambx-dish-l)));
+  --_ambx-dish-dn: calc(var(--_ambx-dish-d) / max(6, var(--_ambx-dish-l)));
+  background: linear-gradient(
+    var(--_ambx-dish-angle),
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% / calc(var(--_ambx-dish-dn) * 0.42)) 0%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% / calc(var(--_ambx-dish-dn) * 0.73)) 20%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% / calc(var(--_ambx-dish-dn) * 0.47)) 40%,
+    /* Doubled stop at the neutral crossing: a zero-length interval, so the
+       gradient never interpolates between a black and a white stop while
+       either still carries alpha. */
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% / 0) 62.5%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 62.5%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--_ambx-dish-up) * 0.44)) 80%,
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / var(--_ambx-dish-up)) 100%
+  );
+}
+
+/* The micro-relief cap face: the layer .amb-mat-brushed / .amb-mat-blasted
+   ride on when the cap itself cannot carry them, because its own ::after is
+   already the dish. Sits under the dish (same negative index, earlier in
+   paint order) and under the legend, so the grain textures the cap's face
+   without washing over either. It paints .amb-surface in its own material's
+   tone, covering the cap's, and wears the cap's chamfer itself — an inset
+   shadow belongs to the background layer of the element that declares it, so
+   an opaque face would otherwise hide the cut. The cap keeps its shadow and
+   its sink-on-press, neither of which the face touches. */
+.ambx-cap-face {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
 }
 
 .amb-button:focus {
@@ -114,6 +493,13 @@
   color: var(--amb-highlight-color);
 }
 
+/* Pressed: the cap keeps its tone and its dish, and only SINKS — thickness
+   1 -> 0.84, the referent's 0.7mm travel. The cue is entirely geometric:
+   the swept drop shadow shortens and tightens as the cap's silhouette
+   drops toward the well floor, and the chamfer bands narrow with it. A
+   key that is the same key still lights the same face, so nothing about
+   the cap's colour moves — the button reads as travel, not as a state
+   repaint. */
 .amb-button:active .amb-button-cap {
   --amb-thickness: 0.84;
 }
@@ -157,148 +543,106 @@
 }
 
 /* Knob: a knob-scale body (thickness 2 = the referent knob.py's 9mm
-   height) resting on the panel. The rotating face carries the knurl — a
-   repeating-conic rib pattern, physically the referent's ribs catching
-   key light on one flank and shading on the other — under a smooth
-   opaque top disc (the OP-1-style cap), with an accent indicator dot.
-   The whole face rotates with the value, so the ribs move under the
-   fingers like the real thing. */
+   height) resting on the panel — a smooth chamfered cap, and around it
+   three independent axes, each its own prop. The cap may be ringed by a
+   knurl — a rim band of ribs standing proud of its edge and a step below
+   it, physically the referent's ribs catching key light on one flank and
+   shading on the other — the panel around it may carry printed scale
+   markers, and the face carries one accent indicator. The knurl and the
+   indicator rotate with the value, so the ribs move under the fingers like
+   the real thing; the markers do not, because they are printed on the
+   panel, and neither does the cap, whose chamfer is lit from a fixed
+   direction and so cannot ride a turning frame. */
+/* Every knob metric is a fraction of the control's own size, so the three
+   size steps only restate that one length. Marker radius and dot size are
+   fractions of the DIAMETER: the ring sits at 1.33R and the dots measure
+   0.14R, both taken off the reference panels. --ambx-knob-size is a family
+   alias of --ambx-size, kept because these fractions read better against a
+   name that says which control they belong to. */
 .amb-knob {
   border-radius: 50%;
-  height: var(--ambx-knob-size);
-  width: var(--ambx-knob-size);
+  --ambx-knob-size: var(--ambx-size);
+  --ambx-knob-rect-width: calc(var(--ambx-knob-size) * 0.075);
+  --ambx-knob-marker-radius: calc(var(--ambx-knob-size) * 0.665);
+  --ambx-knob-marker-size: calc(var(--ambx-knob-size) * 0.07);
 }
 
-/* The body is the smooth circle at the tooth-root radius: it carries
-   the ambient drop shadow (kept circular — the teeth are too fine to
-   read in a penumbra) while the clipped face above it supplies the
-   knurled silhouette. */
+/* The cap: the smooth chamfered disc that is most of the knob, and the
+   element that carries the ambient drop shadow (kept circular — the knurl's
+   teeth are too fine to read in a penumbra).
+
+   Both variants take the small base chamfer the referent cuts on every knob
+   (knob.py's `chamfer=0.35`, regardless of rib count) — width 2,
+   level-for-level with the body's knob-scale thickness (.amb-chamfer-2's
+   pairing). A rim of ribs is a grip, not an edge treatment: it tells you
+   the knob turns, not where its top face stops, so the knurled knob needs
+   the chamfer just as much as the smooth one does.
+
+   knurling={false} leaves the cap flush at the full width and it becomes the
+   whole visible knob — a turned cylinder. Otherwise KnobBody insets it by the
+   knurl band (inline, from the same constant the clip path uses) so the ribs
+   ring it. */
 .amb-knob-body {
   position: absolute;
-  inset: calc(var(--ambx-grid) / 2);
+  inset: 0;
   border-radius: 50%;
+  --amb-chamfer: 1;
+  --amb-chamfer-width: 2;
 }
 
-/* The rotating face: clipped to the straight-knurl silhouette (the
-   inline SVG clipPath in AmbientKnob), opaque at the knob's surface
-   color, with per-tooth flank shading — a lit leading flank and a
-   shaded trailing flank every 10deg, phase-aligned with the clip's
-   teeth (conic 0 is rotated to the +x axis where the tooth path
-   starts) — under the smooth top disc. */
+/* The rotating knurl: clipped to the toothed ANNULUS (the inline SVG
+   clipPath in KnurledFace), so it paints only the rim band outside the cap
+   and the cap's own chamfer bands survive underneath.
+
+   Two things paint it. Per-tooth flank shading — a lit flank climbing to
+   each ridge and a shaded one falling away, one pair every 7.5deg (360/48,
+   the clip's rib count), phase-aligned with the clip: conic 0 is rotated to
+   the +x axis, where the tooth curve starts in a groove, so the ridge lands
+   at 3.75deg and the lit and shaded stops at 1.875 and 5.625. And a
+   contact-occlusion band along the inner edge, where the cap overhangs the
+   band it steps down to: radial, so it survives the frame's rotation
+   unchanged, which a directional cue in a turning element could not.
+
+   The step down itself is --amb-shade, not a black wash: the rim is the same
+   material as the cap sitting lower and facing less of the sky, and shading
+   the albedo darkens it the way less light would, where an overlay would
+   drain a coloured knob toward grey. Uniform round the circumference, so it
+   too is rotation-safe. */
 .amb-knob-face {
   position: absolute;
   inset: 0;
-  background-color: hsl(
-    var(--amb-light-hue)
-    var(--amb-light-saturation)
-    calc(
-      var(--amb-key-light-intensity) * 31.5% +
-        var(--amb-fill-light-intensity) * 26.4% + 43.6%
-    )
-  );
+  --amb-shade: 0.88;
+  background-color: var(--amb-lit);
   background-image:
     radial-gradient(
-      circle,
-      hsl(
-        var(--amb-light-hue)
-        var(--amb-light-saturation)
-        calc(
-          var(--amb-key-light-intensity) * 31.5% +
-            var(--amb-fill-light-intensity) * 26.4% + 43.6%
-        )
-      ) 0 60%,
-      transparent 61%
+      circle closest-side,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% /
+        calc((var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
+          * 0.07 + 0.09)) 89%,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% /
+        calc((var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
+          * 0.02 + 0.03)) 95%,
+      transparent 100%
     ),
     repeating-conic-gradient(
       from 90deg,
+      transparent 0deg,
       hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% /
-        calc(var(--amb-key-light-intensity) * 0.35)) 0deg 1.4deg,
-      transparent 2.2deg 4.6deg,
+        calc(var(--amb-key-light-intensity) * 0.26)) 1.875deg,
+      transparent 3.75deg,
       hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% /
         calc((var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
-          * 0.3 + 0.16)) 5deg 6.4deg,
-      transparent 7.2deg 10deg
+          * 0.24 + 0.13)) 5.625deg,
+      transparent 7.5deg
     );
 }
 
-/* Fluted face (flute variant — the OP-Z-style referent: 14 broad
-   ridges split by narrow grooves, pitch 25.714deg). Flank bands sit on
-   the clip's rising (0–2.1deg) and falling (18.5–20.6deg) flanks;
-   deeper flutes catch more key light, so both bands run stronger than
-   the 36-rib knurl's. */
-.amb-knob-face-flute {
-  background-image:
-    radial-gradient(
-      circle,
-      hsl(
-        var(--amb-light-hue)
-        var(--amb-light-saturation)
-        calc(
-          var(--amb-key-light-intensity) * 31.5% +
-            var(--amb-fill-light-intensity) * 26.4% + 43.6%
-        )
-      ) 0 60%,
-      transparent 61%
-    ),
-    repeating-conic-gradient(
-      from 90deg,
-      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% /
-        calc(var(--amb-key-light-intensity) * 0.45)) 0deg 2.1deg,
-      transparent 3.2deg 17.4deg,
-      hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% /
-        calc((var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
-          * 0.35 + 0.2)) 18.5deg 20.6deg,
-      transparent 21.6deg 25.7143deg
-    );
-}
+/* Indicators. Both ride in the actuator frame, so they point at 12 o'clock
+   here and the frame's rotation carries them round to the value.
 
-/* Fine knurl (cap and wheel variants: 48 ribs, pitch 7.5deg) — the
-   36-rib pattern's angles scaled by 3/4, same flank alphas. */
-.amb-knob-face-fine {
-  background-image:
-    radial-gradient(
-      circle,
-      hsl(
-        var(--amb-light-hue)
-        var(--amb-light-saturation)
-        calc(
-          var(--amb-key-light-intensity) * 31.5% +
-            var(--amb-fill-light-intensity) * 26.4% + 43.6%
-        )
-      ) 0 60%,
-      transparent 61%
-    ),
-    repeating-conic-gradient(
-      from 90deg,
-      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% /
-        calc(var(--amb-key-light-intensity) * 0.35)) 0deg 1.05deg,
-      transparent 1.65deg 3.45deg,
-      hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% /
-        calc((var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
-          * 0.3 + 0.16)) 3.75deg 4.8deg,
-      transparent 5.4deg 7.5deg
-    );
-}
-
-/* Encoder cap (cap variant — the OP-1-style referent's smooth
-   contrasting top disc, 0.35mm proud of the knurl): the accent disc
-   replaces the surface-colored center disc over the fine knurl. */
-.amb-knob-face-cap {
-  background-image:
-    radial-gradient(circle, var(--amb-highlight-color) 0 65%, transparent 66%),
-    repeating-conic-gradient(
-      from 90deg,
-      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% /
-        calc(var(--amb-key-light-intensity) * 0.35)) 0deg 1.05deg,
-      transparent 1.65deg 3.45deg,
-      hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% /
-        calc((var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
-          * 0.3 + 0.16)) 3.75deg 4.8deg,
-      transparent 5.4deg 7.5deg
-    );
-}
-
-.amb-knob-indicator-dot {
+   The circle is the grounded referent's offset dot (knob() dot_frac 0.12,
+   dot_offset 0.68). */
+.amb-knob-indicator-circle {
   position: absolute;
   top: 16%;
   left: 50%;
@@ -309,42 +653,73 @@
   background: var(--amb-highlight-color);
 }
 
-/* Centered dot (flute variant): the OP-Z referent's dot sits in the
-   middle of the cap (dot_frac 0.32), not at the rim. */
-.amb-knob-indicator-dot-center {
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: calc(var(--ambx-knob-size) * 0.28125);
-  height: calc(var(--ambx-knob-size) * 0.28125);
-}
-
-/* Radial indicator line (line variant): the referent's accent bar,
-   center to ~85% of the cap radius, pointing at 12 o'clock. */
-.amb-knob-indicator-line {
+/* The rectangle is a short radial bar out near the rim, not a spoke from
+   the centre: it runs 0.50R to 0.84R, the proportions measured off the
+   reference panels, which is why it is stated as a top offset plus a
+   height rather than the full-radius line it replaces. Corners take a
+   quarter-grid round-over — enough to read as machined rather than
+   aliased, and far short of the pill a 50% radius would give. */
+.amb-knob-indicator-rectangle {
   position: absolute;
-  top: 12%;
+  top: 8%;
   left: 50%;
   transform: translateX(-50%);
-  width: var(--ambx-knob-line-width);
-  height: 34%;
-  border-radius: calc(var(--ambx-knob-line-width) / 2);
+  width: var(--ambx-knob-rect-width);
+  height: 17%;
+  border-radius: var(--ambx-grid-quarter);
   background: var(--amb-highlight-color);
 }
 
-.amb-knob:hover .amb-knob-indicator-dot,
-.amb-knob:hover .amb-knob-indicator-line {
+.amb-knob:hover .amb-knob-indicator-circle,
+.amb-knob:hover .amb-knob-indicator-rectangle {
   background: color-mix(in oklab, var(--amb-highlight-color), white 25%);
+}
+
+/* Printed scale markers. The ring is a zero-size point at the knob's
+   centre and each dot is placed by rotating about that centre and pushing
+   out along the rotated axis, so one angle per dot is the whole geometry —
+   and the angles come from the same sweep the value uses (ScaleRing reads
+   --ambx-travel-start/-sweep off the control), so a dot always lands where
+   its value would, whatever `travel` is set to.
+
+   Ink is --amb-label, not --amb-highlight-color: these are printed panel
+   graphics like the control's legend, not part of the control. */
+.amb-knob-marker-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.amb-knob-marker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--ambx-knob-marker-size);
+  height: var(--ambx-knob-marker-size);
+  margin: calc(var(--ambx-knob-marker-size) / -2);
+  border-radius: 50%;
+  background: var(--amb-label);
+  transform: rotate(var(--amb-marker-angle))
+    translateY(calc(-1 * var(--ambx-knob-marker-radius)));
 }
 
 /* Tracks are grounded grooves (.amb-groove supplies the recess: lit-wall
    shadow band + far-wall bounce) with a lume interior — dark in bright
    light, glowing in low light — overriding the groove's neutral floor. */
-.amb-fader {
-  position: relative;
-  width: var(--ambx-fader-track);
-  height: calc(var(--ambx-grid) * 30);
+.amb-travel-track {
+  position: absolute;
+  inset: 0;
   border-radius: var(--ambx-radius-full);
   background-color: var(--amb-lume);
+}
+
+/* The slider's referent (slider.py) is a shallow concave channel 1mm deep
+   rather than the fader's through-slot. */
+.amb-travel-track-channel {
+  --amb-thickness: 0.22;
 }
 
 /* Fader thumb: the referent (fader.py) is a pill cap on a stem — 7mm
@@ -352,11 +727,7 @@
    with a single grip line across the top. */
 .amb-fader-thumb {
   position: absolute;
-  width: var(--ambx-fader-thumb-w);
-  height: var(--ambx-fader-thumb-h);
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+  inset: 0;
   border-radius: var(--ambx-radius-md);
   display: grid;
   place-items: center;
@@ -371,27 +742,18 @@
   background: var(--amb-lume);
 }
 
-/* Slider: the referent (slider.py) is a shallow concave channel (1mm
-   deep = thickness 0.22), not a through-slot, with a domed disc thumb
-   gliding over it. */
-.amb-slider {
-  position: relative;
-  height: var(--ambx-slider-track);
-  width: calc(var(--ambx-grid) * 30);
-  border-radius: var(--ambx-radius-full);
-  background-color: var(--amb-lume);
-  --amb-thickness: 0.22;
-}
-
+/* A domed disc gliding over the channel. */
 .amb-slider-thumb {
   position: absolute;
-  width: var(--ambx-slider-thumb);
-  height: var(--ambx-slider-thumb);
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  inset: 0;
   border-radius: 50%;
   --amb-thickness: 0.7;
+}
+
+/* The fader's pill is 1.5x its width; the slider's disc is round. Both take
+   their width from the shared travel size step. */
+.amb-fader {
+  --ambx-travel-thumb-h: calc(var(--ambx-size) * 1.5);
 }
 
 .amb-led {
@@ -416,22 +778,9 @@
    in a dark stadium recess (well 1.5mm deep = thickness 0.33; the pill
    stands 2.6mm above the recess floor = thickness 0.58), with an
    optional LED above. The pill slides, nothing presses. */
-.amb-switch {
-  cursor: pointer;
-  border: none;
-  padding: 0;
-  background: none;
-  display: inline-grid;
-  justify-items: center;
-  gap: var(--ambx-grid);
-  margin: 0;
-}
-
 .amb-switch-track {
-  position: relative;
-  display: block;
-  width: var(--ambx-switch-w);
-  height: var(--ambx-switch-h);
+  position: absolute;
+  inset: 0;
   border-radius: calc(var(--ambx-switch-h) / 2);
   background-color: var(--amb-lume);
   --amb-thickness: 0.33;
@@ -439,36 +788,233 @@
 
 .amb-switch-pill {
   position: absolute;
-  top: 50%;
-  left: 0;
-  width: calc(var(--ambx-switch-w) * 0.52);
-  height: calc(var(--ambx-switch-h) * 0.78);
+  inset: 0;
   border-radius: calc(var(--ambx-switch-h) * 0.39);
-  transform: translate(calc(var(--ambx-switch-h) * 0.11), -50%);
-  transition: transform 140ms ease;
   --amb-thickness: 0.58;
 }
 
-.amb-switch-on .amb-switch-pill {
-  transform: translate(
-    calc(var(--ambx-switch-w) - 100% - var(--ambx-switch-h) * 0.11),
-    -50%
-  );
+/* The lamp sits above the track on the tight grid pitch, one tier in from
+   the label's own clearance. */
+.ambx-switch-mount {
+  display: inline-grid;
+  justify-items: center;
+  gap: var(--ambx-grid);
 }
 
 .amb-switch:hover .amb-switch-pill {
   background-color: color-mix(
     in oklab,
-    hsl(
-      var(--amb-light-hue)
-      var(--amb-light-saturation)
-      calc(
-        var(--amb-key-light-intensity) * 31.5% +
-          var(--amb-fill-light-intensity) * 26.4% + 43.6%
-      )
-    ),
+    var(--amb-lit),
     var(--amb-highlight-color) 12%
   );
+}
+
+/* Select: a bank of lamp-lit keys in a shared rail — the hardware idiom
+   for a mode/bank selector, where the state is a lamp rather than a mark.
+   Three physical layers per option, and the ORDER is the whole trick:
+
+     1. the option itself is the pocket floor, in the grounded surface tone
+     2. .amb-select-lens is the LED's lens, a big disc lying ON that floor
+     3. .amb-select-cap is a translucent diffuser sitting OVER both
+
+   The cap is .amb-mat-glass, so its backdrop-filter blurs whatever is
+   behind it — which is the lens. That single fact produces both states
+   without a second gradient anywhere: unlit, the lens body reads as a soft
+   dark circle through the frost ("the LED you can see is there"); lit, the
+   same disc blooms into a broad radial glow with a hot centre, exactly as
+   an LED does behind a diffuser. Confirmed in the browser: backdrop-filter
+   samples a positioned SIBLING, not just an ancestor's background, so the
+   lens must paint before the cap — hence the lens is absolute and the cap
+   is position: relative rather than the other way round. */
+.amb-select {
+  display: inline-flex;
+  flex-direction: column;
+  padding: var(--ambx-grid-half);          /* the clearance gap ring */
+  gap: var(--ambx-grid-half);              /* the dark rail between keys */
+  --amb-thickness: 0.27;                   /* seat depth, as .amb-button */
+  background-color: var(--amb-lume);
+  border-radius: calc(var(--ambx-radius-md) + var(--ambx-grid-half));
+}
+
+.ambx-bank-horizontal.amb-select {
+  flex-direction: row;
+}
+
+.amb-select .ambx-key {
+  /* The lamp colour. Same variable .amb-led and AmbientSwitch's led prop
+     use, so one declaration lights every indicator on a panel; unset, it
+     falls back to the scene's own accent rather than to a hardcoded hue.
+
+     Resolved HERE, on the key, not on the bank: a custom property has its
+     var()s substituted on the element that declares it, so reading
+     --amb-led-color one level up would bake in the bank's colour (or the
+     fallback) and inherit that down, and a per-key colour would never be
+     seen. Same trap --amb-curve-delta is declared per element to avoid. */
+  --_ambx-sel-color: var(--amb-led-color, var(--amb-highlight-color));
+  position: relative;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  display: grid;
+  /* Square by default, but a WORD is allowed to widen it: min-width floors
+     the key at the hardware square, and the cap (a stretched grid item, so
+     it still covers the whole face) contributes its legend's width above
+     that. A bank of numerals stays a bank of numerals; a bank of mode names
+     grows to fit and, in a column, all keys stretch to the widest. */
+  min-width: var(--ambx-select-size);
+  height: var(--ambx-select-size);
+  border-radius: var(--ambx-radius-md);
+  /* The pocket floor the lens lies on: the grounded .amb-surface tone, so
+     an unlit key reads as a lit white diffuser rather than as a hole. */
+  background-color: var(--amb-lit);
+  transition: box-shadow 140ms ease;
+}
+
+/* Disabled dims the LAMP and the legend, not the key. Fading the whole
+   option would sink it into the dark rail, and opacity on the option makes
+   it a backdrop root — the one ancestor property that can cut the cap off
+   from the lens it is supposed to be diffusing. Fading the lens instead
+   leaves the diffuser doing its job on a lamp that simply cannot light. */
+.amb-select .ambx-key:disabled {
+  cursor: not-allowed;
+  box-shadow: none;          /* a dead lamp spills nothing onto the rail */
+}
+
+.amb-select .ambx-key:disabled .amb-select-lens {
+  opacity: 0.4;
+}
+
+.amb-select .ambx-key:disabled .amb-select-cap {
+  color: color-mix(in oklab, var(--amb-label), transparent 55%);
+}
+
+.amb-select .ambx-key:focus-visible {
+  outline-offset: var(--ambx-grid-half);
+}
+
+/* The LED's lens: a big disc, not the pinprick .amb-led is — this is the
+   lamp UNDER the key, sized so the diffused circle is legible through the
+   cap (the referent's lens reads at roughly three fifths of the key). */
+.amb-select-lens {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  height: 62%;
+  aspect-ratio: 1;          /* off the HEIGHT, so a widened key keeps a
+                               round lamp rather than an overflowing one */
+  border-radius: 50%;
+  /* Unlit, the lens is a tinted lens body, not an off pixel: it sits
+     between the floor's lit tone and the same material at 0.38 of its
+     reflectance (the mid-tone plate the rig calls DARKER_ALBEDO, taken
+     off --amb-lit in LINEAR light so it darkens the panel's own colour
+     rather than replacing it with a grey), and carries a trace of its
+     own colour so an amber lamp reads
+     faintly warm while dark — 6%, enough to tell an amber lamp from a
+     cyan one up close and not enough to tint the key. Measured against
+     the referent photo, whose unlit disc dips about 5% below the
+     surrounding cap. */
+  background-color: color-mix(
+    in oklab,
+    color-mix(
+      in oklab,
+      var(--amb-lit) 45%,
+      color-mix(in srgb-linear, var(--amb-lit) 37.8%, black)
+    ),
+    var(--_ambx-sel-color) 6%
+  );
+  transition: background-color 140ms ease;
+}
+
+/* The diffuser cap. --_glass-blur is dialled down from the material's own
+   8 + 8*Ik (15.2px at the defaults): at that radius the lens washes out to
+   a flat tint and both states lose their circle. It is also tied to the
+   key rather than fixed — diffusion is a ratio of the lens it spreads, so
+   a flat radius would leave a small key soft and a large one hard-edged.
+   0.18 of the key puts md back at the 8px that read correctly against the
+   referent. */
+.amb-select-cap {
+  position: relative;      /* paints above the absolutely-placed lens */
+  display: grid;
+  place-items: center;
+  padding-inline: var(--ambx-select-pad);
+  height: 100%;
+  /* Flush with the pocket: the cap IS the key's whole visible face, so
+     the floor beneath it never shows as a rim — the dark gap between keys
+     is the rail, not a ring around each one. */
+  border-radius: var(--ambx-radius-md);
+  font-weight: 600;
+  font-size: var(--ambx-select-label-size);
+  color: var(--amb-label);
+  --_glass-blur: calc(var(--ambx-select-size) * 0.18);
+}
+
+.amb-select .ambx-key:hover .amb-select-cap {
+  color: var(--amb-highlight-color);
+}
+
+/* Pressing sinks the key, and only sinks it — same rule the button follows:
+   the drop shadow shortens and the chamfer bands narrow, nothing repaints. */
+.amb-select .ambx-key:active .amb-select-cap {
+  --amb-thickness: 0.84;
+}
+
+/* Lit. The lens goes to full lamp colour and the diffuser saturates with
+   it: the cap's own tint is mixed to 35% of the lamp over the glass wash,
+   which is what the referent measures — a flooded cap that still shows the
+   lens's hot centre through it. Past ~55% the radial disappears into a
+   flat swatch and the key stops reading as lit-from-behind. */
+.amb-select .ambx-key[data-on] .amb-select-lens {
+  background-color: var(--_ambx-sel-color);
+}
+
+.amb-select .ambx-key[data-on] .amb-select-cap {
+  background-color: color-mix(
+    in srgb,
+    var(--_ambx-sel-color) 35%,
+    hsl(
+      var(--amb-light-hue) var(--amb-light-saturation)
+      calc(var(--amb-key-light-intensity) * 100%) /
+      calc(0.05 + var(--amb-key-light-intensity) * 0.1)
+    )
+  );
+  /* The legend is printed ink: it does not light up, it silhouettes
+     against the lamp — so it darkens toward the lamp's own hue rather
+     than staying --amb-label, which inverts to pale in a dark scene and
+     would vanish against a bright cap. */
+  color: color-mix(in oklab, var(--_ambx-sel-color), black 68%);
+}
+
+/* Light escaping around the key onto the rail. Radius is the grounded
+   emissive bloom (ambient3d/derived/notes/glow.md: 6.2px = 2 sigma of the
+   measured falloff), the same figure .amb-glow uses — only the colour is
+   the lamp's rather than --amb-lume's. */
+.amb-select .ambx-key[data-on] {
+  box-shadow: 0 0 6.2px var(--_ambx-sel-color);
+}
+
+.ambx-bank {
+  --ambx-select-size: calc(var(--ambx-grid) * 11);          /* 44px key */
+  --ambx-select-pad: calc(var(--ambx-grid) * 2);
+  --ambx-select-label-size: calc(var(--ambx-grid) * 3.5);
+}
+
+.ambx-bank-sm {
+  --ambx-select-size: calc(var(--ambx-grid) * 8);           /* 32px */
+  --ambx-select-pad: calc(var(--ambx-grid) * 1.5);
+  --ambx-select-label-size: calc(var(--ambx-grid) * 2.5);
+}
+
+.ambx-bank-md {
+  --ambx-select-size: calc(var(--ambx-grid) * 11);          /* 44px */
+  --ambx-select-pad: calc(var(--ambx-grid) * 2);
+  --ambx-select-label-size: calc(var(--ambx-grid) * 3.5);
+}
+
+.ambx-bank-lg {
+  --ambx-select-size: calc(var(--ambx-grid) * 14);          /* 56px */
+  --ambx-select-pad: calc(var(--ambx-grid) * 2.5);
+  --ambx-select-label-size: calc(var(--ambx-grid) * 4.5);
 }
 
 .ambx-panel {
@@ -508,7 +1054,7 @@
   flex-direction: column;
 }
 
-.ambx-button {
+.ambx-press {
   line-height: var(--ambx-type-3-line);
   --ambx-button-size: calc(var(--ambx-grid) * 18);        /* 72px pill */
   --ambx-button-cap-pad-x: calc(var(--ambx-grid) * 2);    /* 8px */
@@ -516,21 +1062,21 @@
   --ambx-button-cap-inset: var(--ambx-grid);              /* 4px */
 }
 
-.ambx-button-sm {
+.ambx-press-sm {
   --ambx-button-size: calc(var(--ambx-grid) * 16);        /* 64px pill */
   --ambx-button-cap-pad-x: calc(var(--ambx-grid) * 1.5);  /* 6px */
   --ambx-button-cap-pad-y: var(--ambx-grid);              /* 4px */
   --ambx-button-cap-inset: calc(var(--ambx-grid) * 0.75); /* 3px */
 }
 
-.ambx-button-md {
+.ambx-press-md {
   --ambx-button-size: calc(var(--ambx-grid) * 18);        /* 72px pill */
   --ambx-button-cap-pad-x: calc(var(--ambx-grid) * 2);    /* 8px */
   --ambx-button-cap-pad-y: calc(var(--ambx-grid) * 1.5);  /* 6px */
   --ambx-button-cap-inset: var(--ambx-grid);              /* 4px */
 }
 
-.ambx-button-lg {
+.ambx-press-lg {
   --ambx-button-size: calc(var(--ambx-grid) * 20);        /* 80px pill */
   --ambx-button-cap-pad-x: calc(var(--ambx-grid) * 2.5);  /* 10px */
   --ambx-button-cap-pad-y: calc(var(--ambx-grid) * 2);    /* 8px */
@@ -540,43 +1086,23 @@
 /* Round/square shapes have their own min-width table per size (not a
    ratio of the pill's — the three shapes' true md values, 72/48/56,
    share no common factor), overridden via compound selectors so they
-   win regardless of source order relative to .ambx-button-sm/-md/-lg. */
-.amb-button-round.ambx-button-sm { --ambx-button-size: calc(var(--ambx-grid) * 10); }  /* 40px */
-.amb-button-round.ambx-button-md { --ambx-button-size: calc(var(--ambx-grid) * 12); }  /* 48px */
-.amb-button-round.ambx-button-lg { --ambx-button-size: calc(var(--ambx-grid) * 14); }  /* 56px */
+   win regardless of source order relative to .ambx-press-sm/-md/-lg. */
+.amb-button-round.ambx-press-sm { --ambx-button-size: calc(var(--ambx-grid) * 10); }  /* 40px */
+.amb-button-round.ambx-press-md { --ambx-button-size: calc(var(--ambx-grid) * 12); }  /* 48px */
+.amb-button-round.ambx-press-lg { --ambx-button-size: calc(var(--ambx-grid) * 14); }  /* 56px */
 
-.amb-button-square.ambx-button-sm { --ambx-button-size: calc(var(--ambx-grid) * 12); } /* 48px */
-.amb-button-square.ambx-button-md { --ambx-button-size: calc(var(--ambx-grid) * 14); } /* 56px */
-.amb-button-square.ambx-button-lg { --ambx-button-size: calc(var(--ambx-grid) * 16); } /* 64px */
+.amb-button-square.ambx-press-sm { --ambx-button-size: calc(var(--ambx-grid) * 12); } /* 48px */
+.amb-button-square.ambx-press-md { --ambx-button-size: calc(var(--ambx-grid) * 14); } /* 56px */
+.amb-button-square.ambx-press-lg { --ambx-button-size: calc(var(--ambx-grid) * 16); } /* 64px */
 
-.ambx-button-sm .amb-button-cap {
+.ambx-press-sm .amb-button-cap {
   font-size: var(--ambx-label-size);
   line-height: var(--ambx-label-line);
 }
 
-.ambx-button-lg .amb-button-cap {
+.ambx-press-lg .amb-button-cap {
   font-size: calc(var(--ambx-grid) * 3.5);
   line-height: calc(var(--ambx-grid) * 5);
-}
-
-.ambx-switch {
-  --ambx-switch-w: calc(var(--ambx-grid) * 12);
-  --ambx-switch-h: calc(var(--ambx-grid) * 6);
-}
-
-.ambx-switch-sm {
-  --ambx-switch-w: calc(var(--ambx-grid) * 10);
-  --ambx-switch-h: calc(var(--ambx-grid) * 5);
-}
-
-.ambx-switch-md {
-  --ambx-switch-w: calc(var(--ambx-grid) * 12);
-  --ambx-switch-h: calc(var(--ambx-grid) * 6);
-}
-
-.ambx-switch-lg {
-  --ambx-switch-w: calc(var(--ambx-grid) * 16);
-  --ambx-switch-h: calc(var(--ambx-grid) * 8);
 }
 
 .ambx-stack {
@@ -594,89 +1120,270 @@
   color: var(--amb-label);
 }
 
-.ambx-slider + .ambx-label {
+.ambx-travel-horizontal + .ambx-label {
   margin-top: var(--ambx-slider-label-clearance);
 }
 
-.ambx-fader + .ambx-label {
+.ambx-travel-vertical + .ambx-label {
   margin-top: var(--ambx-fader-label-clearance);
 }
 
-.ambx-knob + .ambx-label {
+.ambx-rotary + .ambx-label {
   margin-top: var(--ambx-knob-label-clearance);
 }
 
-.ambx-knob {
-  position: relative;
-  display: grid;
-  place-items: center;
-  touch-action: none;
-  user-select: none;
-  --ambx-knob-size: calc(var(--ambx-grid) * 16);            /* 64px */
-  --ambx-knob-line-width: calc(var(--ambx-knob-size) * 0.046875);
+/* The full ring reaches past the knob's own box, so it has to be paid for in
+   layout or it collides with whatever sits beside the knob. Geometrically only
+   three sides need it — the widest dots are the pair at ±90deg (1.33R out,
+   left and right) and the one at 12 o'clock, while the arc's bottom ends land
+   at 0.94R, inside the box — but the clearance is applied on all four sides
+   anyway, and that is deliberate: margin on three sides moves the knob off the
+   centre of its own box, so turning markers on would shift the knob down from
+   wherever a caller positioned it. Measured against the referent, the
+   three-sided version put the knob 6.4px low at the md size. The price is a
+   band of unused space under the arc; keeping the knob concentric with the box
+   it occupies is worth it.
+
+   markers="ends" gets no clearance: its two dots sit at 0.94R, so only the
+   1.3px their edges reach past the box (at md) falls outside, well inside the
+   drop shadow the knob already casts there. */
+.amb-knob-markers-full {
+  margin: var(--ambx-knob-marker-clearance);
+  --ambx-knob-marker-clearance: calc(
+    var(--ambx-knob-marker-radius) + var(--ambx-knob-marker-size) / 2 -
+      var(--ambx-knob-size) / 2
+  );
 }
 
-.ambx-knob-sm { --ambx-knob-size: calc(var(--ambx-grid) * 12); } /* 48px */
-.ambx-knob-md { --ambx-knob-size: calc(var(--ambx-grid) * 16); } /* 64px */
-.ambx-knob-lg { --ambx-knob-size: calc(var(--ambx-grid) * 20); } /* 80px */
 
-.ambx-knob-rotation {
+/* ==========================================================================
+   KIT: console
+
+   A mixer-desk visual language, measured off photographs of the real
+   controls. It dresses knobs and switches and leaves the rest to `grounded`,
+   which is what a partial third-party kit looks like.
+
+   Everything here is paint. The kit adds no behaviour and touches no
+   mechanism: the toggle's thumb travels because the latch already moves its
+   actuator frame by --ambx-percent, and the track lights because a stylesheet
+   can read that same number. If a genuinely different visual language had
+   needed new mechanism code, the v3 split would not have been clean enough.
+   ========================================================================== */
+
+/* -- console knob ---------------------------------------------------------
+   A cuboid bar standing on a flat face, housed in a circular groove cut into
+   the panel — the same construction the button uses, a groove for the
+   housing and the flat part seated in it. The bar IS the pointer, and a
+   short mark printed near one end of it says which end reads. Measured off
+   the reference: the housing ring is the button's own clearance gap and the
+   bar is 0.24 of the face it stands on. */
+.amb-console-knob {
+  border-radius: 50%;
+  /* The same gap the button leaves around its cap, and a fixed length for
+     the same reason: it is a clearance between two parts, not a feature
+     that scales with the control. */
+  --ambx-console-housing: var(--ambx-grid-half);
+  --ambx-console-face: calc(var(--ambx-size) - 2 * var(--ambx-console-housing));
+  --ambx-console-bar-width: calc(var(--ambx-console-face) * 0.24);
+  /* Just short of the face. The bar swings through every angle inside a
+     circle, so anything longer would cross the housing at the diagonals —
+     and unlike the panel graphics, which pay for their overhang in the two
+     clearance classes at the end of this block, the actuator has no margin
+     of its own to spend. */
+  --ambx-console-bar-length: calc(var(--ambx-console-face) * 0.94);
+}
+
+/* The housing: a circular groove, showing as a thin dark ring around the
+   face — the button's well, cut round. It takes the button's seat depth and
+   the button's floor colour: --amb-lume is near-black under a bright key,
+   which is what makes a clearance gap read as a gap rather than as a paler
+   ring of the same panel. */
+.amb-console-housing {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  --amb-thickness: 0.27;
+  background-color: var(--amb-lume);
+}
+
+/* The face: flat, and the panel's own surface colour. No thickness, so it
+   has no edge to catch light and casts nothing — what draws the knob's
+   outline is the dark ring of housing around it. */
+.amb-console-face {
+  position: absolute;
+  inset: var(--ambx-console-housing);
+  border-radius: 50%;
+}
+
+/* The bar rides the rotating actuator frame, so its lit edge would turn with
+   it: at 180deg the chamfer highlight would sit on the shadow side of the
+   screen and the drop shadow would fall towards the light. Rotating the
+   LIGHT the other way fixes both at once, and it is the same trick the
+   scale ring plays in reverse — the geometry is already published on the
+   root, so a stylesheet can do the trigonometry.
+
+   This outer span exists only to capture the scene's light vector: a custom
+   property cannot read itself, and `--amb-light-x: calc(var(--amb-light-x)
+   ...)` on one element is a cycle, which resolves to invalid at
+   computed-value time and takes the whole .ambient box-shadow composite
+   down with it — silently, and looking exactly like a flat rectangle. */
+.amb-console-bar {
+  position: absolute;
+  inset: 0;
+  --_ambx-console-light-x: var(--amb-light-x);
+  --_ambx-console-light-y: var(--amb-light-y);
+}
+
+/* The world light, restated in the frame's own turned coordinates: the
+   inverse rotation, [cos, sin; -sin, cos] applied to the captured vector.
+   --ambx-angle is an <angle>, which is what cos()/sin() want, so the whole
+   correction is these two lines. */
+.amb-console-bar-body {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--ambx-console-bar-width);
+  height: var(--ambx-console-bar-length);
+  margin-top: calc(var(--ambx-console-bar-length) / -2);
+  margin-left: calc(var(--ambx-console-bar-width) / -2);
+  /* A machined round-over, not a pill: the reference bar's corners are
+     barely broken. */
+  border-radius: calc(var(--ambx-size) * 0.028);
+  /* The bar is the panel's own surface colour, the same material as the
+     face it stands on, so it is not told apart by tone at all: the chamfer
+     down its long edges and the shadow it drops on the face are what read
+     as a block standing proud. */
+  --amb-light-x: calc(
+    var(--_ambx-console-light-x) * cos(var(--ambx-angle)) +
+      var(--_ambx-console-light-y) * sin(var(--ambx-angle))
+  );
+  --amb-light-y: calc(
+    var(--_ambx-console-light-y) * cos(var(--ambx-angle)) -
+      var(--_ambx-console-light-x) * sin(var(--ambx-angle))
+  );
+  /* Standing on the face, not floating above it: the block's own body casts
+     the shadow (the part carries the thickness), and elevation stays at zero
+     so the shadow hugs its shadow-side edges the way a body at rest does. */
+  --amb-elevation: 0;
+}
+
+/* The indicator: a short mark printed across the bar near one end. It is
+   ink, not geometry — no edges, no shadow — and it is inside the bar rather
+   than beside it because the bar already occupies the whole diameter it
+   would otherwise sit on. */
+.amb-console-indicator {
+  position: absolute;
+  left: 50%;
+  top: 7%;
+  width: 62%;
+  height: 7.5%;
+  transform: translateX(-50%);
+  border-radius: calc(var(--ambx-size) * 0.012);
+  background-color: color-mix(in oklab, var(--amb-lit), black 82%);
+}
+
+/* Panel graphics: the accent centre mark above the knob and the -/+ legends
+   beside it. All three sit outside the knob's own box, which is what the
+   panel frame allows — and what the two clearance classes below pay for. */
+.amb-console-marks {
   position: absolute;
   inset: 0;
 }
 
-.ambx-fader {
-  touch-action: none;
-  user-select: none;
-  --ambx-fader-track: calc(var(--ambx-grid) * 2);    /* 8px */
-  --ambx-fader-thumb-w: calc(var(--ambx-grid) * 6);  /* 24px */
-  --ambx-fader-thumb-h: calc(var(--ambx-grid) * 9);  /* 36px */
+.amb-console-mark {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  width: calc(var(--ambx-size) * 0.085);
+  height: calc(var(--ambx-size) * 0.2);
+  margin-bottom: calc(var(--ambx-size) * 0.07);
+  border-radius: var(--ambx-radius-sm);
+  background-color: var(--ambx-accent);
+  transform: translateX(-50%);
 }
 
-.ambx-fader-sm {
-  --ambx-fader-track: calc(var(--ambx-grid) * 1.5);   /* 6px */
-  --ambx-fader-thumb-w: calc(var(--ambx-grid) * 5);   /* 20px */
-  --ambx-fader-thumb-h: calc(var(--ambx-grid) * 7.5); /* 30px */
+.amb-console-legend {
+  position: absolute;
+  top: 58%;
+  font-size: calc(var(--ambx-size) * 0.26);
+  line-height: 1;
+  color: var(--amb-label);
 }
 
-.ambx-fader-md {
-  --ambx-fader-track: calc(var(--ambx-grid) * 2);    /* 8px */
-  --ambx-fader-thumb-w: calc(var(--ambx-grid) * 6);  /* 24px */
-  --ambx-fader-thumb-h: calc(var(--ambx-grid) * 9);  /* 36px */
+.amb-console-legend-min {
+  right: 100%;
+  margin-right: calc(var(--ambx-size) * 0.1);
 }
 
-.ambx-fader-lg {
-  --ambx-fader-track: calc(var(--ambx-grid) * 3);    /* 12px */
-  --ambx-fader-thumb-w: calc(var(--ambx-grid) * 8);  /* 32px */
-  --ambx-fader-thumb-h: calc(var(--ambx-grid) * 12); /* 48px */
+.amb-console-legend-max {
+  left: 100%;
+  margin-left: calc(var(--ambx-size) * 0.1);
 }
 
-.ambx-fader-thumb {
-  transform: translate(-50%, -50%);
+/* Clearance for graphics that overflow the control's box. The centre mark
+   only reaches upward, so unlike the grounded marker ring — which is paid
+   for on all four sides to keep the knob concentric — this one is a top
+   margin, and the knob deliberately sits low in its box because that is
+   where the mark puts it. */
+.amb-console-knob-marked {
+  margin-top: calc(var(--ambx-size) * 0.3);
 }
 
-.ambx-slider {
-  touch-action: none;
-  user-select: none;
-  --ambx-slider-track: calc(var(--ambx-grid) * 2);  /* 8px */
-  --ambx-slider-thumb: calc(var(--ambx-grid) * 6);  /* 24px */
+.amb-console-knob-legended {
+  margin-inline: calc(var(--ambx-size) * 0.34);
 }
 
-.ambx-slider-sm {
-  --ambx-slider-track: calc(var(--ambx-grid) * 1.5); /* 6px */
-  --ambx-slider-thumb: calc(var(--ambx-grid) * 5);   /* 20px */
+/* -- console toggle -------------------------------------------------------
+   A pill track that fills with the accent as the switch travels, carrying a
+   round accent thumb inside a white ring. Track 2.06:1; the thumb takes 0.9
+   of the track height, which is a thumb that nearly fills its groove — the
+   clearance has to come down with it or a thumb that size runs off the ends
+   of its own travel. */
+.amb-console-toggle {
+  --ambx-switch-w: calc(var(--ambx-grid) * 13);
+  --ambx-switch-h: calc(var(--ambx-grid) * 6.3);
+  --ambx-latch-thumb-w: calc(var(--ambx-switch-h) * 0.9);
+  --ambx-latch-thumb-h: calc(var(--ambx-switch-h) * 0.9);
+  --ambx-latch-inset: calc(var(--ambx-switch-h) * 0.05);
 }
 
-.ambx-slider-md {
-  --ambx-slider-track: calc(var(--ambx-grid) * 2); /* 8px */
-  --ambx-slider-thumb: calc(var(--ambx-grid) * 6); /* 24px */
+/* The track is a pure-CSS part: it reads --ambx-percent off the control root
+   and mixes its own colour from it, so it lights and dims with the travel
+   without the mechanism knowing this element exists. */
+.amb-console-track {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--ambx-radius-full);
+  background-color: color-mix(
+    in oklab,
+    color-mix(in oklab, var(--amb-lit), black 55%),
+    var(--ambx-accent) calc(var(--ambx-percent) * 100%)
+  );
+  --amb-thickness: 0.4;
+  transition: background-color 160ms ease;
 }
 
-.ambx-slider-lg {
-  --ambx-slider-track: calc(var(--ambx-grid) * 3); /* 12px */
-  --ambx-slider-thumb: calc(var(--ambx-grid) * 8); /* 32px */
+/* Flat-topped, but a body: `.ambient` with a thickness and NO edge
+   treatment, which is the combination that casts a drop shadow while
+   leaving the top face unbroken — the chamfer and fillet layers of the
+   composite are gated on their own properties, and neither is set here. */
+.amb-console-thumb {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background-color: color-mix(in oklab, var(--ambx-accent), white 12%);
+  /* The white ring is a BORDER, not a spread shadow. Two reasons, and the
+     second is the load-bearing one: with the package's border-box reset the
+     ring grows inward, so the thumb keeps the outer diameter measured off
+     the reference — and `box-shadow` is the property `.ambient` composites
+     the whole lighting model into, so setting it here would silently wipe
+     the drop shadow the thickness above is there to cast. */
+  border: calc(var(--ambx-latch-thumb-h) * 0.09) solid
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 99%);
 }
 
-.ambx-slider-thumb {
-  transform: translate(-50%, -50%);
+@media (prefers-reduced-motion: reduce) {
+  .amb-console-track {
+    transition: none;
+  }
 }

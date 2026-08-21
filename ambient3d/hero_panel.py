@@ -59,6 +59,11 @@ FRAMES_TILT = 54        # beat B: tilt down to flat
 REFERENT_FOR = {
     ("knob", "dot"): "knob",
     ("knob", "line"): "knob-line",
+    ("knob", "smooth"): "knob-smooth",
+    ("knob", "markers"): "knob-markers",
+    # kit-only knob styles: no AmbientKnob counterpart since it collapsed to
+    # knurling/markers/indicator, so a layout using these would wipe between
+    # two different knobs. Left mapped for the generate.py catalog scenes.
     ("knob", "flute"): "knob-flute",
     ("knob", "cap"): "knob-cap",
     ("knob", "wheel"): "knob-wheel",
@@ -169,7 +174,7 @@ def build_screen(spec, body, face_z):
     """A recess in the faceplate with a dark floor — the display cutout.
     Physically a groove (components/plate.py build_groove is its calibration
     referent) lined with the accent material, which is what the CSS peer
-    `.amb-groove.amb-surface-darkest` paints."""
+    `.amb-groove` with --amb-shade: 0.07 paints."""
     w, d = spec["size"]
     recess = am.thickness_mm(ap.amb(**spec.get("amb", {})))
     x, y = spec["x"], spec["y"]

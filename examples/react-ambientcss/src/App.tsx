@@ -36,8 +36,8 @@ export function App() {
 
         <div className="row">
           <AmbientSwitch
-            checked={enabled}
-            onCheckedChange={setEnabled}
+            value={enabled}
+            onChange={setEnabled}
             led
             label="Power"
           />

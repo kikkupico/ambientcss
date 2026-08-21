@@ -1,0 +1,116 @@
+#+TITLE: Control kits — one mechanism, many visual identities
+#+DATE: 2026-08-19
+#+STATUS: proposal
+
+* What v3 left on the table
+
+v3 split each control into a mechanism and a skin, and then shipped exactly one
+skin: the Blender-grounded hardware look. Composing a different one works —
+that was the whole point — but there is no way to say *"dress this whole panel
+in that other look."* Every call site has to pass its own ~parts~.
+
+A *kit* closes that: a named bundle of parts, tokens and defaults that an app
+turns on once, and that a third party can publish without forking anything.
+
+* Two reference controls
+
+The first non-default kit is built from two real controls, measured off
+photographs (see ~measurements~ below):
+
+- A *console knob*: a black bezel ring, a face milled flat at 45° so half of it
+  is cream and half catches a cold sky reflection, a short black pointer bar at
+  the rim, and — crucially — an orange centre mark printed on the panel *above*
+  the knob, outside its own box.
+- A *toggle*: a pill track that fills with the accent when on and goes dark
+  when off, carrying a round accent thumb inside a white ring.
+
+Neither is expressible as an option on the grounded parts, and that is the
+point: they are a different visual language, not a variant of this one.
+
+** Measurements
+
+Toggle, in source pixels: track 64 x 31 (2.06:1), thumb 25 diameter
+(0.81 of the track height), white ring ~2.5 (0.1 of the thumb), thumb inset
+~0.1 of the track height from each end. Track is the accent when on and a
+neutral ~#484849 when off; the thumb is the accent in both states, reading
+lighter against a lit track because the track carries the same hue.
+
+Knob: bezel ring ~0.1 of the diameter, face split on a 45deg diagonal,
+pointer bar at the rim, centre mark clear of the knob body.
+
+* What a kit is
+
+#+begin_src tsx
+export type ControlKit = {
+  name: string;
+  /** Token class applied to every control the kit dresses. */
+  className?: string;
+  rotary?: (look: KnobLook) => ControlParts;
+  travel?: (look: TravelLook) => ControlParts;
+  press?:  (look: PressLook)  => ControlParts;
+  latch?:  (look: LatchLook)  => ControlParts;
+  bank?:   (look: BankLook)   => ControlParts;
+  /** Per-family prop defaults — a kit may want its knobs at 300deg. */
+  defaults?: { rotary?: Partial<AmbientRotaryProps>; /* … */ };
+};
+#+end_src
+
+Three things and no more: *what the parts are*, *what tokens they need*, and
+*what the mechanism should default to*. A kit is a plain object, so publishing
+one is publishing a module — no plugin registry, no lifecycle, nothing to
+initialise.
+
+#+begin_src tsx
+<AmbientKitProvider kit={console}>
+  <AmbientKnob label="Level" />
+  <AmbientSwitch label="On" led />
+</AmbientKitProvider>
+#+end_src
+
+* The hard part: look props are kit vocabulary
+
+~AmbientKnob~ takes ~knurling~, ~markers~ and ~indicator~. Those are *grounded*
+words. The console knob has no knurl and no marker ring; it has a bezel, a
+milled face and a centre mark. A kit system has to answer what happens to
+~knurling={false}~ when the active kit has never heard of knurling.
+
+Three answers, and the one this proposal picks:
+
+1. *Per-kit presets.* Each kit exports its own ~Knob~, fully typed in its own
+   vocabulary. Honest and simple, but switching kits means switching imports,
+   so an app cannot re-dress a tree it does not own.
+2. *Intersect the vocabularies.* Only props every kit implements are allowed.
+   This shrinks to nearly nothing and punishes the rich kit for being rich.
+3. *Look props pass through; a kit reads what it understands.* ← *chosen.*
+   ~AmbientKnob~'s props stay typed as the default kit's vocabulary, since that
+   is what the overwhelming majority of callers use. Another kit receives the
+   same bag and ignores the words it does not know.
+
+(3) is what a CSS theme already does — a stylesheet that does not implement
+~.amb-knob-markers-full~ simply does not react to it — and it keeps the common
+path fully typed with no generics leaking into every call site. The cost is a
+silent no-op, so a kit declares the look keys it honours and a dev-only check
+warns when a caller passes one the active kit will drop.
+
+* Why the state channel makes this cheap
+
+A kit author writes parts, not behaviour. Everything a part needs to react to
+is already published on the control root — ~--ambx-percent~, ~--ambx-angle~,
+~--ambx-size~, ~data-dragging~ — so most of a kit is a stylesheet and a handful
+of ~<span>~s. The console toggle's thumb is one element whose position the
+mechanism already animates; the kit only says what it looks like.
+
+That is the real test of v3: if a genuinely different visual language needs
+*any* new mechanism code, the split was not clean enough.
+
+* Scope of the first cut
+
+- ~core/kit.tsx~ — the type, ~AmbientKitProvider~, ~useKit~.
+- ~kits/grounded.tsx~ — today's parts, packaged as the default kit, so the
+  built-in look goes through exactly the same door a third party would use.
+- ~kits/console.tsx~ — the two reference controls, plus the other three
+  families in the same language so the kit is coherent rather than a demo.
+- Presets resolve ~kit.<family>(look)~ and fall back to grounded.
+
+If the grounded look cannot be expressed as a kit, the abstraction is wrong —
+so it goes first, and its parts do not get a private back door.

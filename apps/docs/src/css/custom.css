@@ -67,6 +67,38 @@
   color: var(--ifm-color-emphasis-800);
 }
 
+/* Kit samples: two versions of the same controls side by side. The gap
+   BETWEEN the columns has to beat the gap inside them or the six controls
+   read as one loose row instead of two groups. */
+.docs-kit-columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 44px;
+  align-items: flex-start;
+}
+
+.docs-kit-column {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+}
+
+/* Fixed height, not natural: a console knob reserves room for the marks
+   printed around it and a grounded knob does not, so equal-height rows are
+   the only way the captions under them land on the same line.
+
+   Bottom-aligned, not centred, because every control's own label is the last
+   thing in its box — hanging the boxes from their bottoms puts all the labels
+   on one line, and lets the difference in height show up where it actually
+   is: above the control. */
+.docs-kit-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 24px;
+  height: 116px;
+}
+
 .docs-css-examples {
   display: grid;
   gap: 16px;

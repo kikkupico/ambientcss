@@ -37,7 +37,7 @@ export function ChannelStrip() {
       }}
     >
       <AmbientButton>Play</AmbientButton>
-      <AmbientSwitch label="Arm" checked={armed} onCheckedChange={setArmed} led="#ef4444" />
+      <AmbientSwitch label="Arm" value={armed} onChange={setArmed} led="#ef4444" />
       <AmbientKnob label="Gain" value={gain} onChange={setGain} />
       <AmbientFader label="Level" value={level} onChange={setLevel} />
     </AmbientPanel>
@@ -63,7 +63,7 @@ export function ThemeToggleShell() {
       }
     >
       <AmbientPanel>
-        <AmbientSwitch label="Warm Mode" checked={warm} onCheckedChange={setWarm} />
+        <AmbientSwitch label="Warm Mode" value={warm} onChange={setWarm} />
       </AmbientPanel>
     </AmbientProvider>
   );

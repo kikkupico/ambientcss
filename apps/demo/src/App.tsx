@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import {
   AmbientProvider,
   AmbientButton,
@@ -6,9 +7,12 @@ import {
   AmbientFader,
   AmbientSlider,
   AmbientSwitch,
+  AmbientSelect,
   AmbientPanel,
+  AmbientKitProvider,
+  consoleKit,
+  ConsoleKnob,
   type AmbientTheme,
-  type AmbientKnobVariant,
 } from "@ambientcss/components";
 
 /* The README hero film (tools/hero-gif): the same device raytraced in
@@ -82,14 +86,20 @@ const THEME_PRESETS: ThemePreset[] = [
 
 const DEFAULTS = THEME_PRESETS[0]!;
 
-/* The settings pulldown is a little lighting console: one AmbientKnob per
-   light parameter. The knobs themselves re-shade as you turn them, since
-   they're lit by the very light they control. */
-type KnobCfg = {
+/* The settings pulldown is a little lighting console, and the SHAPE of each
+   control is the argument: a light vector is a position in the plane, so
+   Light X lies along a horizontal slider and Light Y stands up a fader —
+   the pair reads as the two axes of the lamp's placement rather than as two
+   more dials. The two intensities are hardware knobs, and the three colour
+   parameters are the console kit's bar knobs, which groups them by what they
+   do without a caption saying so.
+
+   The knobs re-shade as you turn them, since they're lit by the very light
+   they control. */
+type ControlCfg = {
   key: string;
   label: string;
   prop: keyof AmbientTheme;
-  variant: AmbientKnobVariant;
   min: number;
   max: number;
   step: number;
@@ -97,22 +107,41 @@ type KnobCfg = {
   to: (v: number) => number;
 };
 
-const LIGHT_KNOBS: KnobCfg[] = [
-  { key: "lx",   label: "Light X", prop: "lightX",         variant: "line",  min: -100, max: 100, step: 2, value: (t) => Math.round(t.lightX * 100),  to: (v) => v / 100 },
-  { key: "ly",   label: "Light Y", prop: "lightY",         variant: "line",  min: -100, max: 100, step: 2, value: (t) => Math.round(t.lightY * 100),  to: (v) => v / 100 },
-  { key: "key",  label: "Key",     prop: "keyLight",       variant: "dot",   min: 0,    max: 100, step: 1, value: (t) => Math.round(t.keyLight * 100), to: (v) => v / 100 },
-  { key: "fill", label: "Fill",    prop: "fillLight",      variant: "dot",   min: 0,    max: 100, step: 1, value: (t) => Math.round(t.fillLight * 100), to: (v) => v / 100 },
-  { key: "hue",  label: "Hue",     prop: "lightHue",       variant: "flute", min: 0,    max: 360, step: 2, value: (t) => Math.round(t.lightHue),       to: (v) => v },
-  { key: "sat",  label: "Sat",     prop: "lightSaturation", variant: "dot",  min: 0,    max: 100, step: 1, value: (t) => Math.round(t.lightSaturation), to: (v) => v },
-  { key: "lume", label: "Lume",    prop: "lumeHue",        variant: "cap",   min: 0,    max: 360, step: 2, value: (t) => Math.round(t.lumeHue),        to: (v) => v },
+/* The lamp's position: bipolar, -100..100, zero at centre.
+
+   Y IS INVERTED, and that is the whole reason it is worth spelling the two
+   axes out separately. --amb-light-y points DOWN the screen, so the lamp
+   overhead is -1; a fader whose travel ran with the property would put the
+   light above the panel when the cap is at the BOTTOM, which is exactly the
+   confusion a control shaped like the thing it moves is supposed to remove.
+   The slider needs no such flip: +x is already to the right. */
+const LIGHT_AXES: Record<"x" | "y", ControlCfg> = {
+  x: { key: "lx", label: "Light X", prop: "lightX", min: -100, max: 100, step: 2, value: (t) => Math.round(t.lightX * 100),  to: (v) => v / 100 },
+  y: { key: "ly", label: "Light Y", prop: "lightY", min: -100, max: 100, step: 2, value: (t) => Math.round(t.lightY * -100), to: (v) => -v / 100 },
+};
+
+/* The two intensities, on grounded knobs. Their grips take a dark knurl:
+   the well they sit in is darker than the panel, and a knob whose rim is
+   the panel's own pale metal reads as floating over it rather than seated
+   in it. --amb-albedo, so the ribs still take the scene's light. */
+const LEVEL_KNOBS: ControlCfg[] = [
+  { key: "key",  label: "Key",  prop: "keyLight",  min: 0, max: 100, step: 1, value: (t) => Math.round(t.keyLight * 100),  to: (v) => v / 100 },
+  { key: "fill", label: "Fill", prop: "fillLight", min: 0, max: 100, step: 1, value: (t) => Math.round(t.fillLight * 100), to: (v) => v / 100 },
 ];
+
+/* Everything chromatic, on the console kit's bar knobs. */
+const TONE_KNOBS: ControlCfg[] = [
+  { key: "hue",  label: "Hue",  prop: "lightHue",        min: 0, max: 360, step: 2, value: (t) => Math.round(t.lightHue),        to: (v) => v },
+  { key: "sat",  label: "Sat",  prop: "lightSaturation", min: 0, max: 100, step: 1, value: (t) => Math.round(t.lightSaturation), to: (v) => v },
+  { key: "lume", label: "Lume", prop: "lumeHue",         min: 0, max: 360, step: 2, value: (t) => Math.round(t.lumeHue),         to: (v) => v },
+];
+
+/* The knurl tone the console's knobs wear, dark enough to read against the
+   well's floor. A reflectance, not a paint: it still darkens with the key. */
+const DARK_KNURL = "color(srgb-linear 0.09 0.09 0.1)";
 
 const ORBIT_COUNT = 9;
 const ANIM_DURATION = 800; // ms for preset transitions
-
-// Each cord is a short chain of shiny ambient balls; the topmost sit behind
-// the panel so a pull pays more of them out from under its edge.
-const CHAIN_BEADS = Array.from({ length: 6 });
 
 /* ══════════════════════════════════════════════════════════════════════════
    APP
@@ -223,10 +252,20 @@ export function App() {
   /* Component demo state (local dummies) ---------------------------------- */
   const [knob1, setKnob1] = useState(65);
   const [knob2, setKnob2] = useState(30);
+  const [knob3, setKnob3] = useState(48);
+  const [knob4, setKnob4] = useState(62);
   const [slider1, setSlider1] = useState(50);
   const [fader1, setFader1] = useState(70);
+  const [bank, setBank] = useState("3");
+  const [armed, setArmed] = useState<string[]>(["A", "C"]);
   const [sw1, setSw1] = useState(true);
   const [sw2, setSw2] = useState(false);
+
+  /* The kit section drives BOTH columns off one pair of values. Turning the
+     grounded knob turns the console knob with it, which is the point: the
+     call site and the state are the same, only the kit above them differs. */
+  const [kitLevel, setKitLevel] = useState(68);
+  const [kitOn, setKitOn] = useState(true);
 
   /* The hero film loops on its own; under prefers-reduced-motion it becomes
      an ordinary paused video the visitor can start themselves. */
@@ -238,9 +277,11 @@ export function App() {
   const thickView = useInView(0.2);
   const surfView = useInView(0.2);
   const matView = useInView(0.2);
+  const matColorView = useInView(0.15);
   const edgeView = useInView(0.2);
   const grooveView = useInView(0.2);
   const compView = useInView(0.1);
+  const kitView = useInView(0.1);
   const finaleView = useInView(0.3);
 
   /* Section refs for scroll navigation ------------------------------------ */
@@ -250,9 +291,11 @@ export function App() {
   const thickSectionRef = useRef<HTMLElement>(null);
   const surfSectionRef = useRef<HTMLElement>(null);
   const matSectionRef = useRef<HTMLElement>(null);
+  const matColorSectionRef = useRef<HTMLElement>(null);
   const edgeSectionRef = useRef<HTMLElement>(null);
   const grooveSectionRef = useRef<HTMLElement>(null);
   const compSectionRef = useRef<HTMLElement>(null);
+  const kitSectionRef = useRef<HTMLElement>(null);
 
   /* Orbit: pointer/touch-driven light direction ───────────────────────── */
   const [orbitLight, setOrbitLight] = useState({ x: -1, y: -1 });
@@ -291,7 +334,7 @@ export function App() {
     <AmbientProvider className="amb-surface" theme={theme}>
 
       {/* ── HEADER — global light control ────────────────────────────── */}
-      <PullCordSwitcher
+      <ThemeSwitcher
         theme={mergedTheme}
         activePreset={activePreset}
         onPreset={animateToPreset}
@@ -369,7 +412,7 @@ export function App() {
             {([0, 1, 2, 3] as const).map((elev, i) => (
               <div className="elevation-item" key={elev}>
                 <div
-                  className={`elevation-circle ambient amb-surface-lighter amb-elevation-${elev}`}
+                  className={`elevation-circle ambient amb-surface amb-elevation-${elev}`}
                   data-visible={elevView.visible}
                   style={{ transitionDelay: `${i * 0.08}s` }}
                 />
@@ -378,7 +421,7 @@ export function App() {
             ))}
             <div className="elevation-item">
               <div
-                className="elevation-circle ambient amb-surface-lighter amb-bounce"
+                className="elevation-circle ambient amb-surface amb-bounce"
                 data-visible={elevView.visible}
                 style={{ transitionDelay: "0.32s" }}
               />
@@ -401,7 +444,7 @@ export function App() {
             ].map(({ t, label }, i) => (
               <div className="elevation-item" key={t}>
                 <div
-                  className={`elevation-circle ambient amb-surface-lighter amb-chamfer amb-thickness-${t}`}
+                  className={`elevation-circle ambient amb-surface amb-chamfer amb-thickness-${t}`}
                   data-visible={thickView.visible}
                   style={{ transitionDelay: `${i * 0.1}s` }}
                 />
@@ -441,11 +484,19 @@ export function App() {
       <section className="scene amb-surface" ref={matSectionRef}>
         <div className="scene-inner" ref={matView.ref}>
           <div className="scene-label">Materials</div>
-          <div className="surface-gallery">
+          <div className="surface-gallery materials-gallery">
             {[
+              /* No --amb-albedo pins here on purpose: brushed, spun and
+                 blasted carry no colour of their own (@ambientcss/css),
+                 same as matte and shiny — this gallery is about relief and
+                 specular, not tone, so every finish sits at the one plain
+                 default. Colour is the Material Colour section's job. */
               { mat: "matte" as const, label: "Matte" },
               { mat: "shiny" as const, label: "Shiny" },
               { mat: "glass" as const, label: "Glass" },
+              { mat: "brushed" as const, label: "Brushed" },
+              { mat: "brushed-round" as const, label: "Spun" },
+              { mat: "blasted" as const, label: "Blasted" },
             ].map(({ mat, label }, i) => (
               <div className="surface-item" key={label}>
                 <div style={{ position: "relative" }}>
@@ -454,14 +505,14 @@ export function App() {
                       className="moving-circle"
                       style={{
                         position: "absolute",
-                        width: "90px",
-                        height: "90px",
+                        width: "48px",
+                        height: "48px",
                         borderRadius: "50%",
                         background: "var(--amb-highlight-color)",
                         top: "50%",
                         left: "50%",
-                        marginTop: "-45px",
-                        marginLeft: "-45px",
+                        marginTop: "-24px",
+                        marginLeft: "-24px",
                         zIndex: 0,
                         opacity: 0.8,
                       }}
@@ -487,6 +538,106 @@ export function App() {
           </div>
         </div>
         <ScrollButton sectionRef={matSectionRef} />
+      </section>
+
+      {/* ── 5b. MATERIAL COLOUR ──────────────────────────────────────── */}
+      <section className="scene amb-surface" ref={matColorSectionRef}>
+        <div className="scene-inner" ref={matColorView.ref}>
+          <div className="scene-label">Material Colour</div>
+          <div className="scene-hint">--amb-albedo retints any finish — glass takes the light's hue instead</div>
+          <div className="material-color-wall">
+            {[
+              {
+                mat: "matte" as const,
+                label: "Matte",
+                round: false,
+                swatches: [
+                  { name: "Default" },
+                  { name: "Oxide", albedo: "#7a3b2e" },
+                  { name: "Steel", albedo: "#24405c" },
+                  { name: "Brass", albedo: "#8a6a1f" },
+                ],
+              },
+              {
+                mat: "shiny" as const,
+                label: "Shiny",
+                round: false,
+                swatches: [
+                  { name: "Default" },
+                  { name: "Oxide", albedo: "#7a3b2e" },
+                  { name: "Steel", albedo: "#24405c" },
+                  { name: "Brass", albedo: "#8a6a1f" },
+                ],
+              },
+              {
+                mat: "glass" as const,
+                label: "Glass",
+                round: false,
+                swatches: [
+                  { name: "Default" },
+                  { name: "Violet", hue: 280, sat: "55%" },
+                  { name: "Amber", hue: 35, sat: "60%" },
+                  { name: "Teal", hue: 175, sat: "50%" },
+                ],
+              },
+              {
+                mat: "brushed" as const,
+                label: "Brushed",
+                round: false,
+                swatches: [
+                  { name: "Default" },
+                  { name: "Oxide", albedo: "#7a3b2e" },
+                  { name: "Steel", albedo: "#24405c" },
+                  { name: "Brass", albedo: "#8a6a1f" },
+                ],
+              },
+              {
+                mat: "brushed-round" as const,
+                label: "Spun",
+                round: true,
+                swatches: [
+                  { name: "Default" },
+                  { name: "Oxide", albedo: "#7a3b2e" },
+                  { name: "Steel", albedo: "#24405c" },
+                  { name: "Black chrome", albedo: "#1a1a1a" },
+                ],
+              },
+              {
+                mat: "blasted" as const,
+                label: "Blasted",
+                round: false,
+                swatches: [
+                  { name: "Default" },
+                  { name: "Crimson", albedo: "#6e1f24" },
+                  { name: "Navy", albedo: "#1c2c4a" },
+                  { name: "Olive", albedo: "#3c4526" },
+                ],
+              },
+            ].map((group) => (
+              <div className="material-color-row" key={group.mat}>
+                <span className="material-color-row-label">{group.label}</span>
+                <div className="material-color-swatches">
+                  {group.swatches.map((sw, i) => (
+                    <div className="material-color-item" key={sw.name}>
+                      <AmbientPanel
+                        material={group.mat}
+                        className={`material-color-swatch${group.round ? " is-round" : ""}`}
+                        data-visible={matColorView.visible}
+                        style={{
+                          transitionDelay: `${i * 0.06}s`,
+                          ...("albedo" in sw ? { "--amb-albedo": sw.albedo } : {}),
+                          ...("hue" in sw ? { "--amb-light-hue": sw.hue, "--amb-light-saturation": sw.sat } : {}),
+                        } as React.CSSProperties}
+                      />
+                      <span className="material-color-name">{sw.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <ScrollButton sectionRef={matColorSectionRef} />
       </section>
 
       {/* ── 6. EDGE TREATMENTS ───────────────────────────────────────── */}
@@ -548,7 +699,16 @@ export function App() {
               <AmbientKnob value={knob1} onChange={setKnob1} label="Knob" />
             </div>
             <div className="component-cell" data-visible={compView.visible}>
-              <AmbientKnob value={knob2} onChange={setKnob2} variant="flute" label="Knob" />
+              {/* All three knob axes at once, against the default beside it:
+                  smooth body, printed marker ring, rectangle pointer. */}
+              <AmbientKnob
+                value={knob2}
+                onChange={setKnob2}
+                knurling={false}
+                markers="full"
+                indicator="rectangle"
+                label="Knob"
+              />
             </div>
             <div className="component-cell" data-visible={compView.visible}>
               <AmbientSlider value={slider1} min={0} max={100} onChange={setSlider1} label="Slider" />
@@ -557,10 +717,10 @@ export function App() {
               <AmbientFader value={fader1} min={0} max={100} onChange={setFader1} label="Fader" />
             </div>
             <div className="component-cell" data-visible={compView.visible}>
-              <AmbientSwitch checked={sw1} onCheckedChange={setSw1} led label="Switch" />
+              <AmbientSwitch value={sw1} onChange={setSw1} led label="Switch" />
             </div>
             <div className="component-cell" data-visible={compView.visible}>
-              <AmbientSwitch checked={sw2} onCheckedChange={setSw2} led="amber" label="Switch" />
+              <AmbientSwitch value={sw2} onChange={setSw2} led="amber" label="Switch" />
             </div>
             <div className="component-cell" data-visible={compView.visible}>
               <AmbientButton>Button</AmbientButton>
@@ -570,6 +730,70 @@ export function App() {
             </div>
             <div className="component-cell" data-visible={compView.visible}>
               <AmbientButton shape="square">FX</AmbientButton>
+            </div>
+            <div className="component-cell" data-visible={compView.visible}>
+              {/* The cap spends its own ::after on the dish, so a relief
+                  material rides an inner layer under it. Blasted carries
+                  no --amb-albedo of its own (@ambientcss/css), so this pins
+                  the reference tone it was fitted at — bead-blasted
+                  aluminium, light grey with a dense sparkle. Leave it off
+                  to blast whatever tone the surface already carries. */}
+              <AmbientButton
+                shape="square"
+                material="blasted"
+                style={{ "--amb-albedo": "color(srgb-linear 0.446 0.446 0.446)" } as React.CSSProperties}
+              >
+                PAD
+              </AmbientButton>
+            </div>
+            <div className="component-cell" data-visible={compView.visible}>
+              {/* Brushed metal never rotates its grain: turn this knob and the
+                  streaks stay put while the shading crosses them. Smooth-bodied
+                  on purpose — the knurled rim rides the rotating frame, so its
+                  grain would turn with it and say the opposite. */}
+              <AmbientKnob
+                value={knob3}
+                onChange={setKnob3}
+                material="brushed"
+                knurling={false}
+                label="Knob"
+              />
+            </div>
+            <div className="component-cell" data-visible={compView.visible}>
+              {/* The spun finish, which is what a knob cap actually wears —
+                  and the one metal a rotating part may carry, because a grain
+                  that turns about the same centre the part does looks the
+                  same at every angle. Dark knurl round a pale cap: two tones,
+                  one control. */}
+              <AmbientKnob
+                value={knob4}
+                onChange={setKnob4}
+                material="brushed-round"
+                knurlColor="color(srgb-linear 0.09 0.09 0.1)"
+                label="Knob"
+              />
+            </div>
+            <div className="component-cell" data-visible={compView.visible}>
+              <AmbientSelect
+                size="sm"
+                options={[{ value: "1" }, { value: "2" }, { value: "3" }, { value: "4" }]}
+                value={bank}
+                onChange={(v) => setBank(v as string)}
+                color="#22d3d3"
+                label="Bank"
+              />
+            </div>
+            <div className="component-cell" data-visible={compView.visible}>
+              <AmbientSelect
+                multiple
+                size="sm"
+                orientation="horizontal"
+                options={[{ value: "A" }, { value: "B" }, { value: "C" }]}
+                value={armed}
+                onChange={(v) => setArmed(v as string[])}
+                color="#4ade80"
+                label="Arm"
+              />
             </div>
           </div>
           <div className="comp-led-row" data-visible={compView.visible}>
@@ -581,7 +805,39 @@ export function App() {
         <ScrollButton sectionRef={compSectionRef} />
       </section>
 
-      {/* ── 8. FINALE ────────────────────────────────────────────────── */}
+      {/* ── 8. KITS ───────────────────────────────────────────────────── */}
+      <section className="scene amb-surface" ref={kitSectionRef}>
+        <div className="scene-inner" ref={kitView.ref}>
+          <div className="scene-label">Kits</div>
+          <div className="scene-subtitle">(react only)</div>
+          <div className="scene-hint">
+            One call site, two looks — grab either knob and both follow
+          </div>
+          <div className="component-stage kit-stage">
+            <div className="component-cell" data-visible={kitView.visible}>
+              <div className="kit-row">
+                <AmbientKnob value={kitLevel} onChange={setKitLevel} label="Level" />
+                <AmbientSwitch value={kitOn} onChange={setKitOn} led label="On" />
+              </div>
+              <div className="kit-name">grounded</div>
+            </div>
+            <div className="component-cell" data-visible={kitView.visible}>
+              {/* The identical markup, one provider deeper. No prop below
+                  this line knows which kit it is being painted by. */}
+              <AmbientKitProvider kit={consoleKit}>
+                <div className="kit-row">
+                  <AmbientKnob value={kitLevel} onChange={setKitLevel} label="Level" />
+                  <AmbientSwitch value={kitOn} onChange={setKitOn} led label="On" />
+                </div>
+              </AmbientKitProvider>
+              <div className="kit-name">consoleKit</div>
+            </div>
+          </div>
+        </div>
+        <ScrollButton sectionRef={kitSectionRef} />
+      </section>
+
+      {/* ── 9. FINALE ────────────────────────────────────────────────── */}
       <section className="finale amb-surface" ref={finaleView.ref}>
         <div>
           <div className="finale-text" data-visible={finaleView.visible}>
@@ -610,7 +866,7 @@ export function App() {
 
           <div className="finale-links">
             <a
-              className="finale-link amb-button amb-groove ambx-button"
+              className="finale-link amb-button amb-groove ambx-press ambx-press-md"
               href="https://github.com/kikkupico/ambientcss"
               target="_blank"
               rel="noopener noreferrer"
@@ -623,7 +879,7 @@ export function App() {
               </span>
             </a>
             <a
-              className="finale-link amb-button amb-groove ambx-button"
+              className="finale-link amb-button amb-groove ambx-press ambx-press-md"
               href="https://kikkupico.github.io/ambientcss/"
               target="_blank"
               rel="noopener noreferrer"
@@ -657,16 +913,15 @@ export function App() {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   PULL-CORD SWITCHER — the header. Five cords hang from a housing rail: one
-   per theme preset, plus a "Custom" cord. Pulling a cord activates its theme
-   and drops the cord — the lowered cord IS the current-selection indicator,
-   so only one hangs low at a time. Pulling Custom draws the light-console
-   assembly down from the rail; clicking outside (or Esc) rolls it back up.
-   Reuses the same THEME_PRESETS / LIGHT_KNOBS / re-light machinery ThemeBar
-   used to drive.
+   THEME SWITCHER — the header. A bank of lamp-lit keys seated IN the console
+   slab's lip: one per theme preset, plus a "Custom" key. The lit lamp IS the
+   current selection, and each key lights in its own preset's indicator
+   colour, so the bank reads as the panel's status row rather than as a menu.
+   Selecting Custom drops the slab to reveal the light console above the bank;
+   clicking outside (or Esc) rolls the whole assembly back up.
    ══════════════════════════════════════════════════════════════════════════ */
 
-type PullCordSwitcherProps = {
+type ThemeSwitcherProps = {
   theme: ThemePreset;
   activePreset: string;
   onPreset: (p: ThemePreset) => void;
@@ -674,13 +929,8 @@ type PullCordSwitcherProps = {
   onProp: (key: keyof AmbientTheme, value: number) => void;
 };
 
-function PullCordSwitcher({ theme, activePreset, onPreset, onCustom, onProp }: PullCordSwitcherProps) {
+function ThemeSwitcher({ theme, activePreset, onPreset, onCustom, onProp }: ThemeSwitcherProps) {
   const [consoleOpen, setConsoleOpen] = useState(false);
-  // A pull is a transient tug: the cord springs down and snaps back like a
-  // real draw cord (the persistent glow, not the position, marks the active
-  // one). tugNonce re-keys the tugged rod so its spring animation replays.
-  const [tugLabel, setTugLabel] = useState<string | null>(null);
-  const [tugNonce, setTugNonce] = useState(0);
   const rigRef = useRef<HTMLDivElement>(null);
 
   // While the console is down, a click outside the rig (or Escape) rolls the
@@ -699,102 +949,132 @@ function PullCordSwitcher({ theme, activePreset, onPreset, onCustom, onProp }: P
     };
   }, [consoleOpen]);
 
-  const tug = (label: string) => { setTugLabel(label); setTugNonce((n) => n + 1); };
-  const pullTheme = (p: ThemePreset) => { tug(p.label); onPreset(p); setConsoleOpen(false); };
-  const pullCustom = () => { tug("Custom"); onCustom(); setConsoleOpen((o) => !o); };
+  // One key per preset plus Custom, legended with the preset's glyph so every
+  // key stays the same square — a bank, not a menu. Each carries its own
+  // indicator colour, so the lit key says which scene you are in by hue as
+  // well as by position (the same --amb-led-color the LEDs use), and its name
+  // rides along as the accessible name and the hover title.
+  const keys = [
+    ...THEME_PRESETS.map((p) => ({ value: p.label, label: p.icon, ariaLabel: p.label, color: p.led })),
+    { value: "Custom", label: "\u2699", ariaLabel: "Custom", color: "#a78bfa" }
+  ];
 
-  const customActive = activePreset === "Custom";
+  const pick = (next: string) => {
+    if (next === "Custom") {
+      onCustom();
+      setConsoleOpen((o) => !o);
+      return;
+    }
+    const preset = THEME_PRESETS.find((p) => p.label === next);
+    if (preset) onPreset(preset);
+    setConsoleOpen(false);
+  };
 
   return (
-    <header className="cordbar">
+    /* The slab's width is derived from the bank's, and the bank's from how
+       many keys there are — so the count is handed to the CSS rather than
+       restated there. It has to be: the slab now wears a micro-relief finish,
+       which brings `overflow: hidden`, so a sixth preset against a hardcoded
+       five would be CLIPPED rather than visibly spilling. */
+    <header className="cordbar" style={{ "--keys": keys.length } as CSSProperties}>
       <div className={`cord-assembly${consoleOpen ? " is-open" : ""}`} ref={rigRef}>
-        {/* One thick slab of the surface itself. Its upper region is the light
-            console, parked above the top of the screen; only the bottom lip
-            shows at rest. Pulling Custom drops the whole slab into view — the
-            console was always just the hidden part of this panel. */}
-        <div className="cord-panel ambient amb-surface amb-chamfer amb-thickness-2 amb-elevation-1">
+        {/* One thick slab of the surface itself, holding both the light
+            console and the key bank. Its upper region is the console, parked
+            above the top of the screen; only the bottom lip — and the bank
+            seated in it — shows at rest. Picking Custom drops the whole slab
+            into view: the console was always just the hidden part of this
+            same panel. */}
+        <div className="cord-panel ambient amb-surface amb-chamfer amb-thickness-2 amb-elevation-1 amb-mat-brushed">
           <div className="cord-console">
             <div className="cord-console-title">
               Global light
               <span className="cord-console-preset">Custom</span>
             </div>
             {/* Controls sit in a recessed darker well so they pop and read
-                apart from the cord labels below. */}
+                apart from the key bank below. */}
             <div className="cord-console-well ambient amb-groove groove-darker">
-              <div className="cord-console-grid">
-                {LIGHT_KNOBS.map((k) => (
-                  <AmbientKnob
-                    key={k.key}
-                    value={k.value(theme)}
-                    min={k.min}
-                    max={k.max}
-                    step={k.step}
-                    variant={k.variant}
-                    onChange={(v) => onProp(k.prop, k.to(v))}
-                    label={k.label}
+              {/* The lamp's placement, laid out as the vector it is: the
+                  fader stands on the left for Y, the slider runs across the
+                  top for X, and the two intensity knobs sit under the slider
+                  in the block the fader's height makes room for. */}
+              <div className="cord-console-lights">
+                <AmbientFader
+                  className="cord-fader"
+                  size="sm"
+                  value={LIGHT_AXES.y.value(theme)}
+                  min={LIGHT_AXES.y.min}
+                  max={LIGHT_AXES.y.max}
+                  step={LIGHT_AXES.y.step}
+                  onChange={(v) => onProp(LIGHT_AXES.y.prop, LIGHT_AXES.y.to(v))}
+                  label={LIGHT_AXES.y.label}
+                />
+                <div className="cord-console-stack">
+                  <AmbientSlider
+                    className="cord-slider"
+                    size="sm"
+                    value={LIGHT_AXES.x.value(theme)}
+                    min={LIGHT_AXES.x.min}
+                    max={LIGHT_AXES.x.max}
+                    step={LIGHT_AXES.x.step}
+                    onChange={(v) => onProp(LIGHT_AXES.x.prop, LIGHT_AXES.x.to(v))}
+                    label={LIGHT_AXES.x.label}
                   />
-                ))}
+                  <div className="cord-console-levels">
+                    {LEVEL_KNOBS.map((k) => (
+                      <AmbientKnob
+                        key={k.key}
+                        size="sm"
+                        knurlColor={DARK_KNURL}
+                        value={k.value(theme)}
+                        min={k.min}
+                        max={k.max}
+                        step={k.step}
+                        onChange={(v) => onProp(k.prop, k.to(v))}
+                        label={k.label}
+                      />
+                    ))}
+                  </div>
+                </div>
               </div>
+              {/* The colour of the light, in the console kit's vocabulary —
+                  a different family of control for a different kind of
+                  parameter, and the kit provider wraps only these three. */}
+              <AmbientKitProvider kit={consoleKit}>
+                <div className="cord-console-tone">
+                  {TONE_KNOBS.map((k) => (
+                    <ConsoleKnob
+                      key={k.key}
+                      size="sm"
+                      legend={false}
+                      value={k.value(theme)}
+                      min={k.min}
+                      max={k.max}
+                      step={k.step}
+                      onChange={(v) => onProp(k.prop, k.to(v))}
+                      label={k.label}
+                    />
+                  ))}
+                </div>
+              </AmbientKitProvider>
             </div>
             <div className="cord-console-hint">every scene re-lights live</div>
           </div>
-        </div>
 
-        {/* Cords hang from the slab's bottom edge. Each label is printed on the
-            panel's revealed lip; below it a chain of shiny ambient balls (drawn
-            behind the panel) ends in a glass ball. A pull slides the whole chain
-            and ball down and it springs back with almost no bounce — the
-            highlighted label marks the active one. */}
-        <div className="cords" role="group" aria-label="Theme">
-          {THEME_PRESETS.map((p) => {
-            const active = activePreset === p.label;
-            return (
-              <button
-                key={p.label}
-                type="button"
-                className={`cord${active ? " is-active" : ""}`}
-                aria-pressed={active}
-                onClick={() => pullTheme(p)}
-              >
-                <span className="cord-name">{p.icon} {p.label}</span>
-                <span
-                  key={tugLabel === p.label ? `tug-${tugNonce}` : "rest"}
-                  className={`cord-pull${tugLabel === p.label ? " is-tugging" : ""}`}
-                  aria-hidden
-                >
-                  <span className="cord-chain">
-                    {CHAIN_BEADS.map((_, i) => (
-                      <span key={i} className="cord-bead ambient amb-surface amb-mat-shiny amb-rounded-full" />
-                    ))}
-                  </span>
-                  <span className="cord-ball ambient amb-surface amb-elevation-3 amb-rounded-full amb-mat-glass" />
-                </span>
-              </button>
-            );
-          })}
-
-          {/* Custom cord — drops the slab to reveal the console. */}
-          <button
-            type="button"
-            className={`cord cord-custom${customActive ? " is-active" : ""}${consoleOpen ? " is-open" : ""}`}
-            aria-pressed={customActive}
-            aria-expanded={consoleOpen}
-            onClick={pullCustom}
-          >
-            <span className="cord-name">⚙ Custom</span>
-            <span
-              key={tugLabel === "Custom" ? `tug-${tugNonce}` : "rest"}
-              className={`cord-pull${tugLabel === "Custom" ? " is-tugging" : ""}`}
-              aria-hidden
-            >
-              <span className="cord-chain">
-                {CHAIN_BEADS.map((_, i) => (
-                  <span key={i} className="cord-bead ambient amb-surface amb-mat-shiny amb-rounded-full" />
-                ))}
-              </span>
-              <span className="cord-ball ambient amb-surface amb-elevation-3 amb-rounded-full amb-mat-glass" />
-            </span>
-          </button>
+          {/* The key bank is seated in the slab's lip — the one part of the
+              panel that stays on screen at rest, so the bank reads as this
+              console's bottom row rather than as a bar floating under it.
+              Selecting a key lights its lamp and re-lights every scene below;
+              the Custom key also drops the slab so the console above comes
+              into view, carrying the bank down with it. */}
+          <div className="theme-keys">
+            <AmbientSelect
+              orientation="horizontal"
+              options={keys}
+              value={activePreset}
+              onChange={(next) => pick(next as string)}
+              aria-label="Theme"
+            />
+          </div>
         </div>
       </div>
     </header>

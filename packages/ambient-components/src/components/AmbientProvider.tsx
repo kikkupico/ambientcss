@@ -47,6 +47,9 @@ export function AmbientProvider({ children, className, style, theme }: AmbientPr
   ].join(" ");
   themeVars["--amb-label"] =
     "hsl(var(--amb-light-hue) var(--amb-light-saturation) calc((1 - var(--amb-key-light-intensity)) * 60% + 20%))";
+  // --amb-curve-delta deliberately absent: unlike these two it is declared
+  // per element in ambient.css, so it already re-resolves against the light
+  // overridden here. Re-declaring it would only re-copy the fit.
   const mergedStyle = { ...themeVars, ...style } as CSSProperties;
 
   return (

@@ -84,8 +84,13 @@ lifts every recess once the target is elevated.
 ## Checking alignment
 
 ```sh
-python3 align.py out/blender/panel/0049.png out/css/panel.png
+python3 align.py "$(ls out/blender/panel/*.png | tail -1)" out/css/panel.png
 ```
+
+The flat frame is the LAST one the move writes (currently `0083.png`, i.e.
+`FRAMES_OPEN + FRAMES_TILT`), which is the only frame framed identically to the
+CSS shot — hence reading it off `ls` rather than hardcoding a number that goes
+stale whenever the beats are retimed.
 
 Prints silhouette drift and IoU and writes `out/align/{side,blend,diff}.png`.
 `blend.png` is the useful one: at 50/50 the two panels should read as a single

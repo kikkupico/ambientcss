@@ -7,7 +7,8 @@ import {
   AmbientSlider,
   AmbientSwitch,
   AmbientFader,
-  type AmbientKnobVariant,
+  type AmbientKnobMarkers,
+  type AmbientKnobIndicator,
   type AmbientButtonShape,
 } from "@ambientcss/components";
 import "@ambientcss/css/ambient.css";
@@ -95,6 +96,26 @@ function Screen({ spec }: { spec: Component }) {
   );
 }
 
+/* The layout's `variant` names a REFERENT, which is what the Blender side
+   consumes (ambient3d/hero_panel.py REFERENT_FOR). AmbientKnob no longer has a
+   matching single prop, so the same name is translated to the three axes here —
+   the DOM's half of that table. Keep the two in step: a variant with no entry
+   on either side renders a different knob in the two halves of the wipe, which
+   is the one thing this tool exists to make impossible. */
+const KNOB_PROPS: Record<
+  string,
+  { knurling?: boolean; markers?: AmbientKnobMarkers; indicator?: AmbientKnobIndicator }
+> = {
+  dot: { indicator: "circle" },
+  line: { indicator: "rectangle" },
+  smooth: { knurling: false, indicator: "rectangle" },
+  markers: { knurling: false, markers: "full", indicator: "rectangle" },
+};
+
+function knobProps(variant?: string) {
+  return KNOB_PROPS[variant ?? "dot"] ?? KNOB_PROPS.dot;
+}
+
 /* Every control is rendered read-only: no state, no handlers. The value is
    the referent's `value` (0..1) scaled to the components' 0..100 range. */
 function Control({ spec }: { spec: Component }) {
@@ -104,13 +125,7 @@ function Control({ spec }: { spec: Component }) {
     case "screen":
       return <Screen spec={spec} />;
     case "knob":
-      return (
-        <AmbientKnob
-          style={style}
-          value={pct}
-          variant={(spec.variant ?? "dot") as AmbientKnobVariant}
-        />
-      );
+      return <AmbientKnob style={style} value={pct} {...knobProps(spec.variant)} />;
     case "button":
       return (
         <AmbientButton style={style} shape={(spec.variant ?? "pill") as AmbientButtonShape}>

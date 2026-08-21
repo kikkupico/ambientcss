@@ -239,6 +239,9 @@ body {
 }
 
 .elevation-circle {
+  /* A shade above the page ground, so the risers read as their own
+     material against it (this was .amb-surface-lighter). */
+  --amb-shade: 1.11;
   width: clamp(72px, 12vw, 110px);
   height: clamp(72px, 12vw, 110px);
   border-radius: 50%;
@@ -275,6 +278,26 @@ body {
   margin: 0 auto;
 }
 
+/* The materials gallery carries five finishes rather than three, so it gets
+   its own track count and a swatch capped to fit one. */
+.surface-gallery.materials-gallery {
+  grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+  max-width: 980px;
+}
+
+.materials-gallery .surface-swatch {
+  width: clamp(64px, 11vw, 150px);
+  height: auto;
+  aspect-ratio: 1;
+}
+
+/* Six narrow tracks leave a narrower gap for the glass demo's circle to
+   slide into, so it travels far enough to clear the glass disc it started
+   behind and stops short of the brushed one next door. */
+.materials-gallery .moving-circle {
+  --slide-out-x: 102px;
+}
+
 .surface-item {
   display: flex;
   flex-direction: column;
@@ -305,6 +328,78 @@ body {
   letter-spacing: 0.35em;
   text-transform: uppercase;
   color: var(--amb-lume);
+}
+
+/* --------------------------------------------------------------------------
+   MATERIAL COLOUR – one row per finish, --amb-albedo (or, for glass,
+   --amb-light-hue/-saturation) swept across a shared palette
+   -------------------------------------------------------------------------- */
+
+.material-color-wall {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.material-color-row {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.material-color-row-label {
+  flex: 0 0 88px;
+  width: 88px;
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--amb-lume);
+  text-align: right;
+}
+
+.material-color-swatches {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.material-color-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.material-color-swatch {
+  width: clamp(44px, 7vw, 60px);
+  height: clamp(44px, 7vw, 60px);
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.6s ease;
+}
+
+.material-color-swatch.is-round {
+  border-radius: 50%;
+}
+
+.material-color-swatch[data-visible="false"] {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.material-color-swatch[data-visible="true"] {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.material-color-name {
+  font-size: 7px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--amb-lume);
+  opacity: 0.75;
 }
 
 /* --------------------------------------------------------------------------
@@ -391,6 +486,43 @@ body {
 .component-cell:nth-child(5) { transition-delay: 0.24s; }
 .component-cell:nth-child(6) { transition-delay: 0.30s; }
 .component-cell:nth-child(7) { transition-delay: 0.36s; }
+
+/* Kit columns: the same two controls twice, so the pair has to read as one
+   group with a name under it rather than as four loose controls. Wider gap
+   BETWEEN the columns than inside them is what does that work. */
+.kit-stage {
+  gap: 72px;
+  align-items: flex-start;
+}
+
+/* A fixed height, not a min: the console knob reserves layout room for the
+   printed marks above and beside it, so left to themselves the two columns
+   come out different heights and the names under them sit on two different
+   lines — which reads as a layout bug rather than as two versions of the
+   same thing. */
+/* Bottom-aligned, not centred: every control's own label is the last thing
+   in its box, so hanging the boxes from their bottoms puts all four labels
+   on one line and lets the height difference show up where it really is —
+   above the console knob, where its marks are printed. */
+.kit-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 40px;
+  height: 132px;
+}
+
+/* Same treatment as .scene-hint — these are captions in the demo's own
+   voice, not code. The kit names happen to be identifiers, but setting them
+   in a monospace face would put the only monospace type in the whole page
+   under two controls. */
+.kit-name {
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  color: var(--amb-lume);
+  opacity: 0.7;
+  margin-top: 8px;
+}
 
 .comp-led-row {
   display: flex;
@@ -617,6 +749,17 @@ body {
     gap: 20px;
   }
 
+  .material-color-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .material-color-row-label {
+    width: auto;
+    text-align: center;
+  }
+
   .theme-playground {
     gap: 20px;
   }
@@ -665,7 +808,7 @@ body {
     transform: translateX(0);
   }
   50% {
-    transform: translateX(150px);
+    transform: translateX(var(--slide-out-x, 150px));
   }
 }
 
@@ -674,25 +817,55 @@ body {
 }
 
 /* ==========================================================================
-   PULL-CORD SWITCHER (header) — cords hang from one thick slab of the
-   surface. The slab's upper region is the light console, parked above the
-   top of the screen; pulling Custom drops the whole slab (cords and all)
-   into view — the console was always just its hidden part. The active
-   cord's convex ball descends and glows.
+   THEME SWITCHER (header) — one thick slab of the surface, carrying both the
+   light console and the key bank. The slab's upper region is the console,
+   parked above the top of the screen; its bottom lip holds the key bank and
+   is the only part on screen at rest. Picking Custom drops the whole slab
+   into view — the console was always just its hidden part — so the bank
+   travels down with the panel it lives in. The active theme's key stays lit
+   in its own indicator colour.
    ========================================================================== */
 
+/* The slab is exactly as wide as the key bank it carries, plus one margin of
+   its own material either side. The bank is five keys of --ambx-select-size
+   with a half-grid of padding and four half-grid rails between them; that is
+   the whole width, restated here in --ambx-grid (which IS at :root) rather
+   than in --ambx-select-size (which is not — it is declared on the bank's own
+   size class, so a var() for it up here resolves to nothing and drops the
+   declaration). Nothing in the console below may exceed it: the console is
+   what the slab is wide FOR, but the bank is what says how wide. */
 .cordbar {
+  /* --keys comes from ThemeSwitcher, which is the only thing that knows how
+     many there are. */
+  --bank: calc(var(--ambx-grid) * 11 * var(--keys) + var(--ambx-grid) * 3);
+  --margin: calc(var(--ambx-grid) * 4);
   position: fixed;
   top: 0;
   left: 50%;
   transform: translateX(-50%);
   z-index: 100;
-  width: min(560px, calc(100vw - 16px));
+  width: min(calc(var(--bank) + var(--margin) * 2), calc(100vw - 16px));
 }
 
-/* The whole slab + cords, parked up by --reveal so only the lip shows. */
+/* The slab, parked up by --reveal so only the lip (and its key bank) shows.
+   --reveal is the height of the parked region, which is exactly the console's
+   height — .cord-console reads it back rather than restating the number, so
+   the two can't drift apart. Anything added BELOW the console only grows the
+   visible resting band; anything added above or inside it changes how far the
+   slab parks (which is why the console's height stays fixed and the mobile
+   query shrinks the knobs inside it instead). */
 .cord-assembly {
-  --reveal: 212px;
+  /* Measured, not guessed: the console's content stacks to 307px, and the
+     extra 13 is slack the flex-end below parks ABOVE the title, so the slab
+     shows a band of its own material over the console rather than starting
+     flush on the first word.
+
+     RE-MEASURE THIS whenever the console's contents change, and note that the
+     failure is now SILENT: .cord-console is exactly --reveal tall, and the
+     slab's micro-relief finish brings `overflow: hidden`, so content past
+     that height is cut off instead of spilling above the slab where you would
+     see it. */
+  --reveal: 320px;
   position: relative;
   transform: translateY(calc(-1 * var(--reveal)));
   transition: transform 0.52s cubic-bezier(0.48, 1.3, 0.5, 1);   /* drawer */
@@ -700,20 +873,33 @@ body {
 .cord-assembly.is-open { transform: translateY(0); }
 
 /* The slab: the ground's own material, told apart by thickness + shadow.
-   Content is the console; padding-bottom is the lip the cord labels sit on.
-   z-index 1 seats it between the chains (behind) and the labels (in front). */
+   Its content is the console followed by the key bank; --lip is the slab
+   material left standing below the bank, so the bank sits ON the panel with
+   a margin under it rather than hanging off its edge. */
+/* The slab wears .amb-mat-brushed at the GROUND's colour, not the material's
+   own aluminium: --amb-albedo is what a finish paints in, so overriding it
+   back to the inherited value is how you take a material's relief and keep
+   your surface's tone. `inherit` rather than a restated number — the ground
+   albedo lives in @ambientcss/css and this is not the place to copy it.
+   The finish also brings `overflow: hidden` (its grain needs a clipped box),
+   which is why the lip below has to be real padding: anything hanging outside
+   the slab's border-box is now cut off. */
 .cord-panel {
-  --lip: 30px;
+  --lip: 12px;
+  --amb-albedo: inherit;
   position: relative;
-  z-index: 1;
   border-radius: 0 0 14px 14px; /* off-scale by design: bespoke console-slab corners, not an .ambx-panel instance, see design-tokens.md */
-  padding: 0 16px var(--lip);
+  padding: 0 var(--margin) var(--lip);
 }
 .cord-console {
-  height: 212px;                 /* == --reveal: the region hidden up top */
+  height: var(--reveal);         /* the region parked off-screen up top */
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  /* Bottom-anchored, not centred: the console's spare height is slack we want
+     ABOVE the content, where it stays parked off-screen, rather than split
+     evenly and left as a gap between the hint and the key bank below. */
+  justify-content: flex-end;
+  padding-bottom: 18px;
   gap: 10px;
 }
 .cord-console-title {
@@ -737,15 +923,55 @@ body {
   border-radius: var(--ambx-radius-lg);
   padding: 14px 12px 12px;
 }
-/* Seven knobs on one even seven-column grid — a Dieter Rams row: equal
-   columns, equal air, each control centred in its cell. */
-.cord-console-grid {
-  --ambx-grid: 3px;
+/* THE CONSOLE'S TWO BLOCKS.
+
+   Upper: the lamp's position, laid out as the axes it drives. The fader
+   stands on the left for Y; beside it a column carries the X slider with the
+   two intensity knobs under it. Two nested flex boxes rather than a grid,
+   because the fader is not spanning two rows — it is one item next to a
+   stack, and the stack's height is simply what it is. The fader's length is
+   what makes the room the knobs sit in.
+
+   Lower: the three colour parameters, on one even three-column row.
+
+   Both blocks are as wide as the well and no wider: the slab's width is the
+   key bank's (see .cordbar), so a control that wanted more would push the
+   bank out of shape rather than the other way round. Nothing here declares a
+   width in pixels except the two travels, whose LENGTH is the one thing a
+   travel cannot derive from its size step. */
+.cord-console-lights {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--ambx-grid) * 3);
+}
+
+/* The X axis and the two intensities, stacked in the room the fader's own
+   height makes beside it. */
+.cord-console-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--ambx-grid) * 2);
+}
+
+.cord-console-levels {
+  display: flex;
+  justify-content: center;
+  gap: calc(var(--ambx-grid) * 4);
+}
+
+/* Track length is the one measurement a travel cannot derive from its size
+   step, and these two are the only pixel widths in the console. */
+.cord-fader { --ambx-travel-length: 84px; }
+.cord-slider { --ambx-travel-length: 112px; }
+
+.cord-console-tone {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   align-items: start;
   justify-items: center;
-  gap: 0 calc(var(--ambx-grid) * 2);
+  margin-top: calc(var(--ambx-grid) * 3);
 }
 .cord-console-hint {
   font-size: 7px;
@@ -756,118 +982,41 @@ body {
   text-align: center;
 }
 
-/* Cords hang from the slab. The label row is pulled up onto the lip. No
-   z-index here, so each cord part stacks against the slab individually:
-   labels in front of it, chains and balls behind. */
-.cords {
-  position: relative;
+/* The key bank is the slab's own bottom row, seated in the lip directly
+   below the console. At rest the header IS this row plus the lip's material
+   around it; the console above stays parked off-screen until Custom is
+   picked, and the bank then rides down inside the slab. The bank brings its
+   own dark groove (.amb-select), so it reads as recessed into the surface
+   without a second well around it. */
+.theme-keys {
   display: flex;
   justify-content: center;
-  gap: clamp(10px, 4vw, 40px);
-  padding: 0 18px;
-  margin-top: calc(-1 * var(--lip, 30px) + 4px);
-}
-.cord {
-  appearance: none;
-  -webkit-appearance: none;
-  background: none;
-  border: 0;
-  margin: 0;
-  padding: 0;
-  font: inherit;
-  color: var(--amb-label);
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  /* Same --lip above the bank as the panel leaves below it, so the bank is
+     centred in the lip instead of butting against the screen edge where the
+     parked console ends. Padding below the console is free — it grows the
+     visible resting band without changing how far the slab parks. */
+  padding-top: var(--lip);
 }
 
-/* Label — printed on the panel's revealed lip, in front of the slab. */
-.cord-name {
-  position: relative;
-  z-index: 2;                    /* in front of the slab (z 1) */
-  font-size: 9px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  margin-bottom: 12px;           /* clears the lip so the chain hangs below it */
-  transition: color 0.2s ease;
-}
-.cord.is-active .cord-name { color: var(--amb-highlight-color); }
-.cord:focus-visible { outline: none; }
-.cord:focus-visible .cord-name {
-  color: var(--amb-highlight-color);
-  text-decoration: underline;
-}
+/* NO MOBILE OVERRIDES FOR THE HEADER, and that is a measured claim rather
+   than an omission.
 
-/* The pull = chain + ball, drawn BEHIND the slab (z 0). A pull slides the
-   whole group down and it retracts with almost no bounce; the panel edge is
-   the housing the chain pays out from. */
-.cord-pull {
-  position: relative;
-  z-index: 0;                    /* behind the slab (z 1) */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.cord-pull.is-tugging {
-  animation: cord-tug 0.42s cubic-bezier(0.4, 0, 0.2, 1);   /* near-bounceless */
-}
-@keyframes cord-tug {
-  0%   { transform: translateY(0); }
-  44%  { transform: translateY(20px); }   /* pays out */
-  100% { transform: translateY(0); }       /* retracts, no overshoot */
-}
+   The slab is 264px wide at every viewport down to 280px, because its width
+   is the bank's plus two margins and the 100vw clamp does not bite until
+   then — and at 264 the console's two blocks measure exactly the 208px the
+   well leaves them (fader column 62 + gap 12 + slider stack 112; three tone
+   knobs whose widest cell is the "Lume" label). Neither has slack, and
+   neither needs any: both shrink with the container from there, spilling a
+   few pixels of label below a ~272px viewport, which is narrower than any
+   shipping phone.
 
-/* Chain of tiny shiny ambient balls. Its top is pulled up behind the panel
-   lip so only the lower balls show at rest. */
-.cord-chain {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
-  margin-top: -18px;
-}
-.cord-bead {
-  width: 7px;
-  height: 7px;
-}
-
-/* Glass ambient ball on the chain end. */
-.cord-ball {
-  width: 26px;
-  height: 26px;
-  margin-top: 1px;
-}
-
-@media (max-width: 600px) {
-  .cordbar { width: calc(100vw - 8px); }
-  .cords { gap: 14px; padding: 0 10px; }
-  .cord-name { font-size: 8px; letter-spacing: 0.06em; }
-
-  /* Seven fixed-size knobs (48px each at the default 3px grid) don't fit a
-     narrow phone's console well — shrink the whole row's grid so it stays
-     one row (the "Dieter Rams row" intent above) instead of overflowing
-     the panel or wrapping. Gap scales with the grid var (see
-     .cord-console-grid), so it shrinks proportionally too. */
-  .cord-console-grid { --ambx-grid: 2px; }
-
-  /* --ambx-label-size is only declared once at :root, referencing
-     --ambx-grid — its var() substitution is baked in there and doesn't
-     re-derive from this local grid override (a general limitation of
-     unregistered custom properties, not something scoping --ambx-grid
-     here fixes). Two-word labels ("Light X"/"Light Y") would otherwise
-     stay at the default 10px and force their column wider than the knob.
-     Set the label size directly, floored so it stays legible. */
-  .cord-console-grid .ambx-label {
-    font-size: max(6px, calc(var(--ambx-grid) * 2 + var(--ambx-grid) / 2));
-    letter-spacing: calc(var(--ambx-grid) / 4);
-  }
-}
+   The rules that used to live here made it worse, not better. Halving the
+   margin on phones takes the slab to 248 and pushes the console's labels 7px
+   past the well; a --ambx-grid: 3px on the key bank took its keys to 33px
+   square, under the 44px touch target. Measure before re-adding either. */
 
 @media (prefers-reduced-motion: reduce) {
   .cord-assembly { transition: none; }
-  .cord-line.is-tugging { animation: none; }
 }
 
 /* ==========================================================================
@@ -901,18 +1050,16 @@ body {
 .groove-lume { background-color: var(--amb-lume); }
 
 /* .amb-groove's own floor sits within a hair of the open ground (see its
-   comment in ambient.css); pairing with .amb-surface-darker's formula
-   here gives the well/inset recesses a floor that reads as visibly
-   deeper material, not just a shadow band on the same page color. */
+   comment in ambient.css); shading the material down to the rig's
+   mid-tone plate gives the well/inset recesses a floor that reads as
+   visibly deeper material, not just a shadow band on the same page
+   colour. --amb-shade rather than a fixed colour, so the recess still
+   follows whatever --amb-albedo the page is themed with. 0.378 is the
+   rig's mid-tone plate over the reference ground, so the floor lands
+   within 0.7 points of lightness of the tone .amb-surface-darker painted
+   here — the remainder is the groove's own wall bounce. */
 .groove-darker {
-  background-color: hsl(
-    var(--amb-light-hue)
-    var(--amb-light-saturation)
-    calc(
-      var(--amb-key-light-intensity) * 21% +
-        var(--amb-fill-light-intensity) * 17.4% + 27.3%
-    )
-  );
+  --amb-shade: 0.378;
 }
 
 .groove-channel {
