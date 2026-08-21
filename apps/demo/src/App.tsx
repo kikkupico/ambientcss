@@ -79,7 +79,13 @@ type ThemePreset = {
 
 const THEME_PRESETS: ThemePreset[] = [
   { label: "Day",    icon: "☀", led: "#f59e0b", lightX: -0.7, lightY: -0.7, keyLight: 0.9,  fillLight: 0.7,  lightHue: 234, lightSaturation: 5,   lumeHue: 16 },
-  { label: "Night",  icon: "☾", led: "#6366f1", lightX: 0.7,  lightY: -0.7, keyLight: 0.3,  fillLight: 0.1,  lightHue: 250, lightSaturation: 30,  lumeHue: 16 },
+  /* NIGHT = BRAUN'S CHARCOAL ATELIER. Warm tungsten light (hue ~30) over
+     deeply dimmed surfaces gives charcoal panels instead of the blue-grey
+     a cool hue reads as at these intensities, and the accents move to
+     Braun's signal orange — the lume and the LED both — so the dark scenes
+     carry one warm note against near-black, the way Dieter Rams' black
+     products use a single orange detail. */
+  { label: "Night",  icon: "☾", led: "#f4674a", lightX: 0.7,  lightY: -0.7, keyLight: 0.32, fillLight: 0.12, lightHue: 30,  lightSaturation: 7,   lumeHue: 20 },
   { label: "Sci-Fi", icon: "✦", led: "#22d3d3", lightX: 0,    lightY: -0.9, keyLight: 0.2,  fillLight: 0.05, lightHue: 190, lightSaturation: 50,  lumeHue: 180 },
   { label: "Fun",    icon: "✷", led: "#ec4899", lightX: 0,    lightY: -1,   keyLight: 0.55, fillLight: 0,    lightHue: 0,   lightSaturation: 100, lumeHue: 0 },
 ];
