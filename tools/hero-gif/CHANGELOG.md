@@ -1,5 +1,28 @@
 # @ambientcss/hero-gif
 
+## 0.0.3
+
+### Patch Changes
+
+- Updated dependencies [f91f203]
+- Updated dependencies [f91f203]
+- Updated dependencies [f91f203]
+- Updated dependencies [f91f203]
+- Updated dependencies [f91f203]
+- Updated dependencies [f91f203]
+- Updated dependencies [f91f203]
+- Updated dependencies [f91f203]
+- Updated dependencies [f91f203]
+- Updated dependencies [f91f203]
+- Updated dependencies [f91f203]
+- Updated dependencies [f91f203]
+- Updated dependencies [f91f203]
+- Updated dependencies [f91f203]
+- Updated dependencies [f91f203]
+- Updated dependencies [f91f203]
+  - @ambientcss/css@3.0.0
+  - @ambientcss/components@3.0.0
+
 ## 0.0.2
 
 ### Patch Changes
