@@ -142,7 +142,9 @@ export function useBank(options: UseBankOptions) {
   const keyProps = (option: BankOption, index: number) => {
     const on = selected.includes(option.value);
     return {
-      key: option.value,
+      /* No `key` here on purpose: the caller maps the options, so it owns
+         the list key. Spreading one into JSX makes React warn and drops
+         the key on release builds. */
       type: "button" as const,
       ref: (node: HTMLButtonElement | null) => {
         keyRefs.current[index] = node;

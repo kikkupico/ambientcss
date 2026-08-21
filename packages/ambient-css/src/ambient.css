@@ -914,7 +914,10 @@
   --_grain-tile: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22512%22%20height%3D%22512%22%3E%3Cfilter%20id%3D%22t%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20color-interpolation-filters%3D%22linearRGB%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.015625%200.9%22%20numOctaves%3D%221%22%20seed%3D%223%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3CfeComponentTransfer%3E%3CfeFuncR%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3CfeFuncG%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3CfeFuncB%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3C%2FfeComponentTransfer%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url(%23t)%22%2F%3E%3C%2Fsvg%3E");
   --_grain-tile-inv: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22512%22%20height%3D%22512%22%3E%3Cfilter%20id%3D%22t%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20color-interpolation-filters%3D%22linearRGB%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.015625%200.9%22%20numOctaves%3D%221%22%20seed%3D%223%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3CfeComponentTransfer%3E%3CfeFuncR%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3CfeFuncG%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3CfeFuncB%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3C%2FfeComponentTransfer%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url(%23t)%22%2F%3E%3C%2Fsvg%3E");
   --_grain-scale: 512px;
-  --_grain-alpha: 0.42;
+  /* SOFTENED twice by eye after the 2026-08-21 hand-tune: 0.42 -> 0.28 ->
+     0.20 so the streaks read as a finish rather than a texture. Linear
+     response means contrast scales by the same ratio (~ -52% total). */
+  --_grain-alpha: 0.20;
   /* The cost of snapping to whole pixels: at a 2px baseline the
      across-grain offset is either 0 or 1, so brushed metal SWITCHES
      rather than fades as the lamp swings along the grain. It therefore
@@ -999,7 +1002,10 @@
      carries a sweep of 2.32 where brushed has 0.19) but reads correctly
      at the same value, and one metal in two finishes should not carry
      two different sheen formulas. */
-  --_sheen-alpha: calc(var(--amb-key-light-intensity) * 0.237 + 0.0863);
+  /* SOFTENED twice alongside the grain above: rescaled from the 0.237/0.0863
+     that put key 0.9 at 0.30 down to key 0.9 at ~0.14, so the band stays
+     present but quiet. Shared verbatim with .amb-mat-brushed-round. */
+  --_sheen-alpha: calc(var(--amb-key-light-intensity) * 0.11 + 0.04);
   /* The band's centre, and a half-width either side of it. Written as three
      calc()s off one position rather than as a gradient rotated to the lamp:
      the highlight of a linear grain does not tilt, it slides. Stops that run
@@ -1098,7 +1104,12 @@
   --_grain-tile: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2296%22%20height%3D%2296%22%3E%3Cfilter%20id%3D%22t%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20color-interpolation-filters%3D%22linearRGB%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.9%200.9%22%20numOctaves%3D%222%22%20seed%3D%223%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3CfeComponentTransfer%3E%3CfeFuncR%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3CfeFuncG%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3CfeFuncB%20type%3D%22linear%22%20slope%3D%222%22%20intercept%3D%22-0.5%22%2F%3E%3C%2FfeComponentTransfer%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url%28%23t%29%22%2F%3E%3C%2Fsvg%3E");
   --_grain-tile-inv: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2296%22%20height%3D%2296%22%3E%3Cfilter%20id%3D%22t%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20color-interpolation-filters%3D%22linearRGB%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.9%200.9%22%20numOctaves%3D%222%22%20seed%3D%223%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20type%3D%22saturate%22%20values%3D%220%22%2F%3E%3CfeComponentTransfer%3E%3CfeFuncR%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3CfeFuncG%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3CfeFuncB%20type%3D%22linear%22%20slope%3D%22-2%22%20intercept%3D%221.5%22%2F%3E%3C%2FfeComponentTransfer%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url%28%23t%29%22%2F%3E%3C%2Fsvg%3E");
   --_grain-scale: 96px;
-  --_grain-alpha: 0.666;
+  /* SOFTENED twice by eye after the 2026-08-21 hand-tune: 0.666 -> 0.45 ->
+     0.32 for a much quieter sparkle. Note this reintroduces the clamp
+     headroom cost recorded above (1.50 x 0.32 = 0.48, well under the
+     rail), which is accepted here — subtlety was the ask, not light
+     tracking. */
+  --_grain-alpha: 0.32;
 }
 
 /* Spun (circular-brushed) aluminium: the same metal as .amb-mat-brushed with
@@ -1198,7 +1209,10 @@
      checked first (0.203 / 2.078 / 4.235 at alpha 0 / 0.175 / 0.35), then
      0.175 -> 0.197, verified at x1.125 against the x1.126 wanted
      (tools/css-harness/ladder.mjs + ambient3d/measure/panel_split.py). */
-  --_grain-alpha: 0.197;
+  /* SOFTENED twice by eye alongside the linear metal: 0.197 -> 0.135 ->
+     0.10, the same proportional move, keeping spun matched to brushed's
+     apparent relief. */
+  --_grain-alpha: 0.10;
 
   /* The sheen, in this material's own geometry: the linear metal's band
      across the grain, wrapped round the centre. The grain is tangential
@@ -1261,7 +1275,9 @@
      carries a sweep of 2.32 where brushed has 0.19) but reads correctly
      at the same value, and one metal in two finishes should not carry
      two different sheen formulas. */
-  --_sheen-alpha: calc(var(--amb-key-light-intensity) * 0.237 + 0.0863);
+  /* SOFTENED twice, same rescale as .amb-mat-brushed's: key 0.9 lands at
+     ~0.14 instead of 0.30. Kept verbatim-shared with the linear metal. */
+  --_sheen-alpha: calc(var(--amb-key-light-intensity) * 0.11 + 0.04);
   /* atan2 of the light vector is the lamp's bearing; +90deg turns it into
      the CSS angle convention (0 = up, clockwise) pointing AT the lamp, the
      same rotation .amb-mat-shiny's --_shiny-angle makes in reverse to point

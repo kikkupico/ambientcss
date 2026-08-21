@@ -42,7 +42,8 @@
   "scripts": {
     "build": "tsup && cp src/styles.css dist/styles.css",
     "clean": "rm -rf dist",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "peerDependencies": {
     "react": "^18.3.0 || ^19.0.0",
@@ -52,9 +53,14 @@
     "@ambientcss/css": "workspace:*"
   },
   "devDependencies": {
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.5",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
+    "jsdom": "^30.0.1",
     "tsup": "^8.3.6",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "vitest": "^4.1.11"
   }
 }
