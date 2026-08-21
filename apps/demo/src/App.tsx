@@ -991,8 +991,9 @@ function ThemeSwitcher({ theme, activePreset, onPreset, onCustom, onProp }: Them
               <span className="cord-console-preset">Custom</span>
             </div>
             {/* Controls sit in a recessed darker well so they pop and read
-                apart from the key bank below. */}
-            <div className="cord-console-well ambient amb-groove groove-darker">
+                apart from the key bank below. Bead-blasted, so the inset
+                reads as a different finish from the brushed slab around it. */}
+            <div className="cord-console-well ambient amb-groove groove-darker amb-mat-blasted">
               {/* The lamp's placement, laid out as the vector it is: the
                   fader stands on the left for Y, the slider runs across the
                   top for X, and the two intensity knobs sit under the slider
