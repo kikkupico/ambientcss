@@ -641,7 +641,10 @@
    here and the frame's rotation carries them round to the value.
 
    The circle is the grounded referent's offset dot (knob() dot_frac 0.12,
-   dot_offset 0.68). */
+   dot_offset 0.68). The ink is --amb-lume: the same emissive tone the
+   scene's lume and LEDs wear, so the pointer reads as backlit hardware
+   rather than as printed paint — bright in a bright scene, glowing when
+   the lights drop. */
 .amb-knob-indicator-circle {
   position: absolute;
   top: 16%;
@@ -650,7 +653,7 @@
   width: calc(var(--ambx-knob-size) * 0.125);
   height: calc(var(--ambx-knob-size) * 0.125);
   border-radius: 50%;
-  background: var(--amb-highlight-color);
+  background: var(--amb-lume);
 }
 
 /* The rectangle is a short radial bar out near the rim, not a spoke from
@@ -667,7 +670,7 @@
   width: var(--ambx-knob-rect-width);
   height: 17%;
   border-radius: var(--ambx-grid-quarter);
-  background: var(--amb-highlight-color);
+  background: var(--amb-lume);
 }
 
 .amb-knob:hover .amb-knob-indicator-circle,
@@ -682,8 +685,9 @@
    --ambx-travel-start/-sweep off the control), so a dot always lands where
    its value would, whatever `travel` is set to.
 
-   Ink is --amb-label, not --amb-highlight-color: these are printed panel
-   graphics like the control's legend, not part of the control. */
+   Ink is --amb-lume, matching the indicators: the scale glows with the
+   same emissive tone as the pointer, so ring and dot read as one lit
+   instrument rather than paint plus light. */
 .amb-knob-marker-ring {
   position: absolute;
   top: 50%;
@@ -701,7 +705,7 @@
   height: var(--ambx-knob-marker-size);
   margin: calc(var(--ambx-knob-marker-size) / -2);
   border-radius: 50%;
-  background: var(--amb-label);
+  background: var(--amb-lume);
   transform: rotate(var(--amb-marker-angle))
     translateY(calc(-1 * var(--ambx-knob-marker-radius)));
 }
@@ -1270,7 +1274,9 @@
 /* The indicator: a short mark printed across the bar near one end. It is
    ink, not geometry — no edges, no shadow — and it is inside the bar rather
    than beside it because the bar already occupies the whole diameter it
-   would otherwise sit on. */
+   would otherwise sit on. The ink is --amb-lume, matching the grounded
+   knob's pointer: the mark reads as backlit rather than printed, glowing
+   as the scene's lights drop. */
 .amb-console-indicator {
   position: absolute;
   left: 50%;
@@ -1279,7 +1285,7 @@
   height: 7.5%;
   transform: translateX(-50%);
   border-radius: calc(var(--ambx-size) * 0.012);
-  background-color: color-mix(in oklab, var(--amb-lit), black 82%);
+  background-color: var(--amb-lume);
 }
 
 /* Panel graphics: the accent centre mark above the knob and the -/+ legends
@@ -1298,7 +1304,12 @@
   height: calc(var(--ambx-size) * 0.2);
   margin-bottom: calc(var(--ambx-size) * 0.07);
   border-radius: var(--ambx-radius-sm);
-  background-color: var(--ambx-accent);
+  /* amb-surface's lit albedo with the albedo pinned to the accent (restated
+     because this sheet loads independently of ambient.css and rule order is
+     not guaranteed) — the mark keeps its orange identity but reads as a
+     little body of material under the scene's light, not printed ink. */
+  --amb-albedo: var(--ambx-accent);
+  background-color: var(--amb-lit);
   transform: translateX(-50%);
 }
 
@@ -1349,15 +1360,35 @@
 
 /* The track is a pure-CSS part: it reads --ambx-percent off the control root
    and mixes its own colour from it, so it lights and dims with the travel
-   without the mechanism knowing this element exists. */
+   without the mechanism knowing this element exists.
+
+   BOTH ends of that mix are now lit reflectance rather than paint, so the
+   whole base responds to the lamp:
+   - OFF: a dark grey body — the scene's lit albedo held at 30% in linear
+     light. It sits well below the panel as a recess should but still
+     tracks the lamp, because the base colour is --amb-lit: dim the key
+     and the floor dims with it. (It briefly sat at plain --amb-lit, which
+     read flush with the panel.)
+   - ON: the accent worn as reflectance, through the SAME law the thumb's
+     face goes through. ambient.css publishes its diffuse exposure factor
+     as --amb-exposure (= key*0.6396 + fill*0.5496, applied in linear
+     light), so mixing in `srgb-linear` by that amount reproduces
+     amb-surface's shading exactly — track ON and thumb sit at the same
+     brightness, instead of the mean-of-intensities approximation that
+     left the floor visibly darker than the body it carries. */
 .amb-console-track {
   position: absolute;
   inset: 0;
   border-radius: var(--ambx-radius-full);
+  --_lit-accent: color-mix(
+    in srgb-linear,
+    var(--ambx-accent) calc(var(--amb-exposure) * 100%),
+    black
+  );
   background-color: color-mix(
     in oklab,
-    color-mix(in oklab, var(--amb-lit), black 55%),
-    var(--ambx-accent) calc(var(--ambx-percent) * 100%)
+    color-mix(in srgb-linear, var(--amb-lit) 30%, black),
+    var(--_lit-accent) calc(var(--ambx-percent) * 100%)
   );
   --amb-thickness: 0.4;
   transition: background-color 160ms ease;
@@ -1366,20 +1397,29 @@
 /* Flat-topped, but a body: `.ambient` with a thickness and NO edge
    treatment, which is the combination that casts a drop shadow while
    leaving the top face unbroken — the chamfer and fillet layers of the
-   composite are gated on their own properties, and neither is set here. */
+   composite are gated on their own properties, and neither is set here.
+   The face stays the accent ORANGE, but as reflectance not paint:
+   --amb-albedo feeds amb-surface's exposure law (restated here because
+   this sheet loads independently of ambient.css, so rule order is not
+   guaranteed), so the thumb still re-shades when the lamp moves or the
+   intensities change — an orange body under the scene's light, not a
+   sticker of orange. */
 .amb-console-thumb {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background-color: color-mix(in oklab, var(--ambx-accent), white 12%);
-  /* The white ring is a BORDER, not a spread shadow. Two reasons, and the
+  --amb-albedo: var(--ambx-accent);
+  background-color: var(--amb-lit);
+  /* The ring is a BORDER, not a spread shadow. Two reasons, and the
      second is the load-bearing one: with the package's border-box reset the
      ring grows inward, so the thumb keeps the outer diameter measured off
      the reference — and `box-shadow` is the property `.ambient` composites
      the whole lighting model into, so setting it here would silently wipe
-     the drop shadow the thickness above is there to cast. */
-  border: calc(var(--ambx-latch-thumb-h) * 0.09) solid
-    hsl(var(--amb-light-hue) var(--amb-light-saturation) 99%);
+     the drop shadow the thickness above is there to cast. The ring's ink
+     is --amb-lume: lit albedo vanished against the thumb's orange face, so
+     the ring reads as an emissive halo instead — present in bright light,
+     glowing as the scene dims. */
+  border: calc(var(--ambx-latch-thumb-h) * 0.09) solid var(--amb-lume);
 }
 
 @media (prefers-reduced-motion: reduce) {

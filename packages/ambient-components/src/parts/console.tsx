@@ -52,7 +52,7 @@ export function ConsoleBar({ className }: { className?: string | undefined }) {
   );
 }
 
-/** Panel graphics around the knob: the accent centre mark above it, and the
+/** Panel graphics around the knob: the centre mark above it, and the
  *  −/+ legends at the ends of the travel. Both sit outside the knob's own
  *  box, which is what the `panel` frame is for. */
 export function ConsoleMarks({
@@ -66,7 +66,7 @@ export function ConsoleMarks({
 }) {
   return (
     <span className={cn("amb-console-marks", className)} aria-hidden>
-      {mark ? <span className="amb-console-mark" /> : null}
+      {mark ? <span className="amb-console-mark amb-surface" /> : null}
       {legend ? (
         <>
           <span className="amb-console-legend amb-console-legend-min">−</span>
@@ -87,13 +87,15 @@ export function ToggleTrack({ className }: { className?: string | undefined }) {
   return <span className={cn("amb-console-track amb-groove", className)} />;
 }
 
-/** The travelling thumb: an accent disc inside a white ring.
+/** The travelling thumb: an albedo disc inside a light ring.
  *
  *  Flat on top and deliberately so — no chamfer, no fillet — but still a
  *  knob-scale body, so it casts. That pairing is why the classes are spelt
  *  out rather than reached through `.amb-fillet-2`: the edge treatments set
  *  a thickness of their own, and here the thickness is wanted without the
- *  cut that usually comes with it. */
+ *  cut that usually comes with it. It wears `amb-surface`, so its colour IS
+ *  the scene's albedo under the current light rather than a fixed paint —
+ *  it re-shades when the lamp moves or the intensities change. */
 export function ToggleThumb({ className }: { className?: string | undefined }) {
-  return <span className={cn("amb-console-thumb ambient amb-thickness-2", className)} />;
+  return <span className={cn("amb-console-thumb ambient amb-surface amb-thickness-2", className)} />;
 }

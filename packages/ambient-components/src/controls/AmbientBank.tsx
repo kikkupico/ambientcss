@@ -106,6 +106,7 @@ export function AmbientBank({
         const ks = keyState(on, option.disabled || disabled);
         return (
           <button
+            key={option.value}
             {...keyProps(option, index)}
             {...stateData(ks)}
             className="ambx-key"

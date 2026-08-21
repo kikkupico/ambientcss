@@ -79,7 +79,7 @@ type ThemePreset = {
 
 const THEME_PRESETS: ThemePreset[] = [
   { label: "Day",    icon: "☀", led: "#f59e0b", lightX: -0.7, lightY: -0.7, keyLight: 0.9,  fillLight: 0.7,  lightHue: 234, lightSaturation: 5,   lumeHue: 16 },
-  { label: "Night",  icon: "☾", led: "#6366f1", lightX: 0.7,  lightY: -0.7, keyLight: 0.3,  fillLight: 0.1,  lightHue: 250, lightSaturation: 30,  lumeHue: 16 },
+  { label: "Night",  icon: "☾", led: "#6366f1", lightX: 0.7,  lightY: -0.7, keyLight: 0.125, fillLight: 0,    lightHue: 250, lightSaturation: 30,  lumeHue: 16 },
   { label: "Sci-Fi", icon: "✦", led: "#22d3d3", lightX: 0,    lightY: -0.9, keyLight: 0.2,  fillLight: 0.05, lightHue: 190, lightSaturation: 50,  lumeHue: 180 },
   { label: "Fun",    icon: "✷", led: "#ec4899", lightX: 0,    lightY: -1,   keyLight: 0.55, fillLight: 0,    lightHue: 0,   lightSaturation: 100, lumeHue: 0 },
 ];
@@ -259,8 +259,6 @@ export function App() {
   const [bank, setBank] = useState("3");
   const [armed, setArmed] = useState<string[]>(["A", "C"]);
   const [sw1, setSw1] = useState(true);
-  const [sw2, setSw2] = useState(false);
-
   /* The kit section drives BOTH columns off one pair of values. Turning the
      grounded knob turns the console knob with it, which is the point: the
      call site and the state are the same, only the kit above them differs. */
@@ -331,7 +329,18 @@ export function App() {
   const mergedTheme = { ...DEFAULTS, ...theme };
 
   return (
-    <AmbientProvider className="amb-surface" theme={theme}>
+    <AmbientProvider className="amb-surface" theme={theme}
+      /* FUN'S FONTS: at hue 0 / sat 100 the derived label and lume tones
+         land mid-red on the red-lit surfaces and vanish. While the Fun
+         preset is active, pin both ink variables to near-black so type
+         reads against its own background. The style prop wins over the
+         theme vars by merge order in AmbientProvider, so this is a clean
+         per-preset override point. */
+      style={
+        activePreset === "Fun"
+          ? ({ "--amb-label": "hsl(0 15% 7%)", "--amb-lume": "hsl(0 15% 7%)" } as React.CSSProperties)
+          : {}
+      }>
 
       {/* ── HEADER — global light control ────────────────────────────── */}
       <ThemeSwitcher
@@ -599,7 +608,7 @@ export function App() {
                   { name: "Default" },
                   { name: "Oxide", albedo: "#7a3b2e" },
                   { name: "Steel", albedo: "#24405c" },
-                  { name: "Black chrome", albedo: "#1a1a1a" },
+                  { name: "Black", albedo: "#1a1a1a" },
                 ],
               },
               {
@@ -672,8 +681,8 @@ export function App() {
           <div className="groove-wall">
             {[
               { cls: "groove-channel", label: "Channel", tone: "lume" },
-              { cls: "groove-well", label: "Well", tone: "darker" },
-              { cls: "groove-inset", label: "Inset", tone: "darker" },
+              { cls: "groove-well", label: "Well", tone: "plain" },
+              { cls: "groove-inset", label: "Inset", tone: "plain" },
             ].map(({ cls, label, tone }, i) => (
               <div className="groove-item" key={label}>
                 <div
@@ -718,9 +727,6 @@ export function App() {
             </div>
             <div className="component-cell" data-visible={compView.visible}>
               <AmbientSwitch value={sw1} onChange={setSw1} led label="Switch" />
-            </div>
-            <div className="component-cell" data-visible={compView.visible}>
-              <AmbientSwitch value={sw2} onChange={setSw2} led="amber" label="Switch" />
             </div>
             <div className="component-cell" data-visible={compView.visible}>
               <AmbientButton>Button</AmbientButton>
@@ -991,8 +997,9 @@ function ThemeSwitcher({ theme, activePreset, onPreset, onCustom, onProp }: Them
               <span className="cord-console-preset">Custom</span>
             </div>
             {/* Controls sit in a recessed darker well so they pop and read
-                apart from the key bank below. */}
-            <div className="cord-console-well ambient amb-groove groove-darker">
+                apart from the key bank below. Bead-blasted, so the inset
+                reads as a different finish from the brushed slab around it. */}
+            <div className="cord-console-well ambient amb-groove amb-mat-blasted">
               {/* The lamp's placement, laid out as the vector it is: the
                   fader stands on the left for Y, the slider runs across the
                   top for X, and the two intensity knobs sit under the slider

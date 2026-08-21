@@ -916,8 +916,8 @@ body {
   color: var(--amb-highlight-color);
   letter-spacing: 0.2em;
 }
-/* Recessed darker well the controls sit in — a groove with a darker floor
-   (groove-darker is a demo-local override that wins the floor colour). */
+/* Recessed well the controls sit in — a groove, floor left at the ground
+   tone (the old groove-darker shading override is gone). */
 .cord-console-well {
   --amb-thickness: 1;
   border-radius: var(--ambx-radius-lg);
@@ -1049,18 +1049,10 @@ body {
    light, glowing when the room goes dark. */
 .groove-lume { background-color: var(--amb-lume); }
 
-/* .amb-groove's own floor sits within a hair of the open ground (see its
-   comment in ambient.css); shading the material down to the rig's
-   mid-tone plate gives the well/inset recesses a floor that reads as
-   visibly deeper material, not just a shadow band on the same page
-   colour. --amb-shade rather than a fixed colour, so the recess still
-   follows whatever --amb-albedo the page is themed with. 0.378 is the
-   rig's mid-tone plate over the reference ground, so the floor lands
-   within 0.7 points of lightness of the tone .amb-surface-darker painted
-   here — the remainder is the groove's own wall bounce. */
-.groove-darker {
-  --amb-shade: 0.378;
-}
+/* EXPERIMENT: the well/inset recesses used to shade their floor down via
+   --amb-shade: 0.378 (.groove-darker). That override is removed — the
+   recesses now sit on the same ground as the page, with only the groove's
+   own wall shading reading as depth. */
 
 .groove-channel {
   width: clamp(150px, 24vw, 240px);
