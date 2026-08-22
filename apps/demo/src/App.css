@@ -364,6 +364,8 @@ body {
   display: flex;
   gap: 18px;
   flex-wrap: wrap;
+  flex: 1;
+  justify-content: space-between;
 }
 
 .material-color-item {
@@ -371,6 +373,7 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 8px;
+  width: clamp(44px, 7vw, 60px);
 }
 
 .material-color-swatch {
@@ -400,6 +403,7 @@ body {
   text-transform: uppercase;
   color: var(--amb-lume);
   opacity: 0.75;
+  white-space: nowrap;
 }
 
 /* --------------------------------------------------------------------------
@@ -798,6 +802,10 @@ body {
     gap: 6px;
   }
 
+  .material-color-item {
+    width: clamp(32px, 8vw, 44px);
+  }
+
   .material-color-swatch {
     width: clamp(32px, 8vw, 44px);
     height: clamp(32px, 8vw, 44px);
@@ -826,6 +834,11 @@ body {
 
   .scene-label {
     margin-bottom: 16px;
+  }
+
+  .scene-subtitle {
+    margin-top: -8px;
+    margin-bottom: 24px;
   }
 
   .scene-hint {
