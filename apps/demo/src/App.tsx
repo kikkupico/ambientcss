@@ -60,6 +60,21 @@ function usePrefersReducedMotion() {
   return reduced;
 }
 
+function useIsMobile() {
+  const [mobile, setMobile] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches,
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 768px)");
+    const onChange = () => setMobile(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  return mobile;
+}
+
 /* ── Theming presets ──────────────────────────────────────────────────────
    The lighting is driven entirely by the header now (presets + the settings
    pulldown) — not by scroll. Every scene below re-lights from the same theme. */
@@ -268,6 +283,8 @@ export function App() {
   /* The hero film loops on its own; under prefers-reduced-motion it becomes
      an ordinary paused video the visitor can start themselves. */
   const reducedMotion = usePrefersReducedMotion();
+  const isMobile = useIsMobile();
+  const compSize = isMobile ? "sm" : "lg";
 
   /* InView hooks for each section ----------------------------------------- */
   const orbitView = useInView(0.2);
@@ -277,9 +294,7 @@ export function App() {
   const matView = useInView(0.2);
   const matColorView = useInView(0.15);
   const edgeView = useInView(0.2);
-  const grooveView = useInView(0.2);
   const compView = useInView(0.1);
-  const kitView = useInView(0.1);
   const finaleView = useInView(0.3);
 
   /* Section refs for scroll navigation ------------------------------------ */
@@ -291,9 +306,7 @@ export function App() {
   const matSectionRef = useRef<HTMLElement>(null);
   const matColorSectionRef = useRef<HTMLElement>(null);
   const edgeSectionRef = useRef<HTMLElement>(null);
-  const grooveSectionRef = useRef<HTMLElement>(null);
   const compSectionRef = useRef<HTMLElement>(null);
-  const kitSectionRef = useRef<HTMLElement>(null);
 
   /* Orbit: pointer/touch-driven light direction ───────────────────────── */
   const [orbitLight, setOrbitLight] = useState({ x: -1, y: -1 });
@@ -669,33 +682,22 @@ export function App() {
                 <span className="edge-label">{label}</span>
               </div>
             ))}
-          </div>
-        </div>
-        <ScrollButton sectionRef={edgeSectionRef} />
-      </section>
-
-      {/* ── GROOVE (grounded) ────────────────────────────────────────── */}
-      <section className="scene amb-surface" ref={grooveSectionRef}>
-        <div className="scene-inner" ref={grooveView.ref}>
-          <div className="scene-label">Groove</div>
-          <div className="groove-wall">
             {[
               { cls: "groove-channel", label: "Channel", tone: "lume" },
-              { cls: "groove-well", label: "Well", tone: "plain" },
               { cls: "groove-inset", label: "Inset", tone: "plain" },
             ].map(({ cls, label, tone }, i) => (
-              <div className="groove-item" key={label}>
+              <div className="edge-item" key={label}>
                 <div
                   className={`groove-swatch ambient amb-groove ${cls} groove-${tone}`}
-                  data-visible={grooveView.visible}
-                  style={{ transitionDelay: `${i * 0.1}s` }}
+                  data-visible={edgeView.visible}
+                  style={{ transitionDelay: `${(i + 4) * 0.06}s` }}
                 />
-                <span className="groove-label">{label}</span>
+                <span className="edge-label">{label}</span>
               </div>
             ))}
           </div>
         </div>
-        <ScrollButton sectionRef={grooveSectionRef} />
+        <ScrollButton sectionRef={edgeSectionRef} />
       </section>
 
       {/* ── 7. COMPONENTS ─────────────────────────────────────────────── */}
@@ -703,144 +705,60 @@ export function App() {
         <div className="scene-inner" ref={compView.ref}>
           <div className="scene-label">Components</div>
           <div className="scene-subtitle">(react only)</div>
-          <div className="component-stage">
-            <div className="component-cell" data-visible={compView.visible}>
-              <AmbientKnob value={knob1} onChange={setKnob1} label="Knob" />
+          
+          <div className="component-stage" data-visible={compView.visible}>
+            {/* Knobs */}
+            <div className="component-cell">
+              <AmbientKnob size={compSize} value={knob1} onChange={setKnob1} knurling={false} markers="full" />
             </div>
-            <div className="component-cell" data-visible={compView.visible}>
-              {/* All three knob axes at once, against the default beside it:
-                  smooth body, printed marker ring, rectangle pointer. */}
-              <AmbientKnob
-                value={knob2}
-                onChange={setKnob2}
-                knurling={false}
-                markers="full"
-                indicator="rectangle"
-                label="Knob"
-              />
+            <div className="component-cell">
+              <AmbientKnob size={compSize} value={knob4} onChange={setKnob4} material="brushed-round" knurlColor="color(srgb-linear 0.09 0.09 0.1)" />
             </div>
-            <div className="component-cell" data-visible={compView.visible}>
-              <AmbientSlider value={slider1} min={0} max={100} onChange={setSlider1} label="Slider" />
+            <div className="component-cell">
+              <AmbientKitProvider kit={consoleKit}>
+                <AmbientKnob size={compSize} value={kitLevel} onChange={setKitLevel} style={{ marginBottom: "calc(var(--ambx-size) * 0.3)" }} />
+              </AmbientKitProvider>
             </div>
-            <div className="component-cell" data-visible={compView.visible}>
-              <AmbientFader value={fader1} min={0} max={100} onChange={setFader1} label="Fader" />
+
+            {/* Buttons */}
+            <div className="component-cell">
+              <AmbientButton size={compSize} shape="round" material="shiny" aria-label="Round button" />
             </div>
-            <div className="component-cell" data-visible={compView.visible}>
-              <AmbientSwitch value={sw1} onChange={setSw1} led label="Switch" />
+            <div className="component-cell">
+              <AmbientButton size={compSize}>Button</AmbientButton>
             </div>
-            <div className="component-cell" data-visible={compView.visible}>
-              <AmbientButton>Button</AmbientButton>
+            <div className="component-cell">
+              <AmbientKitProvider kit={consoleKit}>
+                <AmbientButton size={compSize} shape="square">FX</AmbientButton>
+              </AmbientKitProvider>
             </div>
-            <div className="component-cell" data-visible={compView.visible}>
-              <AmbientButton shape="round" material="shiny" aria-label="Round button" />
+
+            {/* Switches & Horizontal Slider */}
+            <div className="component-cell">
+              <AmbientSwitch size={compSize} value={sw1} onChange={setSw1} led />
             </div>
-            <div className="component-cell" data-visible={compView.visible}>
-              <AmbientButton shape="square">FX</AmbientButton>
+            <div className="component-cell">
+              <AmbientKitProvider kit={consoleKit}>
+                <AmbientSwitch size={compSize} value={kitOn} onChange={setKitOn} led />
+              </AmbientKitProvider>
             </div>
-            <div className="component-cell" data-visible={compView.visible}>
-              {/* The cap spends its own ::after on the dish, so a relief
-                  material rides an inner layer under it. Blasted carries
-                  no --amb-albedo of its own (@ambientcss/css), so this pins
-                  the reference tone it was fitted at — bead-blasted
-                  aluminium, light grey with a dense sparkle. Leave it off
-                  to blast whatever tone the surface already carries. */}
-              <AmbientButton
-                shape="square"
-                material="blasted"
-                style={{ "--amb-albedo": "color(srgb-linear 0.446 0.446 0.446)" } as React.CSSProperties}
-              >
-                PAD
-              </AmbientButton>
+            <div className="component-cell">
+              <AmbientSlider size={compSize} value={slider1} min={0} max={100} onChange={setSlider1} style={{ marginTop: "calc(var(--ambx-grid) * 3)" }} />
             </div>
-            <div className="component-cell" data-visible={compView.visible}>
-              {/* Brushed metal never rotates its grain: turn this knob and the
-                  streaks stay put while the shading crosses them. Smooth-bodied
-                  on purpose — the knurled rim rides the rotating frame, so its
-                  grain would turn with it and say the opposite. */}
-              <AmbientKnob
-                value={knob3}
-                onChange={setKnob3}
-                material="brushed"
-                knurling={false}
-                label="Knob"
-              />
+
+            {/* Select Banks & Vertical Slider */}
+            <div className="component-cell">
+              <AmbientSelect size={compSize} options={[{ value: "1" }, { value: "2" }, { value: "3" }]} value={bank} onChange={(v) => setBank(v as string)} color="#22d3d3" />
             </div>
-            <div className="component-cell" data-visible={compView.visible}>
-              {/* The spun finish, which is what a knob cap actually wears —
-                  and the one metal a rotating part may carry, because a grain
-                  that turns about the same centre the part does looks the
-                  same at every angle. Dark knurl round a pale cap: two tones,
-                  one control. */}
-              <AmbientKnob
-                value={knob4}
-                onChange={setKnob4}
-                material="brushed-round"
-                knurlColor="color(srgb-linear 0.09 0.09 0.1)"
-                label="Knob"
-              />
+            <div className="component-cell">
+              <AmbientSelect size={compSize} multiple orientation="horizontal" options={[{ value: "A" }, { value: "B" }, { value: "C" }]} value={armed} onChange={(v) => setArmed(v as string[])} color="#4ade80" />
             </div>
-            <div className="component-cell" data-visible={compView.visible}>
-              <AmbientSelect
-                size="sm"
-                options={[{ value: "1" }, { value: "2" }, { value: "3" }, { value: "4" }]}
-                value={bank}
-                onChange={(v) => setBank(v as string)}
-                color="#22d3d3"
-                label="Bank"
-              />
+            <div className="component-cell">
+              <AmbientFader size={compSize} value={fader1} min={0} max={100} onChange={setFader1} />
             </div>
-            <div className="component-cell" data-visible={compView.visible}>
-              <AmbientSelect
-                multiple
-                size="sm"
-                orientation="horizontal"
-                options={[{ value: "A" }, { value: "B" }, { value: "C" }]}
-                value={armed}
-                onChange={(v) => setArmed(v as string[])}
-                color="#4ade80"
-                label="Arm"
-              />
-            </div>
-          </div>
-          <div className="comp-led-row" data-visible={compView.visible}>
-            <div className="amb-led" style={{ "--amb-led-color": "#ef4444" } as React.CSSProperties} />
-            <div className="amb-led" style={{ "--amb-led-color": "#4ade80" } as React.CSSProperties} />
-            <div className="amb-led" style={{ "--amb-led-color": "#3b82f6" } as React.CSSProperties} />
           </div>
         </div>
         <ScrollButton sectionRef={compSectionRef} />
-      </section>
-
-      {/* ── 8. KITS ───────────────────────────────────────────────────── */}
-      <section className="scene amb-surface" ref={kitSectionRef}>
-        <div className="scene-inner" ref={kitView.ref}>
-          <div className="scene-label">Kits</div>
-          <div className="scene-subtitle">(react only)</div>
-          <div className="scene-hint">
-            One call site, two looks — grab either knob and both follow
-          </div>
-          <div className="component-stage kit-stage">
-            <div className="component-cell" data-visible={kitView.visible}>
-              <div className="kit-row">
-                <AmbientKnob value={kitLevel} onChange={setKitLevel} label="Level" />
-                <AmbientSwitch value={kitOn} onChange={setKitOn} led label="On" />
-              </div>
-              <div className="kit-name">grounded</div>
-            </div>
-            <div className="component-cell" data-visible={kitView.visible}>
-              {/* The identical markup, one provider deeper. No prop below
-                  this line knows which kit it is being painted by. */}
-              <AmbientKitProvider kit={consoleKit}>
-                <div className="kit-row">
-                  <AmbientKnob value={kitLevel} onChange={setKitLevel} label="Level" />
-                  <AmbientSwitch value={kitOn} onChange={setKitOn} led label="On" />
-                </div>
-              </AmbientKitProvider>
-              <div className="kit-name">consoleKit</div>
-            </div>
-          </div>
-        </div>
-        <ScrollButton sectionRef={kitSectionRef} />
       </section>
 
       {/* ── 9. FINALE ────────────────────────────────────────────────── */}

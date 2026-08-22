@@ -410,8 +410,9 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 32px;
-  max-width: 900px;
+  max-width: 600px; /* Forces exactly 4 columns max on desktop, putting the 2 grooves on the last row */
   margin: 0 auto;
+  justify-items: center;
 }
 
 .edge-item {
@@ -449,15 +450,15 @@ body {
 /* --------------------------------------------------------------------------
    COMPONENT STAGE
    -------------------------------------------------------------------------- */
-
 .component-stage {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 48px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: 48px;
+  row-gap: 80px;
   max-width: 900px;
   margin: 0 auto;
+  justify-items: center;
+  align-items: center;
 }
 
 .component-cell {
@@ -744,20 +745,62 @@ body {
     gap: 20px;
   }
 
+  .surface-gallery.materials-gallery {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .materials-gallery .moving-circle {
+    --slide-out-x: 68px;
+  }
+
   .edge-wall {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 20px;
   }
 
-  .material-color-row {
+  .orbit-grid {
+    gap: 16px;
+  }
+
+  .component-stage {
+    column-gap: 12px;
+    row-gap: 40px;
+  }
+
+  .kit-stage {
+    gap: 20px;
     flex-direction: column;
     align-items: center;
+  }
+
+  .kit-row {
+    gap: 16px;
+  }
+
+  .material-color-wall {
     gap: 12px;
   }
 
+  .material-color-row {
+    flex-direction: row;
+    gap: 8px;
+    justify-content: center;
+  }
+
   .material-color-row-label {
-    width: auto;
-    text-align: center;
+    flex: 0 0 54px;
+    width: 54px;
+    text-align: right;
+    font-size: 8px;
+  }
+
+  .material-color-swatches {
+    gap: 6px;
+  }
+
+  .material-color-swatch {
+    width: clamp(32px, 8vw, 44px);
+    height: clamp(32px, 8vw, 44px);
   }
 
   .theme-playground {
@@ -778,15 +821,20 @@ body {
   }
 
   .scene-inner {
-    padding: 60px 20px;
+    padding: 70px 10px 20px;
   }
 
   .scene-label {
-    margin-bottom: 32px;
+    margin-bottom: 16px;
   }
 
   .scene-hint {
-    margin-bottom: 24px;
+    margin-bottom: 16px;
+  }
+  
+  .finale {
+    padding-top: 70px;
+    padding-bottom: 20px;
   }
 
   .finale-links {
@@ -1020,24 +1068,9 @@ body {
 }
 
 /* ==========================================================================
-   GROOVE scene — grounded recesses
+   GROOVE scene (now part of Edge Treatments)
    ========================================================================== */
 
-.groove-wall {
-  display: flex;
-  gap: clamp(28px, 5vw, 56px);
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  max-width: 900px;
-  margin: 0 auto;
-}
-.groove-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-}
 .groove-swatch {
   transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
               transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
@@ -1049,32 +1082,16 @@ body {
    light, glowing when the room goes dark. */
 .groove-lume { background-color: var(--amb-lume); }
 
-/* EXPERIMENT: the well/inset recesses used to shade their floor down via
-   --amb-shade: 0.378 (.groove-darker). That override is removed — the
-   recesses now sit on the same ground as the page, with only the groove's
-   own wall shading reading as depth. */
-
 .groove-channel {
-  width: clamp(150px, 24vw, 240px);
+  width: clamp(80px, 12vw, 120px);
   height: 28px;
   border-radius: var(--ambx-radius-full);
   --amb-thickness: 0.4;
 }
-.groove-well {
-  width: clamp(96px, 15vw, 140px);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  --amb-thickness: 0.5;
-}
+
 .groove-inset {
-  width: clamp(130px, 20vw, 180px);
-  height: 116px;
+  width: clamp(80px, 12vw, 120px);
+  height: clamp(80px, 12vw, 120px);
   border-radius: var(--ambx-radius-xl);
   --amb-thickness: 0.5;
-}
-.groove-label {
-  font-size: 8px;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--amb-lume);
 }
