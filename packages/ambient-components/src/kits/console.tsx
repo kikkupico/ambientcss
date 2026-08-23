@@ -4,13 +4,14 @@ import type { AmbientKnobProps } from "../components/AmbientKnob";
 import { AmbientSwitch } from "../components/AmbientSwitch";
 import type { AmbientSwitchProps } from "../components/AmbientSwitch";
 import type { ControlKit, KitDress, KitLook } from "../core/kit";
-import { ConsoleBar, ConsoleMarks, ConsoleWell, ToggleThumb, ToggleTrack } from "../parts/console";
+import { ConsoleBar, ConsoleKey, ConsoleMarks, ConsoleWell, ToggleThumb, ToggleTrack } from "../parts/console";
 
 /**
  * A mixer-desk visual identity: cuboid bar knobs seated in a circular
- * groove, and pill toggles that light up with the panel accent.
+ * groove, pill toggles that light up with the panel accent, and a bank
+ * whose selection reads as a depressed key rather than a lit one.
  *
- * It dresses two families and leaves the other three to fall through to
+ * It dresses three families and leaves the other two to fall through to
  * `grounded` — which is what a real third-party kit looks like. A kit is not
  * obliged to have an opinion about everything.
  */
@@ -39,10 +40,21 @@ function latch(): KitDress {
   };
 }
 
+/** No dot to relight: on and off are the same key, styled through
+ *  `[data-on]` in `.amb-console-bank` (styles.css), so `parts` alone
+ *  covers both — this bank needs neither `onParts` nor `offParts`. */
+function bank(): KitDress {
+  return {
+    className: "amb-console-bank amb-groove",
+    parts: { actuator: <ConsoleKey /> }
+  };
+}
+
 export const consoleKit: ControlKit = {
   name: "console",
   rotary,
   latch,
+  bank,
   /* A visual identity may say how its controls feel to turn. The desk knob
      this is drawn from is an absolute-position pot with a centre detent, so
      it grabs where you press rather than tracking a drag. */
@@ -51,7 +63,8 @@ export const consoleKit: ControlKit = {
   },
   looks: {
     rotary: ["mark", "legend"],
-    latch: []
+    latch: [],
+    bank: []
   }
 };
 

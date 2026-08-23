@@ -1,4 +1,6 @@
+import type { ReactNode } from "react";
 import { cn } from "../lib/cn";
+import { useBankKey } from "../core/context";
 
 /* Parts for the `console` kit — a mixer-desk visual language, measured off
    photographs of the real controls. Nothing here is a variant of a grounded
@@ -98,4 +100,30 @@ export function ToggleTrack({ className }: { className?: string | undefined }) {
  *  it re-shades when the lamp moves or the intensities change. */
 export function ToggleThumb({ className }: { className?: string | undefined }) {
   return <span className={cn("amb-console-thumb ambient amb-surface amb-thickness-2", className)} />;
+}
+
+/** The bank key: a squared cast face with the desk's own moulded circle sunk
+ *  into the middle of it — the referent's tooling mark, present on every
+ *  key regardless of selection — and a small LED at its centre that lights
+ *  only on the selected one. Selection is doubly read: the LED, and the
+ *  face itself sitting flush — the SAME markup in both states, styled
+ *  through `[data-on]` in `.amb-console-bank` (styles.css): off stands at
+ *  the desk's own knob-scale thickness, the body ConsoleBar and ToggleThumb
+ *  both stand at; on drops to zero, the flattest the `.ambient` composite
+ *  goes, reading as a button held all the way in. */
+export function ConsoleKey({
+  className,
+  children
+}: {
+  className?: string | undefined;
+  children?: ReactNode | undefined;
+}) {
+  const { option } = useBankKey();
+  return (
+    <span className={cn("amb-console-key ambient amb-surface amb-chamfer amb-heading-3", className)}>
+      <span className="amb-console-key-dish amb-surface-concave" aria-hidden />
+      <span className="amb-console-key-led" aria-hidden />
+      {children ?? option.label ?? option.value}
+    </span>
+  );
 }

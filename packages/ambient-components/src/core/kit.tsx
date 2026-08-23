@@ -21,10 +21,25 @@ export type KitLook = Record<string, unknown>;
  *
  *  The class comes from the kit rather than the preset because it is part of
  *  the look — `.amb-knob` carries the grounded knob's own token table, and a
- *  kit that replaces the parts has no use for it. */
+ *  kit that replaces the parts has no use for it.
+ *
+ *  `onParts` / `offParts` / `panelParts` exist for the `bank` family only,
+ *  where `parts` is reused to mean "every key's frames" rather than "the
+ *  control's own frames" (see `AmbientSelect`). A bank whose lit and unlit
+ *  keys are the same markup styled through `[data-on]` — the grounded key,
+ *  lamp under a diffuser — never needs them: `parts` alone covers both
+ *  states, as it always has. They earn their keep only when on and off are
+ *  genuinely different markup — a glossy cap swapped in for a matte one
+ *  cannot be reached by a CSS selector, since `material` picks a different
+ *  class at render time, not a variable. `panelParts` is the rail itself:
+ *  the frames around the whole row of keys, painted once, distinct from any
+ *  one key's own. */
 export type KitDress = {
   parts: ControlParts;
   className?: string | undefined;
+  onParts?: ControlParts | undefined;
+  offParts?: ControlParts | undefined;
+  panelParts?: ControlParts | undefined;
 };
 
 /** Presentation defaults a visual identity may legitimately set.

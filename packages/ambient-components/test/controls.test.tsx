@@ -259,4 +259,38 @@ describe("AmbientBank", () => {
     expect(screen.getByText("sine:off")).toBeTruthy();
     expect(screen.getByText("tri:off")).toBeTruthy();
   });
+
+  it("swaps keyPartsOn/keyPartsOff per key state and updates on selection", async () => {
+    render(
+      <AmbientBank
+        aria-label="wave"
+        options={options}
+        defaultValue="sine"
+        keyPartsOn={{ actuator: <span>lit</span> }}
+        keyPartsOff={{ actuator: <span>unlit</span> }}
+      />
+    );
+    const keys = screen.getAllByRole("radio");
+    // sine is selected: its own frame reads "lit", the rest "unlit".
+    expect(keys[0].textContent).toBe("lit");
+    expect(keys[1].textContent).toBe("unlit");
+    await userEvent.click(keys[1]);
+    expect(keys[0].textContent).toBe("unlit");
+    expect(keys[1].textContent).toBe("lit");
+  });
+
+  it("falls back to keyParts when only one of keyPartsOn/keyPartsOff is set", () => {
+    render(
+      <AmbientBank
+        aria-label="wave"
+        options={options}
+        defaultValue="sine"
+        keyParts={{ actuator: <span>shared</span> }}
+        keyPartsOn={{ actuator: <span>lit</span> }}
+      />
+    );
+    const keys = screen.getAllByRole("radio");
+    expect(keys[0].textContent).toBe("lit"); // on: keyPartsOn wins
+    expect(keys[1].textContent).toBe("shared"); // off: falls back to keyParts
+  });
 });
