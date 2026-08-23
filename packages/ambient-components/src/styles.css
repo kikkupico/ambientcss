@@ -322,6 +322,24 @@
   --ambx-size: var(--ambx-select-size);
 }
 
+/* Each key is its own actuator, and needs the baseline every other
+   actuator gets at its own mechanism level — `.ambx-latch` positions and
+   sizes itself the same way, above. A bank has one per key instead of one
+   for the whole control, so it belongs here rather than on `.ambx-bank`
+   itself. Without it, a bank wearing no look at all — the kit builder's
+   "empty" seed, or a from-scratch kit before any look is chosen — has
+   keys with no box: a `fill`-placed shape inside one is `position:
+   absolute` with no positioned ancestor, so it escapes to whatever
+   happens to be positioned further up the page instead of filling the
+   key. `min-width` rather than `width`, matching `.amb-select .ambx-key`
+   below: a floor a look's own class still owns and any of them may grow
+   past with real content, not a fixed box fighting it. */
+.ambx-key {
+  position: relative;
+  min-width: var(--ambx-select-size);
+  height: var(--ambx-select-size);
+}
+
 /* Button: a chamfered key cap seated in a clearance well — the referent
    is components/button.py's "flush" style (cap seated into a hole with a
    shadow gap ring around it). The button element IS the well: a shallow
