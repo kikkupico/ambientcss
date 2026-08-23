@@ -1,5 +1,25 @@
 # @ambientcss/components
 
+## 3.1.0
+
+### Minor Changes
+
+- 8651a46: `AmbientBank` / `AmbientSelect`: a key's on and off state can now be genuinely different markup, and a bank's own enclosure can be dressed separately from its keys.
+
+  `AmbientBank` gains `keyPartsOn` / `keyPartsOff`, overriding `keyParts` per key state — for a bank where the lit and unlit keys are different castings rather than the same key restyled through `[data-on]`. `KitDress` gains matching `onParts` / `offParts`, plus `panelParts` for the bank's own root frame (the rail around every key), which `AmbientSelect` now actually forwards to `AmbientBank`'s `parts` prop — it was previously accepted and silently dropped.
+
+  The `grounded` kit demonstrates the new split with a second bank look, `look={{ shape: "round" }}`: a row of ordinary round pushbuttons with no shared rail, Dieter Rams style — off is a plain matte cap, on is a glossy one wearing the bank's lamp colour.
+
+  The `console` kit now dresses `bank` too: selection reads as the key sitting flush (`--amb-thickness: 0`) against the rest at knob-scale thickness, with a moulded circular dish sunk into every key — a mixer-desk key bank, not a lamp-strip. The selected key's lamp has two readings, chosen by whether the option carries a legend: a key without one keeps a small centre LED that lights only when selected; a key with a legend (an empty-string label counts as none) drops the LED and lights the text itself, from the panel's ink to the bank's lamp colour — the same `--amb-led-color` channel, so one `color` prop lights either alike. Both readings are the same markup styled through `[data-on]`, so the kit's bank needs neither `onParts` nor `offParts`.
+
+### Patch Changes
+
+- 8651a46: `AmbientBank` keys get a real box and a positioning context of their own, independent of any look.
+
+  Every other actuator sizes and positions itself at the mechanism level — `.ambx-latch` is `position: relative` with its own width and height before any look touches it. A bank's keys never had that: sizing (`min-width`/`height: var(--ambx-select-size)`) and `position: relative` were only ever declared on the look-specific classes (`.amb-select .ambx-key`, and neither `.amb-select-radio` nor `.amb-console-bank` set `position: relative` at all). A bank dressed with no look — a from-scratch kit, or the Kit Builder's "empty" seed — had keys with no size, and any `fill`-placed content inside one had no positioned ancestor to fill: it escaped to whatever ancestor further up the page happened to be positioned, collapsing every key's content into one shape spanning the wrong box.
+
+  `.ambx-key` now carries that baseline itself. A look's own class is more specific and still wins outright where it sets a real size or shape (the round radio key, the square console key); this only supplies the floor underneath, so a custom bank has correctly boxed, correctly positioned keys from the moment it exists, before any look is chosen.
+
 ## 3.0.1
 
 ### Patch Changes
