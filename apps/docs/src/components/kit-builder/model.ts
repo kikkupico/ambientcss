@@ -156,11 +156,38 @@ export function elementApplies(element: KitElement, upright: boolean): boolean {
   return only === "both" || (only === "vertical") === upright;
 }
 
+/** Which half of a bank an element dresses — meaningless outside that
+ *  family, the same way `only` is meaningless outside travel.
+ *
+ *  `key` is a key's own frames, applied inside every button — the field
+ *  that already existed. `panel` is new: the rail's own frames, painted
+ *  once around the whole row, the thing `AmbientSelect` was silently
+ *  dropping before `panelParts` existed to carry it. */
+export type BankScope = "key" | "panel";
+
+/** Which key state a `key`-scope element belongs to. `both` — the default,
+ *  and what an element written before this field reads as — is the same
+ *  markup for on and off, restyled through `[data-on]`; that is the common
+ *  case and needs nothing else. `on` / `off` are for a bank whose lit and
+ *  unlit keys are genuinely different markup, the case `keyPartsOn` /
+ *  `keyPartsOff` exist for. */
+export type BankKeyState = "both" | "on" | "off";
+
+export function elementBankScope(element: KitElement): BankScope {
+  return element.bankScope ?? "key";
+}
+
+export function elementBankState(element: KitElement): BankKeyState {
+  return element.bankState ?? "both";
+}
+
 export type ShapeElement = {
   id: string;
   kind: "shape";
   frame: FrameName;
   only?: ElementOnly | undefined;
+  bankScope?: BankScope | undefined;
+  bankState?: BankKeyState | undefined;
   /** Names the generated class — `desk-rotary-housing`. */
   name: string;
   box: ShapeBox;
@@ -180,6 +207,8 @@ export type PartElement = {
   kind: "part";
   frame: FrameName;
   only?: ElementOnly | undefined;
+  bankScope?: BankScope | undefined;
+  bankState?: BankKeyState | undefined;
   part: PartName;
   props: PartProps;
 };

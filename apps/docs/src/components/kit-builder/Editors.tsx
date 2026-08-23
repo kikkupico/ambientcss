@@ -11,7 +11,15 @@
  *  swapping them puts the lamp out. */
 
 import { FRAMES, FRAME_NOTES } from "./model";
-import type { ElementOnly, FrameName, KitElement, PartElement, ShapeElement } from "./model";
+import type {
+  BankKeyState,
+  BankScope,
+  ElementOnly,
+  FrameName,
+  KitElement,
+  PartElement,
+  ShapeElement
+} from "./model";
 import { PARTS } from "./parts";
 import { MATERIALS, PANEL_MATERIALS } from "./config";
 import type { KitConfig, MaterialChoice } from "./config";
@@ -494,6 +502,17 @@ const ONLY_OPTIONS: Option<ElementOnly>[] = [
   { value: "horizontal", label: "sliders", title: "horizontal travel only" }
 ];
 
+const BANK_SCOPE_OPTIONS: Option<BankScope>[] = [
+  { value: "key", label: "each key", title: "inside every button — the bank's per-key dress" },
+  { value: "panel", label: "the rail", title: "painted once, around the whole row of keys" }
+];
+
+const BANK_STATE_OPTIONS: Option<BankKeyState>[] = [
+  { value: "both", label: "both", title: "same markup, restyled through [data-on]" },
+  { value: "on", label: "selected only", title: "only the lit / checked key" },
+  { value: "off", label: "unselected only", title: "every key that is not selected" }
+];
+
 /** The fields every element has, whichever kind it is, and then the kind's
  *  own form. */
 export function ElementEditor({
@@ -521,6 +540,24 @@ export function ElementEditor({
           value={element.only ?? "both"}
           options={ONLY_OPTIONS}
           onChange={(only) => onChange({ ...element, only })}
+        />
+      ) : null}
+      {family === "bank" ? (
+        <Segmented
+          label="Placement"
+          hint="a key's own dress, or the enclosure around the whole row"
+          value={element.bankScope ?? "key"}
+          options={BANK_SCOPE_OPTIONS}
+          onChange={(bankScope) => onChange({ ...element, bankScope })}
+        />
+      ) : null}
+      {family === "bank" && (element.bankScope ?? "key") === "key" ? (
+        <Segmented
+          label="Shown when"
+          hint="different markup per state — [data-on] already covers same-markup restyling"
+          value={element.bankState ?? "both"}
+          options={BANK_STATE_OPTIONS}
+          onChange={(bankState) => onChange({ ...element, bankState })}
         />
       ) : null}
       {element.kind === "part" ? (

@@ -15,7 +15,7 @@ import type { ReactNode } from "react";
 import { elementPiece, nodesOf } from "./parts";
 import type { BuildContext, Piece } from "./parts";
 import { rootClass, rootDeclarations } from "./css";
-import { FRAMES, elementApplies } from "./model";
+import { FRAMES, elementApplies, elementBankScope, elementBankState } from "./model";
 import type { FrameName, KitElement } from "./model";
 import type { KitConfig, MaterialChoice } from "./config";
 
@@ -55,9 +55,15 @@ function importsOf(frames: Frames): string[] {
   return FRAMES.flatMap((frame) => frames[frame] ?? []).flatMap((piece) => piece.imports);
 }
 
-/** `parts: { … }` as source. A frame holding more than one element prints as
- *  a fragment, which is what the hand-written kits in the library do. */
-function partsCode(frames: Frames, pad: string): string {
+function hasFrames(frames: Frames): boolean {
+  return FRAMES.some((frame) => (frames[frame]?.length ?? 0) > 0);
+}
+
+/** `‹key›: { … }` as source. A frame holding more than one element prints as
+ *  a fragment, which is what the hand-written kits in the library do. Named
+ *  by `key` rather than fixed to `"parts"` because a bank prints this same
+ *  shape under `panelParts`, `onParts` and `offParts` too. */
+function keyedFramesCode(key: string, frames: Frames, pad: string): string {
   const entries: string[] = [];
   for (const frame of FRAMES) {
     const pieces = frames[frame];
@@ -69,7 +75,11 @@ function partsCode(frames: Frames, pad: string): string {
       entries.push(`${pad}  ${frame}: (\n${pad}    <>\n${inner}\n${pad}    </>\n${pad}  )`);
     }
   }
-  return `${pad}parts: {\n${entries.join(",\n")}\n${pad}}`;
+  return `${pad}${key}: {\n${entries.join(",\n")}\n${pad}}`;
+}
+
+function partsCode(frames: Frames, pad: string): string {
+  return keyedFramesCode("parts", frames, pad);
 }
 
 export type FamilyCode = { code: string; imports: string[]; looks: string[] };
@@ -122,6 +132,41 @@ function build(
   };
 }
 
+/* ── Bank: a rail and a key, not one frame list ───────────────────────── */
+
+/** A dressed bank, already split along the two axes only this family has:
+ *  `panel` elements are the rail, painted once; `key` elements are inside
+ *  every button. Of the key elements, `split` says whether any of them are
+ *  state-only — and when none are, `on` and `off` are never looked at,
+ *  because a bank whose lit and unlit keys are the same markup needs
+ *  nothing beyond `key` (which becomes `parts`, as it always has). */
+type BankBuild = {
+  className: string;
+  panel: Frames;
+  key: Frames;
+  on: Frames;
+  off: Frames;
+  split: boolean;
+};
+
+function buildBank(cfg: KitConfig, slug: string, ctx: BuildContext): BankBuild {
+  const elements = elementsFor(cfg, "bank", true);
+  const panelElements = elements.filter((element) => elementBankScope(element) === "panel");
+  const keyElements = elements.filter((element) => elementBankScope(element) === "key");
+  const split = keyElements.some((element) => elementBankState(element) !== "both");
+  const sharedElements = keyElements.filter((element) => elementBankState(element) === "both");
+  const onElements = keyElements.filter((element) => elementBankState(element) !== "off");
+  const offElements = keyElements.filter((element) => elementBankState(element) !== "on");
+  return {
+    className: className(cfg, "bank", slug, true),
+    panel: frames(panelElements, slug, "bank", ctx),
+    key: frames(sharedElements, slug, "bank", ctx),
+    on: frames(onElements, slug, "bank", ctx),
+    off: frames(offElements, slug, "bank", ctx),
+    split
+  };
+}
+
 /* ── The two products ─────────────────────────────────────────────────── */
 
 /** The live dressing function for a family. */
@@ -145,6 +190,23 @@ export function familyDress(
       return { className: made.className, parts: toParts(made.frames) };
     };
   }
+  /* A bank has a rail and a key, not one frame list: `panel` elements dress
+     the rail once, and `key` elements split into `onParts`/`offParts` only
+     when the builder actually holds a state-only element — the common case,
+     the same markup restyled through `[data-on]`, needs neither. */
+  if (family === "bank") {
+    const made = buildBank(cfg, slug, {});
+    return () => {
+      const dress: KitDress = { className: made.className, parts: toParts(made.key) };
+      if (hasFrames(made.panel)) dress.panelParts = toParts(made.panel);
+      if (made.split) {
+        dress.onParts = toParts(made.on);
+        dress.offParts = toParts(made.off);
+      }
+      return dress;
+    };
+  }
+
   const made = build(cfg, slug, family, true, {});
   return () => ({ className: made.className, parts: toParts(made.frames) });
 }
@@ -200,6 +262,31 @@ export function familyCode(cfg: KitConfig, slug: string, family: FamilyName): Fa
          them or not. A kit that dresses press and does not name them warns
          on every button about props nobody passed. */
       looks: ["material", "shape", "children"]
+    };
+  }
+
+  if (family === "bank") {
+    const made = buildBank(cfg, slug, {});
+    const body = [`    className: "${made.className}",`];
+    if (hasFrames(made.panel)) body.push(keyedFramesCode("panelParts", made.panel, "    ") + ",");
+    body.push(
+      made.split
+        ? keyedFramesCode("parts", made.key, "    ") + ","
+        : keyedFramesCode("parts", made.key, "    ")
+    );
+    if (made.split) {
+      body.push(keyedFramesCode("onParts", made.on, "    ") + ",");
+      body.push(keyedFramesCode("offParts", made.off, "    "));
+    }
+    return {
+      code: [`  bank: () => ({`, ...body, `  }),`].join("\n"),
+      imports: [
+        ...importsOf(made.panel),
+        ...importsOf(made.key),
+        ...importsOf(made.on),
+        ...importsOf(made.off)
+      ],
+      looks: []
     };
   }
 
