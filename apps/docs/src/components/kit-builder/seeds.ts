@@ -237,6 +237,14 @@ export function seedsFor(family: string): SeedName[] {
 export type SeedClasses = { rootClass: string; rootClassH: string };
 
 export function seedRootClass(family: string, seed: SeedName): SeedClasses {
+  /* Empty means empty: no elements AND no library class riding along under
+     them. Every other seed below is a look, and a look is elements plus the
+     class that makes sense of them — starting from scratch should not leave
+     a bank wearing its dark rail and lit key faces, or a knob silently
+     built on `.amb-knob`'s own token table, with nothing on screen to say
+     so. The "Root class" field is still free text, so a look is one click
+     away; it just is not assumed. */
+  if (seed === "empty") return { rootClass: "", rootClassH: "" };
   if (family === "rotary") {
     if (seed === "console")
       return {
