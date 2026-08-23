@@ -13,19 +13,39 @@
  *  fastest way to see how. */
 
 import { defaultPart, defaultShape } from "./model";
-import type { ElementOnly, FrameName, KitElement, PartName, PartProps, ShapeElement } from "./model";
+import type {
+  BankKeyState,
+  ElementOnly,
+  FrameName,
+  KitElement,
+  PartName,
+  PartProps,
+  ShapeElement
+} from "./model";
 
-export type SeedName = "grounded" | "console" | "console-shapes" | "empty";
+export type SeedName = "grounded" | "console" | "console-shapes" | "radio" | "empty";
 
 export const SEED_LABELS: Record<SeedName, string> = {
   grounded: "grounded parts",
   console: "console parts",
   "console-shapes": "console, in shapes",
+  radio: "radio (Rams-style)",
   empty: "empty"
 };
 
-function part(frame: FrameName, name: PartName, props: PartProps = {}, only?: ElementOnly): KitElement {
-  return { ...defaultPart(frame, name), props, ...(only ? { only } : null) };
+function part(
+  frame: FrameName,
+  name: PartName,
+  props: PartProps = {},
+  only?: ElementOnly,
+  bankState?: BankKeyState
+): KitElement {
+  return {
+    ...defaultPart(frame, name),
+    props,
+    ...(only ? { only } : null),
+    ...(bankState ? { bankState } : null)
+  };
 }
 
 type ShapePatch = {
@@ -177,14 +197,27 @@ export function seedElements(family: string, seed: SeedName): KitElement[] {
     return [part("base", "SwitchTrack"), part("actuator", "SwitchPill")];
   }
 
+  /* Rams-style radio bank: a plain matte cap off, a glossy one wearing the
+     bank's lamp colour on — a different cast, not the same cap repainted,
+     which is the one case a key needs `bankState` at all. Reproduces
+     `bankRadio()` in the library's own grounded kit. */
+  if (family === "bank" && seed === "radio") {
+    return [
+      part("actuator", "ButtonCap", { material: "matte" }, undefined, "off"),
+      part("actuator", "ButtonCap", { material: "shiny" }, undefined, "on")
+    ];
+  }
+
   return [part("base", "KeyLens"), part("actuator", "KeyCap")];
 }
 
-/** Seeds that mean something for a family. A key bank has one construction
- *  in this library; a knob has three. */
+/** Seeds that mean something for a family. A key bank has two constructions
+ *  in this library — the lamp-lit key, and the Rams-style radio, which are
+ *  different castings rather than the same key restyled; a knob has three. */
 export function seedsFor(family: string): SeedName[] {
   if (family === "rotary" || family === "latch")
     return ["grounded", "console", "console-shapes", "empty"];
+  if (family === "bank") return ["grounded", "radio", "empty"];
   return ["grounded", "empty"];
 }
 
@@ -204,6 +237,14 @@ export function seedsFor(family: string): SeedName[] {
 export type SeedClasses = { rootClass: string; rootClassH: string };
 
 export function seedRootClass(family: string, seed: SeedName): SeedClasses {
+  /* Empty means empty: no elements AND no library class riding along under
+     them. Every other seed below is a look, and a look is elements plus the
+     class that makes sense of them — starting from scratch should not leave
+     a bank wearing its dark rail and lit key faces, or a knob silently
+     built on `.amb-knob`'s own token table, with nothing on screen to say
+     so. The "Root class" field is still free text, so a look is one click
+     away; it just is not assumed. */
+  if (seed === "empty") return { rootClass: "", rootClassH: "" };
   if (family === "rotary") {
     if (seed === "console")
       return {
@@ -220,6 +261,9 @@ export function seedRootClass(family: string, seed: SeedName): SeedClasses {
   if (family === "press") return { rootClass: "amb-button amb-groove", rootClassH: "" };
   if (family === "latch")
     return { rootClass: seed === "console" ? "amb-console-toggle" : "amb-switch", rootClassH: "" };
+  /* The radio bank has no shared rail — each key is its own pushbutton, so
+     it wears none of the grooved-rail look the lamp-lit key does. */
+  if (family === "bank" && seed === "radio") return { rootClass: "amb-select-radio", rootClassH: "" };
   return { rootClass: "amb-select amb-groove", rootClassH: "" };
 }
 

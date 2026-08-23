@@ -39,7 +39,8 @@ without code](#composing-a-kit-without-code) below.
 - **`groundedKit`** — the Blender-grounded hardware look. The default, used
   whenever no kit is set.
 - **`consoleKit`** — a mixer-desk identity: cuboid bar knobs seated in a
-  circular groove, and pill toggles that light up with the panel accent.
+  circular groove, pill toggles that light up with the panel accent, and key
+  banks whose selection reads as a depressed key rather than a lit one.
 
 ## Writing one
 
@@ -67,8 +68,8 @@ Three things and no more:
 | `defaults` | presentation-only prop defaults — `travel`, `input`, `animate` |
 | `looks` | which look keys each family honours, used to warn in development |
 
-**A kit may be partial.** `consoleKit` dresses knobs and switches and lets
-faders, buttons and key banks fall through to `groundedKit`. That is what a
+**A kit may be partial.** `consoleKit` dresses knobs, switches and key banks
+and lets faders and buttons fall through to `groundedKit`. That is what a
 real third-party kit looks like: it is not obliged to have an opinion about
 everything.
 
@@ -105,10 +106,9 @@ reachable from the form:
 | Colour | an albedo the light then acts on, a flat paint, the scene's recess floor, the accent, **lit by value** (mixes the accent in from `--ambx-percent`, with no React anywhere near it), or ink |
 | Keep the light still | emits the two-element light-capture trick the console bar uses |
 
-**Start from** seeds the list rather than locking it: `grounded parts`,
-`console parts`, or `console, in shapes` — the console knob and toggle rebuilt
-entirely out of shapes, with the reference's own numbers, so you can take one
-apart to see how it is made. A shipped look is a starting point in that
+**Start from** seeds the list rather than locking it: `grounded parts`, `console parts`, or `console, in shapes` — the console knob,
+toggle and key rebuilt entirely out of shapes, with the reference's own
+numbers, so you can take one apart to see how it is made. A shipped look is a starting point in that
 builder, never a wall.
 
 Two things live beside the parts rather than in them, because they belong to
@@ -158,7 +158,7 @@ family has no say in that family's defaults either.
 
 ## The console kit
 
-Both controls were measured off photographs of the real hardware.
+All three families were measured off photographs of the real hardware.
 
 <ConsoleKitPreview />
 
@@ -219,3 +219,41 @@ app's colour rather than imposing one.
 ```
 
 <KitAccentPreview />
+
+**The key** is a squared cast face carrying the desk's own moulded circle —
+the tooling mark sunk into every key regardless of selection. Selection reads
+twice over: through the key's lamp, and through the face itself, which sits
+flush when lit. Both states are the same markup styled through `[data-on]`
+in `.amb-console-bank`: off stands at the desk's own knob-scale thickness —
+the body the bar and the toggle thumb stand at — and on drops to zero,
+reading as a button held all the way in. Because off and on are the same
+elements, the kit's bank needs neither `onParts` nor `offParts`; `parts`
+alone covers both.
+
+The lamp itself has two readings, chosen by whether the key has a legend.
+A key without one carries a small **LED** at its centre that lights only
+when selected. A key with a legend has no LED — the **text changes colour**
+instead, from the panel's ink to the lamp colour, the engraved-and-filled
+legend on the referent's longer keys. Both read the same `--amb-led-color`
+channel, so one `color` prop — on the bank or per option — lights either
+alike:
+
+```tsx
+import { AmbientSelect, consoleKit } from "@ambientcss/components";
+
+// No legend: the selected key's LED lights.
+<AmbientSelect
+  options={[{ value: "1", ariaLabel: "Channel 1" }, { value: "2", ariaLabel: "Channel 2" }]}
+  defaultValue="1"
+/>
+
+// With a legend: no LED — the text takes the lamp colour instead.
+<AmbientSelect
+  color="#00a84d"
+  options={[
+    { value: "a", label: "A", ariaLabel: "Send A" },
+    { value: "b", label: "B", ariaLabel: "Send B" }
+  ]}
+  defaultValue="a"
+/>
+```

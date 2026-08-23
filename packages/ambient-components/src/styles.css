@@ -322,6 +322,34 @@
   --ambx-size: var(--ambx-select-size);
 }
 
+/* Each key is its own actuator, and needs the baseline every other
+   actuator gets at its own mechanism level — `.ambx-latch` positions,
+   sizes AND strips itself the same way, above (cursor/border/padding/
+   background reset, not just position and size). A bank has one per key
+   instead of one for the whole control, so it belongs here rather than
+   on `.ambx-bank` itself. Without the sizing half, a bank wearing no
+   look at all — the kit builder's "empty" seed, or a from-scratch kit
+   before any look is chosen — has keys with no box: a `fill`-placed
+   shape inside one is `position: absolute` with no positioned ancestor,
+   so it escapes to whatever happens to be positioned further up the
+   page instead of filling the key. Without the strip half, the same
+   look-less key is still a bare `<button>`: the browser's own outset
+   border and grey face show through in whatever a `fill` shape at less
+   than 100% doesn't cover, because until now only the look classes ever
+   reset them, never the mechanism. `min-width` rather than `width`,
+   matching `.amb-select .ambx-key` below: a floor a look's own class
+   still owns and any of them may grow past with real content, not a
+   fixed box fighting it. */
+.ambx-key {
+  position: relative;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  background: none;
+  min-width: var(--ambx-select-size);
+  height: var(--ambx-select-size);
+}
+
 /* Button: a chamfered key cap seated in a clearance well — the referent
    is components/button.py's "flush" style (cap seated into a hole with a
    shadow gap ring around it). The button element IS the well: a shallow
@@ -1021,6 +1049,71 @@
   --ambx-select-label-size: calc(var(--ambx-grid) * 4.5);
 }
 
+/* Radio: the other grounded bank reading. A round pushbutton per key, no
+   shared rail — Dieter Rams' selector rather than a lamp strip. Each key
+   IS an .amb-button-round well (same tokens, same cast body); only the cap
+   inside it differs, and it differs by CASTING — the grounded kit swaps a
+   matte ButtonCap for a glossy one via onParts/offParts, because a
+   material is a class chosen when the part renders, not a variable a
+   selector could flip. The lit colour is the one thing that still comes
+   from state alone: --amb-led-color, the same channel the lamp strip
+   reads, mixed into the glossy cap's own albedo. */
+.amb-select-radio {
+  display: inline-flex;
+  gap: calc(var(--ambx-grid) * 3);
+}
+
+.ambx-bank-vertical.amb-select-radio {
+  flex-direction: column;
+}
+
+.amb-select-radio .ambx-key {
+  cursor: pointer;
+  border: none;
+  padding: var(--ambx-grid-half);
+  --amb-thickness: 0.27;
+  background-color: var(--amb-lume);
+  min-width: var(--ambx-select-size);
+  height: var(--ambx-select-size);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  transition: box-shadow 140ms ease;
+}
+
+.amb-select-radio .ambx-key .amb-button-cap {
+  height: 100%;
+  padding: calc(var(--ambx-select-size) * 0.055);
+  border-radius: 50%;
+}
+
+.amb-select-radio .ambx-key:hover .amb-button-cap {
+  color: var(--amb-highlight-color);
+}
+
+.amb-select-radio .ambx-key:active .amb-button-cap {
+  --amb-thickness: 0.84;
+}
+
+/* Lit: the glossy cap (already a different cast from the matte one, via
+   onParts) also wears the bank's lamp colour as reflectance, the same way
+   .amb-console-thumb wears --ambx-accent — a coloured body under the
+   scene's light, not a sticker. */
+.amb-select-radio .ambx-key[data-on] .amb-button-cap {
+  --amb-albedo: var(--amb-led-color, var(--amb-highlight-color));
+}
+
+.amb-select-radio .ambx-key:disabled {
+  cursor: not-allowed;
+}
+
+.amb-select-radio .ambx-key:disabled .amb-button-cap {
+  opacity: 0.5;
+}
+
+.amb-select-radio .ambx-key:focus-visible {
+  outline-offset: var(--ambx-grid-half);
+}
+
 .ambx-panel {
   border-radius: var(--ambx-radius-xl);
   padding: calc(var(--ambx-grid) * 4);
@@ -1420,6 +1513,126 @@
      the ring reads as an emissive halo instead — present in bright light,
      glowing as the scene dims. */
   border: calc(var(--ambx-latch-thumb-h) * 0.09) solid var(--amb-lume);
+}
+
+/* -- console bank -----------------------------------------------------------
+   A row of squared keys with no lamp under them: selection reads as the key
+   itself sitting flush rather than as a lit dot, which is why ConsoleKey
+   (parts/console.tsx) is the SAME markup on and off — only --amb-thickness
+   moves, from the desk's own knob-scale (2, the figure ConsoleBar and
+   ToggleThumb both stand at) down to 0, the flattest the `.ambient`
+   composite goes. A key held all the way in, not a key that lit up. */
+.amb-console-bank {
+  display: inline-flex;
+  flex-direction: column;
+  padding: var(--ambx-grid-half);
+  gap: var(--ambx-grid-half);
+  background-color: var(--amb-lume);
+  border-radius: calc(var(--ambx-radius-md) + var(--ambx-grid-half));
+}
+
+.ambx-bank-horizontal.amb-console-bank {
+  flex-direction: row;
+}
+
+.amb-console-bank .ambx-key {
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  display: grid;
+  min-width: var(--ambx-select-size);
+  height: var(--ambx-select-size);
+  border-radius: var(--ambx-radius-md);
+}
+
+.amb-console-key {
+  position: relative;
+  isolation: isolate;      /* so the dish's negative z-index stays inside
+                               this box rather than sinking behind the rail */
+  height: 100%;
+  display: grid;
+  place-items: center;
+  border-radius: var(--ambx-radius-md);
+  color: var(--amb-label);
+  --amb-thickness: 2;
+  /* The bank's lamp colour, resolved once here so both readings of the
+     selected key can use it — the LED's fill below, and the legend text
+     that replaces the LED on a key with a printed legend. Declared on THIS
+     element, not inherited pre-resolved, for the reason --_ambx-sel-color
+     is in .amb-select: a custom property's var()s substitute on the
+     element that declares it. */
+  --_ambx-console-led: var(--amb-led-color, var(--amb-highlight-color));
+}
+
+/* The moulded circle: a fixed feature of the key's own tooling, not a
+   lamp — it reads --amb-lit off .amb-console-key's own amb-surface and
+   curves it, so it re-shades with the scene's light exactly as the fader
+   cap's dish does, and sits behind the legend (z-index: -1 inside the
+   key's own isolated stack) rather than in front of it. */
+.amb-console-key-dish {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  height: 78%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+
+/* The LED at the dish's centre: unlit, a small dark recess in the dish's
+   own floor tone; selected, the bank's own lamp colour with a soft bloom —
+   the same --amb-led-color channel the grounded and radio banks read, so
+   one `color` prop lights every bank on a panel alike. Declared on THIS
+   element, not inherited pre-resolved, for the reason --_ambx-sel-color is
+   in .amb-select: a custom property's var()s substitute on the element that
+   declares it. */
+.amb-console-key-led {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  height: 15%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background-color: color-mix(in oklab, var(--amb-lit), black 35%);
+  transition: background-color 140ms ease, box-shadow 140ms ease;
+}
+
+.amb-console-bank .ambx-key[data-on] .amb-console-key-led {
+  background-color: var(--_ambx-console-led);
+  box-shadow: 0 0 4px var(--_ambx-console-led);
+}
+
+/* The other reading: a key with a printed legend has no LED to light — the
+   legend itself is the lamp. Unselected it is the panel's ink (the colour
+   .amb-console-key declares); selected it takes the lamp colour, the same
+   channel the LED fills with, so `color` on the bank or per option lights
+   either reading alike. The dish behind it stays put: the tooling mark is
+   cast into every key, lit or not. */
+.amb-console-bank .ambx-key[data-on] .amb-console-key-text {
+  color: var(--_ambx-console-led);
+  text-shadow: 0 0 6px color-mix(in oklab, var(--_ambx-console-led), transparent 45%);
+}
+
+.amb-console-bank .ambx-key:hover .amb-console-key {
+  color: var(--amb-highlight-color);
+}
+
+.amb-console-bank .ambx-key[data-on] .amb-console-key {
+  --amb-thickness: 0;
+}
+
+.amb-console-bank .ambx-key:disabled {
+  cursor: not-allowed;
+}
+
+.amb-console-bank .ambx-key:disabled .amb-console-key {
+  opacity: 0.5;
+}
+
+.amb-console-bank .ambx-key:focus-visible {
+  outline-offset: var(--ambx-grid-half);
 }
 
 @media (prefers-reduced-motion: reduce) {

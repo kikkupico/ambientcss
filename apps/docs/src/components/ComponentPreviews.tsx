@@ -293,6 +293,7 @@ export function CompositionPreview() {
 export function KitComparisonPreview() {
   const [level, setLevel] = useState(68);
   const [on, setOn] = useState(true);
+  const [channel, setChannel] = useState<string | string[]>("1");
 
   /* One call site, rendered twice. The props are identical and the state
      is shared — the only difference between the columns is the kit above
@@ -301,6 +302,18 @@ export function KitComparisonPreview() {
     <>
       <AmbientKnob label="LEVEL" value={level} onChange={setLevel} />
       <AmbientSwitch label="ON" value={on} onChange={setOn} />
+      {/* Legend keys: the selection reads through the text taking the
+          lamp colour, not a numeral-plus-LED. */}
+      <AmbientSelect
+        orientation="horizontal"
+        options={[
+          { value: "1", label: "1", ariaLabel: "Channel 1" },
+          { value: "2", label: "2", ariaLabel: "Channel 2" },
+          { value: "3", label: "3", ariaLabel: "Channel 3" }
+        ]}
+        value={channel}
+        onChange={setChannel}
+      />
     </>
   );
 
@@ -326,6 +339,7 @@ export function ConsoleKitPreview() {
   const [gain, setGain] = useState(40);
   const [bare, setBare] = useState(72);
   const [arm, setArm] = useState(false);
+  const [channel, setChannel] = useState<string | string[]>("1");
 
   /* The bare knob gets its own column rather than standing next to the
      marked one: a knob with the centre mark printed above it is a taller
@@ -359,8 +373,21 @@ export function ConsoleKitPreview() {
               </p>
             </div>
           </div>
+          <div className="docs-kit-row">
+            {/* Legend keys: the selected key's text takes the lamp colour. */}
+            <AmbientSelect
+              orientation="horizontal"
+              options={[
+                { value: "1", label: "1", ariaLabel: "Channel 1" },
+                { value: "2", label: "2", ariaLabel: "Channel 2" },
+                { value: "3", label: "3", ariaLabel: "Channel 3" }
+              ]}
+              value={channel}
+              onChange={setChannel}
+            />
+          </div>
           <p className="docs-demo-text">
-            Gain {gain} · Bare {bare} · {arm ? "armed" : "safe"}
+            Gain {gain} · Bare {bare} · {arm ? "armed" : "safe"} · ch {channel}
           </p>
         </div>
       </AmbientKitProvider>
@@ -371,6 +398,8 @@ export function ConsoleKitPreview() {
 export function KitAccentPreview() {
   const [green, setGreen] = useState(55);
   const [amber, setAmber] = useState(30);
+  const [sendA, setSendA] = useState<string | string[]>("a");
+  const [sendB, setSendB] = useState<string | string[]>("a");
 
   return (
     <DemoShell>
@@ -381,12 +410,38 @@ export function KitAccentPreview() {
               <ConsoleKnob label="SEND" value={green} onChange={setGreen} />
               <ConsoleToggle label="ON" defaultValue />
             </div>
+            <div className="docs-kit-row">
+              {/* Legends, not numerals: these keys read through the text
+                  taking the column's accent, which is the point being shown. */}
+              <AmbientSelect
+                orientation="horizontal"
+                options={[
+                  { value: "a", label: "A", ariaLabel: "Send A" },
+                  { value: "b", label: "B", ariaLabel: "Send B" },
+                  { value: "c", label: "C", ariaLabel: "Send C" }
+                ]}
+                value={sendA}
+                onChange={setSendA}
+              />
+            </div>
             <p className="docs-demo-text">#00a84d</p>
           </div>
           <div className="docs-kit-column" style={{ "--ambx-accent": "#f59e0b" } as React.CSSProperties}>
             <div className="docs-kit-row">
               <ConsoleKnob label="SEND" value={amber} onChange={setAmber} />
               <ConsoleToggle label="ON" defaultValue />
+            </div>
+            <div className="docs-kit-row">
+              <AmbientSelect
+                orientation="horizontal"
+                options={[
+                  { value: "a", label: "A", ariaLabel: "Send A" },
+                  { value: "b", label: "B", ariaLabel: "Send B" },
+                  { value: "c", label: "C", ariaLabel: "Send C" }
+                ]}
+                value={sendB}
+                onChange={setSendB}
+              />
             </div>
             <p className="docs-demo-text">#f59e0b</p>
           </div>

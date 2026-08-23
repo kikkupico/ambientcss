@@ -13,8 +13,15 @@ export type AmbientBankProps = Omit<
   "onChange" | "defaultValue"
 > &
   UseBankOptions & {
-    /** Parts applied to every key. The bank's own frames go in `parts`. */
+    /** Parts applied to every key, in both states unless overridden below.
+     *  The bank's own frames — the rail around every key — go in `parts`. */
     keyParts?: ControlParts | undefined;
+    /** Overrides `keyParts` for a lit / unlit key. Only worth setting when
+     *  the two states are genuinely different markup — a CSS selector on
+     *  `[data-on]` already reaches anything that is the same markup styled
+     *  differently, which is the common case and needs neither. */
+    keyPartsOn?: ControlParts | undefined;
+    keyPartsOff?: ControlParts | undefined;
     parts?: ControlParts | undefined;
     size?: ControlSize | undefined;
     /** Lamp colour. Defaults to the scene's `--amb-highlight-color`. */
@@ -50,6 +57,8 @@ function keyState(on: boolean, disabled: boolean): ControlState {
 export function AmbientBank({
   options,
   keyParts,
+  keyPartsOn,
+  keyPartsOff,
   parts,
   size,
   color,
@@ -104,6 +113,7 @@ export function AmbientBank({
            that its lamp is lit — the one family where "the properties are
            canonical" would quietly not be true. */
         const ks = keyState(on, option.disabled || disabled);
+        const kp = (on ? keyPartsOn : keyPartsOff) ?? keyParts;
         return (
           <button
             key={option.value}
@@ -117,7 +127,7 @@ export function AmbientBank({
           >
             <ControlStateProvider value={ks}>
               <BankKeyProvider value={{ option, on, index }}>
-                {renderKey ? renderKey(option, on) : <Frames parts={keyParts} />}
+                {renderKey ? renderKey(option, on) : <Frames parts={kp} />}
               </BankKeyProvider>
             </ControlStateProvider>
           </button>

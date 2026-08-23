@@ -77,7 +77,7 @@ export type PartSpec = {
    *  a knurl has to turn. Getting this wrong is how a lamp goes out. */
   frame: "panel" | "base" | "actuator" | "fixture";
   options: PartOption[];
-  build: (props: PartProps, ctx: BuildContext) => Piece;
+  build: (props: PartProps, ctx: BuildContext, family: string) => Piece;
 };
 
 export const PARTS: Record<PartName, PartSpec> = {
@@ -218,11 +218,18 @@ export const PARTS: Record<PartName, PartSpec> = {
     note: "a chamfered, subtly dished key top — carries the caller's legend",
     frame: "actuator",
     options: [MATERIAL_OPTION],
-    build: (props, ctx) => {
+    build: (props, ctx, family) => {
       const mat = (material(props.material) ?? "matte") as AmbientMaterial;
+      /* `look.children` is the press family's own wiring — `AmbientButton`
+         hands its caller's legend through. A bank's keys print `option.label`
+         instead, so a cap dressing a bank key must not reference a `look`
+         its dress function never receives. */
+      const legend = family === "press";
       return {
-        node: <ButtonCap material={mat}>{ctx.children}</ButtonCap>,
-        code: `<ButtonCap material="${mat}">{look.children as ReactNode}</ButtonCap>`,
+        node: <ButtonCap material={mat}>{legend ? ctx.children : null}</ButtonCap>,
+        code: legend
+          ? `<ButtonCap material="${mat}">{look.children as ReactNode}</ButtonCap>`
+          : `<ButtonCap material="${mat}" />`,
         imports: ["ButtonCap"]
       };
     }
@@ -288,7 +295,7 @@ export const FAMILY_PARTS: Record<string, PartName[]> = {
   travel: ["TravelTrack", "FaderCap", "SliderThumb"],
   press: ["ButtonCap"],
   latch: ["SwitchTrack", "SwitchPill", "ToggleTrack", "ToggleThumb"],
-  bank: ["KeyLens", "KeyCap"]
+  bank: ["KeyLens", "KeyCap", "ButtonCap"]
 };
 
 /* ── Shapes ───────────────────────────────────────────────────────────── */
@@ -340,7 +347,7 @@ export function elementPiece(
   ctx: BuildContext
 ): Piece {
   return element.kind === "part"
-    ? PARTS[element.part].build(element.props, ctx)
+    ? PARTS[element.part].build(element.props, ctx, family)
     : shapePiece(element, slug, family, ctx);
 }
 

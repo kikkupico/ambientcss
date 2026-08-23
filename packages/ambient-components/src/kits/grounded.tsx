@@ -88,11 +88,32 @@ function latch(): KitDress {
   };
 }
 
-function bank(): KitDress {
+/** The grounded key: a lamp under a glass diffuser, on and off the same
+ *  markup — `[data-on]` in the stylesheet is the whole state change, so
+ *  `parts` alone (no `onParts` / `offParts`) covers both. */
+function bankKey(): KitDress {
   return {
     className: "amb-select amb-groove",
     parts: { base: <KeyLens />, actuator: <KeyCap /> }
   };
+}
+
+/** The Rams reading: a row of round pushbuttons with no shared rail. Off is
+ *  a plain matte cap; on is a glossy one wearing the bank's lamp colour —
+ *  a different cast, not the same cap repainted, which is why this is the
+ *  one grounded look that reaches for `onParts` / `offParts` instead of
+ *  leaving the states to CSS. */
+function bankRadio(): KitDress {
+  return {
+    className: "amb-select-radio",
+    parts: { actuator: <ButtonCap material="matte" /> },
+    offParts: { actuator: <ButtonCap material="matte" /> },
+    onParts: { actuator: <ButtonCap material="shiny" /> }
+  };
+}
+
+function bank(look: KitLook): KitDress {
+  return (look.shape as "key" | "round" | undefined) === "round" ? bankRadio() : bankKey();
 }
 
 /** The Blender-grounded hardware look: the default every preset falls back to. */
@@ -108,6 +129,6 @@ export const groundedKit: ControlKit = {
     travel: ["material", "orientation"],
     press: ["material", "shape", "children"],
     latch: [],
-    bank: []
+    bank: ["shape"]
   }
 };

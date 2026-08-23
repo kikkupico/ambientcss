@@ -272,7 +272,7 @@ export function App() {
   const [slider1, setSlider1] = useState(50);
   const [fader1, setFader1] = useState(70);
   const [bank, setBank] = useState("3");
-  const [armed, setArmed] = useState<string[]>(["A", "C"]);
+  const [deskBank, setDeskBank] = useState("2");
   const [sw1, setSw1] = useState(true);
   /* The kit section drives BOTH columns off one pair of values. Turning the
      grounded knob turns the console knob with it, which is the point: the
@@ -746,12 +746,25 @@ export function App() {
               <AmbientSlider size={compSize} value={slider1} min={0} max={100} onChange={setSlider1} style={{ marginTop: "calc(var(--ambx-grid) * 3)" }} />
             </div>
 
-            {/* Select Banks & Vertical Slider */}
+            {/* Select Banks & Vertical Fader */}
             <div className="component-cell">
               <AmbientSelect size={compSize} options={[{ value: "1" }, { value: "2" }, { value: "3" }]} value={bank} onChange={(v) => setBank(v as string)} color="#22d3d3" />
             </div>
             <div className="component-cell">
-              <AmbientSelect size={compSize} multiple orientation="horizontal" options={[{ value: "A" }, { value: "B" }, { value: "C" }]} value={armed} onChange={(v) => setArmed(v as string[])} color="#4ade80" />
+              <AmbientKitProvider kit={consoleKit}>
+                <AmbientSelect
+                  size={compSize}
+                  orientation="horizontal"
+                  options={[
+                    { value: "1", label: "", ariaLabel: "Preset 1" },
+                    { value: "2", label: "", ariaLabel: "Preset 2" },
+                    { value: "3", label: "", ariaLabel: "Preset 3" },
+                    { value: "4", label: "", ariaLabel: "Preset 4" }
+                  ]}
+                  value={deskBank}
+                  onChange={(v) => setDeskBank(v as string)}
+                />
+              </AmbientKitProvider>
             </div>
             <div className="component-cell">
               <AmbientFader size={compSize} value={fader1} min={0} max={100} onChange={setFader1} />
