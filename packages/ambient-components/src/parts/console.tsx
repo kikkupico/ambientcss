@@ -104,8 +104,16 @@ export function ToggleThumb({ className }: { className?: string | undefined }) {
 
 /** The bank key: a squared cast face with the desk's own moulded circle sunk
  *  into the middle of it — the referent's tooling mark, present on every
- *  key regardless of selection — and a small LED at its centre that lights
- *  only on the selected one. Selection is doubly read: the LED, and the
+ *  key regardless of selection — and one of two readings for the selected
+ *  key, chosen by whether the option carries a text legend:
+ *
+ *  - No legend (the default): a small LED at the centre that lights only
+ *    on the selected one, and no printed text.
+ *  - A legend: the LED is left out and the text itself changes colour,
+ *    from the panel's ink to the bank's lamp colour — the engraved-and-filled
+ *    legend on the referent's longer keys.
+ *
+ *  Selection is doubly read either way: the lamp or the lit legend, and the
  *  face itself sitting flush — the SAME markup in both states, styled
  *  through `[data-on]` in `.amb-console-bank` (styles.css): off stands at
  *  the desk's own knob-scale thickness, the body ConsoleBar and ToggleThumb
@@ -119,11 +127,20 @@ export function ConsoleKey({
   children?: ReactNode | undefined;
 }) {
   const { option } = useBankKey();
+  /* An empty-string label is no legend — some callers pass "" to keep the
+     value from printing, and a blank legend must not put the LED out. */
+  const legend = children ?? (option.label || undefined);
   return (
-    <span className={cn("amb-console-key ambient amb-surface amb-chamfer amb-heading-3", className)}>
+    <span
+      className={cn(
+        "amb-console-key ambient amb-surface amb-chamfer amb-heading-3",
+        legend != null && "amb-console-key-text",
+        className
+      )}
+    >
       <span className="amb-console-key-dish amb-surface-concave" aria-hidden />
-      <span className="amb-console-key-led" aria-hidden />
-      {children ?? option.label ?? option.value}
+      {legend == null && <span className="amb-console-key-led" aria-hidden />}
+      {legend}
     </span>
   );
 }

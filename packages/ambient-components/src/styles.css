@@ -323,19 +323,29 @@
 }
 
 /* Each key is its own actuator, and needs the baseline every other
-   actuator gets at its own mechanism level — `.ambx-latch` positions and
-   sizes itself the same way, above. A bank has one per key instead of one
-   for the whole control, so it belongs here rather than on `.ambx-bank`
-   itself. Without it, a bank wearing no look at all — the kit builder's
-   "empty" seed, or a from-scratch kit before any look is chosen — has
-   keys with no box: a `fill`-placed shape inside one is `position:
-   absolute` with no positioned ancestor, so it escapes to whatever
-   happens to be positioned further up the page instead of filling the
-   key. `min-width` rather than `width`, matching `.amb-select .ambx-key`
-   below: a floor a look's own class still owns and any of them may grow
-   past with real content, not a fixed box fighting it. */
+   actuator gets at its own mechanism level — `.ambx-latch` positions,
+   sizes AND strips itself the same way, above (cursor/border/padding/
+   background reset, not just position and size). A bank has one per key
+   instead of one for the whole control, so it belongs here rather than
+   on `.ambx-bank` itself. Without the sizing half, a bank wearing no
+   look at all — the kit builder's "empty" seed, or a from-scratch kit
+   before any look is chosen — has keys with no box: a `fill`-placed
+   shape inside one is `position: absolute` with no positioned ancestor,
+   so it escapes to whatever happens to be positioned further up the
+   page instead of filling the key. Without the strip half, the same
+   look-less key is still a bare `<button>`: the browser's own outset
+   border and grey face show through in whatever a `fill` shape at less
+   than 100% doesn't cover, because until now only the look classes ever
+   reset them, never the mechanism. `min-width` rather than `width`,
+   matching `.amb-select .ambx-key` below: a floor a look's own class
+   still owns and any of them may grow past with real content, not a
+   fixed box fighting it. */
 .ambx-key {
   position: relative;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  background: none;
   min-width: var(--ambx-select-size);
   height: var(--ambx-select-size);
 }
@@ -1545,6 +1555,13 @@
   border-radius: var(--ambx-radius-md);
   color: var(--amb-label);
   --amb-thickness: 2;
+  /* The bank's lamp colour, resolved once here so both readings of the
+     selected key can use it — the LED's fill below, and the legend text
+     that replaces the LED on a key with a printed legend. Declared on THIS
+     element, not inherited pre-resolved, for the reason --_ambx-sel-color
+     is in .amb-select: a custom property's var()s substitute on the
+     element that declares it. */
+  --_ambx-console-led: var(--amb-led-color, var(--amb-highlight-color));
 }
 
 /* The moulded circle: a fixed feature of the key's own tooling, not a
@@ -1578,7 +1595,6 @@
   height: 15%;
   aspect-ratio: 1;
   border-radius: 50%;
-  --_ambx-console-led: var(--amb-led-color, var(--amb-highlight-color));
   background-color: color-mix(in oklab, var(--amb-lit), black 35%);
   transition: background-color 140ms ease, box-shadow 140ms ease;
 }
@@ -1586,6 +1602,17 @@
 .amb-console-bank .ambx-key[data-on] .amb-console-key-led {
   background-color: var(--_ambx-console-led);
   box-shadow: 0 0 4px var(--_ambx-console-led);
+}
+
+/* The other reading: a key with a printed legend has no LED to light — the
+   legend itself is the lamp. Unselected it is the panel's ink (the colour
+   .amb-console-key declares); selected it takes the lamp colour, the same
+   channel the LED fills with, so `color` on the bank or per option lights
+   either reading alike. The dish behind it stays put: the tooling mark is
+   cast into every key, lit or not. */
+.amb-console-bank .ambx-key[data-on] .amb-console-key-text {
+  color: var(--_ambx-console-led);
+  text-shadow: 0 0 6px color-mix(in oklab, var(--_ambx-console-led), transparent 45%);
 }
 
 .amb-console-bank .ambx-key:hover .amb-console-key {
