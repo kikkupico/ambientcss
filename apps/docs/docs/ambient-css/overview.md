@@ -11,4 +11,4 @@ It includes:
 - Light position helpers
 - General ambient styling primitives
 
-Component-specific styling for `AmbientButton`, `AmbientKnob`, `AmbientSlider`, `AmbientFader`, and `AmbientSwitch` is in `@ambientcss/components/styles.css`.
+Component-specific styling for `AmbientButton`, `AmbientKnob`, `AmbientSlider`, `AmbientFader`, `AmbientSwitch`, and `AmbientSelect` is in `@ambientcss/components/styles.css`.

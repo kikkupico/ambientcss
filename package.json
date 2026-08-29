@@ -23,11 +23,6 @@
     "release:publish": "pnpm --filter @ambientcss/css publish --access public --no-git-checks && pnpm --filter @ambientcss/components publish --access public --no-git-checks",
     "release:publish:next": "pnpm --filter @ambientcss/css publish --access public --tag next --no-git-checks && pnpm --filter @ambientcss/components publish --access public --tag next --no-git-checks"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
-  },
   "devDependencies": {
     "@changesets/cli": "^2.29.8"
   }

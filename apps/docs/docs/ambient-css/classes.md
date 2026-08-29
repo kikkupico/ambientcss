@@ -44,6 +44,16 @@ Use `amb-surface-convex` for raised elements like buttons, knobs, or faders.
 <div class="ambient amb-surface-convex amb-elevation-1">Convex Surface</div>
 ```
 
+### Concave Surfaces (horizontal)
+
+`amb-surface-concave-h` is the same dished gradient as `amb-surface-concave`,
+riding `--amb-light-x` across the element left-to-right instead of
+`--amb-light-y` top-to-bottom — for horizontal tracks and troughs.
+
+```html
+<div class="ambient amb-surface-concave-h amb-elevation-1">Concave Surface (h)</div>
+```
+
 ## Materials
 
 Materials define the physical finish and texture of an element, affecting its background and response to light.
@@ -209,6 +219,18 @@ Filleted edges (`amb-fillet`) create a soft, rounded transition.
 <div class="ambient amb-surface amb-fillet amb-elevation-2">Filleted Edge</div>
 ```
 
+### Groove
+
+`amb-groove` cuts a recessed slot into the surface rather than beveling its
+outer edge — the recess floor takes the same `--amb-albedo`/`--amb-shade` as
+the surrounding surface, under its own exposure, so it stays the same
+material at a different depth. Use it for slider/fader tracks or any inset
+channel.
+
+```html
+<div class="ambient amb-surface amb-groove amb-elevation-1">Groove</div>
+```
+
 ## Elevation
 
 Elevation controls the depth of the element and the strength of its shadow.
@@ -298,6 +320,24 @@ Add `amb-glow` to any element to make it emit light based on its color.
 ```html
 <div class="ambient amb-surface-convex amb-rounded-full amb-glow" style="background-color: #ef4444;"></div>
 ```
+
+### Emissive Indicators
+
+`amb-emit-red` `amb-emit-green` `amb-emit-amber` `amb-emit-cyan` `amb-emit-blue` `amb-emit-white`
+each publish a `--amb-emit-color` custom property; they don't paint anything
+by themselves. Pair one with `background-color: var(--amb-emit-color)` for
+the fill and `amb-glow` for the halo (`box-shadow: 0 0 6.2px var(--amb-lume)`,
+which shifts warmer as the key light dims):
+
+```html
+<span class="ambient amb-rounded-full amb-glow amb-emit-red"
+      style="background-color: var(--amb-emit-color)"></span>
+```
+
+Use a flat LED shape (`amb-rounded-full`, the same pattern `.amb-led` in
+`@ambientcss/components` follows) rather than `amb-surface-convex` — that
+class paints its own opaque gradient `background`, which would fully occlude
+the emit colour.
 
 ### Motion
 

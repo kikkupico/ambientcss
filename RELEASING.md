@@ -85,7 +85,7 @@ Primary automated flow:
 3. Merge version PR
 4. Action publishes packages with `latest` tag
 
-Implementation detail: CI publish uses `npm publish` (via `scripts/publish-trusted.mjs`) to be compatible with npm Trusted Publishing. Release preflight validates publishable packages only (`@ambientcss/css` and `@ambientcss/components`) and does not build docs/demo.
+Implementation detail: CI publish uses `npm publish` (via `scripts/publish-trusted.mjs`, invoked by `pnpm release:changeset:publish`, which first runs `pnpm release:publish:preflight`) to be compatible with npm Trusted Publishing. Release preflight validates publishable packages only (`@ambientcss/css` and `@ambientcss/components`) and does not build docs/demo.
 
 Manual workflow (still available):
 
@@ -94,8 +94,9 @@ Manual workflow (still available):
 - `dry_run=true` to verify without publishing
 - `dry_run=false` to publish
 - `tag` can be `latest`, `next`, `beta`, etc.
+- Publishes with `pnpm publish` rather than `npm publish`, and the npm Trusted Publisher above is registered against `changesets.yml` only — a non-dry-run run of this workflow may not authenticate as-is. Extend the Trusted Publisher config to this workflow file (or add an `NPM_TOKEN` secret) before relying on it for a real publish.
 
-No `NPM_TOKEN` secret is required when Trusted Publishing is configured correctly.
+No `NPM_TOKEN` secret is required when Trusted Publishing is configured correctly for the primary `changesets.yml` flow.
 
 ## Verify on npm
 

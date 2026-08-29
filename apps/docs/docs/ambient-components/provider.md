@@ -4,7 +4,7 @@ title: AmbientProvider
 
 import { ProviderPreview } from "@site/src/components/ComponentPreviews";
 
-`AmbientProvider` applies theme values by writing Ambient CSS variables to `document.documentElement`.
+`AmbientProvider` applies theme values by writing Ambient CSS variables as inline styles on a wrapping `<div>`, scoping the theme to its own subtree rather than the whole document.
 
 ## Interactive preview
 
