@@ -2,6 +2,16 @@
   "name": "@ambientcss/components",
   "version": "3.1.0",
   "description": "React skeuomorphic components powered by Ambient CSS",
+  "keywords": [
+    "react",
+    "components",
+    "css",
+    "lighting",
+    "skeuomorphic",
+    "hardware-ui",
+    "knob",
+    "design-system"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -37,7 +47,9 @@
   },
   "files": [
     "dist",
-    "src"
+    "src",
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "tsup && cp src/styles.css dist/styles.css",

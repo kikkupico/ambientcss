@@ -4,6 +4,9 @@ node_modules
 packages/*/dist
 
 .DS_Store
+.env
+.env.*
+.vercel
 /apps/demo/.vite/
 /apps/demo/dist/
 /examples/*/dist/

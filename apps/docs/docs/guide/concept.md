@@ -64,17 +64,17 @@ All five layers derive from the same direction, intensity, and elevation values.
 Each element combines four concerns:
 
 ```
-┌─────────────┬──────────────────────────────────┐
-│ Structure   │ ambient                          │
+┌─────────────┬───────────────────────────────────┐
+│ Structure   │ ambient                           │
 │ Surface     │ amb-surface / -concave / -convex  │
 │ Edge        │ amb-chamfer / amb-fillet          │
 │ Depth       │ amb-elevation-0 … amb-elevation-3 │
-└─────────────┴──────────────────────────────────┘
+└─────────────┴───────────────────────────────────┘
 ```
 
 - **Structure** (`ambient`) enables the five-layer shadow system.
 - **Surface** sets the background gradient. Flat is uniform. Concave darkens toward the light. Convex brightens toward the light.
-- **Edge** controls inner highlights/shadows. Chamfer gives rounded inner edges, fillet gives beveled ones.
+- **Edge** controls inner highlights/shadows. Chamfer gives beveled inner edges, fillet gives rounded ones.
 - **Depth** (`amb-elevation-0` through `amb-elevation-3`) scales drop shadow offset and spread.
 
 All four read from the same light variables, so any combination is consistent.

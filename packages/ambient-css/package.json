@@ -2,6 +2,15 @@
   "name": "@ambientcss/css",
   "version": "3.0.1",
   "description": "Pure CSS ambient lighting and skeuomorphic utility classes",
+  "keywords": [
+    "css",
+    "lighting",
+    "shadows",
+    "skeuomorphic",
+    "box-shadow",
+    "design-system",
+    "ui"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -32,7 +41,9 @@
   },
   "files": [
     "dist",
-    "src"
+    "src",
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "node ../../scripts/build-css.mjs src/ambient.css dist/ambient.css",

@@ -3,7 +3,8 @@ import type * as Preset from "@docusaurus/preset-classic";
 
 const config: Config = {
   title: "Ambient CSS",
-  tagline: "Documentation for @ambientcss/css and @ambientcss/components",
+  tagline: "A physics-based lighting system for CSS",
+  favicon: "img/favicon.ico",
 
   url: "https://kikkupico.github.io",
   baseUrl: "/ambientcss/",
@@ -40,6 +41,20 @@ const config: Config = {
   ],
 
   themeConfig: {
+    image: "img/og-image.png",
+    metadata: [
+      {
+        name: "description",
+        content:
+          "Define a light source, and every shadow, highlight and surface gradient follows from it. Calibrated against Blender raytraces \u2014 rendered with box-shadow."
+      },
+      { name: "twitter:card", content: "summary_large_image" },
+      {
+        property: "og:image:alt",
+        content:
+          "The same hardware panel split down the middle: Blender Cycles raytrace on one side, CSS box-shadow on the other."
+      }
+    ],
     navbar: {
       title: "Ambient CSS",
       items: [
