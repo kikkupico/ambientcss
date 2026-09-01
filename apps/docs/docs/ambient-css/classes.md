@@ -315,7 +315,10 @@ full component-side scale, including sizing and spacing.
 
 ### Glow
 
-Add `amb-glow` to any element to make it emit light based on its color.
+Add `amb-glow` to any element to give it a soft halo. The halo is a fixed
+`box-shadow: 0 0 6.2px var(--amb-lume)` — it uses the scene's derived light
+colour, which warms as the key light dims, and does **not** track the
+element's own background. Set the fill yourself:
 
 ```html
 <div class="ambient amb-surface-convex amb-rounded-full amb-glow" style="background-color: #ef4444;"></div>
@@ -334,10 +337,13 @@ which shifts warmer as the key light dims):
       style="background-color: var(--amb-emit-color)"></span>
 ```
 
-Use a flat LED shape (`amb-rounded-full`, the same pattern `.amb-led` in
-`@ambientcss/components` follows) rather than `amb-surface-convex` — that
-class paints its own opaque gradient `background`, which would fully occlude
-the emit colour.
+Use a flat LED shape (`amb-rounded-full`) rather than `amb-surface-convex` —
+that class paints its own opaque gradient `background`, which would fully
+occlude the emit colour.
+
+Note that `@ambientcss/components` does not build on `--amb-emit-color`: its
+`.amb-led` reads a separate `--amb-led-color`, driving both its fill and a
+tighter halo from that one variable. The two channels are independent.
 
 ### Motion
 

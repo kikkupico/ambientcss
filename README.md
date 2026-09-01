@@ -67,6 +67,7 @@ npm install @ambientcss/components @ambientcss/css
 
 ```tsx
 import { AmbientProvider, AmbientButton, AmbientKnob, AmbientPanel } from "@ambientcss/components";
+import "@ambientcss/css/ambient.css";
 import "@ambientcss/components/styles.css";
 
 function App() {

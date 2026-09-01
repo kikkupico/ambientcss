@@ -2,6 +2,7 @@
 id: intro
 title: Ambient CSS
 slug: /
+description: Define a light source, and every shadow, highlight and surface gradient follows from it. A physics-based lighting system for CSS, calibrated against Blender raytraces.
 ---
 
 Ambient CSS is a small design system split into two packages:
