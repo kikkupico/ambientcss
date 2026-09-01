@@ -210,6 +210,12 @@ body {
   align-items: center;
   max-width: 700px;
   margin: 0 auto;
+  /* The pad is dragged, not hovered — say so with the cursor, since nothing
+     in the grid looks like a handle. */
+  cursor: grab;
+}
+.orbit-grid[data-dragging="true"] {
+  cursor: grabbing;
 }
 
 .orbit-circle {

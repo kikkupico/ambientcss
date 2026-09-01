@@ -308,20 +308,50 @@ export function App() {
   const edgeSectionRef = useRef<HTMLElement>(null);
   const compSectionRef = useRef<HTMLElement>(null);
 
-  /* Orbit: pointer/touch-driven light direction ───────────────────────── */
+  /* Orbit: drag-driven light direction ─────────────────────────────────
+     Grabbed and dragged, not tracked: a pad that follows the bare pointer
+     re-lights itself on the way past on the way to something else, and on
+     touch there is no hovering pointer to follow at all. The drag is the
+     same gesture in both. Pointer capture means the light keeps following
+     once the drag leaves the grid — you can swing it well past the corner
+     and it stays pinned to that corner instead of stopping dead the moment
+     the pointer crosses the edge. */
   const [orbitLight, setOrbitLight] = useState({ x: -1, y: -1 });
+  const [orbitDragging, setOrbitDragging] = useState(false);
+  /* The drag state twice over: the ref is what the move handler reads (it is
+     current the instant the pointer goes down, where the state would still be
+     a render behind), the state is what the cursor styling needs. */
+  const orbitDragRef = useRef(false);
   const orbitGridRef = useRef<HTMLDivElement>(null);
 
-  const handleOrbitPointer = useCallback((e: React.PointerEvent | React.TouchEvent) => {
+  const aimOrbitLight = useCallback((clientX: number, clientY: number) => {
     const el = orbitGridRef.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
-    const clientX = "touches" in e ? e.touches[0]!.clientX : (e as React.PointerEvent).clientX;
-    const clientY = "touches" in e ? e.touches[0]!.clientY : (e as React.PointerEvent).clientY;
     const rawX = ((clientX - rect.left) / rect.width) * 2 - 1;
     const rawY = ((clientY - rect.top) / rect.height) * 2 - 1;
     const maxAbs = Math.max(Math.abs(rawX), Math.abs(rawY), 0.01);
     setOrbitLight({ x: rawX / maxAbs, y: rawY / maxAbs });
+  }, []);
+
+  const handleOrbitDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    orbitDragRef.current = true;
+    setOrbitDragging(true);
+    aimOrbitLight(e.clientX, e.clientY);
+  }, [aimOrbitLight]);
+
+  const handleOrbitMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (!orbitDragRef.current) return;
+    aimOrbitLight(e.clientX, e.clientY);
+  }, [aimOrbitLight]);
+
+  const handleOrbitUp = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+    orbitDragRef.current = false;
+    setOrbitDragging(false);
   }, []);
 
   /* Scroll button component ----------------------------------------------- */
@@ -396,12 +426,15 @@ export function App() {
       <section className="scene amb-surface" ref={orbitSectionRef}>
         <div className="scene-inner" ref={orbitView.ref}>
           <div className="scene-label">Light Direction</div>
-          <div className="scene-hint">move pointer to change light direction</div>
+          <div className="scene-hint">drag to change light direction</div>
           <div
             className="orbit-grid"
             ref={orbitGridRef}
-            onPointerMove={handleOrbitPointer}
-            onTouchMove={handleOrbitPointer}
+            data-dragging={orbitDragging}
+            onPointerDown={handleOrbitDown}
+            onPointerMove={handleOrbitMove}
+            onPointerUp={handleOrbitUp}
+            onPointerCancel={handleOrbitUp}
             style={{
               "--amb-light-x": orbitLight.x,
               "--amb-light-y": orbitLight.y,
