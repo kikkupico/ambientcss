@@ -906,6 +906,13 @@ body {
   transform: translateX(-50%);
   z-index: 100;
   width: min(calc(var(--bank) + var(--margin) * 2), calc(100vw - 16px));
+  /* The header's own box is the FULL slab's height — the parked console
+     included — because the translate below moves the slab without shrinking
+     what it lays out. Left alone, that box hangs invisibly over the top of
+     the page and eats clicks meant for the content under it. So the header
+     itself catches nothing and the assembly inside takes its events back;
+     the assembly IS transformed, so it only answers where it is drawn. */
+  pointer-events: none;
 }
 
 /* The slab, parked up by --reveal so only the lip (and its key bank) shows.
@@ -930,6 +937,7 @@ body {
   position: relative;
   transform: translateY(calc(-1 * var(--reveal)));
   transition: transform 0.52s cubic-bezier(0.48, 1.3, 0.5, 1);   /* drawer */
+  pointer-events: auto;          /* see .cordbar: the slab, and only it */
 }
 .cord-assembly.is-open { transform: translateY(0); }
 

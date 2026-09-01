@@ -709,10 +709,10 @@ export function App() {
           <div className="component-stage" data-visible={compView.visible}>
             {/* Knobs */}
             <div className="component-cell">
-              <AmbientKnob size={compSize} value={knob1} onChange={setKnob1} knurling={false} markers="full" />
+              <AmbientKnob size={compSize} value={knob1} onChange={setKnob1} knurling={false} markers="full" input="angle" />
             </div>
             <div className="component-cell">
-              <AmbientKnob size={compSize} value={knob4} onChange={setKnob4} material="brushed-round" knurlColor="color(srgb-linear 0.09 0.09 0.1)" />
+              <AmbientKnob size={compSize} value={knob4} onChange={setKnob4} material="brushed-round" knurlColor="color(srgb-linear 0.09 0.09 0.1)" markers="ends" input="angle" />
             </div>
             <div className="component-cell">
               <AmbientKitProvider kit={consoleKit}>
@@ -869,20 +869,38 @@ type ThemeSwitcherProps = {
 function ThemeSwitcher({ theme, activePreset, onPreset, onCustom, onProp }: ThemeSwitcherProps) {
   const [consoleOpen, setConsoleOpen] = useState(false);
   const rigRef = useRef<HTMLDivElement>(null);
+  /* Set while `pick` is driving the page back to the top on open (see
+     below) — the scroll listener has to tell that programmatic scroll
+     apart from the user actually scrolling away, or it would close the
+     console the instant it opened. */
+  const autoScrollingRef = useRef(false);
 
   // While the console is down, a click outside the rig (or Escape) rolls the
   // whole assembly back up. Custom stays the active theme — its cord stays low.
+  //
+  // The rig is `position: fixed`, so it stays pinned to the top of the
+  // viewport rather than scrolling away with the page — leaving it open and
+  // scrolling down puts its ~320px footprint over whatever section is now at
+  // the top of the screen, silently eating clicks meant for the page beneath
+  // it. A scroll is as much "gone somewhere else" as a click outside, so it
+  // closes the rig the same way.
   useEffect(() => {
     if (!consoleOpen) return;
     const onDown = (e: PointerEvent) => {
       if (!rigRef.current?.contains(e.target as Node)) setConsoleOpen(false);
     };
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setConsoleOpen(false); };
+    const onScroll = () => {
+      if (autoScrollingRef.current) return;
+      setConsoleOpen(false);
+    };
     document.addEventListener("pointerdown", onDown);
     document.addEventListener("keydown", onKey);
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       document.removeEventListener("pointerdown", onDown);
       document.removeEventListener("keydown", onKey);
+      window.removeEventListener("scroll", onScroll);
     };
   }, [consoleOpen]);
 
@@ -899,7 +917,33 @@ function ThemeSwitcher({ theme, activePreset, onPreset, onCustom, onProp }: Them
   const pick = (next: string) => {
     if (next === "Custom") {
       onCustom();
-      setConsoleOpen((o) => !o);
+      const opening = !consoleOpen;
+      /* The rig is `position: fixed; top: 0`, so wherever the page happens
+         to be scrolled to, opening it drops the same ~320px panel over
+         whatever content is currently under the top of the viewport — the
+         hero it's meant to sit over if you're there, but anything else if
+         you've scrolled past it. Scrolling back to top on open keeps the
+         console where it visually belongs and out of the way of the rest
+         of the page; the scroll-close effect above handles the reverse case
+         (scrolling away while it's already open). autoScrollingRef keeps
+         this own scroll from immediately triggering that close.
+
+         `behavior: "smooth"` (this page's own default, via CSS
+         `scroll-behavior`) doesn't reliably finish a scroll this long on
+         this page — the reveal-on-scroll animations elsewhere keep the
+         main thread busy enough that the smooth-scroll's own animation
+         frames starve, so it silently never reaches the top. An instant
+         jump has no animation to starve. */
+      if (opening) {
+        if (window.scrollY === 0) {
+          autoScrollingRef.current = false;
+        } else {
+          autoScrollingRef.current = true;
+          window.scrollTo({ top: 0, behavior: "instant" });
+          autoScrollingRef.current = false;
+        }
+      }
+      setConsoleOpen(opening);
       return;
     }
     const preset = THEME_PRESETS.find((p) => p.label === next);
@@ -969,6 +1013,7 @@ function ThemeSwitcher({ theme, activePreset, onPreset, onCustom, onProp }: Them
                         step={k.step}
                         onChange={(v) => onProp(k.prop, k.to(v))}
                         label={k.label}
+                        input="angle"
                       />
                     ))}
                   </div>
