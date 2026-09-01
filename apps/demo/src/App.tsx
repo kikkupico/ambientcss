@@ -155,7 +155,22 @@ const TONE_KNOBS: ControlCfg[] = [
    well's floor. A reflectance, not a paint: it still darkens with the key. */
 const DARK_KNURL = "color(srgb-linear 0.09 0.09 0.1)";
 
-const ORBIT_COUNT = 9;
+/* The grid IS the compass: three columns by three rows, each cell standing
+   for the light direction at its own place in the square — the top-left
+   circle lights from the top left, the middle one from straight overhead.
+   ORBIT_COLS has to match .orbit-grid's grid-template-columns; the count
+   follows from it rather than being restated. */
+const ORBIT_COLS = 3;
+const ORBIT_COUNT = ORBIT_COLS * ORBIT_COLS;
+/* Cell index → light direction, each axis one of -1 / 0 / +1. Not
+   normalised to a unit circle: (-1, -1) is what the rest of the page means
+   by "lit from the top left", and the centre's (0, 0) is a light straight
+   overhead, which is exactly the flat, shadowless case worth being able to
+   point at. */
+const orbitDirection = (i: number) => ({
+  x: (i % ORBIT_COLS) - (ORBIT_COLS - 1) / 2,
+  y: Math.floor(i / ORBIT_COLS) - (ORBIT_COLS - 1) / 2,
+});
 const ANIM_DURATION = 800; // ms for preset transitions
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -308,21 +323,37 @@ export function App() {
   const edgeSectionRef = useRef<HTMLElement>(null);
   const compSectionRef = useRef<HTMLElement>(null);
 
-  /* Orbit: pointer/touch-driven light direction ───────────────────────── */
-  const [orbitLight, setOrbitLight] = useState({ x: -1, y: -1 });
-  const orbitGridRef = useRef<HTMLDivElement>(null);
+  /* Orbit: nine circles, nine directions ────────────────────────────────
+     The section's claim is that one light direction re-lights every edge in
+     the grid at once, so the control for it is the grid itself: point at a
+     circle and the light comes from where that circle sits. Discrete, and
+     the same gesture on both kinds of device — hover on a pointer, tap on
+     a touchscreen (which sends the same pointerenter on the way down), with
+     no drag to discover and nothing to hold. The light stays where it was
+     last put rather than snapping back, so you can point somewhere and then
+     go and look at what it did.
 
-  const handleOrbitPointer = useCallback((e: React.PointerEvent | React.TouchEvent) => {
-    const el = orbitGridRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const clientX = "touches" in e ? e.touches[0]!.clientX : (e as React.PointerEvent).clientX;
-    const clientY = "touches" in e ? e.touches[0]!.clientY : (e as React.PointerEvent).clientY;
-    const rawX = ((clientX - rect.left) / rect.width) * 2 - 1;
-    const rawY = ((clientY - rect.top) / rect.height) * 2 - 1;
-    const maxAbs = Math.max(Math.abs(rawX), Math.abs(rawY), 0.01);
-    setOrbitLight({ x: rawX / maxAbs, y: rawY / maxAbs });
-  }, []);
+     null means "no local pick": the grid then lights from the global
+     direction like every other scene on the page. That is the state the
+     console's own Light X / Light Y hand it back to — see below. */
+  const [orbitLight, setOrbitLight] = useState<{ x: number; y: number } | null>(null);
+
+  /* The console outranks the grid. A local pick is an override of the global
+     light, so the moment the global light MOVES — the console's two travels,
+     or a preset key, which animates them — the override is dropped and the
+     grid goes back to showing the page's own light. Otherwise the one scene
+     on the page that is about light direction would be the one scene that
+     ignored the control for it. Pointing at a circle takes it back.
+
+     No mount-skip needed, and none wanted: the grid starts with no pick, so
+     this effect's run on mount asks for the null it already holds and React
+     drops it. (A skip-the-first-run flag would ALSO have to survive the
+     double-invoked effects of StrictMode, which it silently does not.) */
+  const globalLightX = theme.lightX;
+  const globalLightY = theme.lightY;
+  useEffect(() => {
+    setOrbitLight(null);
+  }, [globalLightX, globalLightY]);
 
   /* Scroll button component ----------------------------------------------- */
   const ScrollButton = ({ sectionRef }: { sectionRef: React.RefObject<HTMLElement | null> }) => (
@@ -396,31 +427,38 @@ export function App() {
       <section className="scene amb-surface" ref={orbitSectionRef}>
         <div className="scene-inner" ref={orbitView.ref}>
           <div className="scene-label">Light Direction</div>
-          <div className="scene-hint">move pointer to change light direction</div>
+          <div className="scene-hint">point at a circle to light from its direction</div>
           <div
             className="orbit-grid"
-            ref={orbitGridRef}
-            onPointerMove={handleOrbitPointer}
-            onTouchMove={handleOrbitPointer}
             style={{
-              "--amb-light-x": orbitLight.x,
-              "--amb-light-y": orbitLight.y,
-              touchAction: "none",
+              /* No local pick: the vars go unset, so the grid inherits the
+                 global light rather than shadowing it with a copy. */
+              ...(orbitLight
+                ? { "--amb-light-x": orbitLight.x, "--amb-light-y": orbitLight.y }
+                : null),
+              touchAction: "manipulation",
             } as React.CSSProperties}
           >
-            {Array.from({ length: ORBIT_COUNT }, (_, i) => (
+            {Array.from({ length: ORBIT_COUNT }, (_, i) => {
+              const dir = orbitDirection(i);
+              const active = !!orbitLight && dir.x === orbitLight.x && dir.y === orbitLight.y;
+              return (
                 <div
                   key={i}
                   className={`orbit-circle ambient amb-surface amb-elevation-3 ${
                     i % 3 === 0 ? "amb-chamfer" : i % 3 === 1 ? "amb-fillet" : "amb-chamfer-2"
                   }`}
+                  data-active={active}
+                  onPointerEnter={() => setOrbitLight(dir)}
+                  onPointerDown={() => setOrbitLight(dir)}
                   style={{
                     opacity: orbitView.visible ? 1 : 0,
                     transform: orbitView.visible ? "scale(1)" : "scale(0.5)",
                     transition: `opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${i * 0.04}s, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${i * 0.04}s, box-shadow 0.3s ease`,
                   } as React.CSSProperties}
                 />
-            ))}
+              );
+            })}
           </div>
         </div>
         <ScrollButton sectionRef={orbitSectionRef} />
@@ -709,10 +747,10 @@ export function App() {
           <div className="component-stage" data-visible={compView.visible}>
             {/* Knobs */}
             <div className="component-cell">
-              <AmbientKnob size={compSize} value={knob1} onChange={setKnob1} knurling={false} markers="full" />
+              <AmbientKnob size={compSize} value={knob1} onChange={setKnob1} knurling={false} markers="full" input="angle" />
             </div>
             <div className="component-cell">
-              <AmbientKnob size={compSize} value={knob4} onChange={setKnob4} material="brushed-round" knurlColor="color(srgb-linear 0.09 0.09 0.1)" />
+              <AmbientKnob size={compSize} value={knob4} onChange={setKnob4} material="brushed-round" knurlColor="color(srgb-linear 0.09 0.09 0.1)" markers="ends" input="angle" />
             </div>
             <div className="component-cell">
               <AmbientKitProvider kit={consoleKit}>
@@ -872,6 +910,13 @@ function ThemeSwitcher({ theme, activePreset, onPreset, onCustom, onProp }: Them
 
   // While the console is down, a click outside the rig (or Escape) rolls the
   // whole assembly back up. Custom stays the active theme — its cord stays low.
+  //
+  // Scrolling is NOT one of those exits, and opening does not move the page:
+  // the rig is a drawer pinned to the top of the viewport, so it opens where
+  // you are and stays open while you scroll — that is the whole point of it,
+  // since the light it controls is what every section below is lit by. It
+  // does cover the top band of whatever you scroll past, which is what
+  // clicking outside it (or Escape) is for.
   useEffect(() => {
     if (!consoleOpen) return;
     const onDown = (e: PointerEvent) => {
@@ -969,6 +1014,7 @@ function ThemeSwitcher({ theme, activePreset, onPreset, onCustom, onProp }: Them
                         step={k.step}
                         onChange={(v) => onProp(k.prop, k.to(v))}
                         label={k.label}
+                        input="angle"
                       />
                     ))}
                   </div>

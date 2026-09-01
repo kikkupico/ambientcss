@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas } from "@react-three/fiber";
 import { Html, OrbitControls } from "@react-three/drei";
-import * as THREE from "three";
 import {
   CHAMFER_MM_PER_WIDTH,
   FILLET_MM_PER_WIDTH,
@@ -86,14 +85,30 @@ const filletBtnGeometry = buildPlateGeometry({
 });
 
 /* ---------------------------------------------------------------------
-   Lighting: mirrors ambient3d/amb_params.py's key-light placement
-   (key.location = (LIGHT_R * lx, -LIGHT_R * ly, LIGHT_Z)) so the sign of
-   light-y matches the CSS: --amb-light-y: -1 means "from the top" in both
-   the box-shadow math and here.
+   Lighting: --amb-light-x/-y are a flat 2D direction, not a 3D position —
+   the box-shadow math offsets by (light-x, light-y) directly, so at (0, 0)
+   both offsets are zero and shadows vanish (a purely overhead light). An
+   earlier version of this mirrored ambient3d/amb_params.py's key-light
+   formula almost verbatim (key.location = (LIGHT_R * lx, -LIGHT_R * ly,
+   LIGHT_Z)), feeding lightY into the light's HEIGHT with a fixed Z depth.
+   That put a light directly over the panel at (0, 0) only along one axis —
+   Z stayed at the fixed depth — so shadows never actually vanished at
+   centre, and past light-y ~0 the light swung below the ground plane
+   entirely, leaving every visible (top-facing) surface dark.
+
+   Both pad axes are horizontal position here instead: X and Z (left/right
+   and near/far — the panel's own plane), with the light's HEIGHT held
+   fixed. (0, 0) is then genuinely overhead — zero horizontal offset on
+   both axes — and the light can never go underground, since height never
+   varies. The sign on Z is chosen so light-y: -1 ("from the top") puts the
+   light on the far side — which reads as "high" in this elevated 3/4 view —
+   so its shadows fall toward the camera, i.e. toward the bottom of the
+   frame, matching the flat CSS rendering's own top-light/bottom-shadow
+   convention.
    --------------------------------------------------------------------- */
 
 const LIGHT_DISTANCE = 90;
-const LIGHT_DEPTH = 70;
+const LIGHT_HEIGHT = 70;
 const KEY_INTENSITY_SCALE = 3.2;
 const FILL_INTENSITY_SCALE = 0.9;
 const AMBIENT_FLOOR = 0.08;
@@ -103,26 +118,11 @@ interface SceneProps {
   lightY: number;
   keyIntensity: number;
   fillIntensity: number;
-  exploded: boolean;
 }
 
-function SceneContents({ lightX, lightY, keyIntensity, fillIntensity, exploded }: SceneProps) {
-  const raised1Ref = useRef<THREE.Group>(null);
-  const raised2Ref = useRef<THREE.Group>(null);
-
+function SceneContents({ lightX, lightY, keyIntensity, fillIntensity }: SceneProps) {
   const lightWorldX = LIGHT_DISTANCE * lightX;
-  const lightWorldY = -LIGHT_DISTANCE * lightY;
-
-  useFrame(() => {
-    const offset1 = exploded ? 16 : 0;
-    const offset2 = exploded ? 40 : 0;
-    if (raised1Ref.current) {
-      raised1Ref.current.position.y = THREE.MathUtils.lerp(raised1Ref.current.position.y, offset1, 0.12);
-    }
-    if (raised2Ref.current) {
-      raised2Ref.current.position.y = THREE.MathUtils.lerp(raised2Ref.current.position.y, offset2, 0.12);
-    }
-  });
+  const lightWorldZ = LIGHT_DISTANCE * lightY;
 
   return (
     <>
@@ -131,7 +131,7 @@ function SceneContents({ lightX, lightY, keyIntensity, fillIntensity, exploded }
         args={["#eef3ff", "#8b8f86", fillIntensity * FILL_INTENSITY_SCALE]}
       />
       <directionalLight
-        position={[lightWorldX, lightWorldY, LIGHT_DEPTH]}
+        position={[lightWorldX, LIGHT_HEIGHT, lightWorldZ]}
         intensity={keyIntensity * KEY_INTENSITY_SCALE}
         color="#fff8ef"
         castShadow
@@ -145,10 +145,10 @@ function SceneContents({ lightX, lightY, keyIntensity, fillIntensity, exploded }
         shadow-camera-far={400}
         shadow-bias={-0.0015}
       />
-      <mesh position={[lightWorldX * 0.42, lightWorldY * 0.42 + 30, LIGHT_DEPTH * 0.42]}>
+      <mesh position={[lightWorldX * 0.42, LIGHT_HEIGHT * 0.42 + 30, lightWorldZ * 0.42]}>
         <sphereGeometry args={[2.2, 16, 16]} />
         <meshBasicMaterial color="#ffdca0" />
-        <Html center distanceFactor={220} className="tdd-label tdd-label-light">
+        <Html center className="tdd-label tdd-label-light">
           Key Light
         </Html>
       </mesh>
@@ -168,25 +168,15 @@ function SceneContents({ lightX, lightY, keyIntensity, fillIntensity, exploded }
         receiveShadow
       >
         <meshStandardMaterial color="#7b8494" roughness={0.9} metalness={0.02} />
-        <Html
-          position={[0, METER_FLOOR.thickness + 2, 0]}
-          center
-          distanceFactor={220}
-          className="tdd-label"
-        >
+        <Html position={[0, METER_FLOOR.thickness + 2, 0]} center className="tdd-label">
           elev 0 &middot; recessed
         </Html>
       </mesh>
 
-      <group ref={raised1Ref}>
+      <group>
         <mesh geometry={knobGeometry} position={[KNOB.x, RAISED_1_Y, KNOB.z]} castShadow receiveShadow>
           <meshStandardMaterial color="#e7ebf2" roughness={0.5} metalness={0.08} />
-          <Html
-            position={[0, KNOB.bodyHeight + KNOB.domeHeight + 4, 0]}
-            center
-            distanceFactor={220}
-            className="tdd-label"
-          >
+          <Html position={[0, KNOB.bodyHeight + KNOB.domeHeight + 4, 0]} center className="tdd-label">
             elev 1 &middot; convex
           </Html>
         </mesh>
@@ -198,18 +188,13 @@ function SceneContents({ lightX, lightY, keyIntensity, fillIntensity, exploded }
           receiveShadow
         >
           <meshStandardMaterial color="#f4f6fa" roughness={0.7} metalness={0.05} />
-          <Html
-            position={[0, CHAMFER_BTN.thickness + 4, 0]}
-            center
-            distanceFactor={220}
-            className="tdd-label"
-          >
+          <Html position={[0, CHAMFER_BTN.thickness + 4, 0]} center className="tdd-label">
             elev 1 &middot; chamfer
           </Html>
         </mesh>
       </group>
 
-      <group ref={raised2Ref}>
+      <group>
         <mesh
           geometry={filletBtnGeometry}
           position={[FILLET_BTN.x, RAISED_2_Y, FILLET_BTN.z]}
@@ -217,12 +202,7 @@ function SceneContents({ lightX, lightY, keyIntensity, fillIntensity, exploded }
           receiveShadow
         >
           <meshStandardMaterial color="#f4f6fa" roughness={0.7} metalness={0.05} />
-          <Html
-            position={[0, FILLET_BTN.thickness + 4, 0]}
-            center
-            distanceFactor={220}
-            className="tdd-label"
-          >
+          <Html position={[0, FILLET_BTN.thickness + 4, 0]} center className="tdd-label">
             elev 2 &middot; fillet
           </Html>
         </mesh>
@@ -232,8 +212,8 @@ function SceneContents({ lightX, lightY, keyIntensity, fillIntensity, exploded }
         makeDefault
         target={[0, 14, 0]}
         enablePan={false}
-        minDistance={110}
-        maxDistance={340}
+        minZoom={1.2}
+        maxZoom={7}
         maxPolarAngle={Math.PI / 2 - 0.05}
         enableDamping
       />
@@ -329,14 +309,16 @@ export default function ConceptScene3D() {
   const [lightY, setLightY] = useState(LIGHT_DEFAULTS.y);
   const [keyIntensity, setKeyIntensity] = useState(LIGHT_DEFAULTS.key);
   const [fillIntensity, setFillIntensity] = useState(LIGHT_DEFAULTS.fill);
-  const [exploded, setExploded] = useState(false);
 
   const handleLightChange = useCallback((x: number, y: number) => {
     setLightX(x);
     setLightY(y);
   }, []);
 
-  const cameraProps = useMemo(() => ({ position: [20, 90, 210] as [number, number, number], fov: 30 }), []);
+  const cameraProps = useMemo(
+    () => ({ position: [20, 90, 210] as [number, number, number], zoom: 3.1, near: 1, far: 1000 }),
+    []
+  );
 
   return (
     <section className="tdd-wrapper">
@@ -344,24 +326,20 @@ export default function ConceptScene3D() {
         <div>
           <h3 className="tdd-title">Lighting model, in 3D</h3>
           <p className="tdd-help">
-            Drag to orbit. The CSS renders this scene as a flat orthographic front view —
+            Drag to orbit. The CSS renders this scene as a flat, straight-on view —
             here you can see the depth and lighting it's approximating.
           </p>
         </div>
-        <button type="button" className="tdd-toggle" onClick={() => setExploded((v) => !v)}>
-          {exploded ? "Collapse" : "Explode"}
-        </button>
       </div>
 
       <div className="tdd-stage">
         <div className="tdd-canvas">
-          <Canvas shadows camera={cameraProps} dpr={[1, 2]}>
+          <Canvas shadows orthographic camera={cameraProps} dpr={[1, 2]}>
             <SceneContents
               lightX={lightX}
               lightY={lightY}
               keyIntensity={keyIntensity}
               fillIntensity={fillIntensity}
-              exploded={exploded}
             />
           </Canvas>
         </div>

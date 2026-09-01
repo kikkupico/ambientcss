@@ -176,23 +176,6 @@
   max-width: 46ch;
 }
 
-.tdd-toggle {
-  flex-shrink: 0;
-  border: 1px solid var(--ifm-color-emphasis-400);
-  background: #fff;
-  border-radius: 8px;
-  padding: 6px 14px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  color: var(--ifm-color-emphasis-800);
-}
-
-.tdd-toggle:hover {
-  border-color: var(--ifm-color-primary);
-  color: var(--ifm-color-primary);
-}
-
 .tdd-stage {
   display: flex;
   gap: 16px;
@@ -329,6 +312,19 @@
 
 .tdd-label-light {
   background: rgba(120, 84, 20, 0.85);
+}
+
+[data-theme="dark"] .tdd-wrapper {
+  background: linear-gradient(150deg, #1b2333 0%, #141a26 100%);
+}
+
+[data-theme="dark"] .tdd-canvas,
+[data-theme="dark"] .tdd-canvas-fallback {
+  background: #10151f;
+}
+
+[data-theme="dark"] .tdd-control-group {
+  background: rgba(255, 255, 255, 0.06);
 }
 
 @media (max-width: 760px) {
