@@ -210,18 +210,35 @@ body {
   align-items: center;
   max-width: 700px;
   margin: 0 auto;
-  /* The pad is dragged, not hovered — say so with the cursor, since nothing
-     in the grid looks like a handle. */
-  cursor: grab;
-}
-.orbit-grid[data-dragging="true"] {
-  cursor: grabbing;
 }
 
+/* Each circle is the light's position as well as a thing the light falls on
+   — point at one and the whole grid re-lights from where it sits. */
 .orbit-circle {
   width: clamp(60px, 10vw, 100px);
   height: clamp(60px, 10vw, 100px);
   border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+}
+
+/* The one currently holding the light wears a small lume pip: the lamp is
+   HERE. Nothing else marks it — the grid's own shading is the answer the
+   section is about, and an outline or a scale would compete with it. */
+.orbit-circle::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--amb-lume);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.orbit-circle[data-active="true"]::after {
+  opacity: 0.5;
 }
 
 
