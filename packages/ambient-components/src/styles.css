@@ -538,7 +538,24 @@
    squarer, flatter EP-133-style pad (exponent 6: tighter corners and a
    3.6mm cap instead of the key's 4.5mm — thickness 0.8 — with the same
    0.7mm press travel). */
+/* GRID, NOT BLOCK, and the reason is a WebKit bug rather than layout taste.
+   These two shapes are the only wells carrying `aspect-ratio` together with
+   the clearance `padding` the ring is drawn from, and CSS Sizing 4 says a
+   preferred ratio applies to the BORDER box when box-sizing is border-box.
+   WebKit applies it to the CONTENT box and then adds the padding back, so a
+   block well came out 2 * padding taller than it was wide; the cap's
+   height: 100% followed the inflated box and overflowed the bottom, eating
+   the ring on the bottom and right while it survived on the top and left.
+   That is what Safari users saw as the round and square buttons looking
+   off. As a grid container WebKit resolves the ratio against the border box
+   like everyone else, and the cap stretches into the content box on its own.
+
+   The reduction, if this ever needs re-checking: give any shrink-to-fit
+   button `box-sizing: border-box; min-width: 64px; aspect-ratio: 1;
+   padding: 2px`. Chromium lays it out 64x64. WebKit makes it 64x68.
+   Adding `display: grid` makes both 64x64. */
 .amb-button.amb-button-round {
+  display: grid;
   min-width: var(--ambx-button-size);
   aspect-ratio: 1;
   border-radius: 50%;
@@ -550,7 +567,9 @@
   border-radius: 50%;
 }
 
+/* display: grid for the same reason as .amb-button-round above. */
 .amb-button.amb-button-square {
+  display: grid;
   min-width: var(--ambx-button-size);
   aspect-ratio: 1;
   border-radius: var(--ambx-radius-md);
