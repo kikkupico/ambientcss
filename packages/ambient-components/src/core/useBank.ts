@@ -100,15 +100,21 @@ export function useBank(options: UseBankOptions) {
     if (!multiple) select(items[i]);
   };
 
+  /* BOTH axes move, whatever the bank's orientation. A native radio group
+     answers all four arrows no matter how its inputs are laid out, and a
+     keyboard user has no way to see that this bank calls itself horizontal
+     — binding the keys to the visual axis just makes two of the four keys
+     silently dead. `aria-orientation` still reports the layout, because
+     that is what it describes; it was never a statement about bindings. */
   const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
-    const back = orientation === "vertical" ? "ArrowUp" : "ArrowLeft";
-    const forward = orientation === "vertical" ? "ArrowDown" : "ArrowRight";
     switch (event.key) {
-      case back:
+      case "ArrowUp":
+      case "ArrowLeft":
         event.preventDefault();
         step(index, -1);
         break;
-      case forward:
+      case "ArrowDown":
+      case "ArrowRight":
         event.preventDefault();
         step(index, 1);
         break;

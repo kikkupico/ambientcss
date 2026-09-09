@@ -293,4 +293,59 @@ describe("AmbientBank", () => {
     expect(keys[0].textContent).toBe("lit"); // on: keyPartsOn wins
     expect(keys[1].textContent).toBe("shared"); // off: falls back to keyParts
   });
+
+  /* All four arrows move, in both orientations. A native radio group binds
+     every arrow whatever the layout, and a keyboard user cannot see which
+     axis this bank was declared on — binding to the visual axis leaves two
+     keys silently dead. */
+  it.each([
+    ["vertical", "{ArrowRight}", "{ArrowLeft}"],
+    ["vertical", "{ArrowDown}", "{ArrowUp}"],
+    ["horizontal", "{ArrowDown}", "{ArrowUp}"],
+    ["horizontal", "{ArrowRight}", "{ArrowLeft}"]
+  ] as const)("moves selection in a %s bank with %s / %s", async (orientation, fwd, back) => {
+    const onChange = vi.fn();
+    render(
+      <AmbientBank
+        aria-label="wave"
+        orientation={orientation}
+        options={options}
+        defaultValue="sine"
+        onChange={onChange}
+      />
+    );
+    const keys = screen.getAllByRole("radio");
+    keys[0].focus();
+
+    await userEvent.keyboard(fwd);
+    expect(keys[1]).toBe(document.activeElement);
+    expect(keys[1].getAttribute("aria-checked")).toBe("true");
+    expect(onChange).toHaveBeenLastCalledWith("square");
+
+    await userEvent.keyboard(back);
+    expect(keys[0]).toBe(document.activeElement);
+    expect(onChange).toHaveBeenLastCalledWith("sine");
+  });
+
+  it("skips disabled keys and wraps at the ends", async () => {
+    render(<AmbientBank aria-label="wave" options={options} defaultValue="square" />);
+    const keys = screen.getAllByRole("radio");
+    keys[1].focus();
+    // tri (index 2) is disabled, so forward from square wraps past it to sine.
+    await userEvent.keyboard("{ArrowRight}");
+    expect(keys[0]).toBe(document.activeElement);
+    expect(keys[0].getAttribute("aria-checked")).toBe("true");
+  });
+
+  it("moves focus without selecting in multiple mode", async () => {
+    render(<AmbientBank aria-label="fx" multiple options={options} defaultValue={["sine"]} />);
+    const keys = screen.getAllByRole("checkbox");
+    keys[0].focus();
+    await userEvent.keyboard("{ArrowRight}");
+    /* A checkbox group only moves focus — each lamp toggles on its own,
+       so selection must NOT follow the arrow. */
+    expect(keys[1]).toBe(document.activeElement);
+    expect(keys[1].getAttribute("aria-checked")).toBe("false");
+    expect(keys[0].getAttribute("aria-checked")).toBe("true");
+  });
 });
