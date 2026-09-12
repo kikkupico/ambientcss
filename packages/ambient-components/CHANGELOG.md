@@ -1,5 +1,13 @@
 # @ambientcss/components
 
+## 3.1.2
+
+### Patch Changes
+
+- 63cf143: AmbientSelect's lit cap mixes the lamp over the glass material's own grounded wash instead of a copy of the old formula.
+- Updated dependencies [63cf143]
+  - @ambientcss/css@3.1.0
+
 ## 3.1.1
 
 ### Patch Changes

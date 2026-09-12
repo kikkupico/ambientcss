@@ -1,5 +1,0 @@
----
-"@ambientcss/css": minor
----
-
-Ground `.amb-mat-glass` on a rendered frosted-glass slab (ambient3d). The pane is now one measured translucent wash that rides both lights (milky, not white), its backdrop blur is physical — proportional to the pane's elevation and thickness, so a pane at rest barely softens what is under it and blurs what it floats over — and the edges carry the slab's own bands: a dark wash inside the lit edges (a bright hairline over dark backdrops) and a glow along the far ones, brighter than the ground beside the pane. Its drop shadow is lighter than an opaque plate's and hollow: a soft ring on the pane's projected silhouette over a shallow interior, painted in the element's `::after` (a new selector; `.ambient`'s filled shadow layers gained a private gain hook for it). The light-keyed fixed blur, the `saturate(160%)`, the lit-edge sheen and the uniform white border are gone; the class defaults to thickness 1 like the edge treatments (`amb-thickness-0` gives a frosted film).
