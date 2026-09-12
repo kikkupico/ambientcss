@@ -318,13 +318,6 @@ body {
   aspect-ratio: 1;
 }
 
-/* Six narrow tracks leave a narrower gap for the glass demo's circle to
-   slide into, so it travels far enough to clear the glass disc it started
-   behind and stops short of the brushed one next door. */
-.materials-gallery .moving-circle {
-  --slide-out-x: 102px;
-}
-
 .surface-item {
   display: flex;
   flex-direction: column;
@@ -780,10 +773,6 @@ body {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .materials-gallery .moving-circle {
-    --slide-out-x: 68px;
-  }
-
   .edge-wall {
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
@@ -891,17 +880,17 @@ body {
    ANIMATIONS
    -------------------------------------------------------------------------- */
 
-@keyframes slide-out {
-  0%, 100% {
-    transform: translateX(0);
-  }
-  50% {
-    transform: translateX(var(--slide-out-x, 150px));
-  }
+/* Glass's blur and edge bands ride --amb-elevation directly (@ambientcss/css),
+   so sweeping it makes the physical depth-blur visible. Unlike .amb-bounce's
+   eased, decaying hops, this is one constant-velocity ramp up and back down —
+   a steady rise and sink rather than a bounce. */
+@keyframes amb-elevation-shift {
+  0%, 100% { --amb-elevation: 0; }
+  50%      { --amb-elevation: 3; }
 }
 
-.moving-circle {
-  animation: slide-out 3s ease-in-out infinite;
+.amb-elevation-shift {
+  animation: amb-elevation-shift 4s linear infinite;
 }
 
 /* ==========================================================================
