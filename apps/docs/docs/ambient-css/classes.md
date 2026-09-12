@@ -76,7 +76,19 @@ Adds a light-reflective gradient that aligns with the global light source. Use `
 
 ### Glass
 
-A frosted glass effect with translucency and background blur. Use `amb-mat-glass` for overlay panels or modern frosted interfaces.
+Frosted glass, grounded on a rendered satin slab (see
+[Grounded on Blender renders](./grounded.mdx#glass)): a milky translucent
+wash that takes the light's colour, a dark band along the lit edges and a
+glow along the far ones, and a backdrop blur that is physical — it grows
+with the pane's distance from what is behind it. A pane resting on a
+surface barely softens it; lift it with `amb-elevation-*` and the frost
+blurs what it floats over. Its drop shadow is lighter than an opaque
+plate's and hollow — a soft ring where the pane's walls are, over a
+shallow interior — painted in the element's `::after` (the material owns
+that pseudo-element, as the relief materials own theirs). Like the edge
+treatments, the class defaults to thickness 1 (the bands are what the
+slab's walls do to the light); `amb-thickness-0` turns it into a frosted
+film — a faint attenuator with no bands.
 
 ```html
 <div class="ambient amb-surface amb-mat-glass amb-elevation-3">Glass Surface</div>
@@ -194,8 +206,9 @@ material's colour, on every finish except glass, instead of a second
 `--amb-albedo`.
 
 Two costs worth knowing before you reach for these. Each material paints its
-relief in `::before` and `::after`, so an element that already uses one of
-its own pseudo-elements needs the grain on an inner layer instead. And the
+relief in `::before` and `::after` (and glass paints its shadow ring in
+`::after`), so an element that already uses one of its own pseudo-elements
+needs the grain on an inner layer instead. And the
 host gets `overflow: hidden`, needed so the blend clips to a rounded corner —
 it clips real children too.
 

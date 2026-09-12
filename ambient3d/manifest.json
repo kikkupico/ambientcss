@@ -484,6 +484,178 @@
         "publish": true,
         "slug": "mat-blasted"
       }
+    },
+    {
+      "id": "mat_glass_default",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": {
+        "mat": "glass",
+        "thickness": 1
+      },
+      "geometry": {
+        "size": [
+          80,
+          80
+        ]
+      },
+      "css": {
+        "classes": [
+          "ambient",
+          "amb-mat-glass",
+          "amb-surface"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "glass_tint",
+        "edge_bands",
+        "plate_profile",
+        "hollow_shadow"
+      ],
+      "docs": {
+        "publish": true,
+        "slug": "mat-glass"
+      }
+    },
+    {
+      "id": "mat_glass_ref",
+      "kind": "effect",
+      "builder": "ground",
+      "amb": {},
+      "geometry": {
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "glass_tint",
+        "edge_bands",
+        "plate_profile"
+      ]
+    },
+    {
+      "id": "mat_glass_frost",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": {
+        "mat": "glass",
+        "thickness": 1
+      },
+      "geometry": {
+        "size": [
+          80,
+          80
+        ],
+        "decals": [
+          {
+            "albedo": 0.06,
+            "rect": [
+              4,
+              -64,
+              20,
+              64
+            ]
+          }
+        ]
+      },
+      "css": {
+        "classes": [
+          "ambient",
+          "amb-mat-glass",
+          "amb-surface"
+        ],
+        "size": [
+          80,
+          80
+        ],
+        "backdrop": [
+          {
+            "classes": [
+              "amb-surface"
+            ],
+            "rect": [
+              4,
+              -64,
+              20,
+              64
+            ],
+            "style": "--amb-albedo: color(srgb-linear 0.06 0.06 0.06);"
+          }
+        ]
+      },
+      "measure": [
+        "glass_tint",
+        "frost_blur"
+      ],
+      "docs": {
+        "publish": true,
+        "slug": "mat-glass-frost"
+      }
+    },
+    {
+      "id": "mat_glass_frost_elevated",
+      "kind": "effect",
+      "builder": "plate",
+      "amb": {
+        "mat": "glass",
+        "thickness": 1,
+        "elevation": 2
+      },
+      "geometry": {
+        "size": [
+          80,
+          80
+        ],
+        "decals": [
+          {
+            "albedo": 0.06,
+            "rect": [
+              4,
+              -64,
+              20,
+              64
+            ]
+          }
+        ]
+      },
+      "css": {
+        "classes": [
+          "ambient",
+          "amb-mat-glass",
+          "amb-surface"
+        ],
+        "size": [
+          80,
+          80
+        ],
+        "backdrop": [
+          {
+            "classes": [
+              "amb-surface"
+            ],
+            "rect": [
+              4,
+              -64,
+              20,
+              64
+            ],
+            "style": "--amb-albedo: color(srgb-linear 0.06 0.06 0.06);"
+          }
+        ]
+      },
+      "measure": [
+        "glass_tint",
+        "frost_blur"
+      ],
+      "docs": {
+        "publish": true,
+        "slug": "mat-glass-frost-elevated"
+      }
     }
   ],
   "sweeps": [
@@ -1911,6 +2083,419 @@
                 0,
                 -1
               ]
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "glass",
+      "builder": "plate",
+      "amb": {
+        "mat": "glass",
+        "thickness": 1
+      },
+      "geometry": {
+        "size": [
+          80,
+          80
+        ]
+      },
+      "css": {
+        "classes": [
+          "ambient",
+          "amb-mat-glass",
+          "amb-surface"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "glass_tint",
+        "edge_bands",
+        "plate_profile"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "light": [
+              [
+                -1,
+                -1
+              ],
+              [
+                -1,
+                0
+              ],
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                -1
+              ]
+            ]
+          }
+        },
+        {
+          "vary": {
+            "key_light_intensity": [
+              0.3,
+              0.6,
+              0.9
+            ]
+          }
+        },
+        {
+          "vary": {
+            "fill_light_intensity": [
+              0.3,
+              1.0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "glass_ref",
+      "builder": "ground",
+      "amb": {},
+      "geometry": {
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "glass_tint",
+        "edge_bands",
+        "plate_profile"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "light": [
+              [
+                -1,
+                -1
+              ],
+              [
+                -1,
+                0
+              ],
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                -1
+              ]
+            ]
+          }
+        },
+        {
+          "vary": {
+            "key_light_intensity": [
+              0.3,
+              0.6,
+              0.9
+            ]
+          }
+        },
+        {
+          "vary": {
+            "fill_light_intensity": [
+              0.3,
+              1.0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "glass_dark",
+      "builder": "plate",
+      "amb": {
+        "mat": "glass",
+        "thickness": 1
+      },
+      "geometry": {
+        "size": [
+          80,
+          80
+        ],
+        "decals": [
+          {
+            "albedo": 0.06,
+            "rect": [
+              -40,
+              -40,
+              40,
+              40
+            ]
+          }
+        ]
+      },
+      "css": {
+        "classes": [
+          "ambient",
+          "amb-mat-glass",
+          "amb-surface"
+        ],
+        "size": [
+          80,
+          80
+        ],
+        "backdrop": [
+          {
+            "classes": [
+              "amb-surface"
+            ],
+            "rect": [
+              -40,
+              -40,
+              40,
+              40
+            ],
+            "style": "--amb-albedo: color(srgb-linear 0.06 0.06 0.06);"
+          }
+        ]
+      },
+      "measure": [
+        "glass_tint",
+        "plate_profile",
+        "edge_bands"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "light": [
+              [
+                -1,
+                -1
+              ],
+              [
+                -1,
+                0
+              ],
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                -1
+              ]
+            ]
+          }
+        },
+        {
+          "vary": {
+            "key_light_intensity": [
+              0.3,
+              0.6,
+              0.9
+            ]
+          }
+        },
+        {
+          "vary": {
+            "fill_light_intensity": [
+              0.3,
+              1.0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "glass_dark_ref",
+      "builder": "ground",
+      "amb": {},
+      "geometry": {
+        "size": [
+          80,
+          80
+        ],
+        "decals": [
+          {
+            "albedo": 0.06,
+            "rect": [
+              -40,
+              -40,
+              40,
+              40
+            ]
+          }
+        ]
+      },
+      "measure": [
+        "glass_tint",
+        "plate_profile",
+        "edge_bands"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "light": [
+              [
+                -1,
+                -1
+              ],
+              [
+                -1,
+                0
+              ],
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                -1
+              ]
+            ]
+          }
+        },
+        {
+          "vary": {
+            "key_light_intensity": [
+              0.3,
+              0.6,
+              0.9
+            ]
+          }
+        },
+        {
+          "vary": {
+            "fill_light_intensity": [
+              0.3,
+              1.0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "glass_frost",
+      "builder": "plate",
+      "amb": {
+        "mat": "glass",
+        "thickness": 1
+      },
+      "geometry": {
+        "size": [
+          80,
+          80
+        ],
+        "decals": [
+          {
+            "albedo": 0.06,
+            "rect": [
+              4,
+              -64,
+              20,
+              64
+            ]
+          }
+        ]
+      },
+      "css": {
+        "classes": [
+          "ambient",
+          "amb-mat-glass",
+          "amb-surface"
+        ],
+        "size": [
+          80,
+          80
+        ],
+        "backdrop": [
+          {
+            "classes": [
+              "amb-surface"
+            ],
+            "rect": [
+              4,
+              -64,
+              20,
+              64
+            ],
+            "style": "--amb-albedo: color(srgb-linear 0.06 0.06 0.06);"
+          }
+        ]
+      },
+      "measure": [
+        "glass_tint",
+        "frost_blur",
+        "edge_bands"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "elevation": [
+              1,
+              2,
+              3
+            ]
+          }
+        },
+        {
+          "vary": {
+            "thickness": [
+              0,
+              2
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "glass_shadow",
+      "builder": "plate",
+      "amb": {
+        "mat": "glass",
+        "thickness": 1
+      },
+      "geometry": {
+        "size": [
+          80,
+          80
+        ]
+      },
+      "css": {
+        "classes": [
+          "ambient",
+          "amb-mat-glass",
+          "amb-surface"
+        ],
+        "size": [
+          80,
+          80
+        ]
+      },
+      "measure": [
+        "hollow_shadow",
+        "glass_tint"
+      ],
+      "axes": [
+        {
+          "vary": {
+            "elevation": [
+              1,
+              2,
+              3
+            ]
+          }
+        },
+        {
+          "vary": {
+            "thickness": [
+              2
             ]
           }
         }

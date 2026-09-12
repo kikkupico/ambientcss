@@ -109,6 +109,10 @@ THICKNESS_MM_PER_LEVEL = 4.5
 SHEET_MM = 0.15           # physical stand-in for thickness 0
 SHEET_PROUD_MM = 0.02     # how far an embedded sheet sits above the ground
                           # (0.08 px: invisible, but never coplanar)
+DECAL_PROUD_MM = 0.01     # backdrop decals (the frost stripe, the dark
+                          # field under a glass plate) sit this far above
+                          # the ground: below a sheet's top face, above the
+                          # ground's, so they never share a face with either
 SAGITTA_MM = 4.0          # dish/dome depth of the curved surface variants
                           # (deep enough that its shading dominates the
                           # residual plate-wide irradiance gradient)
@@ -192,9 +196,19 @@ def plate_z(a):
     """Z of the plate's base. A sheet (t < 1) rests embedded like a decal —
     its top face a sub-pixel hair above the ground (exactly flush would
     z-fight the coplanar ground face) — and rises out with elevation; a
-    slab sits on the ground."""
+    slab sits on the ground.
+
+    A GLASS slab is lifted by the same hair. An opaque slab's bottom face
+    is never seen, so its coplanarity with the ground is harmless; a
+    refracted camera ray reaches a glass slab's bottom face and there the
+    tie between it and the ground's top face is resolved per triangle —
+    which rendered as sharp horizontal tone bands across the plate (found
+    2026-09-12, mistaken for a lighting effect until every light direction
+    produced the same bands)."""
     z = elevation_mm(a)
-    return z - SHEET_MM + SHEET_PROUD_MM if a["thickness"] < 1 else z
+    if a["thickness"] < 1:
+        return z - SHEET_MM + SHEET_PROUD_MM
+    return z + SHEET_PROUD_MM if a["mat"] == "glass" else z
 
 
 def silhouette_mm(a):

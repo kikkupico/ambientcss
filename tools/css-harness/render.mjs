@@ -61,11 +61,18 @@ const page = await browser.newPage({
 let count = 0;
 for (const { rel, amb, spec } of jobs()) {
   const [w, h] = spec.css.size;
+  // backdrop decals (glass scenes): rects in screen mm from the frame
+  // center, the same numbers the Blender rig builds its decals from,
+  // painted behind the subject so backdrop-filter has something to blur
+  const backdrop = (spec.css.backdrop ?? [])
+    .map(({ classes, rect: [x0, y0, x1, y1], style }) =>
+      `<div class="${classes.join(" ")}" style="position: absolute; left: calc(50% + ${x0}px); top: calc(50% + ${y0}px); width: ${x1 - x0}px; height: ${y1 - y0}px; ${style ?? ""}"></div>`)
+    .join("");
   const html = `<!doctype html><html><head><style>${css}
     html, body { margin: 0; width: 100%; height: 100%; }
-    body { display: grid; place-items: center; }
-    #subject { width: ${w}px; height: ${h}px; }
-  </style></head><body class="amb-surface" style="${inlineVars(amb)}">
+    body { display: grid; place-items: center; position: relative; }
+    #subject { width: ${w}px; height: ${h}px; position: relative; }
+  </style></head><body class="amb-surface" style="${inlineVars(amb)}">${backdrop}
     <!-- the physical ground and plate share the same albedo, so the body
          takes .amb-surface and always tracks the shipped formula. The
          subject repeats the frame's inline vars: classes may carry their

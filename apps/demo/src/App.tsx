@@ -562,7 +562,7 @@ export function App() {
                 <div style={{ position: "relative" }}>
                   {mat === "glass" && (
                     <div
-                      className="moving-circle"
+                      className="glass-highlight-circle"
                       style={{
                         position: "absolute",
                         width: "48px",
@@ -570,7 +570,7 @@ export function App() {
                         borderRadius: "50%",
                         background: "var(--amb-highlight-color)",
                         top: "50%",
-                        left: "50%",
+                        left: "100%",
                         marginTop: "-24px",
                         marginLeft: "-24px",
                         zIndex: 0,
@@ -580,7 +580,7 @@ export function App() {
                   )}
                   <AmbientPanel
                     material={mat}
-                    className="surface-swatch"
+                    className={mat === "glass" ? "surface-swatch amb-elevation-shift" : "surface-swatch"}
                     data-visible={matView.visible}
                     style={{
                       transitionDelay: `${i * 0.12}s`,

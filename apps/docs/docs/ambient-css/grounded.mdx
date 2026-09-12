@@ -140,6 +140,36 @@ never flipping with the key.
 
 <RenderComparison slug="mat-shiny" classes="amb-mat-shiny amb-surface" size={[40, 40]} />
 
+## Glass
+
+`.amb-mat-glass` — grounded on a clear frosted slab (satin on both faces,
+IOR 1.5) rendered over a light ground, a dark field and a dark stripe. What
+the pane does to whatever is behind it solves as one translucent wash —
+darkening a light backdrop and lifting a dark one toward a milky ~74%
+grey — that rides both lights. The frost's blur is physical: 0.19 px per
+px of gap between the pane and its backdrop plus 0.14 per px of thickness,
+so a pane resting on a surface barely softens it and the same pane blurs
+what it lifts away from. The slab's lit walls throw a dark band just
+inside the lit edges (a bright hairline over a dark backdrop); the far
+walls glow where the key exits through them — brighter than the bare
+ground beside the pane. Its drop shadow is not the opaque plate's: the
+diffused key comes straight through, leaving a shallow interior, and what
+darkens the ground is a ring riding the pane's projected silhouette (the
+walls, and the light the edges bend sideways) that blurs into a hollow
+frame as the pane lifts.
+
+<RenderComparison slug="mat-glass" classes="ambient amb-mat-glass amb-surface" />
+<RenderComparison
+  slug="mat-glass-frost"
+  classes="ambient amb-mat-glass amb-surface"
+  backdrop={[{ rect: [4, -64, 20, 64], style: { ["--amb-albedo"]: "color(srgb-linear 0.06 0.06 0.06)" } }]}
+/>
+<RenderComparison
+  slug="mat-glass-frost-elevated"
+  classes="ambient amb-mat-glass amb-surface amb-elevation-2"
+  backdrop={[{ rect: [4, -64, 20, 64], style: { ["--amb-albedo"]: "color(srgb-linear 0.06 0.06 0.06)" } }]}
+/>
+
 ## Brushed, spun and blasted metal
 
 `.amb-mat-brushed`, `.amb-mat-brushed-round` (spun) and `.amb-mat-blasted` —

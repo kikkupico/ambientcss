@@ -34,7 +34,7 @@ from amb_model import (  # noqa: F401  (re-exported for callers)
     GROUND_MM, GROUND_ALBEDO, E0, S0, key_energy, SAGITTA_MM, DARKER_ALBEDO,
     DARKEST_ALBEDO, LIGHTER_ALBEDO, LIGHTEST_ALBEDO,
     CHAMFER_MM_PER_WIDTH, FILLET_MM_PER_WIDTH, ELEVATION_MM_PER_LEVEL,
-    THICKNESS_MM_PER_LEVEL, SHEET_MM, SHEET_PROUD_MM,
+    THICKNESS_MM_PER_LEVEL, SHEET_MM, SHEET_PROUD_MM, DECAL_PROUD_MM,
     AMB_DEFAULTS, amb, edge_mm, elevation_mm, plate_z, thickness_mm,
     silhouette_mm,
 )
@@ -53,6 +53,47 @@ def calib_material(name, albedo, rough=1.0):
         if socket in bsdf.inputs:
             bsdf.inputs[socket].default_value = 0.0
             break
+    return mat
+
+
+# ---- frosted glass ---------------------------------------------------------
+#
+# .amb-mat-glass's referent: a CLEAR dielectric slab (no tint — the CSS
+# class ignores --amb-albedo for the same reason), satin on both faces.
+# Roughness 0.65 was chosen from a preview strip (0.5 / 0.65 / 0.8, at rest
+# and 16 mm up): 0.5 reads as satin, barely obscuring a stripe two
+# elevations behind it; 0.8 is bathroom-window frost that smears the same
+# stripe past the fitting window; 0.65 keeps a pattern under the resting
+# pane readable and turns it into a proper frosted blur once the pane
+# lifts — the behaviour the class is named for.
+#
+# Three render-side rules, each learned from a wrong picture:
+#   * NO shadow-ray transparency trick. The classic "Is Shadow Ray ->
+#     Transparent" mix double counts here: Cycles already carries the key
+#     under the slab through caustic paths (a big soft area light through
+#     rough glass converges in well under 100 samples), and adding direct
+#     light on top blows the ground under the pane out to white.
+#   * Filter Glossy must be 0 for glass frames (finalize_calibration_render
+#     takes it): at its default of 1 it biases every after-diffuse
+#     transmission bounce toward a rougher lobe, which loses ~12% of the
+#     light reaching the camera from under the pane. Opaque scenes never
+#     see this (their glossy-after-diffuse energy is negligible).
+#   * A slab's bottom face must not be coplanar with the ground (plate_z).
+GLASS_ROUGHNESS = 0.65
+GLASS_IOR = 1.5
+
+
+def glass_material(name, rough=GLASS_ROUGHNESS, ior=GLASS_IOR):
+    """Clear frosted-glass slab material. Keeps the Principled BSDF's
+    default specular level: the dielectric's Fresnel reflection IS the
+    pane's surface, unlike calib_material's Lambertian base."""
+    mat = bpy.data.materials.new(name)
+    mat.use_nodes = True
+    bsdf = next(n for n in mat.node_tree.nodes if n.type == "BSDF_PRINCIPLED")
+    bsdf.inputs["Base Color"].default_value = (1.0, 1.0, 1.0, 1.0)
+    bsdf.inputs["Roughness"].default_value = rough
+    bsdf.inputs["IOR"].default_value = ior
+    bsdf.inputs["Transmission Weight"].default_value = 1.0
     return mat
 
 
@@ -301,11 +342,7 @@ def material_for(a, name="PlateMat", albedo=None):
                 break
         return mat
     if kind == "glass":
-        mat = calib_material(name, albedo, rough=0.35)
-        bsdf = next(n for n in mat.node_tree.nodes
-                    if n.type == "BSDF_PRINCIPLED")
-        bsdf.inputs["Transmission Weight"].default_value = 1.0
-        return mat
+        return glass_material(name)   # clear: albedo does not apply
     if kind in _GRAIN_KINDS:
         finish, _, variant = kind.partition("-")
         return grain_material(name, albedo, finish, sheen=variant != "relief")
@@ -412,6 +449,19 @@ def _reference_patches(a, plate_w, plate_d):
                      material=calib_material(f"Ref{name.capitalize()}", albedo))
 
 
+def build_decals(decals):
+    """Flush backdrop decals under a (glass) subject: each
+    {"albedo": a, "rect": [sx0, sy0, sx1, sy1]} in screen mm becomes a
+    thin dark/light tile embedded in the ground, DECAL_PROUD_MM above it —
+    the same never-coplanar trick as the t0 sheet."""
+    for i, decal in enumerate(decals or ()):
+        sx0, sy0, sx1, sy1 = decal["rect"]
+        # screen mm -> blender: X = sx, Y = -sy (CCW in blender space)
+        pts = [(sx0, -sy1), (sx1, -sy1), (sx1, -sy0), (sx0, -sy0)]
+        prism_object(f"Decal{i}", pts, -0.5, DECAL_PROUD_MM,
+                     material=calib_material(f"Decal{i}", decal["albedo"]))
+
+
 def setup_calibration_rig(a, plate_size=(80.0, 80.0), resolution=None,
                           patches=True):
     """Ground plane, reference patches, flat-on ortho camera and amb
@@ -473,12 +523,15 @@ def enable_bloom(threshold=1.0, size=0.03):
     scene.compositing_node_group = tree
 
 
-def finalize_calibration_render(samples=512):
+def finalize_calibration_render(samples=512, filter_glossy=1.0):
     """Deterministic, measurement-grade render settings. Call after
     skeuo_kit.setup_render(); asserts the Standard view transform, which the
-    whole measurement pipeline depends on (AgX would poison every fit)."""
+    whole measurement pipeline depends on (AgX would poison every fit).
+    `filter_glossy` is Cycles' Filter Glossy (default 1.0, as every opaque
+    frame was rendered with); glass frames pass 0 — see GLASS_ROUGHNESS."""
     scene = bpy.context.scene
     scene.cycles.samples = samples
+    scene.cycles.blur_glossy = filter_glossy
     scene.cycles.seed = 0
     scene.cycles.use_denoising = True
     try:
