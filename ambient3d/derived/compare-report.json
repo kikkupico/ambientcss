@@ -489,6 +489,316 @@
       "tol": 0.04
     }
   },
+  "calib/mat_glass_default.png": {
+    "edge_bands.bottom.baseline_srgb": {
+      "css": 0.8641,
+      "diff": 0.0005,
+      "ok": true,
+      "render": 0.8635,
+      "tol": 0.04
+    },
+    "edge_bands.bottom.mean_delta_srgb": {
+      "css": 0.0463,
+      "diff": 0.0028,
+      "ok": true,
+      "render": 0.0434,
+      "tol": 0.05
+    },
+    "edge_bands.bottom.peak_srgb": {
+      "css": 0.0585,
+      "diff": 0.0067,
+      "ok": true,
+      "render": 0.0518,
+      "tol": 0.06
+    },
+    "edge_bands.bottom.width_mm": {
+      "css": 1.75,
+      "diff": 0.25,
+      "ok": true,
+      "render": 2.0,
+      "tol": 0.6
+    },
+    "edge_bands.left.baseline_srgb": {
+      "css": 0.8634,
+      "diff": 0.0069,
+      "ok": true,
+      "render": 0.8702,
+      "tol": 0.04
+    },
+    "edge_bands.left.mean_delta_srgb": {
+      "css": -0.0734,
+      "diff": 0.006,
+      "ok": true,
+      "render": -0.0794,
+      "tol": 0.05
+    },
+    "edge_bands.left.peak_srgb": {
+      "css": -0.0936,
+      "diff": 0.0052,
+      "ok": true,
+      "render": -0.0988,
+      "tol": 0.06
+    },
+    "edge_bands.left.width_mm": {
+      "css": 2.25,
+      "diff": 0.25,
+      "ok": true,
+      "render": 2.0,
+      "tol": 0.6
+    },
+    "edge_bands.right.baseline_srgb": {
+      "css": 0.8641,
+      "diff": 0.0006,
+      "ok": true,
+      "render": 0.8646,
+      "tol": 0.04
+    },
+    "edge_bands.right.mean_delta_srgb": {
+      "css": 0.0462,
+      "diff": 0.0033,
+      "ok": true,
+      "render": 0.0429,
+      "tol": 0.05
+    },
+    "edge_bands.right.peak_srgb": {
+      "css": 0.0582,
+      "diff": 0.0052,
+      "ok": true,
+      "render": 0.053,
+      "tol": 0.06
+    },
+    "edge_bands.right.width_mm": {
+      "css": 1.75,
+      "diff": 0.25,
+      "ok": true,
+      "render": 2.0,
+      "tol": 0.6
+    },
+    "edge_bands.top.baseline_srgb": {
+      "css": 0.8634,
+      "diff": 0.0075,
+      "ok": true,
+      "render": 0.8709,
+      "tol": 0.04
+    },
+    "edge_bands.top.mean_delta_srgb": {
+      "css": -0.0734,
+      "diff": 0.0072,
+      "ok": true,
+      "render": -0.0806,
+      "tol": 0.05
+    },
+    "edge_bands.top.peak_srgb": {
+      "css": -0.0948,
+      "diff": 0.0039,
+      "ok": true,
+      "render": -0.0987,
+      "tol": 0.06
+    },
+    "edge_bands.top.width_mm": {
+      "css": 2.25,
+      "diff": 0.25,
+      "ok": true,
+      "render": 2.0,
+      "tol": 0.6
+    },
+    "glass_tint.interior.lstar": {
+      "css": 87.8791,
+      "diff": 0.0463,
+      "ok": true,
+      "render": 87.8328,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 86.4052,
+      "diff": 0.0512,
+      "ok": true,
+      "render": 86.354,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 89.5425,
+      "diff": 0.4432,
+      "ok": true,
+      "render": 89.9857,
+      "tol": 3.0
+    },
+    "hollow_shadow.bottom.hm_mm": {
+      "css": 5.125,
+      "diff": 0.75,
+      "ok": true,
+      "render": 4.375,
+      "tol": 1.5
+    },
+    "hollow_shadow.bottom.near_alpha": {
+      "css": 0.1186,
+      "diff": 0.0178,
+      "ok": true,
+      "render": 0.1364,
+      "tol": 0.04
+    },
+    "hollow_shadow.bottom.peak_alpha": {
+      "css": 0.2161,
+      "diff": 0.0082,
+      "ok": true,
+      "render": 0.2078,
+      "tol": 0.06
+    },
+    "hollow_shadow.bottom.peak_d_mm": {
+      "css": 2.625,
+      "diff": 0.0,
+      "ok": true,
+      "render": 2.625,
+      "tol": 2.0
+    },
+    "hollow_shadow.bottom.v_ref": {
+      "css": 0.8954,
+      "diff": 0.0044,
+      "ok": true,
+      "render": 0.8999,
+      "tol": 0.04
+    },
+    "hollow_shadow.right.hm_mm": {
+      "css": 4.875,
+      "diff": 0.5,
+      "ok": true,
+      "render": 4.375,
+      "tol": 1.5
+    },
+    "hollow_shadow.right.near_alpha": {
+      "css": 0.1186,
+      "diff": 0.0178,
+      "ok": true,
+      "render": 0.1364,
+      "tol": 0.04
+    },
+    "hollow_shadow.right.peak_alpha": {
+      "css": 0.2161,
+      "diff": 0.0067,
+      "ok": true,
+      "render": 0.2093,
+      "tol": 0.06
+    },
+    "hollow_shadow.right.peak_d_mm": {
+      "css": 2.625,
+      "diff": 0.0,
+      "ok": true,
+      "render": 2.625,
+      "tol": 2.0
+    },
+    "hollow_shadow.right.v_ref": {
+      "css": 0.8954,
+      "diff": 0.0044,
+      "ok": true,
+      "render": 0.8999,
+      "tol": 0.04
+    },
+    "plate_profile.far_delta_srgb": {
+      "css": 0.002,
+      "diff": 0.0005,
+      "ok": true,
+      "render": 0.0015,
+      "tol": 0.03
+    },
+    "plate_profile.lit_delta_srgb": {
+      "css": -0.0051,
+      "diff": 0.0188,
+      "ok": true,
+      "render": 0.0136,
+      "tol": 0.03
+    },
+    "plate_profile.mid_srgb": {
+      "css": 0.8641,
+      "diff": 0.0012,
+      "ok": true,
+      "render": 0.8629,
+      "tol": 0.03
+    }
+  },
+  "calib/mat_glass_frost.png": {
+    "frost_blur.blur_sigma_mm": {
+      "css": 0.6,
+      "diff": 0.05,
+      "ok": true,
+      "render": 0.65,
+      "tol": 0.6
+    },
+    "frost_blur.step_srgb": {
+      "css": -0.4978,
+      "diff": 0.0375,
+      "ok": true,
+      "render": -0.4602,
+      "tol": 0.06
+    },
+    "glass_tint.decal.srgb_pct": {
+      "css": 36.6013,
+      "diff": 2.3015,
+      "ok": true,
+      "render": 38.9028,
+      "tol": 3.0
+    },
+    "glass_tint.interior.lstar": {
+      "css": 87.8791,
+      "diff": 0.1025,
+      "ok": true,
+      "render": 87.7766,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 86.4052,
+      "diff": 0.1134,
+      "ok": true,
+      "render": 86.2919,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 89.5425,
+      "diff": 0.4386,
+      "ok": true,
+      "render": 89.981,
+      "tol": 3.0
+    }
+  },
+  "calib/mat_glass_frost_elevated.png": {
+    "frost_blur.blur_sigma_mm": {
+      "css": 3.5,
+      "diff": 0.0,
+      "ok": true,
+      "render": 3.5,
+      "tol": 0.6
+    },
+    "frost_blur.step_srgb": {
+      "css": -0.5032,
+      "render": -0.3423,
+      "residual": true
+    },
+    "glass_tint.decal.srgb_pct": {
+      "css": 42.7418,
+      "render": 51.8689,
+      "residual": true
+    },
+    "glass_tint.interior.lstar": {
+      "css": 87.7937,
+      "diff": 0.066,
+      "ok": true,
+      "render": 87.7277,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 86.3108,
+      "diff": 0.073,
+      "ok": true,
+      "render": 86.2379,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 89.5425,
+      "diff": 0.9485,
+      "ok": true,
+      "render": 90.491,
+      "tol": 3.0
+    }
+  },
   "calib/mat_shiny_default.png": {
     "cyl_profile.band_fwhm_frac": {
       "css": 0.0469,
@@ -8141,6 +8451,3536 @@
       "ok": true,
       "render": 3.0,
       "tol": 0.6
+    }
+  },
+  "sweeps/glass/fill_light_intensity=0.3.png": {
+    "edge_bands.bottom.baseline_srgb": {
+      "css": 0.7608,
+      "diff": 0.0045,
+      "ok": true,
+      "render": 0.7653,
+      "tol": 0.04
+    },
+    "edge_bands.bottom.mean_delta_srgb": {
+      "css": 0.0837,
+      "diff": 0.0296,
+      "ok": true,
+      "render": 0.0541,
+      "tol": 0.05
+    },
+    "edge_bands.bottom.peak_srgb": {
+      "css": 0.1046,
+      "diff": 0.0382,
+      "ok": true,
+      "render": 0.0664,
+      "tol": 0.06
+    },
+    "edge_bands.bottom.width_mm": {
+      "css": 1.75,
+      "diff": 0.25,
+      "ok": true,
+      "render": 2.0,
+      "tol": 0.6
+    },
+    "edge_bands.left.baseline_srgb": {
+      "css": 0.7602,
+      "diff": 0.0135,
+      "ok": true,
+      "render": 0.7737,
+      "tol": 0.04
+    },
+    "edge_bands.left.mean_delta_srgb": {
+      "css": -0.0564,
+      "diff": 0.0342,
+      "ok": true,
+      "render": -0.0905,
+      "tol": 0.05
+    },
+    "edge_bands.left.peak_srgb": {
+      "css": -0.0726,
+      "diff": 0.0362,
+      "ok": true,
+      "render": -0.1089,
+      "tol": 0.06
+    },
+    "edge_bands.left.width_mm": {
+      "css": 2.25,
+      "diff": 0.25,
+      "ok": true,
+      "render": 2.0,
+      "tol": 0.6
+    },
+    "edge_bands.right.baseline_srgb": {
+      "css": 0.7608,
+      "diff": 0.0059,
+      "ok": true,
+      "render": 0.7667,
+      "tol": 0.04
+    },
+    "edge_bands.right.mean_delta_srgb": {
+      "css": 0.0836,
+      "diff": 0.0266,
+      "ok": true,
+      "render": 0.057,
+      "tol": 0.05
+    },
+    "edge_bands.right.peak_srgb": {
+      "css": 0.1046,
+      "diff": 0.0357,
+      "ok": true,
+      "render": 0.0689,
+      "tol": 0.06
+    },
+    "edge_bands.right.width_mm": {
+      "css": 1.75,
+      "diff": 0.0,
+      "ok": true,
+      "render": 1.75,
+      "tol": 0.6
+    },
+    "edge_bands.top.baseline_srgb": {
+      "css": 0.7603,
+      "diff": 0.014,
+      "ok": true,
+      "render": 0.7743,
+      "tol": 0.04
+    },
+    "edge_bands.top.mean_delta_srgb": {
+      "css": -0.0566,
+      "diff": 0.0347,
+      "ok": true,
+      "render": -0.0912,
+      "tol": 0.05
+    },
+    "edge_bands.top.peak_srgb": {
+      "css": -0.0724,
+      "diff": 0.0368,
+      "ok": true,
+      "render": -0.1092,
+      "tol": 0.06
+    },
+    "edge_bands.top.width_mm": {
+      "css": 2.25,
+      "diff": 0.25,
+      "ok": true,
+      "render": 2.0,
+      "tol": 0.6
+    },
+    "glass_tint.interior.lstar": {
+      "css": 78.4314,
+      "diff": 0.5021,
+      "ok": true,
+      "render": 78.9334,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 76.0784,
+      "diff": 0.5425,
+      "ok": true,
+      "render": 76.621,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 79.3464,
+      "diff": 0.7985,
+      "ok": true,
+      "render": 80.1449,
+      "tol": 3.0
+    },
+    "plate_profile.far_delta_srgb": {
+      "css": 0.0036,
+      "diff": 0.0029,
+      "ok": true,
+      "render": 0.0007,
+      "tol": 0.03
+    },
+    "plate_profile.lit_delta_srgb": {
+      "css": -0.0041,
+      "diff": 0.0192,
+      "ok": true,
+      "render": 0.0152,
+      "tol": 0.03
+    },
+    "plate_profile.mid_srgb": {
+      "css": 0.7608,
+      "diff": 0.0048,
+      "ok": true,
+      "render": 0.7656,
+      "tol": 0.03
+    }
+  },
+  "sweeps/glass/fill_light_intensity=1.png": {
+    "edge_bands.bottom.baseline_srgb": {
+      "css": 0.9346,
+      "diff": 0.0044,
+      "ok": true,
+      "render": 0.9303,
+      "tol": 0.04
+    },
+    "edge_bands.bottom.mean_delta_srgb": {
+      "css": 0.0187,
+      "diff": 0.0165,
+      "ok": true,
+      "render": 0.0353,
+      "tol": 0.05
+    },
+    "edge_bands.bottom.peak_srgb": {
+      "css": 0.0248,
+      "diff": 0.0183,
+      "ok": true,
+      "render": 0.0432,
+      "tol": 0.06
+    },
+    "edge_bands.bottom.width_mm": {
+      "css": 2.0,
+      "render": 2.25,
+      "residual": true
+    },
+    "edge_bands.left.baseline_srgb": {
+      "css": 0.9336,
+      "diff": 0.0023,
+      "ok": true,
+      "render": 0.9359,
+      "tol": 0.04
+    },
+    "edge_bands.left.mean_delta_srgb": {
+      "css": -0.0827,
+      "diff": 0.0094,
+      "ok": true,
+      "render": -0.0733,
+      "tol": 0.05
+    },
+    "edge_bands.left.peak_srgb": {
+      "css": -0.109,
+      "diff": 0.0159,
+      "ok": true,
+      "render": -0.0932,
+      "tol": 0.06
+    },
+    "edge_bands.left.width_mm": {
+      "css": 2.25,
+      "diff": 0.25,
+      "ok": true,
+      "render": 2.0,
+      "tol": 0.6
+    },
+    "edge_bands.right.baseline_srgb": {
+      "css": 0.9346,
+      "diff": 0.0036,
+      "ok": true,
+      "render": 0.931,
+      "tol": 0.04
+    },
+    "edge_bands.right.mean_delta_srgb": {
+      "css": 0.0188,
+      "diff": 0.018,
+      "ok": true,
+      "render": 0.0368,
+      "tol": 0.05
+    },
+    "edge_bands.right.peak_srgb": {
+      "css": 0.0248,
+      "diff": 0.0196,
+      "ok": true,
+      "render": 0.0445,
+      "tol": 0.06
+    },
+    "edge_bands.right.width_mm": {
+      "css": 2.0,
+      "render": 2.0,
+      "residual": true
+    },
+    "edge_bands.top.baseline_srgb": {
+      "css": 0.9336,
+      "diff": 0.003,
+      "ok": true,
+      "render": 0.9366,
+      "tol": 0.04
+    },
+    "edge_bands.top.mean_delta_srgb": {
+      "css": -0.0829,
+      "diff": 0.004,
+      "ok": true,
+      "render": -0.0789,
+      "tol": 0.05
+    },
+    "edge_bands.top.peak_srgb": {
+      "css": -0.1091,
+      "diff": 0.0159,
+      "ok": true,
+      "render": -0.0932,
+      "tol": 0.06
+    },
+    "edge_bands.top.width_mm": {
+      "css": 2.25,
+      "diff": 0.5,
+      "ok": true,
+      "render": 1.75,
+      "tol": 0.6
+    },
+    "glass_tint.interior.lstar": {
+      "css": 94.2143,
+      "diff": 0.4358,
+      "ok": true,
+      "render": 93.7785,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 93.4641,
+      "diff": 0.4889,
+      "ok": true,
+      "render": 92.9751,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 96.3399,
+      "diff": 0.1782,
+      "ok": true,
+      "render": 96.5181,
+      "tol": 3.0
+    },
+    "plate_profile.far_delta_srgb": {
+      "css": 0.001,
+      "diff": 0.0007,
+      "ok": true,
+      "render": 0.0017,
+      "tol": 0.03
+    },
+    "plate_profile.lit_delta_srgb": {
+      "css": -0.0061,
+      "diff": 0.0183,
+      "ok": true,
+      "render": 0.0122,
+      "tol": 0.03
+    },
+    "plate_profile.mid_srgb": {
+      "css": 0.9346,
+      "diff": 0.0055,
+      "ok": true,
+      "render": 0.9291,
+      "tol": 0.03
+    }
+  },
+  "sweeps/glass/key_light_intensity=0.3.png": {
+    "edge_bands.bottom.baseline_srgb": {
+      "css": 0.6837,
+      "diff": 0.0138,
+      "ok": true,
+      "render": 0.6974,
+      "tol": 0.04
+    },
+    "edge_bands.bottom.mean_delta_srgb": {
+      "css": 0.0341,
+      "diff": 0.0212,
+      "ok": true,
+      "render": 0.0128,
+      "tol": 0.05
+    },
+    "edge_bands.bottom.peak_srgb": {
+      "css": 0.0431,
+      "diff": 0.027,
+      "ok": true,
+      "render": 0.0162,
+      "tol": 0.06
+    },
+    "edge_bands.bottom.width_mm": {
+      "css": 1.75,
+      "render": 2.75,
+      "residual": true
+    },
+    "edge_bands.left.baseline_srgb": {
+      "css": 0.6835,
+      "diff": 0.0158,
+      "ok": true,
+      "render": 0.6993,
+      "tol": 0.04
+    },
+    "edge_bands.left.mean_delta_srgb": {
+      "css": -0.0187,
+      "diff": 0.0226,
+      "ok": true,
+      "render": -0.0414,
+      "tol": 0.05
+    },
+    "edge_bands.left.peak_srgb": {
+      "css": -0.025,
+      "diff": 0.0277,
+      "ok": true,
+      "render": -0.0527,
+      "tol": 0.06
+    },
+    "edge_bands.left.width_mm": {
+      "css": 2.0,
+      "diff": 0.25,
+      "ok": true,
+      "render": 1.75,
+      "tol": 0.6
+    },
+    "edge_bands.right.baseline_srgb": {
+      "css": 0.6837,
+      "diff": 0.0142,
+      "ok": true,
+      "render": 0.6979,
+      "tol": 0.04
+    },
+    "edge_bands.right.mean_delta_srgb": {
+      "css": 0.0341,
+      "diff": 0.0189,
+      "ok": true,
+      "render": 0.0152,
+      "tol": 0.05
+    },
+    "edge_bands.right.peak_srgb": {
+      "css": 0.0431,
+      "diff": 0.0247,
+      "ok": true,
+      "render": 0.0184,
+      "tol": 0.06
+    },
+    "edge_bands.right.width_mm": {
+      "css": 1.75,
+      "render": 2.25,
+      "residual": true
+    },
+    "edge_bands.top.baseline_srgb": {
+      "css": 0.6835,
+      "diff": 0.0163,
+      "ok": true,
+      "render": 0.6998,
+      "tol": 0.04
+    },
+    "edge_bands.top.mean_delta_srgb": {
+      "css": -0.0198,
+      "diff": 0.0228,
+      "ok": true,
+      "render": -0.0426,
+      "tol": 0.05
+    },
+    "edge_bands.top.peak_srgb": {
+      "css": -0.0255,
+      "diff": 0.027,
+      "ok": true,
+      "render": -0.0525,
+      "tol": 0.06
+    },
+    "edge_bands.top.width_mm": {
+      "css": 1.75,
+      "diff": 0.0,
+      "ok": true,
+      "render": 1.75,
+      "tol": 0.6
+    },
+    "glass_tint.interior.lstar": {
+      "css": 71.2191,
+      "diff": 1.2308,
+      "ok": true,
+      "render": 72.45,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 68.366,
+      "diff": 1.3053,
+      "ok": true,
+      "render": 69.6713,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 70.5882,
+      "diff": 1.1402,
+      "ok": true,
+      "render": 71.7285,
+      "tol": 3.0
+    },
+    "plate_profile.far_delta_srgb": {
+      "css": 0.0016,
+      "diff": 0.0002,
+      "ok": true,
+      "render": 0.0014,
+      "tol": 0.03
+    },
+    "plate_profile.lit_delta_srgb": {
+      "css": -0.0013,
+      "diff": 0.0073,
+      "ok": true,
+      "render": 0.006,
+      "tol": 0.03
+    },
+    "plate_profile.mid_srgb": {
+      "css": 0.6837,
+      "diff": 0.0125,
+      "ok": true,
+      "render": 0.6962,
+      "tol": 0.03
+    }
+  },
+  "sweeps/glass/key_light_intensity=0.6.png": {
+    "edge_bands.bottom.baseline_srgb": {
+      "css": 0.7804,
+      "diff": 0.0071,
+      "ok": true,
+      "render": 0.7875,
+      "tol": 0.04
+    },
+    "edge_bands.bottom.mean_delta_srgb": {
+      "css": 0.0498,
+      "diff": 0.0197,
+      "ok": true,
+      "render": 0.0302,
+      "tol": 0.05
+    },
+    "edge_bands.bottom.peak_srgb": {
+      "css": 0.0631,
+      "diff": 0.0259,
+      "ok": true,
+      "render": 0.0372,
+      "tol": 0.06
+    },
+    "edge_bands.bottom.width_mm": {
+      "css": 1.5,
+      "render": 2.25,
+      "residual": true
+    },
+    "edge_bands.left.baseline_srgb": {
+      "css": 0.7798,
+      "diff": 0.0117,
+      "ok": true,
+      "render": 0.7915,
+      "tol": 0.04
+    },
+    "edge_bands.left.mean_delta_srgb": {
+      "css": -0.0429,
+      "diff": 0.0222,
+      "ok": true,
+      "render": -0.0651,
+      "tol": 0.05
+    },
+    "edge_bands.left.peak_srgb": {
+      "css": -0.0573,
+      "diff": 0.0218,
+      "ok": true,
+      "render": -0.0791,
+      "tol": 0.06
+    },
+    "edge_bands.left.width_mm": {
+      "css": 2.25,
+      "diff": 0.5,
+      "ok": true,
+      "render": 1.75,
+      "tol": 0.6
+    },
+    "edge_bands.right.baseline_srgb": {
+      "css": 0.7804,
+      "diff": 0.0077,
+      "ok": true,
+      "render": 0.7881,
+      "tol": 0.04
+    },
+    "edge_bands.right.mean_delta_srgb": {
+      "css": 0.0498,
+      "diff": 0.0182,
+      "ok": true,
+      "render": 0.0316,
+      "tol": 0.05
+    },
+    "edge_bands.right.peak_srgb": {
+      "css": 0.0629,
+      "diff": 0.0246,
+      "ok": true,
+      "render": 0.0383,
+      "tol": 0.06
+    },
+    "edge_bands.right.width_mm": {
+      "css": 1.5,
+      "render": 2.0,
+      "residual": true
+    },
+    "edge_bands.top.baseline_srgb": {
+      "css": 0.7798,
+      "diff": 0.0123,
+      "ok": true,
+      "render": 0.7921,
+      "tol": 0.04
+    },
+    "edge_bands.top.mean_delta_srgb": {
+      "css": -0.0429,
+      "diff": 0.0238,
+      "ok": true,
+      "render": -0.0667,
+      "tol": 0.05
+    },
+    "edge_bands.top.peak_srgb": {
+      "css": -0.0576,
+      "diff": 0.0213,
+      "ok": true,
+      "render": -0.0789,
+      "tol": 0.06
+    },
+    "edge_bands.top.width_mm": {
+      "css": 2.25,
+      "diff": 0.5,
+      "ok": true,
+      "render": 1.75,
+      "tol": 0.6
+    },
+    "glass_tint.interior.lstar": {
+      "css": 80.2428,
+      "diff": 0.609,
+      "ok": true,
+      "render": 80.8518,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 78.0392,
+      "diff": 0.6613,
+      "ok": true,
+      "render": 78.7005,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 80.7843,
+      "diff": 0.742,
+      "ok": true,
+      "render": 81.5263,
+      "tol": 3.0
+    },
+    "plate_profile.far_delta_srgb": {
+      "css": 0.002,
+      "diff": 0.0004,
+      "ok": true,
+      "render": 0.0016,
+      "tol": 0.03
+    },
+    "plate_profile.lit_delta_srgb": {
+      "css": -0.0031,
+      "diff": 0.0131,
+      "ok": true,
+      "render": 0.01,
+      "tol": 0.03
+    },
+    "plate_profile.mid_srgb": {
+      "css": 0.7804,
+      "diff": 0.006,
+      "ok": true,
+      "render": 0.7864,
+      "tol": 0.03
+    }
+  },
+  "sweeps/glass/key_light_intensity=0.9.png": {
+    "edge_bands.bottom.baseline_srgb": {
+      "css": 0.8641,
+      "diff": 0.0005,
+      "ok": true,
+      "render": 0.8635,
+      "tol": 0.04
+    },
+    "edge_bands.bottom.mean_delta_srgb": {
+      "css": 0.0463,
+      "diff": 0.0028,
+      "ok": true,
+      "render": 0.0434,
+      "tol": 0.05
+    },
+    "edge_bands.bottom.peak_srgb": {
+      "css": 0.0585,
+      "diff": 0.0067,
+      "ok": true,
+      "render": 0.0518,
+      "tol": 0.06
+    },
+    "edge_bands.bottom.width_mm": {
+      "css": 1.75,
+      "diff": 0.25,
+      "ok": true,
+      "render": 2.0,
+      "tol": 0.6
+    },
+    "edge_bands.left.baseline_srgb": {
+      "css": 0.8634,
+      "diff": 0.0069,
+      "ok": true,
+      "render": 0.8702,
+      "tol": 0.04
+    },
+    "edge_bands.left.mean_delta_srgb": {
+      "css": -0.0734,
+      "diff": 0.006,
+      "ok": true,
+      "render": -0.0794,
+      "tol": 0.05
+    },
+    "edge_bands.left.peak_srgb": {
+      "css": -0.0936,
+      "diff": 0.0052,
+      "ok": true,
+      "render": -0.0988,
+      "tol": 0.06
+    },
+    "edge_bands.left.width_mm": {
+      "css": 2.25,
+      "diff": 0.25,
+      "ok": true,
+      "render": 2.0,
+      "tol": 0.6
+    },
+    "edge_bands.right.baseline_srgb": {
+      "css": 0.8641,
+      "diff": 0.0005,
+      "ok": true,
+      "render": 0.8646,
+      "tol": 0.04
+    },
+    "edge_bands.right.mean_delta_srgb": {
+      "css": 0.0462,
+      "diff": 0.0033,
+      "ok": true,
+      "render": 0.0429,
+      "tol": 0.05
+    },
+    "edge_bands.right.peak_srgb": {
+      "css": 0.0582,
+      "diff": 0.0052,
+      "ok": true,
+      "render": 0.053,
+      "tol": 0.06
+    },
+    "edge_bands.right.width_mm": {
+      "css": 1.75,
+      "diff": 0.25,
+      "ok": true,
+      "render": 2.0,
+      "tol": 0.6
+    },
+    "edge_bands.top.baseline_srgb": {
+      "css": 0.8634,
+      "diff": 0.0075,
+      "ok": true,
+      "render": 0.8709,
+      "tol": 0.04
+    },
+    "edge_bands.top.mean_delta_srgb": {
+      "css": -0.0734,
+      "diff": 0.0072,
+      "ok": true,
+      "render": -0.0807,
+      "tol": 0.05
+    },
+    "edge_bands.top.peak_srgb": {
+      "css": -0.0948,
+      "diff": 0.0039,
+      "ok": true,
+      "render": -0.0987,
+      "tol": 0.06
+    },
+    "edge_bands.top.width_mm": {
+      "css": 2.25,
+      "diff": 0.25,
+      "ok": true,
+      "render": 2.0,
+      "tol": 0.6
+    },
+    "glass_tint.interior.lstar": {
+      "css": 87.8791,
+      "diff": 0.0462,
+      "ok": true,
+      "render": 87.8329,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 86.4052,
+      "diff": 0.0511,
+      "ok": true,
+      "render": 86.3541,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 89.5425,
+      "diff": 0.4432,
+      "ok": true,
+      "render": 89.9857,
+      "tol": 3.0
+    },
+    "plate_profile.far_delta_srgb": {
+      "css": 0.002,
+      "diff": 0.0005,
+      "ok": true,
+      "render": 0.0015,
+      "tol": 0.03
+    },
+    "plate_profile.lit_delta_srgb": {
+      "css": -0.0051,
+      "diff": 0.0188,
+      "ok": true,
+      "render": 0.0136,
+      "tol": 0.03
+    },
+    "plate_profile.mid_srgb": {
+      "css": 0.8641,
+      "diff": 0.0012,
+      "ok": true,
+      "render": 0.8629,
+      "tol": 0.03
+    }
+  },
+  "sweeps/glass/light=-1,-1.png": {
+    "edge_bands.bottom.baseline_srgb": {
+      "css": 0.8641,
+      "diff": 0.0005,
+      "ok": true,
+      "render": 0.8635,
+      "tol": 0.04
+    },
+    "edge_bands.bottom.mean_delta_srgb": {
+      "css": 0.0463,
+      "diff": 0.0028,
+      "ok": true,
+      "render": 0.0434,
+      "tol": 0.05
+    },
+    "edge_bands.bottom.peak_srgb": {
+      "css": 0.0585,
+      "diff": 0.0067,
+      "ok": true,
+      "render": 0.0518,
+      "tol": 0.06
+    },
+    "edge_bands.bottom.width_mm": {
+      "css": 1.75,
+      "diff": 0.25,
+      "ok": true,
+      "render": 2.0,
+      "tol": 0.6
+    },
+    "edge_bands.left.baseline_srgb": {
+      "css": 0.8634,
+      "diff": 0.0069,
+      "ok": true,
+      "render": 0.8702,
+      "tol": 0.04
+    },
+    "edge_bands.left.mean_delta_srgb": {
+      "css": -0.0734,
+      "diff": 0.006,
+      "ok": true,
+      "render": -0.0794,
+      "tol": 0.05
+    },
+    "edge_bands.left.peak_srgb": {
+      "css": -0.0936,
+      "diff": 0.0052,
+      "ok": true,
+      "render": -0.0988,
+      "tol": 0.06
+    },
+    "edge_bands.left.width_mm": {
+      "css": 2.25,
+      "diff": 0.25,
+      "ok": true,
+      "render": 2.0,
+      "tol": 0.6
+    },
+    "edge_bands.right.baseline_srgb": {
+      "css": 0.8641,
+      "diff": 0.0005,
+      "ok": true,
+      "render": 0.8646,
+      "tol": 0.04
+    },
+    "edge_bands.right.mean_delta_srgb": {
+      "css": 0.0462,
+      "diff": 0.0033,
+      "ok": true,
+      "render": 0.0429,
+      "tol": 0.05
+    },
+    "edge_bands.right.peak_srgb": {
+      "css": 0.0582,
+      "diff": 0.0052,
+      "ok": true,
+      "render": 0.053,
+      "tol": 0.06
+    },
+    "edge_bands.right.width_mm": {
+      "css": 1.75,
+      "diff": 0.25,
+      "ok": true,
+      "render": 2.0,
+      "tol": 0.6
+    },
+    "edge_bands.top.baseline_srgb": {
+      "css": 0.8634,
+      "diff": 0.0075,
+      "ok": true,
+      "render": 0.8709,
+      "tol": 0.04
+    },
+    "edge_bands.top.mean_delta_srgb": {
+      "css": -0.0734,
+      "diff": 0.0072,
+      "ok": true,
+      "render": -0.0807,
+      "tol": 0.05
+    },
+    "edge_bands.top.peak_srgb": {
+      "css": -0.0948,
+      "diff": 0.0039,
+      "ok": true,
+      "render": -0.0987,
+      "tol": 0.06
+    },
+    "edge_bands.top.width_mm": {
+      "css": 2.25,
+      "diff": 0.25,
+      "ok": true,
+      "render": 2.0,
+      "tol": 0.6
+    },
+    "glass_tint.interior.lstar": {
+      "css": 87.8791,
+      "diff": 0.0462,
+      "ok": true,
+      "render": 87.8329,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 86.4052,
+      "diff": 0.0511,
+      "ok": true,
+      "render": 86.3541,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 89.5425,
+      "diff": 0.4432,
+      "ok": true,
+      "render": 89.9857,
+      "tol": 3.0
+    },
+    "plate_profile.far_delta_srgb": {
+      "css": 0.002,
+      "diff": 0.0005,
+      "ok": true,
+      "render": 0.0015,
+      "tol": 0.03
+    },
+    "plate_profile.lit_delta_srgb": {
+      "css": -0.0051,
+      "diff": 0.0188,
+      "ok": true,
+      "render": 0.0136,
+      "tol": 0.03
+    },
+    "plate_profile.mid_srgb": {
+      "css": 0.8641,
+      "diff": 0.0012,
+      "ok": true,
+      "render": 0.8629,
+      "tol": 0.03
+    }
+  },
+  "sweeps/glass/light=-1,0.png": {
+    "edge_bands.bottom.baseline_srgb": {
+      "css": 0.8636,
+      "render": 0.8733,
+      "residual": true
+    },
+    "edge_bands.bottom.mean_delta_srgb": {
+      "css": -0.0381,
+      "render": -0.0272,
+      "residual": true
+    },
+    "edge_bands.bottom.peak_srgb": {
+      "css": -0.0484,
+      "render": -0.0326,
+      "residual": true
+    },
+    "edge_bands.bottom.width_mm": {
+      "css": 2.0,
+      "render": 0.5,
+      "residual": true
+    },
+    "edge_bands.left.baseline_srgb": {
+      "css": 0.8634,
+      "diff": 0.0269,
+      "ok": true,
+      "render": 0.8902,
+      "tol": 0.04
+    },
+    "edge_bands.left.mean_delta_srgb": {
+      "css": -0.0734,
+      "diff": 0.0215,
+      "ok": true,
+      "render": -0.0949,
+      "tol": 0.05
+    },
+    "edge_bands.left.peak_srgb": {
+      "css": -0.0936,
+      "diff": 0.0203,
+      "ok": true,
+      "render": -0.1139,
+      "tol": 0.06
+    },
+    "edge_bands.left.width_mm": {
+      "css": 2.25,
+      "diff": 0.25,
+      "ok": true,
+      "render": 2.0,
+      "tol": 0.6
+    },
+    "edge_bands.right.baseline_srgb": {
+      "css": 0.8641,
+      "diff": 0.0043,
+      "ok": true,
+      "render": 0.8683,
+      "tol": 0.04
+    },
+    "edge_bands.right.mean_delta_srgb": {
+      "css": 0.0462,
+      "diff": 0.0109,
+      "ok": true,
+      "render": 0.057,
+      "tol": 0.05
+    },
+    "edge_bands.right.peak_srgb": {
+      "css": 0.0582,
+      "diff": 0.0096,
+      "ok": true,
+      "render": 0.0677,
+      "tol": 0.06
+    },
+    "edge_bands.right.width_mm": {
+      "css": 1.75,
+      "diff": 0.0,
+      "ok": true,
+      "render": 1.75,
+      "tol": 0.6
+    },
+    "edge_bands.top.baseline_srgb": {
+      "css": 0.8636,
+      "render": 0.8734,
+      "residual": true
+    },
+    "edge_bands.top.mean_delta_srgb": {
+      "css": -0.0378,
+      "render": -0.0267,
+      "residual": true
+    },
+    "edge_bands.top.peak_srgb": {
+      "css": -0.0482,
+      "render": -0.0302,
+      "residual": true
+    },
+    "edge_bands.top.width_mm": {
+      "css": 2.0,
+      "render": 0.5,
+      "residual": true
+    },
+    "glass_tint.interior.lstar": {
+      "css": 87.8791,
+      "diff": 0.8907,
+      "ok": true,
+      "render": 88.7698,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 86.4052,
+      "diff": 0.9861,
+      "ok": true,
+      "render": 87.3914,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 89.5425,
+      "diff": 1.5487,
+      "ok": true,
+      "render": 91.0912,
+      "tol": 3.0
+    },
+    "plate_profile.far_delta_srgb": {
+      "css": 0.0,
+      "diff": 0.0067,
+      "ok": true,
+      "render": -0.0067,
+      "tol": 0.03
+    },
+    "plate_profile.lit_delta_srgb": {
+      "css": -0.001,
+      "diff": 0.0128,
+      "ok": true,
+      "render": 0.0117,
+      "tol": 0.03
+    },
+    "plate_profile.mid_srgb": {
+      "css": 0.8641,
+      "diff": 0.0097,
+      "ok": true,
+      "render": 0.8738,
+      "tol": 0.03
+    }
+  },
+  "sweeps/glass/light=0,-1.png": {
+    "edge_bands.bottom.baseline_srgb": {
+      "css": 0.8641,
+      "diff": 0.0045,
+      "ok": true,
+      "render": 0.8686,
+      "tol": 0.04
+    },
+    "edge_bands.bottom.mean_delta_srgb": {
+      "css": 0.0463,
+      "diff": 0.0062,
+      "ok": true,
+      "render": 0.0525,
+      "tol": 0.05
+    },
+    "edge_bands.bottom.peak_srgb": {
+      "css": 0.0585,
+      "diff": 0.0058,
+      "ok": true,
+      "render": 0.0643,
+      "tol": 0.06
+    },
+    "edge_bands.bottom.width_mm": {
+      "css": 1.75,
+      "diff": 0.25,
+      "ok": true,
+      "render": 2.0,
+      "tol": 0.6
+    },
+    "edge_bands.left.baseline_srgb": {
+      "css": 0.8636,
+      "render": 0.8731,
+      "residual": true
+    },
+    "edge_bands.left.mean_delta_srgb": {
+      "css": -0.0378,
+      "render": -0.0296,
+      "residual": true
+    },
+    "edge_bands.left.peak_srgb": {
+      "css": -0.0483,
+      "render": -0.0357,
+      "residual": true
+    },
+    "edge_bands.left.width_mm": {
+      "css": 2.0,
+      "render": 0.5,
+      "residual": true
+    },
+    "edge_bands.right.baseline_srgb": {
+      "css": 0.8636,
+      "render": 0.8741,
+      "residual": true
+    },
+    "edge_bands.right.mean_delta_srgb": {
+      "css": -0.038,
+      "render": -0.0226,
+      "residual": true
+    },
+    "edge_bands.right.peak_srgb": {
+      "css": -0.0486,
+      "render": -0.0303,
+      "residual": true
+    },
+    "edge_bands.right.width_mm": {
+      "css": 2.0,
+      "render": 0.75,
+      "residual": true
+    },
+    "edge_bands.top.baseline_srgb": {
+      "css": 0.8634,
+      "diff": 0.0275,
+      "ok": true,
+      "render": 0.8908,
+      "tol": 0.04
+    },
+    "edge_bands.top.mean_delta_srgb": {
+      "css": -0.0734,
+      "diff": 0.0225,
+      "ok": true,
+      "render": -0.0959,
+      "tol": 0.05
+    },
+    "edge_bands.top.peak_srgb": {
+      "css": -0.0948,
+      "diff": 0.0178,
+      "ok": true,
+      "render": -0.1126,
+      "tol": 0.06
+    },
+    "edge_bands.top.width_mm": {
+      "css": 2.25,
+      "diff": 0.25,
+      "ok": true,
+      "render": 2.0,
+      "tol": 0.6
+    },
+    "glass_tint.interior.lstar": {
+      "css": 87.8791,
+      "diff": 0.9281,
+      "ok": true,
+      "render": 88.8072,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 86.4052,
+      "diff": 1.0275,
+      "ok": true,
+      "render": 87.4327,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 89.5425,
+      "diff": 1.5654,
+      "ok": true,
+      "render": 91.1079,
+      "tol": 3.0
+    },
+    "plate_profile.far_delta_srgb": {
+      "css": 0.0,
+      "diff": 0.0068,
+      "ok": true,
+      "render": -0.0068,
+      "tol": 0.03
+    },
+    "plate_profile.lit_delta_srgb": {
+      "css": -0.001,
+      "diff": 0.0125,
+      "ok": true,
+      "render": 0.0115,
+      "tol": 0.03
+    },
+    "plate_profile.mid_srgb": {
+      "css": 0.8641,
+      "diff": 0.01,
+      "ok": true,
+      "render": 0.874,
+      "tol": 0.03
+    }
+  },
+  "sweeps/glass/light=1,0.png": {
+    "edge_bands.bottom.baseline_srgb": {
+      "css": 0.8636,
+      "render": 0.8739,
+      "residual": true
+    },
+    "edge_bands.bottom.mean_delta_srgb": {
+      "css": -0.0381,
+      "render": -0.0288,
+      "residual": true
+    },
+    "edge_bands.bottom.peak_srgb": {
+      "css": -0.0484,
+      "render": -0.0341,
+      "residual": true
+    },
+    "edge_bands.bottom.width_mm": {
+      "css": 2.0,
+      "render": 0.5,
+      "residual": true
+    },
+    "edge_bands.left.baseline_srgb": {
+      "css": 0.8641,
+      "diff": 0.0064,
+      "ok": true,
+      "render": 0.8704,
+      "tol": 0.04
+    },
+    "edge_bands.left.mean_delta_srgb": {
+      "css": 0.0462,
+      "diff": 0.0087,
+      "ok": true,
+      "render": 0.0549,
+      "tol": 0.05
+    },
+    "edge_bands.left.peak_srgb": {
+      "css": 0.0588,
+      "diff": 0.0069,
+      "ok": true,
+      "render": 0.0657,
+      "tol": 0.06
+    },
+    "edge_bands.left.width_mm": {
+      "css": 1.75,
+      "diff": 0.0,
+      "ok": true,
+      "render": 1.75,
+      "tol": 0.6
+    },
+    "edge_bands.right.baseline_srgb": {
+      "css": 0.8634,
+      "diff": 0.0267,
+      "ok": true,
+      "render": 0.8901,
+      "tol": 0.04
+    },
+    "edge_bands.right.mean_delta_srgb": {
+      "css": -0.0735,
+      "diff": 0.0208,
+      "ok": true,
+      "render": -0.0943,
+      "tol": 0.05
+    },
+    "edge_bands.right.peak_srgb": {
+      "css": -0.0948,
+      "diff": 0.0141,
+      "ok": true,
+      "render": -0.1089,
+      "tol": 0.06
+    },
+    "edge_bands.right.width_mm": {
+      "css": 2.25,
+      "diff": 0.25,
+      "ok": true,
+      "render": 2.0,
+      "tol": 0.6
+    },
+    "edge_bands.top.baseline_srgb": {
+      "css": 0.8636,
+      "render": 0.8734,
+      "residual": true
+    },
+    "edge_bands.top.mean_delta_srgb": {
+      "css": -0.0378,
+      "render": -0.0281,
+      "residual": true
+    },
+    "edge_bands.top.peak_srgb": {
+      "css": -0.0482,
+      "render": -0.0319,
+      "residual": true
+    },
+    "edge_bands.top.width_mm": {
+      "css": 2.0,
+      "render": 0.5,
+      "residual": true
+    },
+    "glass_tint.interior.lstar": {
+      "css": 87.8791,
+      "diff": 0.9356,
+      "ok": true,
+      "render": 88.8147,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 86.4052,
+      "diff": 1.0359,
+      "ok": true,
+      "render": 87.4411,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 89.5425,
+      "diff": 1.3181,
+      "ok": true,
+      "render": 88.2244,
+      "tol": 3.0
+    },
+    "plate_profile.far_delta_srgb": {
+      "css": 0.0,
+      "diff": 0.006,
+      "ok": true,
+      "render": -0.006,
+      "tol": 0.03
+    },
+    "plate_profile.lit_delta_srgb": {
+      "css": -0.0014,
+      "diff": 0.0114,
+      "ok": true,
+      "render": 0.0099,
+      "tol": 0.03
+    },
+    "plate_profile.mid_srgb": {
+      "css": 0.8641,
+      "diff": 0.0106,
+      "ok": true,
+      "render": 0.8746,
+      "tol": 0.03
+    }
+  },
+  "sweeps/glass_dark/fill_light_intensity=0.3.png": {
+    "edge_bands.bottom.baseline_srgb": {
+      "css": 0.3203,
+      "render": 0.3351,
+      "residual": true
+    },
+    "edge_bands.bottom.mean_delta_srgb": {
+      "css": 0.2428,
+      "render": 0.0834,
+      "residual": true
+    },
+    "edge_bands.bottom.peak_srgb": {
+      "css": 0.3007,
+      "render": 0.1068,
+      "residual": true
+    },
+    "edge_bands.bottom.width_mm": {
+      "css": 1.75,
+      "render": 0.75,
+      "residual": true
+    },
+    "edge_bands.left.baseline_srgb": {
+      "css": 0.3207,
+      "diff": 0.0208,
+      "ok": true,
+      "render": 0.3414,
+      "tol": 0.04
+    },
+    "edge_bands.left.mean_delta_srgb": {
+      "css": 0.0453,
+      "diff": 0.0154,
+      "ok": true,
+      "render": 0.0299,
+      "tol": 0.05
+    },
+    "edge_bands.left.peak_srgb": {
+      "css": 0.0584,
+      "diff": 0.0285,
+      "ok": true,
+      "render": 0.0299,
+      "tol": 0.06
+    },
+    "edge_bands.left.width_mm": {
+      "css": 2.0,
+      "render": 0.25,
+      "residual": true
+    },
+    "edge_bands.right.baseline_srgb": {
+      "css": 0.3203,
+      "render": 0.3361,
+      "residual": true
+    },
+    "edge_bands.right.mean_delta_srgb": {
+      "css": 0.2427,
+      "render": 0.0798,
+      "residual": true
+    },
+    "edge_bands.right.peak_srgb": {
+      "css": 0.3007,
+      "render": 0.1073,
+      "residual": true
+    },
+    "edge_bands.right.width_mm": {
+      "css": 1.75,
+      "render": 0.75,
+      "residual": true
+    },
+    "edge_bands.top.baseline_srgb": {
+      "css": 0.3208,
+      "diff": 0.0199,
+      "ok": true,
+      "render": 0.3406,
+      "tol": 0.04
+    },
+    "edge_bands.top.mean_delta_srgb": {
+      "css": 0.0451,
+      "diff": 0.0125,
+      "ok": true,
+      "render": 0.0326,
+      "tol": 0.05
+    },
+    "edge_bands.top.peak_srgb": {
+      "css": 0.0586,
+      "diff": 0.026,
+      "ok": true,
+      "render": 0.0326,
+      "tol": 0.06
+    },
+    "edge_bands.top.width_mm": {
+      "css": 2.0,
+      "render": 0.25,
+      "residual": true
+    },
+    "glass_tint.interior.lstar": {
+      "css": 34.7368,
+      "diff": 1.2203,
+      "ok": true,
+      "render": 35.9571,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 32.0261,
+      "diff": 1.1316,
+      "ok": true,
+      "render": 33.1577,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 79.3464,
+      "diff": 0.7682,
+      "ok": true,
+      "render": 80.1146,
+      "tol": 3.0
+    },
+    "plate_profile.far_delta_srgb": {
+      "css": 0.0106,
+      "diff": 0.0031,
+      "ok": true,
+      "render": 0.0075,
+      "tol": 0.03
+    },
+    "plate_profile.lit_delta_srgb": {
+      "css": 0.0031,
+      "diff": 0.013,
+      "ok": true,
+      "render": 0.0161,
+      "tol": 0.03
+    },
+    "plate_profile.mid_srgb": {
+      "css": 0.3203,
+      "diff": 0.0095,
+      "ok": true,
+      "render": 0.3297,
+      "tol": 0.03
+    }
+  },
+  "sweeps/glass_dark/fill_light_intensity=1.png": {
+    "edge_bands.bottom.baseline_srgb": {
+      "css": 0.3974,
+      "render": 0.4114,
+      "residual": true
+    },
+    "edge_bands.bottom.mean_delta_srgb": {
+      "css": 0.1999,
+      "render": 0.0796,
+      "residual": true
+    },
+    "edge_bands.bottom.peak_srgb": {
+      "css": 0.2484,
+      "render": 0.103,
+      "residual": true
+    },
+    "edge_bands.bottom.width_mm": {
+      "css": 1.75,
+      "render": 0.75,
+      "residual": true
+    },
+    "edge_bands.left.baseline_srgb": {
+      "css": 0.3974,
+      "diff": 0.0189,
+      "ok": true,
+      "render": 0.4162,
+      "tol": 0.04
+    },
+    "edge_bands.left.mean_delta_srgb": {
+      "css": 0.0217,
+      "diff": 0.0218,
+      "ok": true,
+      "render": 0.0435,
+      "tol": 0.05
+    },
+    "edge_bands.left.peak_srgb": {
+      "css": 0.0298,
+      "diff": 0.0137,
+      "ok": true,
+      "render": 0.0435,
+      "tol": 0.06
+    },
+    "edge_bands.left.width_mm": {
+      "css": 2.25,
+      "render": 0.25,
+      "residual": true
+    },
+    "edge_bands.right.baseline_srgb": {
+      "css": 0.3974,
+      "render": 0.412,
+      "residual": true
+    },
+    "edge_bands.right.mean_delta_srgb": {
+      "css": 0.1999,
+      "render": 0.0753,
+      "residual": true
+    },
+    "edge_bands.right.peak_srgb": {
+      "css": 0.2484,
+      "render": 0.1029,
+      "residual": true
+    },
+    "edge_bands.right.width_mm": {
+      "css": 1.75,
+      "render": 0.75,
+      "residual": true
+    },
+    "edge_bands.top.baseline_srgb": {
+      "css": 0.3974,
+      "diff": 0.018,
+      "ok": true,
+      "render": 0.4154,
+      "tol": 0.04
+    },
+    "edge_bands.top.mean_delta_srgb": {
+      "css": 0.0224,
+      "diff": 0.0217,
+      "ok": true,
+      "render": 0.0441,
+      "tol": 0.05
+    },
+    "edge_bands.top.peak_srgb": {
+      "css": 0.0297,
+      "diff": 0.0144,
+      "ok": true,
+      "render": 0.0441,
+      "tol": 0.06
+    },
+    "edge_bands.top.width_mm": {
+      "css": 2.0,
+      "render": 0.25,
+      "residual": true
+    },
+    "glass_tint.interior.lstar": {
+      "css": 42.92,
+      "diff": 0.9525,
+      "ok": true,
+      "render": 43.8725,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 39.7386,
+      "diff": 0.916,
+      "ok": true,
+      "render": 40.6545,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 96.3399,
+      "diff": 0.1302,
+      "ok": true,
+      "render": 96.4701,
+      "tol": 3.0
+    },
+    "plate_profile.far_delta_srgb": {
+      "css": 0.0086,
+      "diff": 0.0013,
+      "ok": true,
+      "render": 0.0099,
+      "tol": 0.03
+    },
+    "plate_profile.lit_delta_srgb": {
+      "css": 0.0013,
+      "diff": 0.0148,
+      "ok": true,
+      "render": 0.0161,
+      "tol": 0.03
+    },
+    "plate_profile.mid_srgb": {
+      "css": 0.3974,
+      "diff": 0.0067,
+      "ok": true,
+      "render": 0.404,
+      "tol": 0.03
+    }
+  },
+  "sweeps/glass_dark/key_light_intensity=0.3.png": {
+    "edge_bands.bottom.baseline_srgb": {
+      "css": 0.2863,
+      "render": 0.3,
+      "residual": true
+    },
+    "edge_bands.bottom.mean_delta_srgb": {
+      "css": 0.0798,
+      "render": 0.0513,
+      "residual": true
+    },
+    "edge_bands.bottom.peak_srgb": {
+      "css": 0.0993,
+      "render": 0.0685,
+      "residual": true
+    },
+    "edge_bands.bottom.width_mm": {
+      "css": 1.75,
+      "render": 0.75,
+      "residual": true
+    },
+    "edge_bands.left.baseline_srgb": {
+      "css": 0.2865,
+      "diff": 0.0155,
+      "ok": true,
+      "render": 0.302,
+      "tol": 0.04
+    },
+    "edge_bands.left.mean_delta_srgb": {
+      "css": 0.0244,
+      "diff": 0.0027,
+      "ok": true,
+      "render": 0.0271,
+      "tol": 0.05
+    },
+    "edge_bands.left.peak_srgb": {
+      "css": 0.0321,
+      "diff": 0.004,
+      "ok": true,
+      "render": 0.0361,
+      "tol": 0.06
+    },
+    "edge_bands.left.width_mm": {
+      "css": 2.25,
+      "render": 0.5,
+      "residual": true
+    },
+    "edge_bands.right.baseline_srgb": {
+      "css": 0.2863,
+      "render": 0.3003,
+      "residual": true
+    },
+    "edge_bands.right.mean_delta_srgb": {
+      "css": 0.0798,
+      "render": 0.0576,
+      "residual": true
+    },
+    "edge_bands.right.peak_srgb": {
+      "css": 0.0993,
+      "render": 0.0696,
+      "residual": true
+    },
+    "edge_bands.right.width_mm": {
+      "css": 1.75,
+      "render": 0.5,
+      "residual": true
+    },
+    "edge_bands.top.baseline_srgb": {
+      "css": 0.2865,
+      "diff": 0.0151,
+      "ok": true,
+      "render": 0.3016,
+      "tol": 0.04
+    },
+    "edge_bands.top.mean_delta_srgb": {
+      "css": 0.0242,
+      "diff": 0.0132,
+      "ok": true,
+      "render": 0.0374,
+      "tol": 0.05
+    },
+    "edge_bands.top.peak_srgb": {
+      "css": 0.0316,
+      "diff": 0.0058,
+      "ok": true,
+      "render": 0.0374,
+      "tol": 0.06
+    },
+    "edge_bands.top.width_mm": {
+      "css": 2.25,
+      "render": 0.25,
+      "residual": true
+    },
+    "glass_tint.interior.lstar": {
+      "css": 31.0261,
+      "diff": 1.0812,
+      "ok": true,
+      "render": 32.1073,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 28.6275,
+      "diff": 0.9836,
+      "ok": true,
+      "render": 29.611,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 70.5882,
+      "diff": 1.1019,
+      "ok": true,
+      "render": 71.6902,
+      "tol": 3.0
+    },
+    "plate_profile.far_delta_srgb": {
+      "css": 0.0034,
+      "diff": 0.0044,
+      "ok": true,
+      "render": 0.0078,
+      "tol": 0.03
+    },
+    "plate_profile.lit_delta_srgb": {
+      "css": 0.0017,
+      "diff": 0.0087,
+      "ok": true,
+      "render": 0.0105,
+      "tol": 0.03
+    },
+    "plate_profile.mid_srgb": {
+      "css": 0.2863,
+      "diff": 0.0079,
+      "ok": true,
+      "render": 0.2941,
+      "tol": 0.03
+    }
+  },
+  "sweeps/glass_dark/key_light_intensity=0.6.png": {
+    "edge_bands.bottom.baseline_srgb": {
+      "css": 0.3281,
+      "render": 0.3432,
+      "residual": true
+    },
+    "edge_bands.bottom.mean_delta_srgb": {
+      "css": 0.152,
+      "render": 0.0684,
+      "residual": true
+    },
+    "edge_bands.bottom.peak_srgb": {
+      "css": 0.1899,
+      "render": 0.0889,
+      "residual": true
+    },
+    "edge_bands.bottom.width_mm": {
+      "css": 1.75,
+      "render": 0.75,
+      "residual": true
+    },
+    "edge_bands.left.baseline_srgb": {
+      "css": 0.3283,
+      "diff": 0.0186,
+      "ok": true,
+      "render": 0.347,
+      "tol": 0.04
+    },
+    "edge_bands.left.mean_delta_srgb": {
+      "css": 0.0288,
+      "diff": 0.0072,
+      "ok": true,
+      "render": 0.036,
+      "tol": 0.05
+    },
+    "edge_bands.left.peak_srgb": {
+      "css": 0.0387,
+      "diff": 0.0027,
+      "ok": true,
+      "render": 0.036,
+      "tol": 0.06
+    },
+    "edge_bands.left.width_mm": {
+      "css": 2.25,
+      "render": 0.25,
+      "residual": true
+    },
+    "edge_bands.right.baseline_srgb": {
+      "css": 0.3281,
+      "render": 0.3437,
+      "residual": true
+    },
+    "edge_bands.right.mean_delta_srgb": {
+      "css": 0.152,
+      "render": 0.0646,
+      "residual": true
+    },
+    "edge_bands.right.peak_srgb": {
+      "css": 0.1897,
+      "render": 0.0885,
+      "residual": true
+    },
+    "edge_bands.right.width_mm": {
+      "css": 1.75,
+      "render": 0.75,
+      "residual": true
+    },
+    "edge_bands.top.baseline_srgb": {
+      "css": 0.3284,
+      "diff": 0.0179,
+      "ok": true,
+      "render": 0.3463,
+      "tol": 0.04
+    },
+    "edge_bands.top.mean_delta_srgb": {
+      "css": 0.0287,
+      "diff": 0.0083,
+      "ok": true,
+      "render": 0.037,
+      "tol": 0.05
+    },
+    "edge_bands.top.peak_srgb": {
+      "css": 0.0383,
+      "diff": 0.0013,
+      "ok": true,
+      "render": 0.037,
+      "tol": 0.06
+    },
+    "edge_bands.top.width_mm": {
+      "css": 2.25,
+      "render": 0.25,
+      "residual": true
+    },
+    "glass_tint.interior.lstar": {
+      "css": 35.5834,
+      "diff": 1.1642,
+      "ok": true,
+      "render": 36.7476,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 32.8105,
+      "diff": 1.0838,
+      "ok": true,
+      "render": 33.8943,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 80.7843,
+      "diff": 0.6962,
+      "ok": true,
+      "render": 81.4805,
+      "tol": 3.0
+    },
+    "plate_profile.far_delta_srgb": {
+      "css": 0.0066,
+      "diff": 0.0019,
+      "ok": true,
+      "render": 0.0086,
+      "tol": 0.03
+    },
+    "plate_profile.lit_delta_srgb": {
+      "css": 0.0019,
+      "diff": 0.0118,
+      "ok": true,
+      "render": 0.0137,
+      "tol": 0.03
+    },
+    "plate_profile.mid_srgb": {
+      "css": 0.3281,
+      "diff": 0.0087,
+      "ok": true,
+      "render": 0.3368,
+      "tol": 0.03
+    }
+  },
+  "sweeps/glass_dark/key_light_intensity=0.9.png": {
+    "edge_bands.bottom.baseline_srgb": {
+      "css": 0.366,
+      "render": 0.3805,
+      "residual": true
+    },
+    "edge_bands.bottom.mean_delta_srgb": {
+      "css": 0.2184,
+      "render": 0.0799,
+      "residual": true
+    },
+    "edge_bands.bottom.peak_srgb": {
+      "css": 0.2716,
+      "render": 0.1027,
+      "residual": true
+    },
+    "edge_bands.bottom.width_mm": {
+      "css": 1.75,
+      "render": 0.75,
+      "residual": true
+    },
+    "edge_bands.left.baseline_srgb": {
+      "css": 0.3662,
+      "diff": 0.0196,
+      "ok": true,
+      "render": 0.3858,
+      "tol": 0.04
+    },
+    "edge_bands.left.mean_delta_srgb": {
+      "css": 0.0315,
+      "diff": 0.0059,
+      "ok": true,
+      "render": 0.0374,
+      "tol": 0.05
+    },
+    "edge_bands.left.peak_srgb": {
+      "css": 0.0414,
+      "diff": 0.0041,
+      "ok": true,
+      "render": 0.0374,
+      "tol": 0.06
+    },
+    "edge_bands.left.width_mm": {
+      "css": 2.0,
+      "render": 0.25,
+      "residual": true
+    },
+    "edge_bands.right.baseline_srgb": {
+      "css": 0.366,
+      "render": 0.3812,
+      "residual": true
+    },
+    "edge_bands.right.mean_delta_srgb": {
+      "css": 0.2183,
+      "render": 0.076,
+      "residual": true
+    },
+    "edge_bands.right.peak_srgb": {
+      "css": 0.2712,
+      "render": 0.1027,
+      "residual": true
+    },
+    "edge_bands.right.width_mm": {
+      "css": 1.75,
+      "render": 0.75,
+      "residual": true
+    },
+    "edge_bands.top.baseline_srgb": {
+      "css": 0.3662,
+      "diff": 0.0187,
+      "ok": true,
+      "render": 0.385,
+      "tol": 0.04
+    },
+    "edge_bands.top.mean_delta_srgb": {
+      "css": 0.0303,
+      "diff": 0.0084,
+      "ok": true,
+      "render": 0.0387,
+      "tol": 0.05
+    },
+    "edge_bands.top.peak_srgb": {
+      "css": 0.0403,
+      "diff": 0.0016,
+      "ok": true,
+      "render": 0.0387,
+      "tol": 0.06
+    },
+    "edge_bands.top.width_mm": {
+      "css": 2.25,
+      "render": 0.25,
+      "residual": true
+    },
+    "glass_tint.interior.lstar": {
+      "css": 39.6279,
+      "diff": 1.0534,
+      "ok": true,
+      "render": 40.6813,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 36.6013,
+      "diff": 0.9989,
+      "ok": true,
+      "render": 37.6003,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 89.5425,
+      "diff": 0.4015,
+      "ok": true,
+      "render": 89.944,
+      "tol": 3.0
+    },
+    "plate_profile.far_delta_srgb": {
+      "css": 0.0095,
+      "diff": 0.0003,
+      "ok": true,
+      "render": 0.0091,
+      "tol": 0.03
+    },
+    "plate_profile.lit_delta_srgb": {
+      "css": 0.002,
+      "diff": 0.0138,
+      "ok": true,
+      "render": 0.0158,
+      "tol": 0.03
+    },
+    "plate_profile.mid_srgb": {
+      "css": 0.366,
+      "diff": 0.0077,
+      "ok": true,
+      "render": 0.3737,
+      "tol": 0.03
+    }
+  },
+  "sweeps/glass_dark/light=-1,-1.png": {
+    "edge_bands.bottom.baseline_srgb": {
+      "css": 0.366,
+      "render": 0.3805,
+      "residual": true
+    },
+    "edge_bands.bottom.mean_delta_srgb": {
+      "css": 0.2184,
+      "render": 0.0799,
+      "residual": true
+    },
+    "edge_bands.bottom.peak_srgb": {
+      "css": 0.2716,
+      "render": 0.1027,
+      "residual": true
+    },
+    "edge_bands.bottom.width_mm": {
+      "css": 1.75,
+      "render": 0.75,
+      "residual": true
+    },
+    "edge_bands.left.baseline_srgb": {
+      "css": 0.3662,
+      "diff": 0.0196,
+      "ok": true,
+      "render": 0.3858,
+      "tol": 0.04
+    },
+    "edge_bands.left.mean_delta_srgb": {
+      "css": 0.0315,
+      "diff": 0.0059,
+      "ok": true,
+      "render": 0.0374,
+      "tol": 0.05
+    },
+    "edge_bands.left.peak_srgb": {
+      "css": 0.0414,
+      "diff": 0.0041,
+      "ok": true,
+      "render": 0.0374,
+      "tol": 0.06
+    },
+    "edge_bands.left.width_mm": {
+      "css": 2.0,
+      "render": 0.25,
+      "residual": true
+    },
+    "edge_bands.right.baseline_srgb": {
+      "css": 0.366,
+      "render": 0.3812,
+      "residual": true
+    },
+    "edge_bands.right.mean_delta_srgb": {
+      "css": 0.2183,
+      "render": 0.076,
+      "residual": true
+    },
+    "edge_bands.right.peak_srgb": {
+      "css": 0.2712,
+      "render": 0.1027,
+      "residual": true
+    },
+    "edge_bands.right.width_mm": {
+      "css": 1.75,
+      "render": 0.75,
+      "residual": true
+    },
+    "edge_bands.top.baseline_srgb": {
+      "css": 0.3662,
+      "diff": 0.0187,
+      "ok": true,
+      "render": 0.385,
+      "tol": 0.04
+    },
+    "edge_bands.top.mean_delta_srgb": {
+      "css": 0.0303,
+      "diff": 0.0084,
+      "ok": true,
+      "render": 0.0387,
+      "tol": 0.05
+    },
+    "edge_bands.top.peak_srgb": {
+      "css": 0.0403,
+      "diff": 0.0016,
+      "ok": true,
+      "render": 0.0387,
+      "tol": 0.06
+    },
+    "edge_bands.top.width_mm": {
+      "css": 2.25,
+      "render": 0.25,
+      "residual": true
+    },
+    "glass_tint.interior.lstar": {
+      "css": 39.6279,
+      "diff": 1.0534,
+      "ok": true,
+      "render": 40.6813,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 36.6013,
+      "diff": 0.999,
+      "ok": true,
+      "render": 37.6003,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 89.5425,
+      "diff": 0.4015,
+      "ok": true,
+      "render": 89.944,
+      "tol": 3.0
+    },
+    "plate_profile.far_delta_srgb": {
+      "css": 0.0095,
+      "diff": 0.0003,
+      "ok": true,
+      "render": 0.0091,
+      "tol": 0.03
+    },
+    "plate_profile.lit_delta_srgb": {
+      "css": 0.002,
+      "diff": 0.0138,
+      "ok": true,
+      "render": 0.0158,
+      "tol": 0.03
+    },
+    "plate_profile.mid_srgb": {
+      "css": 0.366,
+      "diff": 0.0077,
+      "ok": true,
+      "render": 0.3737,
+      "tol": 0.03
+    }
+  },
+  "sweeps/glass_dark/light=-1,0.png": {
+    "edge_bands.bottom.baseline_srgb": {
+      "css": 0.3662,
+      "render": 0.3754,
+      "residual": true
+    },
+    "edge_bands.bottom.mean_delta_srgb": {
+      "css": 0.015,
+      "render": 0.0464,
+      "residual": true
+    },
+    "edge_bands.bottom.peak_srgb": {
+      "css": 0.0197,
+      "render": 0.0544,
+      "residual": true
+    },
+    "edge_bands.bottom.width_mm": {
+      "css": 2.25,
+      "render": 0.5,
+      "residual": true
+    },
+    "edge_bands.left.baseline_srgb": {
+      "css": 0.3662,
+      "diff": 0.02,
+      "ok": true,
+      "render": 0.3862,
+      "tol": 0.04
+    },
+    "edge_bands.left.mean_delta_srgb": {
+      "css": 0.0315,
+      "diff": 0.0024,
+      "ok": true,
+      "render": 0.0291,
+      "tol": 0.05
+    },
+    "edge_bands.left.peak_srgb": {
+      "css": 0.0414,
+      "diff": 0.0123,
+      "ok": true,
+      "render": 0.0291,
+      "tol": 0.06
+    },
+    "edge_bands.left.width_mm": {
+      "css": 2.0,
+      "render": 0.25,
+      "residual": true
+    },
+    "edge_bands.right.baseline_srgb": {
+      "css": 0.366,
+      "render": 0.3742,
+      "residual": true
+    },
+    "edge_bands.right.mean_delta_srgb": {
+      "css": 0.2183,
+      "render": 0.0837,
+      "residual": true
+    },
+    "edge_bands.right.peak_srgb": {
+      "css": 0.2712,
+      "render": 0.1117,
+      "residual": true
+    },
+    "edge_bands.right.width_mm": {
+      "css": 1.75,
+      "render": 0.75,
+      "residual": true
+    },
+    "edge_bands.top.baseline_srgb": {
+      "css": 0.3662,
+      "render": 0.3755,
+      "residual": true
+    },
+    "edge_bands.top.mean_delta_srgb": {
+      "css": 0.015,
+      "render": 0.0382,
+      "residual": true
+    },
+    "edge_bands.top.peak_srgb": {
+      "css": 0.0193,
+      "render": 0.0483,
+      "residual": true
+    },
+    "edge_bands.top.width_mm": {
+      "css": 2.25,
+      "render": 0.5,
+      "residual": true
+    },
+    "glass_tint.interior.lstar": {
+      "css": 39.6279,
+      "diff": 0.7458,
+      "ok": true,
+      "render": 40.3736,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 36.6013,
+      "diff": 0.7067,
+      "ok": true,
+      "render": 37.308,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 89.5425,
+      "diff": 1.3745,
+      "ok": true,
+      "render": 90.917,
+      "tol": 3.0
+    },
+    "plate_profile.far_delta_srgb": {
+      "css": -0.0,
+      "diff": 0.0011,
+      "ok": true,
+      "render": -0.0011,
+      "tol": 0.03
+    },
+    "plate_profile.lit_delta_srgb": {
+      "css": 0.0001,
+      "diff": 0.0086,
+      "ok": true,
+      "render": 0.0087,
+      "tol": 0.03
+    },
+    "plate_profile.mid_srgb": {
+      "css": 0.366,
+      "diff": 0.0062,
+      "ok": true,
+      "render": 0.3723,
+      "tol": 0.03
+    }
+  },
+  "sweeps/glass_dark/light=0,-1.png": {
+    "edge_bands.bottom.baseline_srgb": {
+      "css": 0.366,
+      "render": 0.3744,
+      "residual": true
+    },
+    "edge_bands.bottom.mean_delta_srgb": {
+      "css": 0.2184,
+      "render": 0.086,
+      "residual": true
+    },
+    "edge_bands.bottom.peak_srgb": {
+      "css": 0.2716,
+      "render": 0.1098,
+      "residual": true
+    },
+    "edge_bands.bottom.width_mm": {
+      "css": 1.75,
+      "render": 0.75,
+      "residual": true
+    },
+    "edge_bands.left.baseline_srgb": {
+      "css": 0.3662,
+      "render": 0.3748,
+      "residual": true
+    },
+    "edge_bands.left.mean_delta_srgb": {
+      "css": 0.0151,
+      "render": 0.0398,
+      "residual": true
+    },
+    "edge_bands.left.peak_srgb": {
+      "css": 0.0194,
+      "render": 0.0488,
+      "residual": true
+    },
+    "edge_bands.left.width_mm": {
+      "css": 2.25,
+      "render": 0.5,
+      "residual": true
+    },
+    "edge_bands.right.baseline_srgb": {
+      "css": 0.3662,
+      "render": 0.3756,
+      "residual": true
+    },
+    "edge_bands.right.mean_delta_srgb": {
+      "css": 0.0151,
+      "render": 0.0401,
+      "residual": true
+    },
+    "edge_bands.right.peak_srgb": {
+      "css": 0.0204,
+      "render": 0.0516,
+      "residual": true
+    },
+    "edge_bands.right.width_mm": {
+      "css": 2.25,
+      "render": 0.5,
+      "residual": true
+    },
+    "edge_bands.top.baseline_srgb": {
+      "css": 0.3662,
+      "diff": 0.0197,
+      "ok": true,
+      "render": 0.386,
+      "tol": 0.04
+    },
+    "edge_bands.top.mean_delta_srgb": {
+      "css": 0.0303,
+      "diff": 0.0005,
+      "ok": true,
+      "render": 0.0308,
+      "tol": 0.05
+    },
+    "edge_bands.top.peak_srgb": {
+      "css": 0.0403,
+      "diff": 0.0095,
+      "ok": true,
+      "render": 0.0308,
+      "tol": 0.06
+    },
+    "edge_bands.top.width_mm": {
+      "css": 2.25,
+      "render": 0.25,
+      "residual": true
+    },
+    "glass_tint.interior.lstar": {
+      "css": 39.6279,
+      "diff": 0.7413,
+      "ok": true,
+      "render": 40.3692,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 36.6013,
+      "diff": 0.7025,
+      "ok": true,
+      "render": 37.3038,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 89.5425,
+      "diff": 1.3838,
+      "ok": true,
+      "render": 90.9263,
+      "tol": 3.0
+    },
+    "plate_profile.far_delta_srgb": {
+      "css": -0.0,
+      "diff": 0.0001,
+      "ok": true,
+      "render": 0.0001,
+      "tol": 0.03
+    },
+    "plate_profile.lit_delta_srgb": {
+      "css": 0.0001,
+      "diff": 0.0086,
+      "ok": true,
+      "render": 0.0088,
+      "tol": 0.03
+    },
+    "plate_profile.mid_srgb": {
+      "css": 0.366,
+      "diff": 0.0054,
+      "ok": true,
+      "render": 0.3714,
+      "tol": 0.03
+    }
+  },
+  "sweeps/glass_dark/light=1,0.png": {
+    "edge_bands.bottom.baseline_srgb": {
+      "css": 0.3662,
+      "render": 0.375,
+      "residual": true
+    },
+    "edge_bands.bottom.mean_delta_srgb": {
+      "css": 0.015,
+      "render": 0.0452,
+      "residual": true
+    },
+    "edge_bands.bottom.peak_srgb": {
+      "css": 0.0197,
+      "render": 0.0527,
+      "residual": true
+    },
+    "edge_bands.bottom.width_mm": {
+      "css": 2.25,
+      "render": 0.5,
+      "residual": true
+    },
+    "edge_bands.left.baseline_srgb": {
+      "css": 0.366,
+      "render": 0.3742,
+      "residual": true
+    },
+    "edge_bands.left.mean_delta_srgb": {
+      "css": 0.2182,
+      "render": 0.0849,
+      "residual": true
+    },
+    "edge_bands.left.peak_srgb": {
+      "css": 0.2719,
+      "render": 0.1058,
+      "residual": true
+    },
+    "edge_bands.left.width_mm": {
+      "css": 1.75,
+      "render": 0.75,
+      "residual": true
+    },
+    "edge_bands.right.baseline_srgb": {
+      "css": 0.3663,
+      "diff": 0.0198,
+      "ok": true,
+      "render": 0.386,
+      "tol": 0.04
+    },
+    "edge_bands.right.mean_delta_srgb": {
+      "css": 0.0305,
+      "diff": 0.0017,
+      "ok": true,
+      "render": 0.0322,
+      "tol": 0.05
+    },
+    "edge_bands.right.peak_srgb": {
+      "css": 0.0403,
+      "diff": 0.0081,
+      "ok": true,
+      "render": 0.0322,
+      "tol": 0.06
+    },
+    "edge_bands.right.width_mm": {
+      "css": 2.25,
+      "render": 0.25,
+      "residual": true
+    },
+    "edge_bands.top.baseline_srgb": {
+      "css": 0.3662,
+      "render": 0.3757,
+      "residual": true
+    },
+    "edge_bands.top.mean_delta_srgb": {
+      "css": 0.015,
+      "render": 0.0393,
+      "residual": true
+    },
+    "edge_bands.top.peak_srgb": {
+      "css": 0.0193,
+      "render": 0.0491,
+      "residual": true
+    },
+    "edge_bands.top.width_mm": {
+      "css": 2.25,
+      "render": 0.5,
+      "residual": true
+    },
+    "glass_tint.interior.lstar": {
+      "css": 39.6279,
+      "diff": 0.7405,
+      "ok": true,
+      "render": 40.3683,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 36.6013,
+      "diff": 0.7017,
+      "ok": true,
+      "render": 37.303,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 89.5425,
+      "diff": 1.5127,
+      "ok": true,
+      "render": 88.0298,
+      "tol": 3.0
+    },
+    "plate_profile.far_delta_srgb": {
+      "css": -0.0,
+      "diff": 0.0009,
+      "ok": true,
+      "render": 0.0009,
+      "tol": 0.03
+    },
+    "plate_profile.lit_delta_srgb": {
+      "css": 0.0004,
+      "diff": 0.0091,
+      "ok": true,
+      "render": 0.0095,
+      "tol": 0.03
+    },
+    "plate_profile.mid_srgb": {
+      "css": 0.366,
+      "diff": 0.0048,
+      "ok": true,
+      "render": 0.3709,
+      "tol": 0.03
+    }
+  },
+  "sweeps/glass_frost/elevation=1.png": {
+    "edge_bands.bottom.baseline_srgb": {
+      "css": 0.7264,
+      "render": 0.726,
+      "residual": true
+    },
+    "edge_bands.bottom.mean_delta_srgb": {
+      "css": 0.0938,
+      "render": 0.0241,
+      "residual": true
+    },
+    "edge_bands.bottom.peak_srgb": {
+      "css": 0.1152,
+      "render": 0.0241,
+      "residual": true
+    },
+    "edge_bands.bottom.width_mm": {
+      "css": 1.75,
+      "render": 0.25,
+      "residual": true
+    },
+    "edge_bands.left.baseline_srgb": {
+      "css": 0.8586,
+      "render": 0.9122,
+      "residual": true
+    },
+    "edge_bands.left.mean_delta_srgb": {
+      "css": 0.0084,
+      "render": 0.0209,
+      "residual": true
+    },
+    "edge_bands.left.peak_srgb": {
+      "css": 0.012,
+      "render": 0.0237,
+      "residual": true
+    },
+    "edge_bands.left.width_mm": {
+      "css": 3.75,
+      "render": 3.25,
+      "residual": true
+    },
+    "edge_bands.right.baseline_srgb": {
+      "css": 0.8686,
+      "render": 0.8406,
+      "residual": true
+    },
+    "edge_bands.right.mean_delta_srgb": {
+      "css": 0.0449,
+      "render": -0.0078,
+      "residual": true
+    },
+    "edge_bands.right.peak_srgb": {
+      "css": 0.0555,
+      "render": -0.0097,
+      "residual": true
+    },
+    "edge_bands.right.width_mm": {
+      "css": 1.75,
+      "render": 3.25,
+      "residual": true
+    },
+    "edge_bands.top.baseline_srgb": {
+      "css": 0.718,
+      "render": 0.7815,
+      "residual": true
+    },
+    "edge_bands.top.mean_delta_srgb": {
+      "css": 0.0077,
+      "render": 0.0157,
+      "residual": true
+    },
+    "edge_bands.top.peak_srgb": {
+      "css": 0.0104,
+      "render": 0.0185,
+      "residual": true
+    },
+    "edge_bands.top.width_mm": {
+      "css": 3.75,
+      "render": 3.75,
+      "residual": true
+    },
+    "frost_blur.blur_sigma_mm": {
+      "css": 2.1,
+      "diff": 0.3,
+      "ok": true,
+      "render": 2.4,
+      "tol": 0.6
+    },
+    "frost_blur.step_srgb": {
+      "css": -0.4999,
+      "render": -0.4206,
+      "residual": true
+    },
+    "glass_tint.decal.srgb_pct": {
+      "css": 38.5609,
+      "render": 44.2874,
+      "residual": true
+    },
+    "glass_tint.interior.lstar": {
+      "css": 87.6595,
+      "diff": 1.2563,
+      "ok": true,
+      "render": 86.4031,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 86.1624,
+      "diff": 1.3866,
+      "ok": true,
+      "render": 84.7758,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 89.5425,
+      "diff": 0.721,
+      "ok": true,
+      "render": 90.2635,
+      "tol": 3.0
+    }
+  },
+  "sweeps/glass_frost/elevation=2.png": {
+    "edge_bands.bottom.baseline_srgb": {
+      "css": 0.7325,
+      "render": 0.7309,
+      "residual": true
+    },
+    "edge_bands.bottom.mean_delta_srgb": {
+      "css": 0.0896,
+      "render": 0.0188,
+      "residual": true
+    },
+    "edge_bands.bottom.peak_srgb": {
+      "css": 0.1106,
+      "render": 0.0248,
+      "residual": true
+    },
+    "edge_bands.bottom.width_mm": {
+      "css": 1.75,
+      "render": 0.5,
+      "residual": true
+    },
+    "edge_bands.left.baseline_srgb": {
+      "css": 0.8711,
+      "render": 0.9367,
+      "residual": true
+    },
+    "edge_bands.left.mean_delta_srgb": {
+      "css": 0.0047,
+      "render": -0.0239,
+      "residual": true
+    },
+    "edge_bands.left.peak_srgb": {
+      "css": 0.0053,
+      "render": -0.0286,
+      "residual": true
+    },
+    "edge_bands.left.width_mm": {
+      "css": 3.75,
+      "render": 0.5,
+      "residual": true
+    },
+    "edge_bands.right.baseline_srgb": {
+      "css": 0.875,
+      "render": 0.8309,
+      "residual": true
+    },
+    "edge_bands.right.mean_delta_srgb": {
+      "css": 0.0431,
+      "render": -0.0021,
+      "residual": true
+    },
+    "edge_bands.right.peak_srgb": {
+      "css": 0.0515,
+      "render": -0.0025,
+      "residual": true
+    },
+    "edge_bands.right.width_mm": {
+      "css": 1.5,
+      "render": 2.75,
+      "residual": true
+    },
+    "edge_bands.top.baseline_srgb": {
+      "css": 0.7298,
+      "render": 0.8146,
+      "residual": true
+    },
+    "edge_bands.top.mean_delta_srgb": {
+      "css": 0.0047,
+      "render": -0.0089,
+      "residual": true
+    },
+    "edge_bands.top.peak_srgb": {
+      "css": 0.0056,
+      "render": -0.0119,
+      "residual": true
+    },
+    "edge_bands.top.width_mm": {
+      "css": 3.75,
+      "render": 1.75,
+      "residual": true
+    },
+    "frost_blur.blur_sigma_mm": {
+      "css": 3.5,
+      "diff": 0.0,
+      "ok": true,
+      "render": 3.5,
+      "tol": 0.6
+    },
+    "frost_blur.step_srgb": {
+      "css": -0.5032,
+      "render": -0.3423,
+      "residual": true
+    },
+    "glass_tint.decal.srgb_pct": {
+      "css": 42.7418,
+      "render": 51.8689,
+      "residual": true
+    },
+    "glass_tint.interior.lstar": {
+      "css": 87.7937,
+      "diff": 0.0657,
+      "ok": true,
+      "render": 87.728,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 86.3108,
+      "diff": 0.0727,
+      "ok": true,
+      "render": 86.2381,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 89.5425,
+      "diff": 0.9485,
+      "ok": true,
+      "render": 90.491,
+      "tol": 3.0
+    }
+  },
+  "sweeps/glass_frost/elevation=3.png": {
+    "edge_bands.bottom.baseline_srgb": {
+      "css": 0.7387,
+      "render": 0.7475,
+      "residual": true
+    },
+    "edge_bands.bottom.mean_delta_srgb": {
+      "css": 0.0871,
+      "render": 0.0187,
+      "residual": true
+    },
+    "edge_bands.bottom.peak_srgb": {
+      "css": 0.1071,
+      "render": 0.0246,
+      "residual": true
+    },
+    "edge_bands.bottom.width_mm": {
+      "css": 1.75,
+      "render": 0.5,
+      "residual": true
+    },
+    "edge_bands.left.baseline_srgb": {
+      "css": 0.8834,
+      "render": 0.9331,
+      "residual": true
+    },
+    "edge_bands.left.mean_delta_srgb": {
+      "css": 0.0023,
+      "render": -0.0204,
+      "residual": true
+    },
+    "edge_bands.left.peak_srgb": {
+      "css": 0.0027,
+      "render": -0.0278,
+      "residual": true
+    },
+    "edge_bands.left.width_mm": {
+      "css": 3.5,
+      "render": 0.75,
+      "residual": true
+    },
+    "edge_bands.right.baseline_srgb": {
+      "css": 0.88,
+      "render": 0.8297,
+      "residual": true
+    },
+    "edge_bands.right.mean_delta_srgb": {
+      "css": 0.0393,
+      "render": 0.0052,
+      "residual": true
+    },
+    "edge_bands.right.peak_srgb": {
+      "css": 0.0486,
+      "render": 0.0074,
+      "residual": true
+    },
+    "edge_bands.right.width_mm": {
+      "css": 1.75,
+      "render": 2.25,
+      "residual": true
+    },
+    "edge_bands.top.baseline_srgb": {
+      "css": 0.7425,
+      "render": 0.8214,
+      "residual": true
+    },
+    "edge_bands.top.mean_delta_srgb": {
+      "css": 0.003,
+      "render": -0.0093,
+      "residual": true
+    },
+    "edge_bands.top.peak_srgb": {
+      "css": 0.0034,
+      "render": -0.0124,
+      "residual": true
+    },
+    "edge_bands.top.width_mm": {
+      "css": 3.5,
+      "render": 1.75,
+      "residual": true
+    },
+    "frost_blur.blur_sigma_mm": {
+      "css": 5.0,
+      "diff": 0.25,
+      "ok": true,
+      "render": 5.25,
+      "tol": 0.6
+    },
+    "frost_blur.step_srgb": {
+      "css": -0.499,
+      "render": -0.3155,
+      "residual": true
+    },
+    "glass_tint.decal.srgb_pct": {
+      "css": 48.0163,
+      "render": 58.298,
+      "residual": true
+    },
+    "glass_tint.interior.lstar": {
+      "css": 88.0951,
+      "diff": 1.7808,
+      "ok": true,
+      "render": 89.8759,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 86.6441,
+      "diff": 1.9747,
+      "ok": true,
+      "render": 88.6188,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 89.5425,
+      "diff": 1.041,
+      "ok": true,
+      "render": 90.5834,
+      "tol": 3.0
+    }
+  },
+  "sweeps/glass_frost/thickness=0.png": {
+    "edge_bands.bottom.baseline_srgb": {
+      "css": 0.6889,
+      "render": 0.6881,
+      "residual": true
+    },
+    "edge_bands.bottom.mean_delta_srgb": {
+      "css": 0.0,
+      "render": -0.0027,
+      "residual": true
+    },
+    "edge_bands.bottom.peak_srgb": {
+      "css": 0.0,
+      "render": -0.0034,
+      "residual": true
+    },
+    "edge_bands.bottom.width_mm": {
+      "css": 0.0,
+      "render": 0.5,
+      "residual": true
+    },
+    "edge_bands.left.baseline_srgb": {
+      "css": 0.8614,
+      "render": 0.8737,
+      "residual": true
+    },
+    "edge_bands.left.mean_delta_srgb": {
+      "css": 0.0,
+      "render": 0.0037,
+      "residual": true
+    },
+    "edge_bands.left.peak_srgb": {
+      "css": 0.0,
+      "render": 0.0047,
+      "residual": true
+    },
+    "edge_bands.left.width_mm": {
+      "css": 0.0,
+      "render": 1.25,
+      "residual": true
+    },
+    "edge_bands.right.baseline_srgb": {
+      "css": 0.8614,
+      "render": 0.8558,
+      "residual": true
+    },
+    "edge_bands.right.mean_delta_srgb": {
+      "css": 0.0,
+      "render": -0.0021,
+      "residual": true
+    },
+    "edge_bands.right.peak_srgb": {
+      "css": 0.0,
+      "render": -0.003,
+      "residual": true
+    },
+    "edge_bands.right.width_mm": {
+      "css": 0.0,
+      "render": 1.0,
+      "residual": true
+    },
+    "edge_bands.top.baseline_srgb": {
+      "css": 0.6889,
+      "render": 0.7031,
+      "residual": true
+    },
+    "edge_bands.top.mean_delta_srgb": {
+      "css": 0.0,
+      "render": 0.0017,
+      "residual": true
+    },
+    "edge_bands.top.peak_srgb": {
+      "css": 0.0,
+      "render": 0.0019,
+      "residual": true
+    },
+    "edge_bands.top.width_mm": {
+      "css": 0.0,
+      "render": 0.75,
+      "residual": true
+    },
+    "frost_blur.blur_sigma_mm": {
+      "css": 0.1,
+      "diff": 0.0,
+      "ok": true,
+      "render": 0.1,
+      "tol": 0.6
+    },
+    "frost_blur.step_srgb": {
+      "css": -0.6064,
+      "diff": 0.0171,
+      "ok": true,
+      "render": -0.5893,
+      "tol": 0.06
+    },
+    "glass_tint.decal.srgb_pct": {
+      "css": 25.7516,
+      "diff": 1.2593,
+      "ok": true,
+      "render": 27.011,
+      "tol": 3.0
+    },
+    "glass_tint.interior.lstar": {
+      "css": 87.6426,
+      "diff": 0.6438,
+      "ok": true,
+      "render": 88.2864,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 86.1438,
+      "diff": 0.7121,
+      "ok": true,
+      "render": 86.8559,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 89.5425,
+      "diff": 0.3505,
+      "ok": true,
+      "render": 89.893,
+      "tol": 3.0
+    }
+  },
+  "sweeps/glass_frost/thickness=2.png": {
+    "edge_bands.bottom.baseline_srgb": {
+      "css": 0.7412,
+      "render": 0.7475,
+      "residual": true
+    },
+    "edge_bands.bottom.mean_delta_srgb": {
+      "css": 0.0796,
+      "render": 0.0473,
+      "residual": true
+    },
+    "edge_bands.bottom.peak_srgb": {
+      "css": 0.1005,
+      "render": 0.0642,
+      "residual": true
+    },
+    "edge_bands.bottom.width_mm": {
+      "css": 1.75,
+      "render": 2.0,
+      "residual": true
+    },
+    "edge_bands.left.baseline_srgb": {
+      "css": 0.8297,
+      "render": 0.8472,
+      "residual": true
+    },
+    "edge_bands.left.mean_delta_srgb": {
+      "css": -0.051,
+      "render": -0.0629,
+      "residual": true
+    },
+    "edge_bands.left.peak_srgb": {
+      "css": -0.0663,
+      "render": -0.0754,
+      "residual": true
+    },
+    "edge_bands.left.width_mm": {
+      "css": 3.0,
+      "render": 3.75,
+      "residual": true
+    },
+    "edge_bands.right.baseline_srgb": {
+      "css": 0.8728,
+      "render": 0.8747,
+      "residual": true
+    },
+    "edge_bands.right.mean_delta_srgb": {
+      "css": 0.0386,
+      "render": 0.0326,
+      "residual": true
+    },
+    "edge_bands.right.peak_srgb": {
+      "css": 0.0475,
+      "render": 0.0387,
+      "residual": true
+    },
+    "edge_bands.right.width_mm": {
+      "css": 1.75,
+      "render": 3.5,
+      "residual": true
+    },
+    "edge_bands.top.baseline_srgb": {
+      "css": 0.7048,
+      "render": 0.7193,
+      "residual": true
+    },
+    "edge_bands.top.mean_delta_srgb": {
+      "css": -0.0319,
+      "render": -0.0446,
+      "residual": true
+    },
+    "edge_bands.top.peak_srgb": {
+      "css": -0.0402,
+      "render": -0.0534,
+      "residual": true
+    },
+    "edge_bands.top.width_mm": {
+      "css": 2.75,
+      "render": 3.75,
+      "residual": true
+    },
+    "frost_blur.blur_sigma_mm": {
+      "css": 1.15,
+      "diff": 0.05,
+      "ok": true,
+      "render": 1.2,
+      "tol": 0.6
+    },
+    "frost_blur.step_srgb": {
+      "css": -0.4872,
+      "diff": 0.0334,
+      "ok": true,
+      "render": -0.4538,
+      "tol": 0.06
+    },
+    "glass_tint.decal.srgb_pct": {
+      "css": 38.0011,
+      "diff": 2.3039,
+      "ok": true,
+      "render": 40.305,
+      "tol": 3.0
+    },
+    "glass_tint.interior.lstar": {
+      "css": 87.9973,
+      "diff": 0.1775,
+      "ok": true,
+      "render": 87.8198,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 86.5359,
+      "diff": 0.1963,
+      "ok": true,
+      "render": 86.3396,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 89.5425,
+      "diff": 0.6302,
+      "ok": true,
+      "render": 90.1727,
+      "tol": 3.0
+    }
+  },
+  "sweeps/glass_shadow/elevation=1.png": {
+    "glass_tint.interior.lstar": {
+      "css": 87.9453,
+      "diff": 0.845,
+      "ok": true,
+      "render": 87.1002,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 86.4784,
+      "diff": 0.9337,
+      "ok": true,
+      "render": 85.5447,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 89.5425,
+      "diff": 0.779,
+      "ok": true,
+      "render": 90.3214,
+      "tol": 3.0
+    },
+    "hollow_shadow.bottom.hm_mm": {
+      "css": 11.875,
+      "diff": 1.0,
+      "ok": true,
+      "render": 12.875,
+      "tol": 1.5
+    },
+    "hollow_shadow.bottom.near_alpha": {
+      "css": 0.099,
+      "diff": 0.0086,
+      "ok": true,
+      "render": 0.0905,
+      "tol": 0.04
+    },
+    "hollow_shadow.bottom.peak_alpha": {
+      "css": 0.1953,
+      "diff": 0.0194,
+      "ok": true,
+      "render": 0.1759,
+      "tol": 0.06
+    },
+    "hollow_shadow.bottom.peak_d_mm": {
+      "css": 7.625,
+      "diff": 0.5,
+      "ok": true,
+      "render": 8.125,
+      "tol": 2.0
+    },
+    "hollow_shadow.bottom.v_ref": {
+      "css": 0.8954,
+      "diff": 0.0077,
+      "ok": true,
+      "render": 0.9031,
+      "tol": 0.04
+    },
+    "hollow_shadow.right.hm_mm": {
+      "css": 11.875,
+      "diff": 1.0,
+      "ok": true,
+      "render": 12.875,
+      "tol": 1.5
+    },
+    "hollow_shadow.right.near_alpha": {
+      "css": 0.099,
+      "diff": 0.0095,
+      "ok": true,
+      "render": 0.0895,
+      "tol": 0.04
+    },
+    "hollow_shadow.right.peak_alpha": {
+      "css": 0.1953,
+      "diff": 0.0203,
+      "ok": true,
+      "render": 0.175,
+      "tol": 0.06
+    },
+    "hollow_shadow.right.peak_d_mm": {
+      "css": 7.625,
+      "diff": 0.5,
+      "ok": true,
+      "render": 8.125,
+      "tol": 2.0
+    },
+    "hollow_shadow.right.v_ref": {
+      "css": 0.8954,
+      "diff": 0.0077,
+      "ok": true,
+      "render": 0.9031,
+      "tol": 0.04
+    }
+  },
+  "sweeps/glass_shadow/elevation=2.png": {
+    "glass_tint.interior.lstar": {
+      "css": 88.3219,
+      "diff": 0.7364,
+      "ok": true,
+      "render": 87.5855,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 86.8951,
+      "diff": 0.8145,
+      "ok": true,
+      "render": 86.0806,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 89.5425,
+      "diff": 1.0299,
+      "ok": true,
+      "render": 90.5724,
+      "tol": 3.0
+    },
+    "hollow_shadow.bottom.hm_mm": {
+      "css": 19.875,
+      "diff": 1.5,
+      "ok": true,
+      "render": 21.375,
+      "tol": 1.5
+    },
+    "hollow_shadow.bottom.near_alpha": {
+      "css": 0.0905,
+      "diff": 0.0132,
+      "ok": true,
+      "render": 0.1037,
+      "tol": 0.04
+    },
+    "hollow_shadow.bottom.peak_alpha": {
+      "css": 0.1613,
+      "diff": 0.0125,
+      "ok": true,
+      "render": 0.1737,
+      "tol": 0.06
+    },
+    "hollow_shadow.bottom.peak_d_mm": {
+      "css": 12.875,
+      "diff": 0.5,
+      "ok": true,
+      "render": 13.375,
+      "tol": 2.0
+    },
+    "hollow_shadow.bottom.v_ref": {
+      "css": 0.8954,
+      "diff": 0.0104,
+      "ok": true,
+      "render": 0.9058,
+      "tol": 0.04
+    },
+    "hollow_shadow.right.hm_mm": {
+      "css": 19.875,
+      "diff": 1.5,
+      "ok": true,
+      "render": 21.375,
+      "tol": 1.5
+    },
+    "hollow_shadow.right.near_alpha": {
+      "css": 0.0905,
+      "diff": 0.0116,
+      "ok": true,
+      "render": 0.1021,
+      "tol": 0.04
+    },
+    "hollow_shadow.right.peak_alpha": {
+      "css": 0.1613,
+      "diff": 0.0123,
+      "ok": true,
+      "render": 0.1736,
+      "tol": 0.06
+    },
+    "hollow_shadow.right.peak_d_mm": {
+      "css": 12.875,
+      "diff": 0.25,
+      "ok": true,
+      "render": 13.125,
+      "tol": 2.0
+    },
+    "hollow_shadow.right.v_ref": {
+      "css": 0.8954,
+      "diff": 0.0104,
+      "ok": true,
+      "render": 0.9058,
+      "tol": 0.04
+    }
+  },
+  "sweeps/glass_shadow/elevation=3.png": {
+    "glass_tint.interior.lstar": {
+      "css": 88.9626,
+      "diff": 0.1185,
+      "ok": true,
+      "render": 88.8441,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 87.6051,
+      "diff": 0.1314,
+      "ok": true,
+      "render": 87.4737,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 89.5425,
+      "diff": 1.1113,
+      "ok": true,
+      "render": 90.6538,
+      "tol": 3.0
+    },
+    "hollow_shadow.bottom.hm_mm": {
+      "css": 21.875,
+      "diff": 0.0,
+      "ok": true,
+      "render": 21.875,
+      "tol": 1.5
+    },
+    "hollow_shadow.bottom.near_alpha": {
+      "css": 0.0725,
+      "diff": 0.0213,
+      "ok": true,
+      "render": 0.0938,
+      "tol": 0.04
+    },
+    "hollow_shadow.bottom.peak_alpha": {
+      "css": 0.1327,
+      "diff": 0.021,
+      "ok": true,
+      "render": 0.1537,
+      "tol": 0.06
+    },
+    "hollow_shadow.bottom.peak_d_mm": {
+      "css": 18.875,
+      "diff": 1.0,
+      "ok": true,
+      "render": 17.875,
+      "tol": 2.0
+    },
+    "hollow_shadow.bottom.v_ref": {
+      "css": 0.8954,
+      "diff": 0.0112,
+      "ok": true,
+      "render": 0.9066,
+      "tol": 0.04
+    },
+    "hollow_shadow.right.hm_mm": {
+      "css": 21.875,
+      "diff": 0.0,
+      "ok": true,
+      "render": 21.875,
+      "tol": 1.5
+    },
+    "hollow_shadow.right.near_alpha": {
+      "css": 0.0724,
+      "diff": 0.0201,
+      "ok": true,
+      "render": 0.0925,
+      "tol": 0.04
+    },
+    "hollow_shadow.right.peak_alpha": {
+      "css": 0.1327,
+      "diff": 0.022,
+      "ok": true,
+      "render": 0.1548,
+      "tol": 0.06
+    },
+    "hollow_shadow.right.peak_d_mm": {
+      "css": 18.625,
+      "diff": 0.5,
+      "ok": true,
+      "render": 18.125,
+      "tol": 2.0
+    },
+    "hollow_shadow.right.v_ref": {
+      "css": 0.8954,
+      "diff": 0.0112,
+      "ok": true,
+      "render": 0.9066,
+      "tol": 0.04
+    }
+  },
+  "sweeps/glass_shadow/thickness=2.png": {
+    "glass_tint.interior.lstar": {
+      "css": 87.9973,
+      "diff": 0.2478,
+      "ok": true,
+      "render": 88.245,
+      "tol": 3.0
+    },
+    "glass_tint.interior.srgb_pct": {
+      "css": 86.5359,
+      "diff": 0.2742,
+      "ok": true,
+      "render": 86.8101,
+      "tol": 3.0
+    },
+    "glass_tint.ref.srgb_pct": {
+      "css": 89.5425,
+      "diff": 0.6607,
+      "ok": true,
+      "render": 90.2032,
+      "tol": 3.0
+    },
+    "hollow_shadow.bottom.hm_mm": {
+      "css": 10.125,
+      "diff": 1.25,
+      "ok": true,
+      "render": 8.875,
+      "tol": 1.5
+    },
+    "hollow_shadow.bottom.near_alpha": {
+      "css": 0.0861,
+      "diff": 0.0238,
+      "ok": true,
+      "render": 0.1099,
+      "tol": 0.04
+    },
+    "hollow_shadow.bottom.peak_alpha": {
+      "css": 0.2241,
+      "diff": 0.0124,
+      "ok": true,
+      "render": 0.2117,
+      "tol": 0.06
+    },
+    "hollow_shadow.bottom.peak_d_mm": {
+      "css": 6.375,
+      "diff": 1.0,
+      "ok": true,
+      "render": 5.375,
+      "tol": 2.0
+    },
+    "hollow_shadow.bottom.v_ref": {
+      "css": 0.8954,
+      "diff": 0.0066,
+      "ok": true,
+      "render": 0.9021,
+      "tol": 0.04
+    },
+    "hollow_shadow.right.hm_mm": {
+      "css": 10.125,
+      "diff": 1.25,
+      "ok": true,
+      "render": 8.875,
+      "tol": 1.5
+    },
+    "hollow_shadow.right.near_alpha": {
+      "css": 0.0865,
+      "diff": 0.0243,
+      "ok": true,
+      "render": 0.1108,
+      "tol": 0.04
+    },
+    "hollow_shadow.right.peak_alpha": {
+      "css": 0.2241,
+      "diff": 0.0129,
+      "ok": true,
+      "render": 0.2112,
+      "tol": 0.06
+    },
+    "hollow_shadow.right.peak_d_mm": {
+      "css": 6.375,
+      "diff": 1.0,
+      "ok": true,
+      "render": 5.375,
+      "tol": 2.0
+    },
+    "hollow_shadow.right.v_ref": {
+      "css": 0.8954,
+      "diff": 0.0066,
+      "ok": true,
+      "render": 0.9021,
+      "tol": 0.04
     }
   },
   "sweeps/groove/fill_light_intensity=0.3.png": {

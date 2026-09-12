@@ -54,8 +54,20 @@ TOLERANCES = {
     "delta_end_srgb": 0.022,   # render keeps the ~1.4% ambient plate
     "delta_mid_srgb": 0.022,   # gradient the CSS doesn't paint
     "center_srgb_pct": 3.0,
+    # glass: the frost blur's Gaussian sigma (mm = CSS px of blur()),
+    # and the veil gradient along the light axis
+    "blur_sigma_mm": 0.6,
+    "step_srgb": 0.06,        # stripe contrast through the pane
+    "lit_delta_srgb": 0.03,
+    "far_delta_srgb": 0.03,
+    "mid_srgb": 0.03,
+    # glass drop shadow (hollow_shadow): the ring's peak reuses
+    # peak_alpha, its reach reuses hm_mm
+    "near_alpha": 0.04,
+    "peak_d_mm": 2.0,
 }
-SKIP_KEYS = {"noise", "floor_over_ref", "kind"}
+SKIP_KEYS = {"noise", "floor_over_ref", "kind", "r2", "edge_x_mm", "sigma_out_mm",
+             "halo_alpha"}
 
 
 def flatten(d, prefix=""):
@@ -152,6 +164,42 @@ def main():
                     frame_report[f"{metric}.{key}"] = {
                         "render": round(float(tv), 4) if not isinstance(tv, list) else None,
                         "css": round(float(got[key]), 4) if not isinstance(got[key], list) else None,
+                        "residual": True,
+                    }
+                    continue
+                # glass, residual-only cases. (1) Edge bands on the
+                # striped frost frames: the stripe runs into the top and
+                # bottom bands' lateral average and, elevated, the pane's
+                # wall shadow leaves the band zone altogether — the
+                # clean glass sweep gates the edges. (2) Band WIDTHS over
+                # the dark field: there the far glow is a 0.75 mm
+                # hairline over a skirt, which one gradient profile
+                # cannot be at the same time as the 2 mm band it is over
+                # a light backdrop; amplitudes still gate. (3) The stripe
+                # seen through an ELEVATED pane: the render's transmission
+                # lobe has GGX tails that lift the stripe's centre far
+                # more than a Gaussian of the fitted core sigma does, so
+                # its depth (step, decal tone) is inexpressible in
+                # blur(); the core sigma gates.
+                # (4) The far-edge glow over the dark field: additive
+                # beyond any wash (L_beta 1.35 when solved), the CSS's
+                # white wash is set for the light ground and overshoots
+                # here — amplitude residual on the far edges only.
+                _, far_edges = lit_edges(a)
+                if metric == "edge_bands" and (
+                        rel.startswith("sweeps/glass_frost/") or
+                        (rel.startswith("sweeps/glass_dark/") and
+                         (leaf == "width_mm" or
+                          key.split(".", 1)[0] in far_edges))):
+                    frame_report[f"{metric}.{key}"] = {
+                        "render": round(tv, 4), "css": round(got[key], 4),
+                        "residual": True,
+                    }
+                    continue
+                if (a["mat"] == "glass" and a["elevation"] > 0 and
+                        key in ("decal.srgb_pct", "step_srgb")):
+                    frame_report[f"{metric}.{key}"] = {
+                        "render": round(tv, 4), "css": round(got[key], 4),
                         "residual": True,
                     }
                     continue

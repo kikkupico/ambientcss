@@ -12,6 +12,8 @@ CIE L* (perceptual), computed from the final PNG pixels — the same color
 space a browser composits in.
 """
 
+import math
+
 import numpy as np
 from PIL import Image
 
@@ -646,6 +648,225 @@ def groove(img, meta):
     }
 
 
+# ------------------------------------------------------------- glass ---
+
+def _decals(meta):
+    return (meta.get("plate") or {}).get("decals") or []
+
+
+def _frost_stripe(meta):
+    """The frost stripe decal (a decal narrower than the plate), or None."""
+    hw = meta["plate"]["size"][0] / 2
+    for d in _decals(meta):
+        x0, y0, x1, y1 = d["rect"]
+        if x1 - x0 < 2 * hw:
+            return d
+    return None
+
+
+def _erf(x):
+    return np.vectorize(math.erf)(x)
+
+
+def glass_tint(img, meta):
+    """Tones seen THROUGH a glass plate, plus the bare ground beside it.
+
+    `interior` is the plate's clear-ground interior (well inside every
+    edge band, and left of the frost stripe when one is present);
+    `decal` is the stripe's own tone under the plate (present only on
+    striped frames); `ref` is the mean of the two unshadowed-ground
+    reference samples from reference_layout. On a bare-ground reference
+    frame (builder "ground") the same regions read the backdrop itself,
+    so a glass frame minus its reference isolates the pane.
+
+    The fit (measure/fit.py fit_glass) solves the pane as
+    `out = T * backdrop + V` from the light-ground and dark-field sweeps —
+    the exact shape a CSS translucent background-color composites in sRGB
+    (T = 1 - alpha, V = alpha * lightness) — so everything here is raw
+    sRGB, in the percent points surface_lightness reports."""
+    f = Frame(img, meta)
+    stripe = _frost_stripe(meta)
+    x1 = min(30.0, stripe["rect"][0] - 6.0) if stripe else 30.0
+    interior = f.region(-30.0, x1, -30.0, 30.0)
+    layout = reference_layout(f.amb, f.plate_w, f.plate_d)
+    refs = []
+    for key in ("ref_a", "ref_b"):
+        sx, sy = layout[key]
+        refs.append(f.region(sx - 4, sx + 4, sy - 4, sy + 4).mean())
+    out = {
+        "interior": {"srgb_pct": float(interior.mean()) * 100.0,
+                     "lstar": float(srgb_to_lstar(interior.mean())),
+                     "noise": float(interior.std())},
+        "ref": {"srgb_pct": float(np.mean(refs)) * 100.0},
+    }
+    if stripe:
+        sx0, _, sx1, _ = stripe["rect"]
+        band = f.region(sx0 + 2.0, sx1 - 2.0, -30.0, 30.0)
+        out["decal"] = {"srgb_pct": float(band.mean()) * 100.0}
+    return out
+
+
+def frost_blur(img, meta):
+    """Blur of the frost stripe seen through the plate: the Gaussian
+    sigma (mm = CSS px, the unit backdrop-filter: blur() takes) of the
+    stripe's known box profile convolved with a Gaussian — a difference
+    of two error functions at the stripe's edges — fitted to the
+    row-averaged profile across the stripe, with a free linear baseline
+    so the pane's own lit-to-far gradient does not masquerade as blur.
+    Fitting the whole box rather than one edge keeps the model honest
+    once the blur is wider than the stripe (an elevated pane): a single
+    step then has no plateau to lock its height to. The window stops
+    2 mm inside the plate's far edge, where the stripe reappears sharp.
+    `sigma_out_mm` is the same fit on the stripe beyond the plate (reads
+    as the render's own pixel antialiasing) — a sanity residual."""
+    f = Frame(img, meta)
+    stripe = _frost_stripe(meta)
+    if stripe is None:
+        raise ValueError("frost_blur needs a stripe decal")
+    x0, _, x1, _ = stripe["rect"]
+    hw, hd = f.plate_w / 2, f.plate_d / 2
+    lo, hi = x0 - 14.0, min(x1 + 14.0, hw - 2.0)
+
+    def fit(y0, y1):
+        rows = f.region(lo, hi, y0, y1).mean(axis=0)
+        xs = np.arange(len(rows)) / f.s + lo + 0.5 / f.s
+        sigmas = np.concatenate([np.arange(0.1, 3.0, 0.05),
+                                 np.arange(3.0, 16.0, 0.25)])
+        best = None
+        for sig in sigmas:
+            for dx in np.arange(-1.0, 1.01, 0.1):
+                k = sig * math.sqrt(2.0)
+                box = 0.5 * (_erf((xs - (x0 + dx)) / k) -
+                             _erf((xs - (x1 + dx)) / k))
+                A = np.stack([np.ones_like(xs), box, xs - x0], axis=1)
+                c, *_ = np.linalg.lstsq(A, rows, rcond=None)
+                res = float(((A @ c - rows) ** 2).sum())
+                if best is None or res < best[0]:
+                    best = (res, float(sig), float(dx), c)
+        res, sig, dx, c = best
+        ss = float(((rows - rows.mean()) ** 2).sum())
+        return {"blur_sigma_mm": sig, "edge_x_mm": x0 + dx,
+                "step_srgb": float(c[1]),
+                "r2": 1.0 - res / ss if ss > 0 else 0.0}
+
+    inside = fit(-12.0, 12.0)
+    outside = fit(hd + 10.0, hd + 20.0)
+    inside["sigma_out_mm"] = outside["blur_sigma_mm"]
+    return inside
+
+
+def plate_profile(img, meta):
+    """Lightness profile through the plate center ALONG THE LIGHT
+    DIRECTION, index 0 = lit end, spanning +-0.9 of the distance from the
+    center to the plate's edge in that direction (stopping 4 mm short of
+    the silhouette, whose bands edge_bands owns). Each sample is the mean
+    across a +-3 mm band perpendicular to the axis. Summaries: the lit
+    and far sixths against the middle third, in sRGB — what a gradient
+    along the light axis has to reproduce. Raw (not baseline-relative):
+    the fit subtracts a matched bare-ground frame."""
+    f = Frame(img, meta)
+    hw, hd = f.plate_w / 2, f.plate_d / 2
+    lx, ly = f.amb["light_x"], f.amb["light_y"]
+    if lx == 0 and ly == 0:
+        lx, ly = -1.0, -1.0
+    norm = np.hypot(lx, ly)
+    ux, uy = lx / norm, ly / norm    # from center toward the lit edge
+    vx, vy = -uy, ux                 # perpendicular
+    reach = min(hw / abs(ux) if ux else np.inf, hd / abs(uy) if uy else np.inf)
+
+    n = 61
+    half = f.frame_mm / 2
+    ts = np.linspace(-0.9, 0.9, n) * reach
+    lat = np.linspace(-3.0, 3.0, 7)
+    prof = np.zeros(n)
+    for off in lat:
+        sx = ux * ts + vx * off
+        sy = uy * ts + vy * off
+        rows = (sy + half) * f.s
+        cols = (sx + half) * f.s
+        r0 = np.clip(rows.astype(int), 0, f.img.shape[0] - 2)
+        c0 = np.clip(cols.astype(int), 0, f.img.shape[1] - 2)
+        fr, fc = rows - r0, cols - c0
+        prof += ((1 - fr) * (1 - fc) * f.img[r0, c0] +
+                 (1 - fr) * fc * f.img[r0, c0 + 1] +
+                 fr * (1 - fc) * f.img[r0 + 1, c0] +
+                 fr * fc * f.img[r0 + 1, c0 + 1])
+    prof = prof[::-1] / len(lat)     # index 0 = lit end
+    mid = float(prof[n // 3: 2 * n // 3].mean())
+    return {
+        "profile_srgb": [round(float(v), 4) for v in prof],
+        "lit_delta_srgb": float(prof[: n // 6].mean()) - mid,
+        "far_delta_srgb": float(prof[-(n // 6):].mean()) - mid,
+        "mid_srgb": mid,
+    }
+
+
+def _erf_np(x):
+    """Vectorized erf (Abramowitz & Stegun 7.1.26, |err| < 1.5e-7)."""
+    x = np.asarray(x, dtype=np.float64)
+    sign = np.sign(x)
+    ax = np.abs(x)
+    t = 1.0 / (1.0 + 0.3275911 * ax)
+    poly = t * (0.254829592 + t * (-0.284496736 + t * (1.421413741 +
+                t * (-1.453152027 + t * 1.061405429))))
+    return sign * (1.0 - poly * np.exp(-ax * ax))
+
+
+def hollow_shadow(img, meta):
+    """A frosted pane's drop shadow, from the outward profile beyond each
+    FAR edge (the edges the light points at). It is not an opaque
+    plate's filled square: the pane's flat faces pass the key straight
+    through (diffused, but nearly all of it), so the shadow's interior is
+    only a few percent deep, and what darkens the ground is a RING riding
+    the body's projected silhouette — the walls' shadow plus the light
+    the edges refract sideways — blurring wider as the pane lifts. Per
+    far edge, alpha(d) = 1 - v(d) / v_ref outward from the plate edge:
+    `near_alpha` (the first 1 mm: the shadow interior once the pane has
+    lifted past its own edge), `peak_alpha` and `peak_d_mm` (the ring),
+    `hm_mm` (outermost half-max crossing, as drop_shadow reports it) and
+    `halo_alpha` (the most negative alpha past the peak: the faint bright
+    halo of light exiting the far walls). v_ref comes from
+    reference_layout's unshadowed pockets, as drop_shadow's does."""
+    from measure.fit import lit_edges   # local: fit imports metrics
+    f = Frame(img, meta)
+    hw, hd = f.plate_w / 2, f.plate_d / 2
+    half = f.frame_mm / 2
+    reach = half - max(hw, hd) - 2.0
+    lat = min(hw, hd) * 0.6
+    layout = reference_layout(f.amb, f.plate_w, f.plate_d)
+    refs = [float(f.region(cx - 3, cx + 3, cy - 3, cy + 3).mean())
+            for cx, cy in (layout["ref_a"], layout["ref_b"])]
+    v_ref = float(np.mean(refs))
+    edges = {
+        "left":   (f.region(-hw - reach, -hw, -lat, lat).mean(axis=0), True),
+        "right":  (f.region(hw, hw + reach, -lat, lat).mean(axis=0), False),
+        "top":    (f.region(-lat, lat, -hd - reach, -hd).mean(axis=1), True),
+        "bottom": (f.region(-lat, lat, hd, hd + reach).mean(axis=1), False),
+    }
+    _, far = lit_edges(f.amb)
+    out = {}
+    for name in far:
+        profile, flip = edges[name]
+        if flip:
+            profile = profile[::-1]
+        skip = max(1, int(round(0.5 * f.s)))
+        prof = profile[skip:]
+        d = (np.arange(len(prof)) + skip + 0.5) / f.s
+        alpha = 1.0 - prof / v_ref
+        i = int(np.argmax(alpha))
+        peak = float(alpha[i])
+        above = np.nonzero(alpha >= peak / 2)[0]
+        hm = float(d[above[-1]]) if len(above) else 0.0
+        past = alpha[i:]
+        halo = float(past.min())
+        out[name] = {
+            "near_alpha": float(alpha[d <= 1.5].mean()),
+            "peak_alpha": peak, "peak_d_mm": float(d[i]), "hm_mm": hm,
+            "halo_alpha": halo, "v_ref": v_ref,
+        }
+    return out
+
+
 EXTRACTORS = {
     "surface_lightness": surface_lightness,
     "edge_bands": edge_bands,
@@ -657,4 +878,8 @@ EXTRACTORS = {
     "grain_texture": grain_texture,
     "glow": glow,
     "groove": groove,
+    "glass_tint": glass_tint,
+    "frost_blur": frost_blur,
+    "plate_profile": plate_profile,
+    "hollow_shadow": hollow_shadow,
 }

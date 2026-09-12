@@ -241,6 +241,15 @@
   --amb-thickness: 1;
 }
 
+/* Frosted glass is a slab too: its veil is lit through its walls and its
+   edge bands are what the walls do to the light, so the class defaults
+   to thickness 1 the same way (a thickness-0 pane is a film: a faint
+   attenuator with no bands). Declared here for the same cascade reason;
+   the look itself lives in the .amb-mat-glass rule under MATERIALS. */
+.amb-mat-glass {
+  --amb-thickness: 1;
+}
+
 /* --------------------------------------------------------------------------
    THICKNESS LEVELS
 
@@ -289,10 +298,13 @@
   --_amb-sh-gate: max(0, min(var(--amb-elevation) + var(--amb-thickness), 1));
   --_amb-body-gate: max(0, min(var(--amb-thickness), 1));
   --_amb-sweep-a: calc(
-    var(--_amb-sh-gate) * var(--_amb-body-gate) *
+    var(--_amb-sh-gate) * var(--_amb-body-gate) * var(--_amb-sh-gain, 1) *
       max(0, 1 - var(--amb-elevation) / 3) *
       (var(--amb-thickness) * 0.02 + 0.047)
   );
+  /* --_amb-sh-gain scales every filled shadow layer (default 1). A
+     material that lets light through sets it below 1 and paints what
+     the body's walls do on its own — see .amb-mat-glass. */
   /* Drop shadow, grounded (ambient3d/derived/notes/shadow.md): the umbra
      is the silhouette projection SWEPT from the body's bottom (elevation)
      to its top (elevation + thickness) — at rest a smooth wedge hugging
@@ -312,7 +324,7 @@
         var(--amb-light-saturation)
         0%
         / calc(
-            var(--_amb-sh-gate) *
+            var(--_amb-sh-gate) * var(--_amb-sh-gain, 1) *
               (
                 (var(--amb-key-light-intensity) - var(--amb-fill-light-intensity))
                   * 0.13 + var(--amb-elevation) * -0.077 + 0.368 -
@@ -576,37 +588,234 @@
   --amb-mat-specular: 0.05;
   --amb-mat-roughness: 0.9;
   --amb-mat-opacity: 0;
-  /* Soft diffuse brightening — wide and faint, no sharp specular or env reflection */
-  --_shiny-angle: calc(atan2(var(--amb-light-y), var(--amb-light-x)) + 270deg);
-  --_spec-peak: var(--amb-key-light-intensity);
-  background-image:
-    linear-gradient(
-      var(--_shiny-angle),
-      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--_spec-peak) * 0.12)) 0%,
-      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--_spec-peak) * 0.06)) 40%,
-      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 75%,
-      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / 0) 100%
-    );
-  background-blend-mode: screen;
-  /* Glass layer — translucency + frosted blur, scaling with light */
-  --_glass-lightness: calc(var(--amb-key-light-intensity) * 100%);
-  --_glass-alpha: calc(0.05 + var(--amb-key-light-intensity) * 0.1);
-  --_glass-blur: calc(8px + var(--amb-key-light-intensity) * 8px);
+  /* Frosted glass, grounded (ambient3d/derived/notes/glass.md) on a clear
+     satin-both-faces slab (roughness 0.65, IOR 1.5) rendered over a
+     light ground, a dark field and a dark stripe. Four features, each
+     fitted on its own frames:
+
+     PANE. What the pane does to whatever is behind it is one sRGB
+     affine transfer, out = T * backdrop + V (R^2 0.92 for V; T is flat
+     within 0.03 across key, fill and light direction) — exactly what a
+     translucent background-color composites, with alpha = 1 - T and
+     lightness = V / alpha. The veil V rides BOTH lights (the pane is lit
+     through its walls); T barely moves. So the pane darkens a light
+     backdrop and lifts a dark one, toward a ~74% grey at the defaults —
+     not toward white: frosted glass is milky, not bright.
+
+     BODY. A sheet (thickness 0) is a near-pure 5% attenuator with almost
+     no veil — there are no walls to light it through; the veil needs a
+     body, and grows a further ~10% for a knob-scale slab. Like the edge
+     classes, the class defaults its thickness to 1 (declared with them,
+     above the .amb-thickness-* overrides); .amb-thickness-0 opts into a
+     frosted film.
+
+     BLUR. sigma = 0.19 px per px of elevation gap + 0.14 per px of
+     thickness (R^2 0.99, through the origin). A pane RESTING on its
+     backdrop hardly blurs it (0.6 px): the frost only smears what sits
+     at a distance, which is what makes the same pane read as glass when
+     it lifts. The old fixed 8-16 px blur, keyed to the light, had no
+     counterpart in the render.
+
+     EDGES. The slab's lit walls refract the key away from the ground
+     just inside them and pipe light into the glass there: a 4.5 px-wide
+     band (width scales with thickness) that is DARK over a light
+     backdrop and a bright hairline over a dark one — solved over both
+     backdrops, it is a 30% wash of a 53% grey painted over the pane.
+     Perpendicular edges carry half of it. It is a RESTING feature — the
+     wall's shadow falls on the ground directly under the wall — and is
+     gone by one level of elevation (the render reads +0.02 there), so
+     it fades out with elevation. The far walls glow: the key exits
+     through them, a band that is additive beyond any wash (L > 1 when
+     solved); painted as a 45% wash of white with a brighter 1 px core
+     (over a dark backdrop the glow is a hairline with a skirt). 45%
+     lands the glow at its measured height over the light ground — the
+     far edge reads brighter than the bare ground beside it — and about
+     three times it over the dark field, which the gate carries as a
+     residual; a UI pane sits on light surfaces far more often. It
+     stays when the pane lifts (the render keeps it at every
+     elevation). Both bands ride the key and recede with fill (fitted
+     per role, R^2 0.93 / 0.90). No specular
+     gradient across the interior: the light-axis excess is flat to
+     0.005 (r^2 0.15) — the old lit-edge sheen was not there. */
+  --_glass-body: max(0, min(var(--amb-thickness), 1));
+  --_glass-slab2: max(0, min(var(--amb-thickness) - 1, 1));
+  --_glass-alpha: calc(
+    (0.232 - var(--amb-fill-light-intensity) * 0.017) *
+      (0.245 + var(--_glass-body) * 0.755 + var(--_glass-slab2) * 0.09)
+  );
+  --_glass-veil: calc(
+    (
+        var(--amb-key-light-intensity) * 0.0509 +
+          var(--amb-fill-light-intensity) * 0.0424 + 0.0923 +
+          var(--amb-elevation) * 0.008
+      ) *
+      (0.09 + var(--_glass-body) * 0.91 + var(--_glass-slab2) * 0.11)
+  );
+  --_glass-lightness: calc(var(--_glass-veil) / var(--_glass-alpha) * 100%);
+  --_glass-blur: calc(
+    (var(--amb-elevation) * 1.51 + var(--amb-thickness) * 0.63) * 1px
+  );
+  /* Edge roles from the light: s = +1 for a wall facing the lamp, 0 for a
+     wall parallel to it, -1 for the far wall. The lit wash is 1 at s=1,
+     1/2 at s=0, 0 at s=-1; the far glow is (-s)+. */
+  --_glass-s-left: max(-1, min(1, -1 * var(--amb-light-x)));
+  --_glass-s-right: max(-1, min(1, var(--amb-light-x)));
+  --_glass-s-top: max(-1, min(1, -1 * var(--amb-light-y)));
+  --_glass-s-bottom: max(-1, min(1, var(--amb-light-y)));
+  --_glass-lit-a: calc(
+    0.303 * var(--_glass-body) * max(0, 1 - var(--amb-elevation)) *
+      max(0, var(--amb-key-light-intensity) * 0.81 -
+        var(--amb-fill-light-intensity) * 0.21 + 0.42)
+  );
+  --_glass-far-a: calc(
+    0.45 * var(--_glass-body) *
+      max(0, var(--amb-key-light-intensity) * 1.13 -
+        var(--amb-fill-light-intensity) * 0.1 + 0.06)
+  );
+  --_glass-band-w: calc(var(--amb-thickness) * 4.5px);
+  --_glass-glow-w: calc(var(--amb-thickness) * 3.5px);
+  /* SHADOW. Light goes through the pane, so its drop shadow is not the
+     opaque plate's filled square. Measured beyond the far edges
+     (hollow_shadow): a shallow interior — the diffused key minus the
+     pane's transmission loss, ~0.10 alpha at every elevation where the
+     opaque model fades from 0.32 to 0.16 — and, riding the body's
+     projected silhouette, a RING (the walls' shadow plus the light the
+     edges refract sideways) peaking at 0.20 alpha at rest and blurring
+     wider as the pane lifts (centre 5.2px per level of elevation +
+     2.7px per level of thickness; bump sigma ~1.5 + 1.4*elevation +
+     0.5*thickness px). The interior is the .ambient layers scaled by
+     --_amb-sh-gain; the ring is the ::after below. */
+  --_amb-sh-gain: calc(0.12 + var(--amb-elevation) * 0.12);
+  /* Everything the ring pseudo needs is computed HERE: --amb-elevation
+     is a registered, non-inheriting property, so inside ::after it reads
+     as 0 (the private vars below inherit like any custom property). */
+  --_glass-ring-lift: calc(0.25 * max(0, min(var(--amb-elevation), 1)));   /* lit/parallel sides land under the pane and are seen through it */
+  --_glass-ring-a: calc((0.2 + var(--amb-elevation) * 0.04) * var(--_glass-body));
+  --_glass-ring-w: calc(var(--amb-thickness) * 4px);   /* whole px: Chrome floors fractional border widths */
+  --_glass-ring-blur: calc(
+    (0.9 + var(--amb-elevation) * 1.7 + max(0, var(--amb-thickness) - 1) * 0.5) * 1px
+  );
+  --_glass-skirt-blur: calc((6 + var(--amb-elevation) * 5) * 1px);
+  --_glass-skirt-a: calc(
+    var(--_glass-body) * var(--_glass-ring-lift) *
+      (0.12 + min(var(--amb-elevation), 2) * 0.12)
+  );
+  --_glass-sh-x: calc(
+    var(--amb-light-x) * -1 *
+      (var(--amb-elevation) * 5.16px + var(--amb-thickness) * 5.12px)
+  );
+  --_glass-sh-y: calc(
+    var(--amb-light-y) * -1 *
+      (var(--amb-elevation) * 5.16px + var(--amb-thickness) * 5.12px)
+  );
   background-color: hsl(
     var(--amb-light-hue) var(--amb-light-saturation)
     var(--_glass-lightness) / var(--_glass-alpha)
   );
+  background-image:
+    linear-gradient(
+      to right,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 53% / calc(var(--_glass-lit-a) * (0.5 + var(--_glass-s-left) * 0.5))) 0,
+      transparent var(--_glass-band-w)
+    ),
+    linear-gradient(
+      to left,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 53% / calc(var(--_glass-lit-a) * (0.5 + var(--_glass-s-right) * 0.5))) 0,
+      transparent var(--_glass-band-w)
+    ),
+    linear-gradient(
+      to bottom,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 53% / calc(var(--_glass-lit-a) * (0.5 + var(--_glass-s-top) * 0.5))) 0,
+      transparent var(--_glass-band-w)
+    ),
+    linear-gradient(
+      to top,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 53% / calc(var(--_glass-lit-a) * (0.5 + var(--_glass-s-bottom) * 0.5))) 0,
+      transparent var(--_glass-band-w)
+    ),
+    linear-gradient(
+      to right,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--_glass-far-a) * 0.6 * max(0, -1 * var(--_glass-s-left)))) 0,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--_glass-far-a) * max(0, -1 * var(--_glass-s-left)))) 0.75px,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--_glass-far-a) * 0.55 * max(0, -1 * var(--_glass-s-left)))) 1.75px,
+      transparent var(--_glass-glow-w)
+    ),
+    linear-gradient(
+      to left,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--_glass-far-a) * 0.6 * max(0, -1 * var(--_glass-s-right)))) 0,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--_glass-far-a) * max(0, -1 * var(--_glass-s-right)))) 0.75px,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--_glass-far-a) * 0.55 * max(0, -1 * var(--_glass-s-right)))) 1.75px,
+      transparent var(--_glass-glow-w)
+    ),
+    linear-gradient(
+      to bottom,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--_glass-far-a) * 0.6 * max(0, -1 * var(--_glass-s-top)))) 0,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--_glass-far-a) * max(0, -1 * var(--_glass-s-top)))) 0.75px,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--_glass-far-a) * 0.55 * max(0, -1 * var(--_glass-s-top)))) 1.75px,
+      transparent var(--_glass-glow-w)
+    ),
+    linear-gradient(
+      to top,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--_glass-far-a) * 0.6 * max(0, -1 * var(--_glass-s-bottom)))) 0,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--_glass-far-a) * max(0, -1 * var(--_glass-s-bottom)))) 0.75px,
+      hsl(var(--amb-light-hue) var(--amb-light-saturation) 100% / calc(var(--_glass-far-a) * 0.55 * max(0, -1 * var(--_glass-s-bottom)))) 1.75px,
+      transparent var(--_glass-glow-w)
+    );
   /* Unprefixed ONLY: the build (lightningcss, scripts/build-css.mjs)
      autoprefixes this itself against the browser targets. A hand-written
      -webkit- copy AFTER this line is not redundant but destructive — the
      minifier collapses the pair to the last one it sees and ships the
      prefixed form alone, which current Chrome no longer accepts, leaving
      glass with no backdrop blur at all in the built package. */
-  backdrop-filter: blur(var(--_glass-blur)) saturate(160%);
-  border: 1px solid hsl(
-    var(--amb-light-hue) var(--amb-light-saturation) 100% /
-    calc(0.1 + var(--amb-key-light-intensity) * 0.15)
-  );
+  backdrop-filter: blur(var(--_glass-blur));
+  /* the ring pseudo needs a stacking context to sit behind the pane's
+     own paint (backdrop-filter already makes one; stated for browsers
+     without it) */
+  isolation: isolate;
+}
+
+/* Positioned at zero specificity, for the same reason the relief
+   materials are (see :where(.amb-mat-brushed) below): a host that
+   positions itself keeps its own. */
+:where(.amb-mat-glass) {
+  position: relative;
+}
+
+/* The shadow RING: a blurred hollow frame the pane's size, displaced
+   toward the shadow side by the ring's fitted centre, its border 3.8px
+   per level of thickness (the walls' projected sweep, the same 3.8px
+   the .ambient far layer offsets by) at a plateau alpha that reproduces
+   the measured bump peak through that width and blur. Per side it is
+   full on the far walls; on the lit and parallel walls it lands under
+   the pane, where at rest the fitted edge bands already ARE the walls'
+   shadow seen through the glass, so those sides fade in only as the
+   pane lifts and the lit wash fades out. Painted over the pane's wash
+   rather than through it (a negative z-index child paints after its
+   parent's background) — a small residual under the pane itself. */
+.amb-mat-glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: inherit;
+  border-style: solid;
+  border-width: var(--_glass-ring-w);
+  border-left-color: hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% /
+    calc(var(--_glass-ring-a) * (max(0, -1 * var(--_glass-s-left)) + (1 - max(0, -1 * var(--_glass-s-left))) * var(--_glass-ring-lift))));
+  border-right-color: hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% /
+    calc(var(--_glass-ring-a) * (max(0, -1 * var(--_glass-s-right)) + (1 - max(0, -1 * var(--_glass-s-right))) * var(--_glass-ring-lift))));
+  border-top-color: hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% /
+    calc(var(--_glass-ring-a) * (max(0, -1 * var(--_glass-s-top)) + (1 - max(0, -1 * var(--_glass-s-top))) * var(--_glass-ring-lift))));
+  border-bottom-color: hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% /
+    calc(var(--_glass-ring-a) * (max(0, -1 * var(--_glass-s-bottom)) + (1 - max(0, -1 * var(--_glass-s-bottom))) * var(--_glass-ring-lift))));
+  filter: blur(var(--_glass-ring-blur));
+  /* the skirt: an outer box-shadow of the frame paints only OUTSIDE its
+     box, i.e. beyond the projected silhouette — the diffused deficit's
+     long soft tail, which the opaque model's sharp-edged layers lack */
+  box-shadow: 0 0 var(--_glass-skirt-blur) 0
+    hsl(var(--amb-light-hue) var(--amb-light-saturation) 0% / var(--_glass-skirt-a));
+  translate: var(--_glass-sh-x) var(--_glass-sh-y);
 }
 
 /* MICRO-RELIEF MATERIALS — brushed aluminium (linear and spun), and

@@ -35,6 +35,7 @@ export function RenderComparison({
   classes,
   size = [80, 80],
   subjectStyle,
+  backdrop = [],
   dir = "renders",
   children
 }: {
@@ -42,6 +43,10 @@ export function RenderComparison({
   classes?: string;
   size?: [number, number];
   subjectStyle?: React.CSSProperties;
+  /** decals painted behind the subject, as the calibration rig embeds
+   *  them in its ground: [x0, y0, x1, y1] in CSS px from the stage
+   *  center (the glass scenes' frost stripe and dark field) */
+  backdrop?: { rect: [number, number, number, number]; className?: string; style?: React.CSSProperties }[];
   /** image directory under /img: "renders" (effect calibration frames)
    *  or "components" (component counterpart shots) */
   dir?: "renders" | "components";
@@ -60,11 +65,25 @@ export function RenderComparison({
       }}
     >
       <div style={{ textAlign: "center" }}>
-        <div className="amb-surface" style={stageStyle}>
+        <div className="amb-surface" style={{ ...stageStyle, position: "relative" }}>
+          {backdrop.map(({ rect: [x0, y0, x1, y1], className = "amb-surface", style }, i) => (
+            <div
+              key={i}
+              className={className}
+              style={{
+                position: "absolute",
+                left: `calc(50% + ${x0}px)`,
+                top: `calc(50% + ${y0}px)`,
+                width: x1 - x0,
+                height: y1 - y0,
+                ...style
+              }}
+            />
+          ))}
           {children ?? (
             <div
               className={classes}
-              style={{ width: size[0], height: size[1], ...subjectStyle }}
+              style={{ width: size[0], height: size[1], position: "relative", ...subjectStyle }}
             />
           )}
         </div>

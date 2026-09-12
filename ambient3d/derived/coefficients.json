@@ -74,6 +74,198 @@
       "2": 2.438
     }
   },
+  "glass": {
+    "T0": 0.7674,
+    "TV_by_light_at_defaults": {
+      "-1,-1": [
+        0.7689,
+        0.1714
+      ],
+      "-1,0": [
+        0.7949,
+        0.1632
+      ],
+      "0,-1": [
+        0.7956,
+        0.1629
+      ],
+      "1,0": [
+        0.7958,
+        0.1629
+      ]
+    },
+    "T_per_fill": 0.0167,
+    "T_per_key": 0.0011,
+    "V0": 0.0923,
+    "V_per_fill": 0.0424,
+    "V_per_key": 0.0509,
+    "bands_at_defaults": {
+      "far": {
+        "L_beta": 1.3453,
+        "T": 0.691,
+        "V": 0.3023,
+        "beta": 0.1142,
+        "peak_over_dark": 0.221,
+        "peak_over_ground": 0.027
+      },
+      "lit": {
+        "L_beta": 0.5274,
+        "T": 0.5438,
+        "V": 0.2767,
+        "beta": 0.3029,
+        "peak_over_dark": 0.1538,
+        "peak_over_ground": -0.1383
+      }
+    },
+    "blur_per_elev_mm": 0.1884,
+    "blur_per_thick_mm": 0.1393,
+    "body": {
+      "t0": {
+        "T": 0.9457,
+        "V": 0.0184
+      },
+      "t1": {
+        "T": 0.7478,
+        "V": 0.19
+      },
+      "t2": {
+        "T": 0.7243,
+        "V": 0.2103
+      }
+    },
+    "far_edge0": 0.0219,
+    "far_edge_per_fill": -0.0335,
+    "far_edge_per_key": 0.0668,
+    "far_edge_width_mm": 2.05,
+    "lit_edge0": -0.0439,
+    "lit_edge_mean_at_defaults": -0.1063,
+    "lit_edge_per_fill": 0.0219,
+    "lit_edge_per_key": -0.0847,
+    "lit_edge_width_mm": 1.917,
+    "model": "pane transfer out = T*backdrop + V (sRGB), T = tk*Ik + tf*If + t0, V = vk*Ik + vf*If + v0; CSS alpha = 1 - T, lightness = V / alpha; body gate T/V per thickness; frost blur sigma_mm = be*elev_mm + bt*thick_mm; edge band peaks (lit: dark, far: bright) affine in Ik, If; veil gradient lit/far sixth excess affine in Ik, If",
+    "n_blur_samples": 7,
+    "perp_edge_mean": -0.0322,
+    "r2_T": 0.0533,
+    "r2_V": 0.9176,
+    "r2_blur": 0.9936,
+    "r2_far_edge": 0.9014,
+    "r2_lit_edge": 0.9304,
+    "r2_veil_far": 0.0668,
+    "r2_veil_lit": 0.1531,
+    "ring_center_per_elev": 5.164,
+    "ring_center_per_thick": 2.72,
+    "ring_peak0": 0.2027,
+    "ring_peak_per_elev": -0.0165,
+    "ring_sigma_per_elev": 1.207,
+    "ring_sigma_per_thick": 1.803,
+    "shadow_interior_alpha": 0.0953,
+    "shadow_ring": {
+      "e0_t1": {
+        "halo_alpha": 0.0004,
+        "hm_mm": 4.38,
+        "near_alpha": 0.1364,
+        "peak_alpha": 0.2086,
+        "peak_d_mm": 2.62
+      },
+      "e0_t2": {
+        "halo_alpha": 0.0067,
+        "hm_mm": 8.88,
+        "near_alpha": 0.1103,
+        "peak_alpha": 0.2114,
+        "peak_d_mm": 5.38
+      },
+      "e1_t1": {
+        "halo_alpha": 0.0103,
+        "hm_mm": 12.88,
+        "near_alpha": 0.09,
+        "peak_alpha": 0.1755,
+        "peak_d_mm": 8.12
+      },
+      "e2_t1": {
+        "halo_alpha": 0.0835,
+        "hm_mm": 21.38,
+        "near_alpha": 0.1029,
+        "peak_alpha": 0.1737,
+        "peak_d_mm": 13.25
+      },
+      "e3_t1": {
+        "halo_alpha": 0.143,
+        "hm_mm": 21.88,
+        "near_alpha": 0.0931,
+        "peak_alpha": 0.1542,
+        "peak_d_mm": 18.0
+      }
+    },
+    "veil_far0": 0.014,
+    "veil_far_per_fill": -0.007,
+    "veil_far_per_key": 0.0049,
+    "veil_lit0": -0.0033,
+    "veil_lit_per_fill": 0.0024,
+    "veil_lit_per_key": -0.0015,
+    "veil_shape_defaults": [
+      -0.0248,
+      -0.0001,
+      0.0036,
+      0.0004,
+      -0.0018,
+      -0.0036,
+      -0.0034,
+      -0.0031,
+      -0.0021,
+      -0.0029,
+      -0.0018,
+      -0.001,
+      -0.0003,
+      -0.0004,
+      -0.0009,
+      -0.0005,
+      0.0001,
+      0.0002,
+      0.0004,
+      0.0001,
+      0.001,
+      -0.0007,
+      -0.0006,
+      -0.0008,
+      -0.0013,
+      -0.0018,
+      -0.0021,
+      -0.0001,
+      -0.0002,
+      0.0,
+      0.0,
+      0.0009,
+      0.0008,
+      -0.0003,
+      0.0006,
+      0.0,
+      -0.0003,
+      0.0013,
+      0.0021,
+      0.0013,
+      0.002,
+      0.0026,
+      0.0025,
+      0.0031,
+      0.0028,
+      0.004,
+      0.0038,
+      0.0053,
+      0.0058,
+      0.0057,
+      0.0062,
+      0.0081,
+      0.0097,
+      0.0107,
+      0.0125,
+      0.0134,
+      0.0151,
+      0.0175,
+      0.0219,
+      0.0303,
+      0.0483
+    ]
+  },
   "glow": {
     "css_blur_px": 6.208,
     "g0_alpha": 0.72,

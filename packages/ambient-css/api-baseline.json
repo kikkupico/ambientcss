@@ -36,6 +36,7 @@
     ".amb-mat-brushed::after",
     ".amb-mat-brushed::before",
     ".amb-mat-glass",
+    ".amb-mat-glass::after",
     ".amb-mat-matte",
     ".amb-mat-shiny",
     ".amb-rounded",
@@ -54,7 +55,8 @@
     ":root",
     ":where(.amb-mat-blasted)",
     ":where(.amb-mat-brushed)",
-    ":where(.amb-mat-brushed-round)"
+    ":where(.amb-mat-brushed-round)",
+    ":where(.amb-mat-glass)"
   ],
   "properties": [
     "--amb-albedo",

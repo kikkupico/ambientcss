@@ -39,8 +39,11 @@ def render_job(rel, amb_over, spec, manifest, args):
     kit.reset_scene()
     plate_cfg = spec.get("geometry") or manifest["plate"]
     ground = ap.setup_calibration_rig(a, plate_size=tuple(plate_cfg["size"]))
+    ap.build_decals(plate_cfg.get("decals"))
 
-    if spec["builder"] == "plate":
+    if spec["builder"] == "ground":
+        pass                       # bare ground (+ decals): a reference frame
+    elif spec["builder"] == "plate":
         chamfer_mm, fillet_mm = ap.edge_mm(a)
         build_plate(
             width=plate_cfg["size"][0], depth=plate_cfg["size"][1],
@@ -68,7 +71,9 @@ def render_job(rel, amb_over, spec, manifest, args):
     os.makedirs(os.path.dirname(png), exist_ok=True)
     kit.setup_render(png, resolution=ap.FRAME_MM * ap.PX_PER_MM,
                      samples=args.samples)
-    ap.finalize_calibration_render(samples=args.samples)
+    ap.finalize_calibration_render(
+        samples=args.samples,
+        filter_glossy=0.0 if a["mat"] == "glass" else 1.0)
     kit.render_and_save(png)
     print(f"WROTE {png}")
 

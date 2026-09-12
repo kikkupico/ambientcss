@@ -786,13 +786,279 @@ def fit_sheen_ring(m):
 
 # ------------------------------------------------------------------- main ---
 
+def _affine3(rows):
+    """Least-squares y = a*key + b*fill + c over (key, fill, y) rows."""
+    x = np.array([[k, f, 1.0] for k, f, _ in rows])
+    y = np.array([v for _, _, v in rows])
+    coef, *_ = np.linalg.lstsq(x, y, rcond=None)
+    return coef, r2(y, x @ coef)
+
+
+def _glass_edge_roles(a):
+    """(lit, far, perpendicular) edge-name lists for a light direction."""
+    lit, far = lit_edges(a)
+    perp = [e for e in ("left", "right", "top", "bottom")
+            if e not in lit and e not in far]
+    return list(lit), list(far), perp
+
+
+def fit_glass(m):
+    """Frosted glass pane (shape of .amb-mat-glass), four features, each
+    grounded on its own frames:
+
+    PANE TRANSFER: what the pane does to the tone behind it, solved as
+    `out = T * backdrop + V` from the same pane over the light ground
+    (sweeps/glass) and over a dark field (sweeps/glass_dark), each minus
+    its bare-ground reference. This is exactly what a translucent CSS
+    background-color composites in sRGB (T = 1 - alpha, V = alpha *
+    lightness), so the fit is done in sRGB, not linear. T and V are
+    affine in key and fill; V is what the CSS calls the frost's veil.
+    BODY GATE: the same T/V per thickness from the striped frost frames
+    (two backdrop tones in one frame): a t0 sheet is a near-pure
+    attenuator, the veil needs a body to be lit through its walls.
+    FROST BLUR: Gaussian sigma of a stripe edge seen through the pane,
+    affine in the pane's height above the backdrop (elevation) and its
+    thickness — the pane at rest barely blurs at all.
+    EDGE BANDS: the lit walls refract the key away from the ground just
+    inside the lit edges (a dark band) and pipe it out under the far
+    edges (a bright band); peak affine in key and fill, per role.
+    VEIL GRADIENT: the excess along the light axis, lit sixth and far
+    sixth against the middle third, affine in key and fill."""
+    def tint(entry, key="interior"):
+        return entry["metrics"]["glass_tint"][key]["srgb_pct"] / 100.0
+
+    # ---- pane transfer
+    t_rows, v_rows, by_light = [], [], {}
+    for rel, entry in m.items():
+        if not rel.startswith("sweeps/glass/"):
+            continue
+        dark = rel.replace("sweeps/glass/", "sweeps/glass_dark/")
+        ref = rel.replace("sweeps/glass/", "sweeps/glass_ref/")
+        dref = rel.replace("sweeps/glass/", "sweeps/glass_dark_ref/")
+        if not all(k in m for k in (dark, ref, dref)):
+            continue
+        a = entry["amb"]
+        il, idk = tint(entry), tint(m[dark])
+        rl, rd = tint(m[ref]), tint(m[dref])
+        t = (il - idk) / (rl - rd)
+        v = il - t * rl
+        k, f = a["key_light_intensity"], a["fill_light_intensity"]
+        t_rows.append((k, f, t))
+        v_rows.append((k, f, v))
+        if k == 0.9 and f == 0.7:
+            by_light[f"{a['light_x']:g},{a['light_y']:g}"] = (round(t, 4),
+                                                              round(v, 4))
+    (tk, tf, t0), r2_t = _affine3(t_rows)
+    (vk, vf, v0), r2_v = _affine3(v_rows)
+
+    # ---- body gate (thickness) from the striped frames at rest
+    body = {}
+    dref = m.get("sweeps/glass_dark_ref/light=-1,-1.png")
+    for rel, entry in m.items():
+        if not (rel.startswith("sweeps/glass_frost/thickness=") or
+                rel == "calib/mat_glass_frost.png"):
+            continue
+        if dref is None or "decal" not in entry["metrics"]["glass_tint"]:
+            continue
+        il, ist = tint(entry), tint(entry, "decal")
+        rl = entry["metrics"]["glass_tint"]["ref"]["srgb_pct"] / 100.0
+        rd = tint(dref)
+        t = (il - ist) / (rl - rd)
+        body[f"t{entry['amb']['thickness']:g}"] = {
+            "T": round(t, 4), "V": round(il - t * rl, 4)}
+
+    # ---- frost blur vs height
+    rows = []
+    for rel, entry in m.items():
+        if not (rel.startswith("sweeps/glass_frost/") or
+                rel in ("calib/mat_glass_frost.png",
+                        "calib/mat_glass_frost_elevated.png")):
+            continue
+        a = entry["amb"]
+        from amb_model import elevation_mm, thickness_mm
+        rows.append((elevation_mm(a), thickness_mm(a),
+                     entry["metrics"]["frost_blur"]["blur_sigma_mm"]))
+    # through the origin: a sheet resting on its backdrop blurs nothing
+    # (its 0.1 mm reads as the render's own antialiasing), so the model
+    # has no intercept for the CSS to carry
+    bx = np.array([[e, t] for e, t, _ in rows])
+    by = np.array([s for _, _, s in rows])
+    (be, bt), *_ = np.linalg.lstsq(bx, by, rcond=None)
+    r2_blur = r2(by, bx @ np.array([be, bt]))
+
+    # ---- edge bands by role, reference-subtracted
+    role_rows = {"lit": [], "far": [], "perp": []}
+    widths = {"lit": [], "far": []}
+    for rel, entry in m.items():
+        if not rel.startswith("sweeps/glass/"):
+            continue
+        ref = rel.replace("sweeps/glass/", "sweeps/glass_ref/")
+        if ref not in m:
+            continue
+        a = entry["amb"]
+        k, f = a["key_light_intensity"], a["fill_light_intensity"]
+        eb, rb = entry["metrics"]["edge_bands"], m[ref]["metrics"]["edge_bands"]
+        for role, names in zip(("lit", "far", "perp"), _glass_edge_roles(a)):
+            for name in names:
+                role_rows[role].append(
+                    (k, f, eb[name]["peak_srgb"] - rb[name]["peak_srgb"]))
+                if role in widths:
+                    widths[role].append(eb[name]["width_mm"])
+    (lk, lf, l0), r2_lit = _affine3(role_rows["lit"])
+    (fk, ff, f0), r2_far = _affine3(role_rows["far"])
+    perp_mean = float(np.mean([v for _, _, v in role_rows["perp"]]))
+    lit_mean = float(np.mean([v for k, f, v in role_rows["lit"]
+                              if k == 0.9 and f == 0.7]))
+
+    # ---- what each band IS, over two backdrops at the defaults: solve
+    # the band peak as its own pane transfer (T_b, V_b) from the light
+    # ground and the dark field, then express it as a wash painted OVER
+    # the pane's interior transfer (T, V): band = (1 - beta) * interior
+    # + beta * L_beta. That is the layer the CSS paints (a gradient on
+    # background-image sits over background-color), so beta and L_beta
+    # are its alpha and lightness. A far-edge L_beta above 1 means the
+    # glow is additive beyond any wash — the CSS caps it at white and
+    # takes the beta that splits the difference between backdrops.
+    bands = {}
+    key = "light=-1,-1.png"
+    g, gr = m.get(f"sweeps/glass/{key}"), m.get(f"sweeps/glass_ref/{key}")
+    d, dr = (m.get(f"sweeps/glass_dark/{key}"),
+             m.get(f"sweeps/glass_dark_ref/{key}"))
+    if all(x and "edge_bands" in x["metrics"] for x in (g, gr, d, dr)):
+        t_def = tk * 0.9 + tf * 0.7 + t0
+        v_def = vk * 0.9 + vf * 0.7 + v0
+        for role, edge in (("lit", "left"), ("far", "right")):
+            def peak_over(frame, ref):
+                eb, rb = frame["metrics"]["edge_bands"][edge], \
+                    ref["metrics"]["edge_bands"][edge]
+                # backdrop tone beside the band, and the band's own peak
+                return (rb["baseline_srgb"],
+                        eb["baseline_srgb"] + eb["peak_srgb"])
+            (bl, pl), (bd, pd) = peak_over(g, gr), peak_over(d, dr)
+            t_b = (pl - pd) / (bl - bd)
+            v_b = pl - t_b * bl
+            beta = 1.0 - t_b / t_def
+            l_beta = (v_b - (1.0 - beta) * v_def) / beta if beta > 1e-6 else 0.0
+            bands[role] = {"T": round(t_b, 4), "V": round(v_b, 4),
+                           "beta": round(beta, 4), "L_beta": round(l_beta, 4),
+                           "peak_over_ground": round(pl - bl, 4),
+                           "peak_over_dark": round(pd - bd, 4)}
+
+    # ---- veil gradient along the light axis
+    lit_rows, far_rows, shape = [], [], None
+    for rel, entry in m.items():
+        if not rel.startswith("sweeps/glass/"):
+            continue
+        ref = rel.replace("sweeps/glass/", "sweeps/glass_ref/")
+        if ref not in m:
+            continue
+        a = entry["amb"]
+        k, f = a["key_light_intensity"], a["fill_light_intensity"]
+        exc = (np.array(entry["metrics"]["plate_profile"]["profile_srgb"]) -
+               np.array(m[ref]["metrics"]["plate_profile"]["profile_srgb"]))
+        n = len(exc)
+        mid = exc[n // 3: 2 * n // 3].mean()
+        lit_rows.append((k, f, float(exc[: n // 6].mean() - mid)))
+        far_rows.append((k, f, float(exc[-(n // 6):].mean() - mid)))
+        if rel == "sweeps/glass/light=-1,-1.png":
+            shape = [round(float(v - mid), 4) for v in exc]
+    (gk, gf, g0), r2_gl = _affine3(lit_rows)
+    (hk, hf, h0), r2_gf = _affine3(far_rows)
+
+    # ---- drop shadow: interior depth and the ring, by elevation/thickness
+    ring = {}
+    rows_c, rows_p, rows_hm, near = [], [], [], []
+    for rel, entry in m.items():
+        if not (rel.startswith("sweeps/glass_shadow/") or
+                rel == "calib/mat_glass_default.png"):
+            continue
+        hs = entry["metrics"].get("hollow_shadow")
+        if not hs:
+            continue
+        a = entry["amb"]
+        e, t = a["elevation"], a["thickness"]
+        vals = list(hs.values())
+        pk = float(np.mean([v["peak_alpha"] for v in vals]))
+        pd = float(np.mean([v["peak_d_mm"] for v in vals]))
+        hm = float(np.mean([v["hm_mm"] for v in vals]))
+        na = float(np.mean([v["near_alpha"] for v in vals]))
+        ring[f"e{e:g}_t{t:g}"] = {"peak_alpha": round(pk, 4),
+                                 "peak_d_mm": round(pd, 2),
+                                 "hm_mm": round(hm, 2),
+                                 "near_alpha": round(na, 4),
+                                 "halo_alpha": round(float(np.mean(
+                                     [v["halo_alpha"] for v in vals])), 4)}
+        rows_c.append((e, t, pd))
+        rows_hm.append((e, t, hm - pd))
+        rows_p.append((e, t, pk))
+        if e > 0:
+            near.append(na)
+    cx = np.array([[e, t] for e, t, _ in rows_c])
+    (ce, ct), *_ = np.linalg.lstsq(cx, np.array([v for *_, v in rows_c]),
+                                   rcond=None)
+    # half-max half-width -> Gaussian sigma of the ring's bump
+    sx = np.array([[e, t] for e, t, _ in rows_hm])
+    (se, st), *_ = np.linalg.lstsq(sx, np.array([v for *_, v in rows_hm]) / 1.177,
+                                   rcond=None)
+    px = np.array([[e, 1.0] for e, t, _ in rows_p if t == 1])
+    py = np.array([v for e, t, v in rows_p if t == 1])
+    (pe, p0), *_ = np.linalg.lstsq(px, py, rcond=None)
+
+    return {
+        "shadow_ring": ring,
+        "shadow_interior_alpha": round(float(np.mean(near)), 4) if near else 0.0,
+        "ring_center_per_elev": round(float(ce), 3),
+        "ring_center_per_thick": round(float(ct), 3),
+        "ring_sigma_per_elev": round(float(se), 3),
+        "ring_sigma_per_thick": round(float(st), 3),
+        "ring_peak_per_elev": round(float(pe), 4),
+        "ring_peak0": round(float(p0), 4),
+        "model": ("pane transfer out = T*backdrop + V (sRGB), T = tk*Ik + "
+                  "tf*If + t0, V = vk*Ik + vf*If + v0; CSS alpha = 1 - T, "
+                  "lightness = V / alpha; body gate T/V per thickness; "
+                  "frost blur sigma_mm = be*elev_mm + bt*thick_mm; "
+                  "edge band peaks (lit: dark, far: bright) affine in "
+                  "Ik, If; veil gradient lit/far sixth excess affine in "
+                  "Ik, If"),
+        "T_per_key": round(float(tk), 4), "T_per_fill": round(float(tf), 4),
+        "T0": round(float(t0), 4), "r2_T": round(r2_t, 4),
+        "V_per_key": round(float(vk), 4), "V_per_fill": round(float(vf), 4),
+        "V0": round(float(v0), 4), "r2_V": round(r2_v, 4),
+        "TV_by_light_at_defaults": by_light,
+        "body": body,
+        "blur_per_elev_mm": round(float(be), 4),
+        "blur_per_thick_mm": round(float(bt), 4),
+        "r2_blur": round(r2_blur, 4),
+        "n_blur_samples": len(rows),
+        "bands_at_defaults": bands,
+        "lit_edge_mean_at_defaults": round(lit_mean, 4),
+        "lit_edge_per_key": round(float(lk), 4),
+        "lit_edge_per_fill": round(float(lf), 4),
+        "lit_edge0": round(float(l0), 4), "r2_lit_edge": round(r2_lit, 4),
+        "lit_edge_width_mm": round(float(np.mean(widths["lit"])), 3),
+        "far_edge_per_key": round(float(fk), 4),
+        "far_edge_per_fill": round(float(ff), 4),
+        "far_edge0": round(float(f0), 4), "r2_far_edge": round(r2_far, 4),
+        "far_edge_width_mm": round(float(np.mean(widths["far"])), 3),
+        "perp_edge_mean": round(perp_mean, 4),
+        "veil_lit_per_key": round(float(gk), 4),
+        "veil_lit_per_fill": round(float(gf), 4),
+        "veil_lit0": round(float(g0), 4), "r2_veil_lit": round(r2_gl, 4),
+        "veil_far_per_key": round(float(hk), 4),
+        "veil_far_per_fill": round(float(hf), 4),
+        "veil_far0": round(float(h0), 4), "r2_veil_far": round(r2_gf, 4),
+        "veil_shape_defaults": shape,
+    }
+
+
 FITTERS = {"surface": fit_surface, "chamfer": fit_chamfer,
            "fillet": fit_fillet, "shadow": fit_shadow,
            "curved": fit_curved,
            "shiny": fit_shiny, "glow": fit_glow,
            "groove": fit_groove,
            "brushed": fit_brushed, "spun": fit_spun, "blasted": fit_blasted,
-           "brushed_sheen": fit_sheen_axis, "spun_sheen": fit_sheen_ring}
+           "brushed_sheen": fit_sheen_axis, "spun_sheen": fit_sheen_ring,
+           "glass": fit_glass}
 
 
 def write_note(effect, coeffs):
