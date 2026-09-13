@@ -13,6 +13,7 @@
     "docs:dev": "pnpm --filter docs dev",
     "docs:build": "pnpm --filter docs build",
     "docs:preview": "pnpm --filter docs preview",
+    "demo:deploy": "pnpm --filter @ambientcss/css build && pnpm --filter @ambientcss/components build && pnpm --filter demo build && pnpm --filter demo deploy",
     "api:check": "pnpm --filter @ambientcss/css api:check",
     "hero:shot": "pnpm --filter @ambientcss/hero-gif build && pnpm --filter @ambientcss/hero-gif shot",
     "hero:gif": "pnpm hero:shot && python3 tools/hero-gif/assemble.py",
@@ -24,6 +25,7 @@
     "release:publish:next": "pnpm --filter @ambientcss/css publish --access public --tag next --no-git-checks && pnpm --filter @ambientcss/components publish --access public --tag next --no-git-checks"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.29.8"
+    "@changesets/cli": "^2.29.8",
+    "wrangler": "^4.131.1"
   }
 }

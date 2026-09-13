@@ -16,10 +16,15 @@ import {
 } from "@ambientcss/components";
 
 /* The README hero film (tools/hero-gif): the same device raytraced in
-   Blender and rendered by the CSS, wiped against each other. Imported from
-   the repo root rather than copied into the app so the demo can never show
-   a stale cut of it. */
-import heroFilm from "../../../ambientcss.mp4";
+   Blender and rendered by the CSS, wiped against each other. The root file
+   is near-2K and the film never displays wider than 720 CSS px (see
+   .hero-film in App.css), so the demo serves a downscaled, web-encoded copy
+   instead of importing it directly. That trades the "can never go stale"
+   guarantee for a much smaller payload — regenerate these with
+   `pnpm --filter demo hero-media` whenever tools/hero-gif cuts a new film. */
+import heroFilmMp4 from "./assets/hero-film.mp4";
+import heroFilmWebm from "./assets/hero-film.webm";
+import heroPoster from "./assets/hero-poster.jpg";
 import kubernetes3dShot from "./assets/kubernetes3d.jpg";
 
 /* ── Intersection observer hook ───────────────────────────────────────── */
@@ -401,14 +406,18 @@ export function App() {
         <div className="hero-sub">physically based css</div>
         <video
           className="hero-film ambient amb-elevation-1 amb-rounded-lg"
-          src={heroFilm}
+          poster={heroPoster}
+          preload="metadata"
           autoPlay={!reducedMotion}
           controls={reducedMotion}
           loop
           muted
           playsInline
           aria-label="A hardware panel raytraced in Blender rotating to a flat-on view, then wiped across to reveal the same panel rendered by Ambient CSS"
-        />
+        >
+          <source src={heroFilmWebm} type="video/webm" />
+          <source src={heroFilmMp4} type="video/mp4" />
+        </video>
         <div
           className="hero-scroll-hint"
           onClick={() => scrollToNextSection(heroRef)}
