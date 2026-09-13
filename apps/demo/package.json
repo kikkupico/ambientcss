@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "vite",
     "build": "node ../../scripts/vite-build-compat.mjs build",
+    "deploy": "wrangler deploy",
+    "hero-media": "node scripts/build-hero-media.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

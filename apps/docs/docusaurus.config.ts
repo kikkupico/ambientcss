@@ -70,7 +70,7 @@ const config: Config = {
           position: "left"
         },
         {
-          href: "https://ambientcss.vercel.app/",
+          href: "https://ambientcss.com/",
           label: "Demo App",
           position: "right"
         },

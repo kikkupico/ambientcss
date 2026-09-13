@@ -2,7 +2,7 @@
 
 **A physics-based lighting system for CSS.** Define a light source, and every shadow, highlight, and surface gradient follows from it — no more hand-tuned `shadow-sm` / `shadow-md` / `shadow-lg`.
 
-[Live Demo](https://ambientcss.vercel.app/) &nbsp;&bull;&nbsp; [Documentation](https://kikkupico.github.io/ambientcss/) &nbsp;&bull;&nbsp; [npm (@ambientcss/css)](https://www.npmjs.com/package/@ambientcss/css) &nbsp;&bull;&nbsp; [npm (@ambientcss/components)](https://www.npmjs.com/package/@ambientcss/components)
+[Live Demo](https://ambientcss.com/) &nbsp;&bull;&nbsp; [Documentation](https://kikkupico.github.io/ambientcss/) &nbsp;&bull;&nbsp; [npm (@ambientcss/css)](https://www.npmjs.com/package/@ambientcss/css) &nbsp;&bull;&nbsp; [npm (@ambientcss/components)](https://www.npmjs.com/package/@ambientcss/components)
 
 ![A hardware panel raytraced in Blender, rotating to a flat-on view, then wiped across to reveal the same panel rendered by Ambient CSS](./ambientcss.gif)
 

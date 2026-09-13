@@ -4,7 +4,7 @@ title: Demo App
 
 The demo application lives in `apps/demo` and is deployed at:
 
-- https://ambientcss.vercel.app/
+- https://ambientcss.com/
 
 Run it from the monorepo root:
 

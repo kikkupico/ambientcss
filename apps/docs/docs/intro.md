@@ -35,5 +35,5 @@ Read [Guide > Concept](/guide/concept) for the full model.
 
 ## Quick links
 
-- Demo app: https://ambientcss.vercel.app/
+- Demo app: https://ambientcss.com/
 - GitHub repository: https://github.com/kikkupico/ambientcss
