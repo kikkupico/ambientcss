@@ -1,5 +1,19 @@
 # @ambientcss/components
 
+## 3.2.0
+
+### Minor Changes
+
+- c088f7e: The bank's glow is now a kit's choice rather than part of the bank. `.amb-select` draws only the rail and the keys' boxes; the light pocket floor the lamp parts sit on is `.amb-select-lamp`, and the light a selected key spills onto the rail is `.amb-select-glow`. `groundedKit` wears all three, so `AmbientSelect` renders exactly as before. `KeyLens` and `KeyCap` now style their lit, hover and disabled states from the key itself, so they work in any bank.
+
+  A custom kit that wore `amb-select` with `KeyLens` / `KeyCap` and wants to keep the old look should add `amb-select-lamp amb-select-glow` to its bank's `className`.
+
+- c088f7e: Kits can draw more than one version of a control. Every preset (`AmbientKnob`, `AmbientFader`, `AmbientSlider`, `AmbientButton`, `AmbientSwitch`, `AmbientSelect`) takes a `variant` prop, which reaches the kit's family function as `look.variant`. `ControlKit.variants` lists the names each family offers, default first; in development, asking for a name the kit does not offer warns once and draws the default.
+
+### Patch Changes
+
+- c088f7e: Export `ConsoleKey`, the console kit's bank key part, so kits (and the Kit Builder) can compose it like the other console parts.
+
 ## 3.1.2
 
 ### Patch Changes
