@@ -320,12 +320,6 @@
   gap: 2px;
 }
 
-.kb-control-scene {
-  margin-top: 6px;
-  padding-top: 6px;
-  border-top: 1px solid var(--kb-line-soft);
-}
-
 .kb-control {
   position: relative;
   display: flex;
@@ -1559,13 +1553,6 @@
     flex: 0 0 auto;
   }
 
-  .kb-control-scene {
-    margin: 0 0 0 4px;
-    padding: 0 0 0 6px;
-    border-top: none;
-    border-left: 1px solid var(--kb-line-soft);
-  }
-
   .kb-control {
     width: auto;
     padding: 4px 10px 4px 4px;
@@ -1906,5 +1893,175 @@
   .kb-samples {
     grid-template-columns: minmax(0, 1fr);
     padding: 4px 14px;
+  }
+}
+
+/* ── Scene bar ────────────────────────────────────────────────────────── */
+
+/* The rooms, above the stage: one key per preset, each with its own lamp
+   that lights when it is the room you are in — the demo app's header bank,
+   in the tool's own plain idiom. */
+.kb-scene-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.kb-scene-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--kb-faint);
+}
+
+.kb-scene-keys {
+  display: flex;
+  gap: 4px;
+  min-width: 0;
+  padding: 3px;
+  border-radius: 11px;
+  background: var(--kb-hover);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.kb-scene-key {
+  --kb-lamp: var(--kb-accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  height: 30px;
+  padding: 0 11px 0 9px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--kb-muted);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.kb-scene-key:hover {
+  color: var(--kb-text);
+}
+
+.kb-scene-key-on,
+.kb-scene-key-on:hover {
+  background: var(--kb-bg);
+  color: var(--kb-text);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 14%), 0 0 0 1px var(--kb-line-soft);
+}
+
+[data-theme="dark"] .kb-scene-key-on {
+  background: var(--ifm-color-emphasis-300);
+}
+
+.kb-scene-lamp {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--kb-lamp) 22%, var(--kb-line));
+  transition: background-color 160ms ease, box-shadow 160ms ease;
+}
+
+.kb-scene-key-on .kb-scene-lamp {
+  background: var(--kb-lamp);
+  box-shadow: 0 0 6px var(--kb-lamp);
+}
+
+/* The custom console. Not a blocking modal: no backdrop, and docked where
+   the inspector is, so the stage stays in plain view and relights live. */
+.kb-scene-dialog {
+  position: fixed;
+  z-index: 950;
+  top: var(--kb-top);
+  right: max(20px, calc((100vw - 1680px) / 2 + 20px));
+  display: flex;
+  flex-direction: column;
+  width: 360px;
+  max-height: calc(100vh - var(--kb-top) - 16px);
+  border: 1px solid var(--kb-line-soft);
+  border-radius: 16px;
+  background: var(--kb-bg);
+  color: var(--kb-text);
+  box-shadow: 0 18px 48px rgb(0 0 0 / 24%);
+  animation: kb-rise 160ms ease;
+}
+
+.kb-scene-dialog:focus {
+  outline: none;
+}
+
+.kb-scene-dialog-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 16px 8px;
+}
+
+.kb-scene-dialog-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 4px;
+  padding: 0 16px 12px;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.kb-scene-dialog-foot {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 16px 14px;
+  border-top: 1px solid var(--kb-line-soft);
+}
+
+@media (max-width: 1240px) {
+  .kb-scene-dialog {
+    width: 330px;
+  }
+}
+
+@media (max-width: 760px) {
+  .kb-scene-bar {
+    gap: 6px;
+  }
+
+  .kb-scene-label {
+    display: none;
+  }
+
+  /* A sheet along the bottom, under the pinned stage. */
+  .kb-scene-dialog {
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: auto;
+    max-height: 40vh;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .kb-scene-dialog-head {
+    padding: 12px 14px 4px;
+  }
+
+  .kb-scene-dialog-body {
+    padding: 0 14px 8px;
+  }
+
+  .kb-scene-dialog-foot {
+    padding: 8px 14px 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kb-scene-dialog {
+    animation: none;
   }
 }

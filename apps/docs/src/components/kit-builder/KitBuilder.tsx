@@ -39,7 +39,8 @@ import { FRAMES, defaultPart, defaultShape, duplicateElement, elementApplies } f
 import { newId } from "./model";
 import type { FrameName, KitElement, PartName } from "./model";
 import { FAMILY_PARTS, PARTS, partDefaults } from "./parts";
-import { ControlEditor, FRAME_INFO, LayerEditor, SCENE_PRESETS, SceneEditor, VersionEditor, elementLabel } from "./Editors";
+import { ControlEditor, FRAME_INFO, LayerEditor, VersionEditor, elementLabel } from "./Editors";
+import { SceneBar, SceneDialog, useSceneGlide } from "./SceneBar";
 import { Note, Segmented, Slider, Toggle } from "./Fields";
 import { CONTROLS, Canvas, ControlPreview, KitStyles, Rack, Thumb, isolate } from "./Stage";
 import type { ControlDef, ControlId, PreviewState, RackVersion } from "./Stage";
@@ -122,7 +123,7 @@ function isTyping(target: EventTarget | null): boolean {
   return type === "text" || type === "search" || type === "url" || type === "number";
 }
 
-type Selection = { kind: "control"; id: ControlId } | { kind: "scene" };
+type Selection = { kind: "control"; id: ControlId };
 
 type Toast = { id: number; message: string; undo?: boolean };
 
@@ -158,6 +159,7 @@ export default function KitBuilder() {
   const [adding, setAdding] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [browsing, setBrowsing] = useState(false);
+  const [sceneOpen, setSceneOpen] = useState(false);
   const [toast, setToast] = useState<Toast | null>(null);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [copied, copy] = useCopy();
@@ -240,6 +242,13 @@ export default function KitBuilder() {
     },
     [setConfig]
   );
+
+  /* Presets glide the light rather than cut to it. */
+  const applyLight = useCallback(
+    (light: Partial<KitConfig["theme"]>) => setConfig((prev) => ({ ...prev, theme: { ...prev.theme, ...light } })),
+    [setConfig]
+  );
+  const glide = useSceneGlide(config.theme, applyLight);
 
   const applySeed = (target: FamilyName, seed: SeedName) =>
     setConfig((prev) => {
@@ -478,11 +487,8 @@ export default function KitBuilder() {
     () => (solo && current ? isolate(config, family, current.id, vIndex) : config),
     [solo, current, config, family, vIndex]
   );
-  const showRack = stageView === "rack" || selection.kind === "scene";
+  const showRack = stageView === "rack";
   const undressed = !config[family].dressed;
-  const activeScene = SCENE_PRESETS.find((preset) =>
-    Object.entries(preset.theme).every(([key, value]) => config.theme[key as keyof KitConfig["theme"]] === value)
-  );
 
   /* ── Render ─────────────────────────────────────────────────────────── */
 
@@ -598,30 +604,17 @@ export default function KitBuilder() {
                 </li>
               );
             })}
-            <li className={`kb-control kb-control-scene${selection.kind === "scene" ? " kb-control-on" : ""}`}>
-              <span className="kb-control-thumb kb-control-icon">
-                <Icon name="sun" size={20} />
-              </span>
-              <span className="kb-control-text">
-                <span className="kb-control-name">Scene</span>
-                <span className="kb-control-status">{activeScene ? activeScene.label : "Custom light"}</span>
-              </span>
-              <button
-                type="button"
-                className="kb-hit"
-                aria-label="Scene and lighting"
-                aria-current={selection.kind === "scene" ? "true" : undefined}
-                onClick={() => {
-                  setSelection({ kind: "scene" });
-                  setAdding(false);
-                }}
-              />
-            </li>
           </ul>
         </nav>
 
         {/* ── Stage ── */}
         <main className="kb-stage">
+          <SceneBar
+            theme={config.theme}
+            customOpen={sceneOpen}
+            onPreset={(preset) => glide(preset.light)}
+            onCustom={() => setSceneOpen((open) => !open)}
+          />
           <div className="kb-stage-bar">
             <div className="kb-seg-group" role="radiogroup" aria-label="Stage view">
               <button
@@ -629,10 +622,7 @@ export default function KitBuilder() {
                 role="radio"
                 aria-checked={!showRack}
                 className={`kb-seg${!showRack ? " kb-seg-on" : ""}`}
-                onClick={() => {
-                  setStageView("control");
-                  if (selection.kind === "scene") setSelection({ kind: "control", id: lastControl });
-                }}
+                onClick={() => setStageView("control")}
               >
                 {control.label}
               </button>
@@ -738,14 +728,6 @@ export default function KitBuilder() {
 
         {/* ── Inspector ── */}
         <aside className="kb-inspector" aria-label="Inspector">
-          {selection.kind === "scene" ? (
-            <>
-              <div className="kb-inspector-head">
-                <h2 className="kb-inspector-title">Scene</h2>
-              </div>
-              <SceneEditor config={config} patch={patchScene} />
-            </>
-          ) : (
             <>
               <div className="kb-inspector-head">
                 <h2 className="kb-inspector-title">{control.label}</h2>
@@ -923,7 +905,6 @@ export default function KitBuilder() {
                 </div>
               )}
             </>
-          )}
         </aside>
       </div>
 
@@ -956,6 +937,8 @@ export default function KitBuilder() {
           this browser and in the page link.
         </p>
       </section>
+
+      {sceneOpen ? <SceneDialog config={config} patch={patchScene} onClose={() => setSceneOpen(false)} /> : null}
 
       {browsing ? <SamplesDialog onOpen={openSample} onClose={() => setBrowsing(false)} /> : null}
 

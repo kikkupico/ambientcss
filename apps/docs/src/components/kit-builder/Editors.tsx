@@ -712,32 +712,6 @@ export function VersionEditor({
 
 /* ── The scene ────────────────────────────────────────────────────────── */
 
-type ThemePatch = Partial<KitConfig["theme"]>;
-
-/** Quick rooms to try a kit under. A kit should survive all of them. */
-export const SCENE_PRESETS: { id: string; label: string; theme: ThemePatch }[] = [
-  {
-    id: "day",
-    label: "Daylight",
-    theme: { lightX: -1, lightY: -1, keyLight: 0.9, fillLight: 0.72, lightHue: 220, lightSaturation: 14, lumeHue: 190 }
-  },
-  {
-    id: "warm",
-    label: "Warm",
-    theme: { lightX: -0.6, lightY: -1, keyLight: 0.88, fillLight: 0.7, lightHue: 30, lightSaturation: 26, lumeHue: 36 }
-  },
-  {
-    id: "studio",
-    label: "Studio",
-    theme: { lightX: 0, lightY: -1, keyLight: 0.66, fillLight: 0.55, lightHue: 215, lightSaturation: 8, lumeHue: 200 }
-  },
-  {
-    id: "night",
-    label: "Night",
-    theme: { lightX: -1, lightY: -1, keyLight: 0.3, fillLight: 0.4, lightHue: 225, lightSaturation: 20, lumeHue: 190 }
-  }
-];
-
 export function SceneEditor({
   config,
   patch
@@ -746,34 +720,15 @@ export function SceneEditor({
   patch: (key: "theme" | "panel", values: Record<string, unknown>) => void;
 }) {
   const theme = config.theme;
-  const activePreset = SCENE_PRESETS.find((preset) =>
-    Object.entries(preset.theme).every(([key, value]) => theme[key as keyof typeof theme] === value)
-  );
 
   return (
     <>
-      <Section title="Presets">
-        <div className="kb-scene-presets">
-          {SCENE_PRESETS.map((preset) => (
-            <button
-              key={preset.id}
-              type="button"
-              className={`kb-chip${activePreset?.id === preset.id ? " kb-chip-on" : ""}`}
-              onClick={() => patch("theme", preset.theme)}
-            >
-              {preset.label}
-            </button>
-          ))}
-        </div>
-        <Note>The scene isn't part of the kit. It's exported beside it so the file reproduces what you see here.</Note>
-      </Section>
-
       <Section title="Light">
         <LightPad x={theme.lightX} y={theme.lightY} onChange={(lightX, lightY) => patch("theme", { lightX, lightY })} />
         <Slider label="Key light" hint="Below 0.5 the room goes dark." value={theme.keyLight} min={0} max={1} step={0.02} onChange={(keyLight) => patch("theme", { keyLight })} />
         <Slider label="Fill light" value={theme.fillLight} min={0} max={1} step={0.02} onChange={(fillLight) => patch("theme", { fillLight })} />
         <Slider label="Hue" value={theme.lightHue} min={0} max={360} unit="°" onChange={(lightHue) => patch("theme", { lightHue })} />
-        <Slider label="Saturation" value={theme.lightSaturation} min={0} max={60} unit="%" onChange={(lightSaturation) => patch("theme", { lightSaturation })} />
+        <Slider label="Saturation" value={theme.lightSaturation} min={0} max={100} unit="%" onChange={(lightSaturation) => patch("theme", { lightSaturation })} />
       </Section>
 
       <Section title="Colour">
