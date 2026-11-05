@@ -213,7 +213,8 @@ const PATHS: Record<string, string> = {
   focus: "M3 8V3h5M16 3h5v5M21 16v5h-5M8 21H3v-5",
   back: "m15 18-6-6 6-6",
   reset: "M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5",
-  sliders: "M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1M15 4v4M9 10v4M17 16v4"
+  sliders: "M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1M15 4v4M9 10v4M17 16v4",
+  grid: "M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"
 };
 
 export function Icon({ name, size = 16 }: { name: keyof typeof PATHS | string; size?: number }) {

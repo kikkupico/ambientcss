@@ -35,6 +35,22 @@ the module: a real `ControlKit`, its imports, and the scene it was drawn
 under. It goes all the way down to the parts themselves: see [Composing a kit
 without code](#composing-a-kit-without-code) below.
 
+## Sample kits
+
+The [Kit Builder](/kit-builder) comes with six sample kits, chosen to differ
+in every way a kit can. Each opens in the builder, ready to take apart; they
+are builder samples rather than library exports, so they are a starting
+point, not a dependency.
+
+| Sample | What it shows |
+| --- | --- |
+| [Studio desk](/kit-builder?sample=studio) | A kit made only of library parts, with versions: a console pot and a flush trim knob, a pill switch and a lit toggle |
+| [Bakelite radio](/kit-builder?sample=bakelite) | Shapes with material colour — glossy brown domes, an ivory chicken-head pointer that holds the light as it turns — and a partial kit that leaves faders to grounded |
+| [Neon synth](/kit-builder?sample=neon) | A dark room, and colour driven by value with no JavaScript: rings and tracks glow brighter as they rise, and only the selected key has a lamp |
+| [Lab instrument](/kit-builder?sample=lab) | Not a single shape — library parts re-chosen and re-finished, with snap motion and a round-button version |
+| [Pastel gadget](/kit-builder?sample=pastel) | Glossy pastel bodies under overhead light, and switch geometry no library class provides |
+| [Blueprint](/kit-builder?sample=blueprint) | No lighting at all: flat line drawing and panel graphics, because a kit is paint and paint need not imitate hardware |
+
 ## What ships
 
 - **`groundedKit`** — the Blender-grounded hardware look. The default, used

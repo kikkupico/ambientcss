@@ -33,7 +33,7 @@ export const SEED_LABELS: Record<SeedName, string> = {
   empty: "Blank"
 };
 
-function part(
+export function part(
   frame: FrameName,
   name: PartName,
   props: PartProps = {},
@@ -48,12 +48,12 @@ function part(
   };
 }
 
-type ShapePatch = {
+export type ShapePatch = {
   box?: Partial<ShapeElement["box"]>;
   paint?: Partial<ShapeElement["paint"]>;
 } & Partial<Omit<ShapeElement, "box" | "paint" | "id" | "kind" | "frame" | "name">>;
 
-function shape(frame: FrameName, name: string, patch: ShapePatch): ShapeElement {
+export function shape(frame: FrameName, name: string, patch: ShapePatch): ShapeElement {
   const base = defaultShape(frame, name);
   const { box, paint, ...rest } = patch;
   return {

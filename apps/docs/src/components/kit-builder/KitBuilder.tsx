@@ -46,6 +46,9 @@ import type { ControlDef, ControlId, PreviewState, RackVersion } from "./Stage";
 import { ExportDialog, Icon, useCopy } from "./ExportDialog";
 import type { ExportFile } from "./ExportDialog";
 import { useHistory } from "./useHistory";
+import { SamplesDialog } from "./SampleGallery";
+import { findSample } from "./samples";
+import type { SampleKit } from "./samples";
 import { SEED_LABELS, seedsFor } from "./seeds";
 import type { SeedName } from "./seeds";
 import "./kit-builder.css";
@@ -61,6 +64,13 @@ function initialConfig(): KitConfig {
   if (hash.startsWith("#s=")) {
     const fromLink = decodeConfig(hash.slice(3));
     if (fromLink) return fromLink;
+  }
+  /* `?sample=neon` opens a sample — how the docs link to each one. A query
+     rather than a hash, so the docs' link checker has nothing to resolve. */
+  const sampleId = new URLSearchParams(window.location.search).get("sample");
+  if (sampleId) {
+    const sample = findSample(sampleId);
+    if (sample) return sample.config;
   }
   try {
     const saved = window.localStorage.getItem(STORAGE_KEY);
@@ -89,7 +99,9 @@ function controlStatus(config: KitConfig, family: FamilyName): string {
   if (!state.dressed) return "Library default";
   const versions = variantNames(config, family).length;
   if (versions > 1) return `${versions} versions`;
-  return `${SEED_LABELS[state.seed]}${isPristine(config, family) ? "" : " · edited"}`;
+  if (isPristine(config, family)) return SEED_LABELS[state.seed];
+  /* Drawn up from nothing: "Blank · edited" would be true and unhelpful. */
+  return state.seed === "empty" ? "Custom" : `${SEED_LABELS[state.seed]} · edited`;
 }
 
 /** The preset an app writes for each control, for the "how to pick it" hint. */
@@ -145,6 +157,7 @@ export default function KitBuilder() {
   const [preview, setPreview] = useState<PreviewState>({ value: 62, on: true, bank: "2" });
   const [adding, setAdding] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [browsing, setBrowsing] = useState(false);
   const [toast, setToast] = useState<Toast | null>(null);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [copied, copy] = useCopy();
@@ -160,7 +173,9 @@ export default function KitBuilder() {
      storage, so closing the tab does not throw an afternoon away. */
   useEffect(() => {
     const encoded = encodeConfig(settled);
-    window.history.replaceState(null, "", `#s=${encoded}`);
+    /* The path alone: a `?sample=` that opened the page has done its job,
+       and left in place it would outrank nothing but confuse a reader. */
+    window.history.replaceState(null, "", `${window.location.pathname}#s=${encoded}`);
     setShareUrl(`${window.location.origin}${window.location.pathname}#s=${encoded}`);
     try {
       window.localStorage.setItem(STORAGE_KEY, encoded);
@@ -285,6 +300,17 @@ export default function KitBuilder() {
     notify(`Deleted the "${vName}" version.`, true);
   };
 
+  const openSample = (sample: SampleKit) => {
+    setConfig(sample.config);
+    setPicked({});
+    setVersionPick({});
+    setBrowsing(false);
+    setSelection({ kind: "control", id: "knob" });
+    setLastControl("knob");
+    setStageView("rack");
+    notify(`Opened ${sample.name}.`, true);
+  };
+
   const applyPreset = (preset: KitPresetName) => {
     setConfig((prev) => applyKitPreset(prev, preset));
     setPicked({});
@@ -367,7 +393,7 @@ export default function KitBuilder() {
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       const state = keyState.current;
-      if (state.exporting || isTyping(event.target)) return;
+      if (state.exporting || document.querySelector(".kb-dialog") || isTyping(event.target)) return;
       const mod = event.metaKey || event.ctrlKey;
       if (mod && event.key.toLowerCase() === "z") {
         event.preventDefault();
@@ -482,6 +508,10 @@ export default function KitBuilder() {
         </div>
 
         <div className="kb-toolbar-actions">
+          <button type="button" className="kb-btn" onClick={() => setBrowsing(true)}>
+            <Icon name="grid" />
+            Samples
+          </button>
           <label className="kb-preset">
             <span className="kb-visually-hidden">Start the whole kit from</span>
             <select
@@ -926,6 +956,8 @@ export default function KitBuilder() {
           this browser and in the page link.
         </p>
       </section>
+
+      {browsing ? <SamplesDialog onOpen={openSample} onClose={() => setBrowsing(false)} /> : null}
 
       {exporting ? (
         <ExportDialog files={files} shareUrl={shareUrl} hiddenCount={hiddenCount} onClose={() => setExporting(false)} />
