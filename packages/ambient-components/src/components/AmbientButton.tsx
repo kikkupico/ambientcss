@@ -19,6 +19,11 @@ export type AmbientButtonProps = Omit<AmbientPressProps, "parts" | "size"> & {
   material?: AmbientMaterial | undefined;
   shape?: AmbientButtonShape | undefined;
   size?: AmbientButtonSize | undefined;
+  /** Which of the active kit's versions of this control to draw — a kit
+   *  may ship a pill switch and a toggle switch side by side. Names are the
+   *  kit's own (see `ControlKit.variants`); an unknown name, or none, draws
+   *  the kit's first. */
+  variant?: string | undefined;
   /** Look options in the active kit's vocabulary. */
   look?: KitLook | undefined;
 };
@@ -27,13 +32,14 @@ export type AmbientButtonProps = Omit<AmbientPressProps, "parts" | "size"> & {
 export function AmbientButton({
   className,
   children,
+  variant,
   look,
   material = "matte",
   shape = "pill",
   size = "md",
   ...rest
 }: AmbientButtonProps) {
-  const { dress } = useDress("press", { material, shape, children, ...look }, groundedKit.press!);
+  const { dress } = useDress("press", { variant, material, shape, children, ...look }, groundedKit.press!);
   return (
     <AmbientPress
       {...rest}

@@ -8,7 +8,7 @@ import type { AmbientTheme, ControlKit } from "@ambientcss/components";
 import { dressedFamilies, familyCode, familyDress, kitDefaults } from "./catalog";
 import type { FamilyName } from "./catalog";
 import { emitCss } from "./css";
-import { fileName, kitIdent, kitSlug, themeIdent } from "./config";
+import { fileName, kitIdent, kitSlug, themeIdent, variantNames } from "./config";
 import type { KitConfig } from "./config";
 
 /* ── The live kit ─────────────────────────────────────────────────────── */
@@ -21,8 +21,15 @@ export function buildKit(cfg: KitConfig): ControlKit {
   const looks: Record<string, readonly string[]> = {};
   for (const family of dressedFamilies(cfg)) looks[family] = familyCode(cfg, slug, family).looks;
 
+  const variants: Record<string, readonly string[]> = {};
+  for (const family of dressedFamilies(cfg)) {
+    const names = variantNames(cfg, family);
+    if (names.length > 1) variants[family] = names;
+  }
+
   return {
     name: slug,
+    ...(Object.keys(variants).length > 0 ? { variants } : null),
     rotary: dress("rotary"),
     travel: dress("travel"),
     press: dress("press"),
@@ -124,12 +131,20 @@ export function emitKit(cfg: KitConfig, shareUrl?: string): string {
      cheaper thing to reason about anyway. */
   const parts: string[] = [];
   const bodies: string[] = [];
+  const preambles: string[] = [];
+  const variantLines: string[] = [];
   let usesLegend = false;
   for (const family of families) {
     const emitted = familyCode(cfg, slug, family);
     for (const name of emitted.imports) if (!parts.includes(name)) parts.push(name);
-    if (emitted.code.includes("look.children as ReactNode")) usesLegend = true;
+    if (`${emitted.preamble ?? ""}${emitted.code}`.includes("look.children as ReactNode")) usesLegend = true;
     bodies.push(emitted.code);
+    if (emitted.preamble) {
+      preambles.push(emitted.preamble);
+      variantLines.push(
+        `    ${family}: [${variantNames(cfg, family).map((name) => `"${name}"`).join(", ")}]`
+      );
+    }
   }
 
   const undressed = (["rotary", "travel", "press", "latch", "bank"] as FamilyName[]).filter(
@@ -162,7 +177,11 @@ export function emitKit(cfg: KitConfig, shareUrl?: string): string {
       `import {\n${names.map((name) => `  ${name}`).join(",\n")}\n} from "@ambientcss/components";`
     );
   }
-  imports.push(`import type { AmbientTheme, ControlKit } from "@ambientcss/components";`);
+  imports.push(
+    preambles.length > 0
+      ? `import type { AmbientTheme, ControlKit, KitDress, KitLook } from "@ambientcss/components";`
+      : `import type { AmbientTheme, ControlKit } from "@ambientcss/components";`
+  );
   if (styles) imports.push(`import "./${slug}.css";`);
 
   const body = [
@@ -170,6 +189,15 @@ export function emitKit(cfg: KitConfig, shareUrl?: string): string {
     `  name: "${slug}",`,
     ...bodies,
     defaultsCode(cfg),
+    variantLines.length > 0
+      ? [
+          `  /* The versions each family draws, default first. Pick one with the`,
+          `     preset's variant prop: <AmbientSwitch variant="…" />. */`,
+          `  variants: {`,
+          variantLines.join(",\n"),
+          `  },`
+        ].join("\n")
+      : null,
     looksCode(cfg),
     `};`
   ]
@@ -183,7 +211,7 @@ export function emitKit(cfg: KitConfig, shareUrl?: string): string {
     themeCode(cfg, theme)
   ].join("\n");
 
-  return [header, imports.join("\n"), body, scene].join("\n\n") + "\n";
+  return [header, imports.join("\n"), ...preambles, body, scene].join("\n\n") + "\n";
 }
 
 /** The call site: what to write once the module above is in the project. */
@@ -193,19 +221,44 @@ export function emitUsage(cfg: KitConfig): string {
   const accent = cfg.theme.accent;
   const module = `./${kitSlug(cfg.name)}`;
 
-  const providerProps = accent
-    ? `theme={${theme}} style={{ "--ambx-accent": "${accent}" } as CSSProperties}`
-    : `theme={${theme}}`;
+  /* Custom properties the scene sets beside the theme: the accent, the
+     panel colour (inherited by every part that has none of its own) and
+     the label colour. */
+  const vars: string[] = [];
+  if (accent) vars.push(`"--ambx-accent": "${accent}"`);
+  if (cfg.panel.albedo) vars.push(`"--amb-albedo": "${cfg.panel.albedo}"`);
+  if (cfg.theme.label) vars.push(`"--amb-label": "${cfg.theme.label}"`);
+  const providerProps =
+    vars.length > 0 ? `theme={${theme}} style={{ ${vars.join(", ")} } as CSSProperties}` : `theme={${theme}}`;
+
+  /* One line per extra version, so the snippet shows how one is picked. */
+  const PRESET: Record<FamilyName, { name: string; jsx: (variant: string) => string }> = {
+    rotary: { name: "AmbientKnob", jsx: (v) => `<AmbientKnob label="${v.toUpperCase()}" variant="${v}" />` },
+    travel: { name: "AmbientFader", jsx: (v) => `<AmbientFader label="${v.toUpperCase()}" variant="${v}" />` },
+    press: { name: "AmbientButton", jsx: (v) => `<AmbientButton variant="${v}">${v.toUpperCase()}</AmbientButton>` },
+    latch: { name: "AmbientSwitch", jsx: (v) => `<AmbientSwitch label="${v.toUpperCase()}" variant="${v}" />` },
+    bank: {
+      name: "AmbientSelect",
+      jsx: (v) => `<AmbientSelect options={[{ value: "1" }, { value: "2" }]} defaultValue="1" variant="${v}" />`
+    }
+  };
+  const presets = ["AmbientKnob", "AmbientSwitch", "AmbientButton"];
+  const extra: string[] = [];
+  for (const family of dressedFamilies(cfg)) {
+    for (const name of variantNames(cfg, family).slice(1)) {
+      const preset = PRESET[family];
+      if (!presets.includes(preset.name)) presets.push(preset.name);
+      extra.push(`          ${preset.jsx(name)}`);
+    }
+  }
 
   return [
-    accent ? `import type { CSSProperties } from "react";` : null,
+    vars.length > 0 ? `import type { CSSProperties } from "react";` : null,
     `import {`,
     `  AmbientProvider,`,
     `  AmbientKitProvider,`,
     `  AmbientPanel,`,
-    `  AmbientKnob,`,
-    `  AmbientSwitch,`,
-    `  AmbientButton`,
+    ...presets.map((name, i) => `  ${name}${i === presets.length - 1 ? "" : ","}`),
     `} from "@ambientcss/components";`,
     `import "@ambientcss/components/styles.css";`,
     `import { ${kit}, ${theme} } from "${module}";`,
@@ -218,6 +271,7 @@ export function emitUsage(cfg: KitConfig): string {
     `          <AmbientKnob label="GAIN" defaultValue={40} />`,
     `          <AmbientSwitch label="ON" defaultValue />`,
     `          <AmbientButton>PLAY</AmbientButton>`,
+    ...(extra.length > 0 ? [`          {/* The kit's other versions, picked by name. */}`, ...extra] : []),
     `        </AmbientPanel>`,
     `      </AmbientKitProvider>`,
     `    </AmbientProvider>`,

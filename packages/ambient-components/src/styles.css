@@ -348,6 +348,17 @@
   background: none;
   min-width: var(--ambx-select-size);
   height: var(--ambx-select-size);
+  /* The key's lamp colour, for any part or look that lights. Same variable
+     .amb-led and AmbientSwitch's led prop use, so one declaration lights
+     every indicator on a panel; unset, it falls back to the scene's own
+     accent rather than to a hardcoded hue.
+
+     Resolved HERE, on the key, not on the bank: a custom property has its
+     var()s substituted on the element that declares it, so reading
+     --amb-led-color one level up would bake in the bank's colour (or the
+     fallback) and inherit that down, and a per-key colour would never be
+     seen. Same trap --amb-curve-delta is declared per element to avoid. */
+  --_ambx-sel-color: var(--amb-led-color, var(--amb-highlight-color));
 }
 
 /* Button: a chamfered key cap seated in a clearance well — the referent
@@ -860,23 +871,19 @@
   );
 }
 
-/* Select: a bank of lamp-lit keys in a shared rail — the hardware idiom
-   for a mode/bank selector, where the state is a lamp rather than a mark.
-   Three physical layers per option, and the ORDER is the whole trick:
+/* Select: a bank of keys in a shared rail — the hardware idiom for a mode,
+   bank or track selector. This file draws it in three layers, and only the
+   first is the bank itself; the other two are a kit's choices:
 
-     1. the option itself is the pocket floor, in the grounded surface tone
-     2. .amb-select-lens is the LED's lens, a big disc lying ON that floor
-     3. .amb-select-cap is a translucent diffuser sitting OVER both
+     .amb-select       the rail and the keys' boxes: a dark groove with the
+                       keys seated in it. Structure, and nothing that lights.
+     .amb-select-lamp  the pocket floor a lamp key's lens lies on — what the
+                       KeyLens / KeyCap parts need under them to read as a
+                       lit diffuser rather than a hole.
+     .amb-select-glow  light escaping round a lit key onto the rail.
 
-   The cap is .amb-mat-glass, so its backdrop-filter blurs whatever is
-   behind it — which is the lens. That single fact produces both states
-   without a second gradient anywhere: unlit, the lens body reads as a soft
-   dark circle through the frost ("the LED you can see is there"); lit, the
-   same disc blooms into a broad radial glow with a hot centre, exactly as
-   an LED does behind a diffuser. Confirmed in the browser: backdrop-filter
-   samples a positioned SIBLING, not just an ancestor's background, so the
-   lens must paint before the cap — hence the lens is absolute and the cap
-   is position: relative rather than the other way round. */
+   The grounded kit wears all three. A kit that draws its own keys wears
+   `.amb-select` alone and gets a rail with no glow it did not ask for. */
 .amb-select {
   display: inline-flex;
   flex-direction: column;
@@ -892,20 +899,6 @@
 }
 
 .amb-select .ambx-key {
-  /* The lamp colour. Same variable .amb-led and AmbientSwitch's led prop
-     use, so one declaration lights every indicator on a panel; unset, it
-     falls back to the scene's own accent rather than to a hardcoded hue.
-
-     Resolved HERE, on the key, not on the bank: a custom property has its
-     var()s substituted on the element that declares it, so reading
-     --amb-led-color one level up would bake in the bank's colour (or the
-     fallback) and inherit that down, and a per-key colour would never be
-     seen. Same trap --amb-curve-delta is declared per element to avoid. */
-  --_ambx-sel-color: var(--amb-led-color, var(--amb-highlight-color));
-  position: relative;
-  cursor: pointer;
-  border: none;
-  padding: 0;
   display: grid;
   /* Square by default, but a WORD is allowed to widen it: min-width floors
      the key at the hardware square, and the cap (a stretched grid item, so
@@ -915,33 +908,53 @@
   min-width: var(--ambx-select-size);
   height: var(--ambx-select-size);
   border-radius: var(--ambx-radius-md);
-  /* The pocket floor the lens lies on: the grounded .amb-surface tone, so
-     an unlit key reads as a lit white diffuser rather than as a hole. */
-  background-color: var(--amb-lit);
-  transition: box-shadow 140ms ease;
 }
 
-/* Disabled dims the LAMP and the legend, not the key. Fading the whole
-   option would sink it into the dark rail, and opacity on the option makes
-   it a backdrop root — the one ancestor property that can cut the cap off
-   from the lens it is supposed to be diffusing. Fading the lens instead
-   leaves the diffuser doing its job on a lamp that simply cannot light. */
 .amb-select .ambx-key:disabled {
   cursor: not-allowed;
-  box-shadow: none;          /* a dead lamp spills nothing onto the rail */
-}
-
-.amb-select .ambx-key:disabled .amb-select-lens {
-  opacity: 0.4;
-}
-
-.amb-select .ambx-key:disabled .amb-select-cap {
-  color: color-mix(in oklab, var(--amb-label), transparent 55%);
 }
 
 .amb-select .ambx-key:focus-visible {
   outline-offset: var(--ambx-grid-half);
 }
+
+/* The pocket floor the lens lies on: the grounded .amb-surface tone, so an
+   unlit key reads as a lit white diffuser rather than as a hole. */
+.amb-select-lamp .ambx-key {
+  background-color: var(--amb-lit);
+}
+
+/* Light escaping around the key onto the rail. Radius is the grounded
+   emissive bloom (ambient3d/derived/notes/glow.md: 6.2px = 2 sigma of the
+   measured falloff), the same figure .amb-glow uses — only the colour is
+   the lamp's rather than --amb-lume's. A dead lamp spills nothing. */
+.amb-select-glow .ambx-key {
+  transition: box-shadow 140ms ease;
+}
+
+.amb-select-glow .ambx-key[data-on]:not(:disabled) {
+  box-shadow: 0 0 6.2px var(--_ambx-sel-color);
+}
+
+/* The lamp parts. KeyLens and KeyCap are three physical layers with the
+   key, and the ORDER is the whole trick:
+
+     1. the key itself is the pocket floor (.amb-select-lamp, above)
+     2. .amb-select-lens is the LED's lens, a big disc lying ON that floor
+     3. .amb-select-cap is a translucent diffuser sitting OVER both
+
+   The cap is .amb-mat-glass, so its backdrop-filter blurs whatever is
+   behind it — which is the lens. That single fact produces both states
+   without a second gradient anywhere: unlit, the lens body reads as a soft
+   dark circle through the frost ("the LED you can see is there"); lit, the
+   same disc blooms into a broad radial glow with a hot centre, exactly as
+   an LED does behind a diffuser. Confirmed in the browser: backdrop-filter
+   samples a positioned SIBLING, not just an ancestor's background, so the
+   lens must paint before the cap — hence the lens is absolute and the cap
+   is position: relative rather than the other way round.
+
+   These rules key off the key's own state rather than the rail's class, so
+   the parts behave the same in whatever bank a kit seats them in. */
 
 /* The LED's lens: a big disc, not the pinprick .amb-led is — this is the
    lamp UNDER the key, sized so the diffused circle is legible through the
@@ -1001,13 +1014,13 @@
   --_glass-blur: calc(var(--ambx-select-size) * 0.18);
 }
 
-.amb-select .ambx-key:hover .amb-select-cap {
+.ambx-key:hover .amb-select-cap {
   color: var(--amb-highlight-color);
 }
 
 /* Pressing sinks the key, and only sinks it — same rule the button follows:
    the drop shadow shortens and the chamfer bands narrow, nothing repaints. */
-.amb-select .ambx-key:active .amb-select-cap {
+.ambx-key:active .amb-select-cap {
   --amb-thickness: 0.84;
 }
 
@@ -1016,11 +1029,11 @@
    which is what the referent measures — a flooded cap that still shows the
    lens's hot centre through it. Past ~55% the radial disappears into a
    flat swatch and the key stops reading as lit-from-behind. */
-.amb-select .ambx-key[data-on] .amb-select-lens {
+.ambx-key[data-on] .amb-select-lens {
   background-color: var(--_ambx-sel-color);
 }
 
-.amb-select .ambx-key[data-on] .amb-select-cap {
+.ambx-key[data-on] .amb-select-cap {
   background-color: color-mix(
     in srgb,
     var(--_ambx-sel-color) 35%,
@@ -1037,12 +1050,17 @@
   color: color-mix(in oklab, var(--_ambx-sel-color), black 68%);
 }
 
-/* Light escaping around the key onto the rail. Radius is the grounded
-   emissive bloom (ambient3d/derived/notes/glow.md: 6.2px = 2 sigma of the
-   measured falloff), the same figure .amb-glow uses — only the colour is
-   the lamp's rather than --amb-lume's. */
-.amb-select .ambx-key[data-on] {
-  box-shadow: 0 0 6.2px var(--_ambx-sel-color);
+/* Disabled dims the LAMP and the legend, not the key. Fading the whole
+   option would sink it into the dark rail, and opacity on the option makes
+   it a backdrop root — the one ancestor property that can cut the cap off
+   from the lens it is supposed to be diffusing. Fading the lens instead
+   leaves the diffuser doing its job on a lamp that simply cannot light. */
+.ambx-key:disabled .amb-select-lens {
+  opacity: 0.4;
+}
+
+.ambx-key:disabled .amb-select-cap {
+  color: color-mix(in oklab, var(--amb-label), transparent 55%);
 }
 
 .ambx-bank {
@@ -1579,7 +1597,7 @@
      selected key can use it — the LED's fill below, and the legend text
      that replaces the LED on a key with a printed legend. Declared on THIS
      element, not inherited pre-resolved, for the reason --_ambx-sel-color
-     is in .amb-select: a custom property's var()s substitute on the
+     is on .ambx-key: a custom property's var()s substitute on the
      element that declares it. */
   --_ambx-console-led: var(--amb-led-color, var(--amb-highlight-color));
 }
@@ -1605,7 +1623,7 @@
    the same --amb-led-color channel the grounded and radio banks read, so
    one `color` prop lights every bank on a panel alike. Declared on THIS
    element, not inherited pre-resolved, for the reason --_ambx-sel-color is
-   in .amb-select: a custom property's var()s substitute on the element that
+   on .ambx-key: a custom property's var()s substitute on the element that
    declares it. */
 .amb-console-key-led {
   position: absolute;

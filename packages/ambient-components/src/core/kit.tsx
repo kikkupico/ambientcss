@@ -65,6 +65,12 @@ export type ControlKit = {
    *  caller passes a prop the active kit is going to drop on the floor —
    *  the one real cost of letting look props pass through untyped. */
   looks?: Partial<Record<ControlFamily, readonly string[]>> | undefined;
+  /** The named versions this kit draws of each family — a pill switch and a
+   *  toggle switch, say — with the default first. A caller picks one with
+   *  the preset's `variant` prop, which reaches the family's function as
+   *  `look.variant`; the function branches on it. Listed so development can
+   *  warn about a name the kit does not have, and so tools can offer them. */
+  variants?: Partial<Record<ControlFamily, readonly string[]>> | undefined;
 };
 
 const KitContext = createContext<ControlKit | null>(null);
@@ -99,7 +105,8 @@ export function useDress<F extends ControlFamily>(
     const honoured = kit.looks?.[family];
     if (honoured) {
       for (const key of Object.keys(look)) {
-        if (look[key] === undefined || honoured.includes(key)) continue;
+        /* `variant` is every kit's word, not one kit's vocabulary. */
+        if (look[key] === undefined || key === "variant" || honoured.includes(key)) continue;
         const id = `${kit.name}:${family}:${key}`;
         if (warned.has(id)) continue;
         warned.add(id);
@@ -109,6 +116,20 @@ export function useDress<F extends ControlFamily>(
             `have no effect here.`
         );
       }
+    }
+  }
+
+  const variant = look.variant;
+  const offered = kit?.variants?.[family];
+  if (isDev && kit && dressed && typeof variant === "string" && offered && !offered.includes(variant)) {
+    const id = `${kit.name}:${family}:variant:${variant}`;
+    if (!warned.has(id)) {
+      warned.add(id);
+      console.warn(
+        `[@ambientcss/components] the "${kit.name}" kit has no ${family} variant ` +
+          `"${variant}" — it offers ${offered.map((name) => `"${name}"`).join(", ")}, ` +
+          `so the first is drawn instead.`
+      );
     }
   }
 

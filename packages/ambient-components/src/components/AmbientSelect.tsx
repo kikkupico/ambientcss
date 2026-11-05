@@ -15,6 +15,11 @@ export type AmbientSelectProps = Omit<
   "keyParts" | "keyPartsOn" | "keyPartsOff" | "parts" | "size"
 > & {
   size?: AmbientSelectSize | undefined;
+  /** Which of the active kit's versions of this control to draw — a kit
+   *  may ship a pill switch and a toggle switch side by side. Names are the
+   *  kit's own (see `ControlKit.variants`); an unknown name, or none, draws
+   *  the kit's first. */
+  variant?: string | undefined;
   /** Look options in the active kit's vocabulary. */
   look?: KitLook | undefined;
 };
@@ -37,8 +42,8 @@ export type AmbientSelectProps = Omit<
  * lit from behind — the case `AmbientBank`'s `keyPartsOn` / `keyPartsOff`
  * exists for.
  */
-export function AmbientSelect({ size = "md", look, className, ...rest }: AmbientSelectProps) {
-  const { dress } = useDress("bank", { ...look }, groundedKit.bank!);
+export function AmbientSelect({ size = "md", variant, look, className, ...rest }: AmbientSelectProps) {
+  const { dress } = useDress("bank", { variant, ...look }, groundedKit.bank!);
   return (
     <AmbientBank
       {...rest}

@@ -12,6 +12,7 @@ import type { ReactNode } from "react";
 import {
   ButtonCap,
   ConsoleBar,
+  ConsoleKey,
   ConsoleMarks,
   ConsoleWell,
   FaderCap,
@@ -40,7 +41,12 @@ export type Piece = { node: ReactNode; code: string; imports: string[] };
 /** What a part may need from the control it is being dressed into. Only one
  *  thing so far, and it is not decoration: a button's legend is the caller's
  *  and arrives through the look, so whatever part carries it has to be told. */
-export type BuildContext = { children?: ReactNode | undefined };
+export type BuildContext = {
+  children?: ReactNode | undefined;
+  /** What generated class names are scoped by: the family, or the family
+   *  and version name (`latch-toggle`) for a version after the first. */
+  scope?: string | undefined;
+};
 
 /* ── helpers shared by both views ─────────────────────────────────────── */
 
@@ -269,6 +275,13 @@ export const PARTS: Record<PartName, PartSpec> = {
     options: [],
     build: () => ({ node: <KeyLens />, code: "<KeyLens />", imports: ["KeyLens"] })
   },
+  ConsoleKey: {
+    label: "Console key",
+    note: "a squared cast key with a moulded dish; sits flush when selected",
+    frame: "actuator",
+    options: [],
+    build: () => ({ node: <ConsoleKey />, code: "<ConsoleKey />", imports: ["ConsoleKey"] })
+  },
   KeyCap: {
     label: "Key cap",
     note: "the translucent diffuser over the lamp, printing the key's legend",
@@ -295,7 +308,7 @@ export const FAMILY_PARTS: Record<string, PartName[]> = {
   travel: ["TravelTrack", "FaderCap", "SliderThumb"],
   press: ["ButtonCap"],
   latch: ["SwitchTrack", "SwitchPill", "ToggleTrack", "ToggleThumb"],
-  bank: ["KeyLens", "KeyCap", "ButtonCap"]
+  bank: ["KeyLens", "KeyCap", "ConsoleKey", "ButtonCap"]
 };
 
 /* ── Shapes ───────────────────────────────────────────────────────────── */
@@ -316,7 +329,8 @@ export function shapePiece(
   family: string,
   ctx: BuildContext
 ): Piece {
-  const classes = [...shapeAmbientClasses(shape), shapeClass(slug, family, shape)].join(" ");
+  const scope = ctx.scope ?? family;
+  const classes = [...shapeAmbientClasses(shape), shapeClass(slug, scope, shape)].join(" ");
   const content = shapeContent(shape, ctx);
 
   const inner = content.code
@@ -331,7 +345,7 @@ export function shapePiece(
 
   if (!shape.steadyLight) return { ...inner, imports: [] };
 
-  const mount = mountClass(slug, family, shape);
+  const mount = mountClass(slug, scope, shape);
   return {
     node: <span className={mount}>{inner.node}</span>,
     code: `<span className="${mount}">${inner.code}</span>`,

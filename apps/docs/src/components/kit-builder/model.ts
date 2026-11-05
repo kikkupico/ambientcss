@@ -35,6 +35,7 @@ export type PartName =
   | "ConsoleWell"
   | "ConsoleBar"
   | "ConsoleMarks"
+  | "ConsoleKey"
   | "TravelTrack"
   | "FaderCap"
   | "SliderThumb"
@@ -73,7 +74,10 @@ export type ShapePlace = "fill" | "centre" | "edge" | "flow";
 
 export type ShapeAnchor = "top" | "bottom" | "left" | "right" | "above" | "below" | "outside-left" | "outside-right";
 
-export type ShapeRadius = "circle" | "pill" | "sharp" | "soft";
+/** `inherit` takes the corner of whatever box the shape sits in — a
+ *  button's well, a bank key — so a cap nests in its seat without its
+ *  corners cutting across the seat's curve. */
+export type ShapeRadius = "circle" | "pill" | "sharp" | "soft" | "inherit";
 
 /** The three structures an element can have, and they do not combine.
  *
@@ -181,13 +185,21 @@ export function elementBankState(element: KitElement): BankKeyState {
   return element.bankState ?? "both";
 }
 
-export type ShapeElement = {
+/** Fields every element has, whichever kind it is. */
+type ElementBase = {
   id: string;
-  kind: "shape";
   frame: FrameName;
   only?: ElementOnly | undefined;
   bankScope?: BankScope | undefined;
   bankState?: BankKeyState | undefined;
+  /** Switched off in the layer list. A hidden element is left out of the
+   *  preview AND the export, so what the page shows is still what you take
+   *  away — hiding is for comparing, not for keeping a second copy. */
+  hidden?: boolean | undefined;
+};
+
+export type ShapeElement = ElementBase & {
+  kind: "shape";
   /** Names the generated class — `desk-rotary-housing`. */
   name: string;
   box: ShapeBox;
@@ -202,13 +214,8 @@ export type ShapeElement = {
   steadyLight: boolean;
 };
 
-export type PartElement = {
-  id: string;
+export type PartElement = ElementBase & {
   kind: "part";
-  frame: FrameName;
-  only?: ElementOnly | undefined;
-  bankScope?: BankScope | undefined;
-  bankState?: BankKeyState | undefined;
   part: PartName;
   props: PartProps;
 };
@@ -255,6 +262,23 @@ export function defaultShape(frame: FrameName, name: string): ShapeElement {
     text: "",
     textSize: 0.26,
     steadyLight: false
+  };
+}
+
+/** The same element under a fresh id — and, for a shape, a fresh name,
+ *  because the name is what its generated class is called and two shapes
+ *  sharing one would share a rule. */
+export function duplicateElement(element: KitElement, taken: string[]): KitElement {
+  if (element.kind === "part") return { ...element, id: newId(), props: { ...element.props } };
+  const stem = element.name.replace(/-\d+$/, "") || "shape";
+  let i = 2;
+  while (taken.includes(`${stem}-${i}`)) i += 1;
+  return {
+    ...element,
+    id: newId(),
+    name: `${stem}-${i}`,
+    box: { ...element.box },
+    paint: { ...element.paint }
   };
 }
 

@@ -5,6 +5,7 @@
  *  writes, so what you are looking at is literally the stylesheet you take
  *  away. There is no second implementation to keep in step. */
 
+import { getVariants, projectVariant, variantScope } from "./config";
 import type { KitConfig } from "./config";
 import type { FamilyName } from "./catalog";
 import { mountSelector, shapeSelector } from "./model";
@@ -16,7 +17,17 @@ function n(value: number): string {
   return String(Math.round(value * 1000) / 1000);
 }
 
-function radius(shape: ShapeElement): string | null {
+/** What "match container" means per family. A button's and a key's frames
+ *  are `display: contents`, so `inherit` would read the frame (no radius),
+ *  not the well; the radius has to be the token the container is built on.
+ *  A button cap sits in its well by the well's own padding, so it takes the
+ *  well's radius less that gap — which is `--ambx-radius-lg`. */
+const CONTAINER_RADIUS: Record<string, string> = {
+  press: "var(--ambx-radius-lg)",
+  bank: "var(--ambx-radius-md)"
+};
+
+function radius(shape: ShapeElement, scope = ""): string | null {
   /* A line of text with no box to speak of has no corners to round, and a
      `border-radius: 50%` sitting in the rule is noise in a file someone is
      going to read. A key cap has content AND a body, so it keeps its. */
@@ -34,6 +45,8 @@ function radius(shape: ShapeElement): string | null {
       return "var(--ambx-radius-full)";
     case "soft":
       return `calc(var(--ambx-size) * ${n(shape.box.softness / 100)})`;
+    case "inherit":
+      return CONTAINER_RADIUS[scope.split("-")[0] ?? ""] ?? "inherit";
     default:
       return null;
   }
@@ -199,7 +212,7 @@ function rule(selector: string, declarations: string[]): string {
   return `${selector} {\n${declarations.map((line) => `  ${line};`).join("\n")}\n}`;
 }
 
-function shapeRules(slug: string, family: FamilyName, shape: ShapeElement): string[] {
+function shapeRules(slug: string, family: string, shape: ShapeElement): string[] {
   const rules: string[] = [];
 
   if (shape.steadyLight) {
@@ -224,7 +237,7 @@ function shapeRules(slug: string, family: FamilyName, shape: ShapeElement): stri
   }
 
   const declarations = [...geometry(shape), ...paint(shape), ...text(shape)];
-  const round = radius(shape);
+  const round = radius(shape, family);
   if (round) declarations.push(`border-radius: ${round}`);
 
   if (shape.steadyLight) {
@@ -279,7 +292,7 @@ export function rootDeclarations(cfg: KitConfig, family: FamilyName): string[] {
   return out;
 }
 
-export function rootClass(slug: string, family: FamilyName): string {
+export function rootClass(slug: string, family: string): string {
   return `${slug}-${family}-root`;
 }
 
@@ -294,18 +307,23 @@ export function emitCss(cfg: KitConfig, slug: string, families: FamilyName[]): s
   const bodies: string[] = [];
   let usesTransition = false;
   for (const family of families) {
-    const elements = cfg[family].elements ?? [];
+    /* Each version is its own set of rules, scoped by its name — so two
+       versions may each have a `track` without the rules colliding. */
+    getVariants(cfg, family).forEach((variant, index) => {
+      const version = projectVariant(cfg, family, index);
+      const scope = variantScope(family, variant.name, index);
 
-    const root = rootDeclarations(cfg, family);
-    if (root.length > 0) bodies.push(rule(`.${rootClass(slug, family)}`, root));
+      const root = rootDeclarations(version, family);
+      if (root.length > 0) bodies.push(rule(`.${rootClass(slug, scope)}`, root));
 
-    for (const element of elements) {
-      if (element.kind !== "shape") continue;
-      usesShapes = true;
-      if (element.steadyLight) usesMount = true;
-      if (element.paint.transition) usesTransition = true;
-      bodies.push(...shapeRules(slug, family, element));
-    }
+      for (const element of version[family].elements ?? []) {
+        if (element.kind !== "shape" || element.hidden) continue;
+        usesShapes = true;
+        if (element.steadyLight) usesMount = true;
+        if (element.paint.transition) usesTransition = true;
+        bodies.push(...shapeRules(slug, scope, element));
+      }
+    });
   }
 
   if (bodies.length === 0) return "";

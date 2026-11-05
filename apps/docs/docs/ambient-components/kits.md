@@ -27,12 +27,29 @@ same state, and differ only in the kit above them.
 
 <KitComparisonPreview />
 
-Or build one without writing any of it: the [Kit Builder](/kit-builder) gives
-each control a tab, the control itself a screen, and its parts a row of keys
-beneath it — open a key and you are editing that part. What it hands back is
+Or build one without writing any of it: the [Kit Builder](/kit-builder) lists
+each control on the left, runs the one you pick on a stage in the kit's own
+light, and shows its parts as layers beside it — select a layer and you are
+editing that part. What it hands back is
 the module: a real `ControlKit`, its imports, and the scene it was drawn
 under. It goes all the way down to the parts themselves: see [Composing a kit
 without code](#composing-a-kit-without-code) below.
+
+## Sample kits
+
+The [Kit Builder](/kit-builder) comes with six sample kits, chosen to differ
+in every way a kit can. Each opens in the builder, ready to take apart; they
+are builder samples rather than library exports, so they are a starting
+point, not a dependency.
+
+| Sample | What it shows |
+| --- | --- |
+| [Studio desk](/kit-builder?sample=studio) | A kit made only of library parts, with versions: a console pot and a flush trim knob, a pill switch and a lit toggle |
+| [Cockpit](/kit-builder?sample=cockpit) | Versions throughout — a chicken-head selector with its positions printed round it and a knurled trim knob, a toggle and a guarded toggle with red guard rails, annunciator buttons in red, amber and green — on a dark painted panel with white print |
+| [Arcade cabinet](/kit-builder?sample=arcade) | Domed arcade buttons in four colour versions, a trackball whose fleck turns with the value (or a spinner), a ball-top joystick on the fader, and keys that light up when chosen, on glossy black laminate |
+| [Lab instrument](/kit-builder?sample=lab) | Not a single shape — library parts re-chosen and re-finished, with snap motion and a round-button version |
+| [Glass](/kit-builder?sample=glass) | Frosted glass panes floating over softly tinted light that brightens with the value, so a knob or fader fills with a lavender glow as it turns up; the selected key's light is diffused through its pane; primary, danger and ghost button versions |
+| [Blueprint](/kit-builder?sample=blueprint) | No lighting at all: flat line drawing and panel graphics, because a kit is paint and paint need not imitate hardware |
 
 ## What ships
 
@@ -60,13 +77,14 @@ export const neon: ControlKit = {
 };
 ```
 
-Three things and no more:
+The fields:
 
 | Field | What it does |
 | --- | --- |
 | `<family>` | `(look) => { parts, className }` for `rotary`, `travel`, `press`, `latch`, `bank` |
 | `defaults` | presentation-only prop defaults — `travel`, `input`, `animate` |
 | `looks` | which look keys each family honours, used to warn in development |
+| `variants` | the named versions each family draws, default first — see [below](#more-than-one-version-of-a-control) |
 
 **A kit may be partial.** `consoleKit` dresses knobs, switches and key banks
 and lets faders and buttons fall through to `groundedKit`. That is what a
@@ -84,13 +102,60 @@ mechanism does not know it exists.
 look: `.amb-knob` carries the grounded knob's own token table, and a kit
 that replaces the parts has no use for it.
 
+## More than one version of a control
+
+A kit is not limited to one look per family. A desk might want a pill
+switch for most things and a lit toggle for the master bus — both latches,
+both in the same kit. Every preset takes a `variant` prop, which reaches the
+family's function as `look.variant`; the function branches on it, and
+`variants` lists the names so a misspelt one warns in development:
+
+```tsx
+import type { ControlKit, KitDress, KitLook } from "@ambientcss/components";
+import { SwitchPill, SwitchTrack, ToggleThumb, ToggleTrack } from "@ambientcss/components";
+
+const latchPill = (): KitDress => ({
+  className: "amb-switch",
+  parts: { base: <SwitchTrack />, actuator: <SwitchPill /> }
+});
+
+const latchToggle = (): KitDress => ({
+  className: "amb-console-toggle",
+  parts: { base: <ToggleTrack />, actuator: <ToggleThumb /> }
+});
+
+export const deskKit: ControlKit = {
+  name: "desk",
+  latch: (look: KitLook) => (look.variant === "toggle" ? latchToggle() : latchPill()),
+  variants: { latch: ["pill", "toggle"] },
+  looks: { latch: [] }
+};
+```
+
+```tsx
+<AmbientKitProvider kit={deskKit}>
+  <AmbientSwitch label="MUTE" />                    {/* pill — the default */}
+  <AmbientSwitch label="MASTER" variant="toggle" />
+</AmbientKitProvider>
+```
+
+The first name is the default: a control with no `variant`, or one the kit
+does not have, gets it. A family the kit leaves to `groundedKit` ignores
+`variant` entirely, the same way it ignores any other kit's look props.
+
+In the [Kit Builder](/kit-builder), **Add version** above a control's layers
+starts another version — a copy of the one you are on, or a fresh start from
+any seed — and each version has its own layers and root class. Name it, and
+the export writes one dress function per version and the switch above.
+
 ## Composing a kit without code
 
-There is no shallower mode in the [Kit Builder](/kit-builder): what a tab
-shows you is always the real thing — the control's four frames as a list of
-elements, each one either a part this package exports or a **shape**, which is
-a `<span>` with a generated rule behind it. Every part in the row of keys under
-a control can be opened, including the two the library ships.
+There is no shallower mode in the [Kit Builder](/kit-builder): the layer list
+is always the real thing — the control's four frames (shown as Panel, Base,
+Moving and Top) as a list of elements, each one either a part this package
+exports or a **shape**, which is a `<span>` with a generated rule behind it.
+Every layer can be opened, hidden, reordered or duplicated, including the parts
+the library ships.
 
 A shape is not a lesser way of writing a part; it is what a part is.
 `ConsoleWell` is a groove ring with a flat disc in it. `ConsoleBar` is one
@@ -99,16 +164,18 @@ reachable from the form:
 
 | Field | What it writes |
 | --- | --- |
-| Placement | `inset`, a centred `width`/`height`, an edge anchor — including *outside* the control's box, which is what a panel graphic needs — or **in flow**, the one a button's cap has to use |
-| Structure | `.ambient` (a body that cuts edges and casts), `.amb-groove` (a recess), or neither. Never both: each paints the whole lighting model into `box-shadow` |
+| Placement | `inset` (**Fill**), a centred `width`/`height`, an **Edge** anchor — including *outside* the control's box, which is what a panel graphic needs — or **Wrap content** (in flow), the one a button's cap has to use |
+| Structure | **Raised** is `.ambient` (a body that cuts edges and casts), **Recessed** is `.amb-groove`, **Flat** is neither. Never both: each paints the whole lighting model into `box-shadow` |
 | Surface, edge, material | `amb-surface*`, `amb-chamfer`/`amb-fillet`, `amb-mat-*` |
 | Thickness, elevation | `--amb-thickness`, `--amb-elevation`, as fractions — the console housing is 0.27 deep |
 | Colour | an albedo the light then acts on, a flat paint, the scene's recess floor, the accent, **lit by value** (mixes the accent in from `--ambx-percent`, with no React anywhere near it), or ink |
-| Keep the light still | emits the two-element light-capture trick the console bar uses |
+| Hold the light | emits the two-element light-capture trick the console bar uses |
 
-**Start from** seeds the list rather than locking it: `grounded parts`, `console parts`, or `console, in shapes` — the console knob,
-toggle and key rebuilt entirely out of shapes, with the reference's own
-numbers, so you can take one apart to see how it is made. A shipped look is a starting point in that
+**Start from** seeds the list rather than locking it — for one control, or
+for the whole kit at once from the toolbar: *Grounded*, *Console*, or
+*Console, from shapes* — the console knob and toggle rebuilt entirely out of
+shapes, with the reference's own numbers, so you can take one apart to see how
+it is made. A shipped look is a starting point in that
 builder, never a wall.
 
 Two things live beside the parts rather than in them, because they belong to
