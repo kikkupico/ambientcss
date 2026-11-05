@@ -268,7 +268,9 @@ export function seedRootClass(family: string, seed: SeedName): SeedClasses {
   if (family === "bank" && seed === "radio") return { rootClass: "amb-select-radio", rootClassH: "" };
   if (family === "bank" && seed === "console")
     return { rootClass: "amb-console-bank amb-groove", rootClassH: "" };
-  return { rootClass: "amb-select amb-groove", rootClassH: "" };
+  /* The rail, the lamp floor and the glow are three classes; the grounded
+     key wears all three. A bank drawn from shapes keeps only the rail. */
+  return { rootClass: "amb-select amb-select-lamp amb-select-glow amb-groove", rootClassH: "" };
 }
 
 /** Root tokens that go with a seed — the ones the root class does NOT

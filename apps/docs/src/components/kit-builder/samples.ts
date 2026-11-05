@@ -471,7 +471,8 @@ const arcade = kit({
         bankState: "on"
       }
     ],
-    "amb-select amb-groove"
+    /* The one sample whose bank glows: a lit arcade key should. */
+    "amb-select amb-select-glow amb-groove"
   ),
   /* Glossy black laminate under a cool overhead, with a violet cast. */
   theme: {

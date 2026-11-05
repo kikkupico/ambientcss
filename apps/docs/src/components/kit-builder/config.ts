@@ -452,6 +452,21 @@ export function encodeConfig(config: KitConfig): string {
   return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
+/** Links made before the bank's glow became a kit's choice: a lamp-key bank
+ *  then wore only `amb-select` and got the lamp floor and glow with it. It
+ *  now has to ask for them, so such a bank is given both on the way in and
+ *  looks the way it did when the link was made. */
+function migrateBankRoot<T extends { rootClass: string; elements: KitElement[] }>(version: T): T {
+  const classes = version.rootClass.split(/\s+/);
+  const lampParts = version.elements.some(
+    (element) => element.kind === "part" && (element.part === "KeyLens" || element.part === "KeyCap")
+  );
+  if (!lampParts || !classes.includes("amb-select") || classes.includes("amb-select-lamp")) return version;
+  const at = classes.indexOf("amb-select") + 1;
+  classes.splice(at, 0, "amb-select-lamp", "amb-select-glow");
+  return { ...version, rootClass: classes.join(" ") };
+}
+
 export function decodeConfig(encoded: string): KitConfig | null {
   try {
     const padded = encoded.replace(/-/g, "+").replace(/_/g, "/");
@@ -469,7 +484,10 @@ export function decodeConfig(encoded: string): KitConfig | null {
       travel: { ...DEFAULT_CONFIG.travel, ...parsed.travel },
       press: { ...DEFAULT_CONFIG.press, ...parsed.press },
       latch: { ...DEFAULT_CONFIG.latch, ...parsed.latch },
-      bank: { ...DEFAULT_CONFIG.bank, ...parsed.bank },
+      bank: (() => {
+        const bank = migrateBankRoot({ ...DEFAULT_CONFIG.bank, ...parsed.bank });
+        return bank.variants ? { ...bank, variants: bank.variants.map(migrateBankRoot) } : bank;
+      })(),
       theme: { ...DEFAULT_CONFIG.theme, ...parsed.theme },
       panel: { ...DEFAULT_CONFIG.panel, ...parsed.panel }
     };

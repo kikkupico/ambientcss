@@ -31,6 +31,23 @@ diffuser. The light that escapes around the key onto the rail uses the
 grounded emissive bloom radius (6.2px, two sigma of the measured falloff —
 the same figure `amb-glow` uses).
 
+### The glow is the kit's, not the bank's
+
+The bank's root wears up to three classes, and only the first is the bank
+itself:
+
+| Class | What it draws |
+| --- | --- |
+| `amb-select` | the rail — a dark groove with the keys' square boxes seated in it |
+| `amb-select-lamp` | the light pocket floor the lens lies on, which `KeyLens` and `KeyCap` need under them |
+| `amb-select-glow` | the selected key's light spilling onto the rail |
+
+The grounded kit wears all three, so `AmbientSelect` looks as described above.
+A [kit](./kits) that seats its own keys in the rail wears `amb-select` alone
+and gets no glow it did not ask for — or adds `amb-select-glow` when its keys
+should spill light too. The lamp parts style their lit, hover and disabled
+states off the key's own state, so they behave the same in any bank.
+
 Pressing a key sinks it and only sinks it, exactly as
 [AmbientButton](/ambient-components/button) does: the drop shadow shortens and
 the chamfer bands narrow. Nothing repaints.

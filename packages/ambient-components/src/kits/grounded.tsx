@@ -90,10 +90,16 @@ function latch(): KitDress {
 
 /** The grounded key: a lamp under a glass diffuser, on and off the same
  *  markup — `[data-on]` in the stylesheet is the whole state change, so
- *  `parts` alone (no `onParts` / `offParts`) covers both. */
+ *  `parts` alone (no `onParts` / `offParts`) covers both.
+ *
+ *  The rail (`amb-select`), the lit pocket floor the lens needs
+ *  (`amb-select-lamp`) and the light spilling onto the rail
+ *  (`amb-select-glow`) are three separate classes, and the glow is this
+ *  kit's choice: another kit seats its own keys in the same rail without
+ *  inheriting a glow it never asked for. */
 function bankKey(): KitDress {
   return {
-    className: "amb-select amb-groove",
+    className: "amb-select amb-select-lamp amb-select-glow amb-groove",
     parts: { base: <KeyLens />, actuator: <KeyCap /> }
   };
 }

@@ -467,6 +467,30 @@ export function LayerEditor({
 
 /* ── The control itself ───────────────────────────────────────────────── */
 
+/* ── The bank's look layers ─────────────────────────────────────────────── */
+
+const BANK_LAYERS = [
+  { name: "amb-select", label: "Rail", hint: "The dark groove the keys sit in, and their square boxes." },
+  { name: "amb-select-lamp", label: "Lamp floor", hint: "The light floor a key lens lies on. Needed under Key lens and Key cap." },
+  { name: "amb-select-glow", label: "Glow", hint: "The selected key spills its lamp colour onto the rail." }
+];
+
+function hasClass(list: string, name: string): boolean {
+  return list.split(/\s+/).includes(name);
+}
+
+/** Add or remove one class, keeping the others where they were. A layer
+ *  added goes right after the rail, so the root class reads in order. */
+function toggleClass(list: string, name: string, on: boolean): string {
+  const classes = list.split(/\s+/).filter(Boolean).filter((candidate) => candidate !== name);
+  if (on) {
+    const rail = classes.indexOf("amb-select");
+    if (name === "amb-select" || rail === -1) classes.unshift(name);
+    else classes.splice(rail + 1, 0, name);
+  }
+  return classes.join(" ");
+}
+
 const ANIMATE_OPTIONS: Option<KitConfig["rotary"]["animate"]>[] = [
   { value: "default", label: "Default", title: "Let the control decide." },
   { value: "auto", label: "Auto", title: "Follow while dragging, ease otherwise." },
@@ -578,6 +602,24 @@ export function ControlEditor({
               <Slider label="End gap" value={latch.root.inset} min={0} max={0.3} step={0.01} unit="×" onChange={(inset) => patch("latch", { root: { ...latch.root, inset } })} />
             </>
           ) : null}
+        </Section>
+      ) : null}
+
+      {family === "bank" ? (
+        <Section title="Rail & lamp">
+          <Note>
+            Three separate classes on the bank's root. The glow is yours to choose: a bank of your own keys can sit in
+            the rail without it.
+          </Note>
+          {BANK_LAYERS.map((layer) => (
+            <Toggle
+              key={layer.name}
+              label={layer.label}
+              hint={layer.hint}
+              checked={hasClass(state.rootClass, layer.name)}
+              onChange={(on) => patch("bank", { rootClass: toggleClass(state.rootClass, layer.name, on) })}
+            />
+          ))}
         </Section>
       ) : null}
 
