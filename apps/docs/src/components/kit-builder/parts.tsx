@@ -12,6 +12,7 @@ import type { ReactNode } from "react";
 import {
   ButtonCap,
   ConsoleBar,
+  ConsoleKey,
   ConsoleMarks,
   ConsoleWell,
   FaderCap,
@@ -269,6 +270,13 @@ export const PARTS: Record<PartName, PartSpec> = {
     options: [],
     build: () => ({ node: <KeyLens />, code: "<KeyLens />", imports: ["KeyLens"] })
   },
+  ConsoleKey: {
+    label: "Console key",
+    note: "a squared cast key with a moulded dish; sits flush when selected",
+    frame: "actuator",
+    options: [],
+    build: () => ({ node: <ConsoleKey />, code: "<ConsoleKey />", imports: ["ConsoleKey"] })
+  },
   KeyCap: {
     label: "Key cap",
     note: "the translucent diffuser over the lamp, printing the key's legend",
@@ -295,7 +303,7 @@ export const FAMILY_PARTS: Record<string, PartName[]> = {
   travel: ["TravelTrack", "FaderCap", "SliderThumb"],
   press: ["ButtonCap"],
   latch: ["SwitchTrack", "SwitchPill", "ToggleTrack", "ToggleThumb"],
-  bank: ["KeyLens", "KeyCap", "ButtonCap"]
+  bank: ["KeyLens", "KeyCap", "ConsoleKey", "ButtonCap"]
 };
 
 /* ── Shapes ───────────────────────────────────────────────────────────── */

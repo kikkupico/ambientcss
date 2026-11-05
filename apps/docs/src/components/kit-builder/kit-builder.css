@@ -1,483 +1,1163 @@
-/* The Kit Builder, styled as the thing it makes.
+/* The Kit Builder.
  *
- *  The page is one device: a tab per control, the control on a screen, its
- *  parts on keys below it, and the form for whichever key is pressed. The
- *  casing is the library's own — `.ambient` for the body, `.amb-groove` for
- *  the two recesses — because a builder for skeuomorphic controls that came
- *  in a flat box would be arguing with itself.
- *
- *  The forms stay plain HTML. Everything on the screen is the kit being
- *  built, and a knob in the form would be a knob you cannot tell apart from
- *  the one you are designing. */
+ *  The tool is plain and follows the docs site's own colours, light or dark,
+ *  so that the only skeuomorphic thing on the page is the kit being built.
+ *  The stage is the kit's own room: its theme, its panel, its light. */
 
-/* Width, explicitly: the page's main wrapper is a column flex container, so
-   a block with auto margins and no width shrink-wraps to its content and the
-   device would change size with whichever tab is open. */
 .kb {
+  /* Infima leaves --ifm-background-color transparent in light mode, so the
+     surface colour is the one that is always a real colour. */
+  --kb-bg: var(--ifm-background-surface-color, #fff);
+  --kb-panel: color-mix(in srgb, var(--ifm-color-emphasis-100) 55%, var(--kb-bg));
+  --kb-hover: var(--ifm-color-emphasis-100);
+  --kb-line: var(--ifm-color-emphasis-300);
+  --kb-line-soft: var(--ifm-color-emphasis-200);
+  --kb-text: var(--ifm-font-color-base);
+  --kb-muted: var(--ifm-color-emphasis-700);
+  --kb-faint: var(--ifm-color-emphasis-600);
+  --kb-accent: var(--ifm-color-primary);
+  --kb-accent-soft: color-mix(in srgb, var(--ifm-color-primary) 13%, transparent);
+  --kb-accent-text: var(--ifm-color-primary-dark);
+  --kb-danger: var(--ifm-color-danger, #e5484d);
+  --kb-warn-bg: color-mix(in srgb, var(--ifm-color-warning, #f5a524) 14%, transparent);
+  --kb-radius: 14px;
+  --kb-top: calc(var(--ifm-navbar-height, 60px) + 12px);
+
   width: 100%;
-  max-width: 1180px;
+  max-width: 1680px;
   margin: 0 auto;
-  padding: 24px 20px 64px;
-}
-
-.kb-chrome {
-  display: block;
-}
-
-.kb-intro {
-  max-width: 68ch;
-  margin: 0 auto 22px;
-  text-align: center;
-}
-
-.kb-intro-title {
-  margin: 0 0 6px;
-  font-size: 2rem;
-}
-
-.kb-intro-text {
-  margin: 0;
-  font-size: 0.92rem;
-  line-height: 1.6;
-  color: var(--ifm-color-emphasis-700);
-}
-
-.kb-scrim {
-  position: fixed;
-  inset: 0;
-  z-index: 4;
-  border: none;
-  background: transparent;
-  cursor: default;
-}
-
-.kb-device {
-  --kb-line: color-mix(in oklab, var(--amb-label), transparent 82%);
-  --kb-quiet: color-mix(in oklab, var(--amb-label), transparent 38%);
-  --kb-accent: var(--amb-highlight-color, #8ab4f8);
-  display: grid;
-  gap: 18px;
-  padding: 22px;
-  border-radius: 28px;
-  color: var(--amb-label);
-  font-size: 0.95rem;
-}
-
-/* ── The bar ──────────────────────────────────────────────────────────── */
-
-.kb-bar {
-  display: flex;
-  align-items: stretch;
-  gap: 10px;
-}
-
-.kb-name {
-  flex: 1 1 auto;
-  min-width: 0;
-  border-radius: 10px;
-  display: flex;
-}
-
-.kb-name-input {
-  flex: 1;
-  min-width: 0;
-  border: none;
-  background: none;
-  color: var(--amb-label);
-  font: inherit;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  text-align: center;
-  padding: 9px 14px;
-}
-
-.kb-name-input:focus {
-  outline: none;
-  color: var(--kb-accent);
-}
-
-.kb-key {
-  flex: 0 0 auto;
-  min-width: 52px;
-  border: 1px solid var(--kb-line);
-  border-radius: 10px;
-  background: color-mix(in oklab, var(--amb-label), transparent 94%);
-  color: var(--kb-quiet);
-  font-family: var(--ifm-font-family-monospace);
+  padding: 16px 20px 56px;
+  color: var(--kb-text);
   font-size: 0.9rem;
-  cursor: pointer;
 }
 
-.kb-key:hover {
-  color: var(--amb-label);
-  border-color: var(--kb-quiet);
+[data-theme="dark"] .kb {
+  --kb-panel: color-mix(in srgb, var(--ifm-color-emphasis-100) 60%, var(--kb-bg));
+  --kb-accent-text: var(--ifm-color-primary-lighter);
 }
 
-.kb-key-on {
-  color: var(--kb-accent);
-  border-color: var(--kb-accent);
+.kb *,
+.kb *::before,
+.kb *::after {
+  box-sizing: border-box;
 }
 
-.kb-menu-anchor {
-  position: relative;
-  display: flex;
-}
-
-.kb-menu {
+.kb-visually-hidden {
   position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
-  z-index: 5;
-  display: grid;
-  min-width: 232px;
-  padding: 5px;
-  border: 1px solid var(--ifm-color-emphasis-300);
-  border-radius: 12px;
-  background: var(--ifm-background-surface-color);
-  box-shadow: 0 12px 32px rgb(0 0 0 / 22%);
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
-.kb-menu button {
-  border: none;
-  background: none;
-  color: var(--ifm-font-color-base);
-  text-align: left;
-  padding: 8px 10px;
-  border-radius: 8px;
+.kb :focus-visible {
+  outline: 2px solid var(--kb-accent);
+  outline-offset: 2px;
+}
+
+.kb code {
+  font-size: 0.85em;
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────── */
+
+.kb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--kb-line);
+  border-radius: 9px;
+  background: var(--kb-bg);
+  color: var(--kb-text);
+  font: inherit;
   font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
 }
 
-.kb-menu button:hover:not(:disabled) {
-  background: var(--ifm-color-emphasis-200);
+.kb-btn:hover:not(:disabled) {
+  background: var(--kb-hover);
 }
 
-.kb-menu button:disabled {
-  opacity: 0.45;
+.kb-btn:disabled {
+  opacity: 0.4;
   cursor: default;
 }
 
-/* ── Tabs ─────────────────────────────────────────────────────────────── */
-
-.kb-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 18px;
-  padding: 0 4px;
+.kb-btn-primary {
+  border-color: var(--kb-accent);
+  background: var(--kb-accent);
+  color: #fff;
 }
 
-.kb-tab {
+.kb-btn-primary:hover:not(:disabled) {
+  background: var(--ifm-color-primary-dark);
+}
+
+.kb-btn-ghost {
+  border-color: transparent;
+  background: transparent;
+  color: var(--kb-muted);
+}
+
+.kb-btn-ghost:hover:not(:disabled) {
+  color: var(--kb-text);
+}
+
+.kb-btn-icon {
+  width: 34px;
+  padding: 0;
+}
+
+.kb-btn-small {
+  height: 28px;
+  padding: 0 9px;
+  font-size: 0.8rem;
+  border-radius: 8px;
+}
+
+.kb-btn-tiny {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+}
+
+.kb-btn-on {
+  border-color: var(--kb-accent);
+  background: var(--kb-accent-soft);
+  color: var(--kb-accent-text);
+}
+
+.kb-btn-danger:hover:not(:disabled) {
+  color: var(--kb-danger);
+}
+
+.kb-btn-group {
+  display: inline-flex;
+}
+
+.kb-btn-group .kb-btn:first-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.kb-btn-group .kb-btn:last-child {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  margin-left: -1px;
+}
+
+.kb-link {
   border: none;
   background: none;
-  padding: 2px 0;
-  color: var(--kb-quiet);
-  font-size: 1.02rem;
+  padding: 0;
+  color: var(--kb-accent-text);
+  font: inherit;
+  font-size: 0.8rem;
   font-weight: 600;
-  letter-spacing: 0.01em;
   cursor: pointer;
-  border-bottom: 2px solid transparent;
 }
 
-.kb-tab:hover {
-  color: var(--amb-label);
+.kb-link:hover {
+  text-decoration: underline;
 }
 
-.kb-tab-on {
-  color: var(--amb-label);
-  border-bottom-color: var(--kb-accent);
+.kb-icon-svg {
+  flex: 0 0 auto;
 }
 
-/* ── The screen ───────────────────────────────────────────────────────── */
-
-.kb-screen {
-  border-radius: 20px;
-  padding: 32px 24px;
-  min-height: 300px;
-  display: grid;
-  place-items: center;
-  overflow-x: auto;
-}
-
-.kb-stage-scene {
-  display: grid;
-  justify-items: center;
-  gap: 12px;
-}
-
-.kb-panel {
-  display: grid;
-  gap: 32px;
-  padding: 32px;
-  justify-items: center;
-}
-
-.kb-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 32px;
-}
-
-.kb-column {
-  display: grid;
-  justify-items: center;
-  gap: 24px;
-}
-
-/* ── The part keys ────────────────────────────────────────────────────── */
-
-.kb-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+.kb-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--kb-hover);
+  color: var(--kb-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .kb-chip {
-  flex: 0 0 auto;
-  width: 116px;
-  display: grid;
-  gap: 4px;
-  justify-items: center;
-  padding: 8px 8px 10px;
+  height: 30px;
+  padding: 0 12px;
   border: 1px solid var(--kb-line);
-  border-radius: 16px;
-  background: color-mix(in oklab, var(--amb-label), transparent 95%);
-  color: var(--kb-quiet);
+  border-radius: 999px;
+  background: var(--kb-bg);
+  color: var(--kb-text);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
   cursor: pointer;
 }
 
 .kb-chip:hover {
-  border-color: var(--kb-quiet);
-  color: var(--amb-label);
+  background: var(--kb-hover);
 }
 
 .kb-chip-on {
   border-color: var(--kb-accent);
-  color: var(--amb-label);
-  box-shadow: inset 0 0 0 1px var(--kb-accent);
+  background: var(--kb-accent-soft);
+  color: var(--kb-accent-text);
 }
 
-/* The thumbnails are the control itself, wearing one part. They are cropped
-   to a fixed box so a row of them reads as a row — a fader is three times a
-   switch, and a strip that argued the point would be unusable. */
-.kb-chip-art {
+/* ── Toolbar ──────────────────────────────────────────────────────────── */
+
+.kb-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 16px;
+  margin-bottom: 14px;
+}
+
+.kb-toolbar-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1 1 320px;
+}
+
+.kb-title {
+  margin: 0;
+  font-size: 1.25rem;
+  white-space: nowrap;
+}
+
+.kb-name {
+  flex: 1 1 auto;
+  max-width: 320px;
+  min-width: 0;
+}
+
+.kb-name-input {
+  width: 100%;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: var(--kb-hover);
+  color: var(--kb-text);
+  font: inherit;
+  font-weight: 600;
+}
+
+.kb-name-input:hover {
+  border-color: var(--kb-line);
+}
+
+.kb-name-input:focus {
+  outline: none;
+  border-color: var(--kb-accent);
+  background: var(--kb-bg);
+}
+
+.kb-toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.kb-preset-select {
+  width: auto;
+  max-width: 160px;
+  height: 34px;
+  font-weight: 600;
+}
+
+/* ── Workspace ────────────────────────────────────────────────────────── */
+
+.kb-workspace {
+  display: grid;
+  grid-template-columns: 208px minmax(0, 1fr) 360px;
+  grid-template-areas: "side stage inspector";
+  gap: 14px;
+  align-items: start;
+}
+
+.kb-sidebar,
+.kb-inspector {
+  border: 1px solid var(--kb-line-soft);
+  border-radius: var(--kb-radius);
+  background: var(--kb-panel);
+}
+
+.kb-panel-title {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--kb-faint);
+}
+
+/* ── Controls list ────────────────────────────────────────────────────── */
+
+.kb-sidebar {
+  grid-area: side;
+  position: sticky;
+  top: var(--kb-top);
+  padding: 12px 8px;
+}
+
+.kb-sidebar > .kb-panel-title {
+  padding: 0 8px 8px;
+}
+
+.kb-control-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.kb-control-scene {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--kb-line-soft);
+}
+
+.kb-control {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 6px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: var(--kb-text);
+}
+
+/* The hit target covering a row. The row's thumbnail is a live control, so
+   it cannot sit inside the button; the button sits over it instead. */
+.kb-hit {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  padding: 0;
+  border: none;
+  border-radius: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+.kb-hit:focus-visible {
+  outline-offset: -2px;
+}
+
+.kb-control:hover {
+  background: var(--kb-hover);
+}
+
+.kb-control-on,
+.kb-control-on:hover {
+  border-color: var(--kb-accent);
+  background: var(--kb-accent-soft);
+}
+
+.kb-control-thumb {
+  flex: 0 0 auto;
   display: grid;
   place-items: center;
-  width: 100%;
-  height: 74px;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
   overflow: hidden;
 }
 
-.kb-thumb-scene {
-  display: grid;
-  place-items: center;
+.kb-control-icon {
+  background: var(--kb-hover);
+  color: var(--kb-muted);
 }
 
-/* The control inside a key is a rendering, not a control: `inert` takes it
-   out of the tab order and off the hit test, and pointer-events is the belt
-   to that braces — the key underneath has to receive every click on it. */
+.kb-control-text {
+  display: grid;
+  min-width: 0;
+}
+
+.kb-control-name {
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+.kb-control-status {
+  font-size: 0.74rem;
+  color: var(--kb-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Thumbnails ───────────────────────────────────────────────────────── */
+
+/* The control itself, small and inert, on the kit's own lit surface. */
+.kb-thumb {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Absolutely centred, then scaled: a transform does not shrink the layout
+   box, so a grid-centred fader would overflow its cell from the top. */
 .kb-thumb-art {
+  --kb-thumb-scale: 0.5;
+  position: absolute;
+  left: 50%;
+  top: 50%;
   display: grid;
   place-items: center;
   pointer-events: none;
-  transform: scale(0.78);
+  transform: translate(-50%, -50%) scale(var(--kb-thumb-scale));
 }
 
-/* A fader is three times the height of a switch, so its strip gets taller
-   keys rather than a thumbnail scaled down to a smudge. */
-.kb-chips[data-tab="fader"] .kb-chip-art {
-  height: 116px;
+.kb-thumb-art[data-control="fader"] {
+  --kb-thumb-scale: 0.3;
 }
 
-.kb-chips[data-tab="fader"] .kb-thumb-art {
-  transform: scale(0.62);
+.kb-thumb-art[data-control="slider"],
+.kb-thumb-art[data-control="bank"] {
+  --kb-thumb-scale: 0.34;
 }
 
-.kb-chips[data-tab="knob"] .kb-thumb-art,
-.kb-chips[data-tab="bank"] .kb-thumb-art {
-  transform: scale(0.66);
+.kb-thumb-art[data-control="switch"],
+.kb-thumb-art[data-control="button"] {
+  --kb-thumb-scale: 0.55;
 }
 
-.kb-chip-plus {
-  font-size: 1.6rem;
-  color: var(--kb-quiet);
+/* ── Stage ────────────────────────────────────────────────────────────── */
+
+.kb-stage {
+  grid-area: stage;
+  position: sticky;
+  top: var(--kb-top);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  height: calc(100vh - var(--kb-top) - 16px);
+  min-height: 460px;
+  max-height: 860px;
 }
 
-.kb-chip-name {
-  font-size: 0.78rem;
-  line-height: 1.25;
-  text-align: center;
-  overflow-wrap: anywhere;
+.kb-stage-bar,
+.kb-stage-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
-.kb-chip-frame {
-  font-size: 0.62rem;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--kb-quiet);
+.kb-stage-frame {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  border: 1px solid var(--kb-line-soft);
+  border-radius: var(--kb-radius);
+  overflow: hidden;
 }
 
-.kb-chip-add {
-  border-style: dashed;
+.kb-stage-canvas {
+  height: 100%;
 }
 
-/* ── The form ─────────────────────────────────────────────────────────── */
-
-.kb-form {
-  border-top: 1px solid var(--kb-line);
-  padding-top: 16px;
+.kb-stage-panel {
   display: grid;
-  gap: 14px;
+  place-items: center;
+  height: 100%;
+  border-radius: 0;
+  overflow: auto;
+  padding: 32px 24px;
 }
 
-.kb-form-head {
+.kb-stage-control {
+  display: grid;
+  place-items: center;
+  /* Room for graphics a kit prints outside the control's own box. */
+  padding: 24px;
+}
+
+.kb-stage-badge {
+  position: absolute;
+  left: 50%;
+  top: 12px;
+  transform: translateX(-50%);
+  max-width: calc(100% - 24px);
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--kb-bg) 86%, transparent);
+  border: 1px solid var(--kb-line-soft);
+  color: var(--kb-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+
+.kb-stage-foot {
+  min-height: 34px;
+  padding: 0 4px;
+}
+
+.kb-stage-foot .kb-row {
+  grid-template-columns: 110px minmax(0, 1fr);
+  max-width: 520px;
+}
+
+.kb-rack {
+  display: grid;
+  gap: 28px;
+  justify-items: center;
+  padding: 8px;
+}
+
+.kb-rack-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 28px;
+}
+
+.kb-rack-column {
+  display: grid;
+  justify-items: center;
+  gap: 22px;
+}
+
+/* ── Inspector ────────────────────────────────────────────────────────── */
+
+.kb-inspector {
+  grid-area: inspector;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  padding: 14px;
+  min-width: 0;
+}
+
+.kb-inspector-head {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.kb-form-title {
+.kb-inspector-title {
   margin: 0;
-  font-size: 1.05rem;
-  font-weight: 700;
+  font-size: 1.1rem;
 }
 
-.kb-badge {
-  font-size: 0.64rem;
-  letter-spacing: 0.09em;
+.kb-layers {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid var(--kb-line-soft);
+  border-radius: 12px;
+  background: var(--kb-bg);
+}
+
+.kb-layers-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.kb-layer-settings {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 8px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: none;
+  color: var(--kb-muted);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.kb-layer-settings:hover {
+  background: var(--kb-hover);
+  color: var(--kb-text);
+}
+
+.kb-layer-settings-on,
+.kb-layer-settings-on:hover {
+  border-color: var(--kb-accent);
+  background: var(--kb-accent-soft);
+  color: var(--kb-accent-text);
+}
+
+.kb-frame {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2px;
+}
+
+.kb-frame-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 8px 2px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--kb-quiet);
-  border: 1px solid var(--kb-line);
-  border-radius: 999px;
-  padding: 2px 8px;
+  color: var(--kb-faint);
   cursor: help;
 }
 
-.kb-form-head .kb-icon:first-of-type {
-  margin-left: auto;
+.kb-frame-note {
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.kb-fields {
+.kb-layer-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 14px 28px;
-  align-items: start;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2px;
 }
 
-.kb-add {
+.kb-layer {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+}
+
+.kb-layer:hover {
+  background: var(--kb-hover);
+}
+
+.kb-layer-on,
+.kb-layer-on:hover {
+  border-color: var(--kb-accent);
+  background: var(--kb-accent-soft);
+}
+
+.kb-layer-main {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.kb-layer-thumb {
+  flex: 0 0 auto;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 8px;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.kb-layer-thumb .kb-thumb-art {
+  --kb-thumb-scale: 0.42;
+}
+
+.kb-layer-thumb .kb-thumb-art[data-control="fader"] {
+  --kb-thumb-scale: 0.24;
+}
+
+.kb-layer-thumb .kb-thumb-art[data-control="slider"],
+.kb-layer-thumb .kb-thumb-art[data-control="bank"] {
+  --kb-thumb-scale: 0.28;
+}
+
+.kb-layer-thumb .kb-thumb-art[data-control="switch"],
+.kb-layer-thumb .kb-thumb-art[data-control="button"] {
+  --kb-thumb-scale: 0.45;
+}
+
+.kb-layer-text {
+  display: grid;
+  min-width: 0;
+}
+
+.kb-layer-name {
+  font-size: 0.86rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kb-layer-kind {
+  font-size: 0.72rem;
+  color: var(--kb-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kb-layer-hidden .kb-layer-thumb,
+.kb-layer-hidden .kb-layer-name {
+  opacity: 0.4;
+}
+
+.kb-layer-hidden .kb-layer-name {
+  text-decoration: line-through;
+}
+
+.kb-layer-tools {
+  display: flex;
+  flex: 0 0 auto;
+  padding-right: 4px;
+}
+
+.kb-empty {
+  margin: 4px 8px 6px;
+  font-size: 0.8rem;
+  color: var(--kb-muted);
+}
+
+.kb-add-menu {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 4px;
+  padding: 6px;
+  border: 1px dashed var(--kb-line);
+  border-radius: 10px;
 }
 
 .kb-add-item {
   display: grid;
-  gap: 2px;
-  text-align: left;
-  padding: 9px 12px;
-  border: 1px solid var(--kb-line);
-  border-radius: 12px;
+  gap: 1px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
   background: none;
-  color: var(--amb-label);
+  color: var(--kb-text);
+  font: inherit;
+  text-align: left;
   cursor: pointer;
 }
 
 .kb-add-item:hover {
   border-color: var(--kb-accent);
+  background: var(--kb-accent-soft);
+}
+
+.kb-add-item strong {
+  font-size: 0.85rem;
 }
 
 .kb-add-item span {
   font-size: 0.76rem;
-  color: var(--kb-quiet);
+  color: var(--kb-muted);
 }
 
-/* ── Field primitives ─────────────────────────────────────────────────── */
-
-.kb-field {
+.kb-props {
   display: grid;
-  gap: 6px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
 }
 
-.kb-field-head {
+.kb-props-head {
   display: flex;
-  gap: 8px;
-  align-items: baseline;
+  align-items: center;
+  gap: 4px;
+  margin-left: -6px;
+}
+
+.kb-props-title {
+  margin: 0 4px 0 0;
+  font-size: 1rem;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kb-props-head .kb-pill {
+  margin-right: auto;
+}
+
+/* ── Sections & rows ──────────────────────────────────────────────────── */
+
+.kb-section {
+  border-top: 1px solid var(--kb-line-soft);
+}
+
+.kb-section-head {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
 }
 
-.kb-field-label {
-  font-size: 0.86rem;
-  font-weight: 600;
-  flex: 0 0 auto;
-}
-
-/* The hint gives way, never the label: a label that wraps to two lines
-   while a parenthetical sits beside it reads as the broken one. */
-.kb-field-hint {
-  flex: 1 1 auto;
-  min-width: 0;
-  font-size: 0.72rem;
-  line-height: 1.35;
-  color: var(--kb-quiet);
-  text-align: right;
-}
-
-.kb-segmented {
+.kb-section-toggle {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  background: none;
+  color: var(--kb-text);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.kb-caret {
+  width: 0;
+  height: 0;
+  border-left: 4px solid currentColor;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  opacity: 0.6;
+  transition: transform 120ms ease;
+}
+
+.kb-section-open .kb-caret {
+  transform: rotate(90deg);
+}
+
+.kb-section-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  padding: 2px 0 14px;
+}
+
+.kb-row {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 4px 12px;
+  align-items: start;
+}
+
+.kb-row-stacked {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.kb-row-label {
+  padding-top: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--kb-muted);
+  line-height: 1.3;
+}
+
+.kb-row-stacked .kb-row-label {
+  padding-top: 0;
+}
+
+.kb-row-control {
+  display: grid;
   gap: 4px;
+  min-width: 0;
+}
+
+.kb-hint {
+  margin: 0;
+  font-size: 0.74rem;
+  line-height: 1.4;
+  color: var(--kb-faint);
+}
+
+.kb-note {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--kb-muted);
+}
+
+.kb-note-warn {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--kb-warn-bg);
+  color: var(--kb-text);
+}
+
+/* ── Inputs ───────────────────────────────────────────────────────────── */
+
+.kb-seg-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 9px;
+  background: var(--kb-hover);
+  max-width: 100%;
 }
 
 .kb-seg {
-  border: 1px solid var(--kb-line);
+  flex: 1 0 auto;
+  min-height: 28px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 7px;
   background: transparent;
-  color: var(--kb-quiet);
-  border-radius: 999px;
-  padding: 3px 10px;
-  font-size: 0.78rem;
-  line-height: 1.4;
+  color: var(--kb-muted);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
   cursor: pointer;
 }
 
 .kb-seg:hover {
-  border-color: var(--kb-quiet);
-  color: var(--amb-label);
+  color: var(--kb-text);
 }
 
-.kb-seg-on {
-  background: var(--kb-accent);
-  border-color: var(--kb-accent);
-  color: #10151b;
-  font-weight: 600;
+.kb-seg-on,
+.kb-seg-on:hover {
+  background: var(--kb-bg);
+  color: var(--kb-text);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 14%), 0 0 0 1px var(--kb-line-soft);
 }
 
-.kb-check {
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
+[data-theme="dark"] .kb-seg-on {
+  background: var(--ifm-color-emphasis-300);
+}
+
+.kb-select,
+.kb-text {
+  width: 100%;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--kb-line);
+  border-radius: 8px;
+  background: var(--kb-bg);
+  color: var(--kb-text);
+  font: inherit;
+  font-size: 0.84rem;
+}
+
+.kb-select {
+  padding-right: 28px;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 15px) 50%, calc(100% - 10px) 50%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
   cursor: pointer;
 }
 
-.kb-check input {
-  margin-top: 3px;
-  accent-color: var(--kb-accent);
+.kb-select:focus,
+.kb-text:focus {
+  outline: none;
+  border-color: var(--kb-accent);
+  box-shadow: 0 0 0 3px var(--kb-accent-soft);
 }
 
-.kb-check-label {
-  font-size: 0.86rem;
+.kb-mono {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.8rem;
+}
+
+.kb-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--kb-muted);
+  font: inherit;
+  font-size: 0.8rem;
   font-weight: 600;
+  cursor: pointer;
+  justify-self: start;
 }
 
-.kb-check-label .kb-field-hint {
-  display: block;
-  font-weight: 400;
-  text-align: left;
+.kb-switch-thumb {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--kb-line);
+  transition: background-color 120ms ease;
+}
+
+.kb-switch-thumb::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 30%);
+  transition: transform 140ms ease;
+}
+
+.kb-switch-on .kb-switch-thumb {
+  background: var(--kb-accent);
+}
+
+.kb-switch-on .kb-switch-thumb::after {
+  transform: translateX(16px);
+}
+
+.kb-switch-on .kb-switch-text {
+  color: var(--kb-text);
+}
+
+.kb-slider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .kb-range {
+  --kb-pct: 50%;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 28px;
+  margin: 0;
+  background: transparent;
+  appearance: none;
+  cursor: pointer;
+}
+
+.kb-range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--kb-accent) var(--kb-pct), var(--kb-line) var(--kb-pct));
+}
+
+.kb-range::-moz-range-track {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--kb-line);
+}
+
+.kb-range::-moz-range-progress {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--kb-accent);
+}
+
+.kb-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-top: -6px;
+  border: 2px solid var(--kb-accent);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 25%);
+}
+
+.kb-range::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--kb-accent);
+  border-radius: 50%;
+  background: #fff;
+}
+
+.kb-number-wrap {
+  position: relative;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  width: 76px;
+  height: 28px;
+  border: 1px solid var(--kb-line);
+  border-radius: 7px;
+  background: var(--kb-bg);
+}
+
+.kb-number-wrap:focus-within {
+  border-color: var(--kb-accent);
+  box-shadow: 0 0 0 3px var(--kb-accent-soft);
+}
+
+.kb-number {
   width: 100%;
-  accent-color: var(--kb-accent);
+  min-width: 0;
+  height: 100%;
+  padding: 0 4px 0 8px;
+  border: none;
+  background: none;
+  color: var(--kb-text);
+  font: inherit;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.kb-number:focus {
+  outline: none;
+}
+
+.kb-unit {
+  padding-right: 7px;
+  font-size: 0.72rem;
+  color: var(--kb-faint);
+  white-space: nowrap;
+}
+
+.kb-unset {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px dashed var(--kb-line);
+  border-radius: 8px;
+  background: none;
+  color: var(--kb-muted);
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.kb-unset:hover {
+  border-color: var(--kb-accent);
+}
+
+.kb-unset-action {
+  color: var(--kb-accent-text);
+  font-weight: 600;
+}
+
+.kb-optional {
+  display: grid;
+  gap: 2px;
+}
+
+.kb-optional-clear {
+  justify-self: end;
+  font-size: 0.74rem;
 }
 
 .kb-color {
@@ -486,119 +1166,567 @@
   gap: 8px;
 }
 
-.kb-color-swatch {
-  width: 44px;
-  height: 26px;
-  padding: 0;
-  border: 1px solid var(--kb-line);
-  border-radius: 6px;
-  background: none;
-  cursor: pointer;
-}
-
-.kb-color-value {
-  font-size: 0.76rem;
-  background: none;
-  color: var(--kb-quiet);
-}
-
-.kb-mini {
-  border: 1px solid var(--kb-line);
-  background: transparent;
-  color: var(--kb-quiet);
-  border-radius: 6px;
-  padding: 2px 8px;
-  font-size: 0.74rem;
-  cursor: pointer;
-  margin-left: auto;
-}
-
-.kb-text {
-  width: 100%;
+.kb-swatch {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 30px;
+  padding: 2px;
   border: 1px solid var(--kb-line);
   border-radius: 8px;
-  padding: 6px 10px;
-  font-size: 0.88rem;
-  background: color-mix(in oklab, var(--amb-label), transparent 94%);
-  color: var(--amb-label);
-}
-
-.kb-text:focus {
-  outline: 1px solid var(--kb-accent);
-  border-color: var(--kb-accent);
-}
-
-.kb-icon {
-  border: none;
-  background: transparent;
-  color: var(--kb-quiet);
-  font-size: 0.72rem;
-  line-height: 1;
-  padding: 6px 5px;
+  background: var(--kb-bg);
   cursor: pointer;
-  border-radius: 6px;
 }
 
-.kb-icon:hover:not(:disabled) {
-  color: var(--kb-accent);
-  background: color-mix(in oklab, var(--amb-label), transparent 92%);
+.kb-swatch::-webkit-color-swatch-wrapper {
+  padding: 0;
 }
 
-.kb-icon:disabled {
-  opacity: 0.3;
-  cursor: default;
-}
-
-.kb-note {
-  margin: 0;
-  font-size: 0.78rem;
-  line-height: 1.5;
-  color: var(--kb-quiet);
-}
-
-.kb-note-wide {
-  grid-column: 1 / -1;
-}
-
-.kb-note code {
-  background: color-mix(in oklab, var(--amb-label), transparent 92%);
+.kb-swatch::-webkit-color-swatch {
   border: none;
-  color: inherit;
+  border-radius: 5px;
 }
 
-/* ── The file it makes ────────────────────────────────────────────────── */
+.kb-swatch::-moz-color-swatch {
+  border: none;
+  border-radius: 5px;
+}
 
-.kb-code {
+.kb-hex {
+  width: 100px;
+  flex: 0 1 auto;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.8rem;
+}
+
+/* The light pad: a square with the subject in the middle and the lamp you
+   drag. Its own little room, drawn with plain gradients. */
+.kb-lightpad-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.kb-lightpad {
+  position: relative;
+  flex: 0 0 auto;
+  width: 128px;
+  height: 128px;
+  border: 1px solid var(--kb-line);
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at center, var(--kb-bg) 0 60%, transparent 61%),
+    var(--kb-hover);
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.kb-lightpad-cross {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(var(--kb-line-soft), var(--kb-line-soft)) center / 1px 100% no-repeat,
+    linear-gradient(var(--kb-line-soft), var(--kb-line-soft)) center / 100% 1px no-repeat;
+}
+
+.kb-lightpad-subject {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--kb-line);
+}
+
+.kb-lightpad-lamp {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: #ffd25a;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 25%), 0 0 16px 4px rgb(255 210 90 / 60%);
+}
+
+.kb-lightpad-values {
+  display: grid;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: var(--kb-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.kb-lightpad-values strong {
+  color: var(--kb-text);
+}
+
+.kb-lightpad-values .kb-link {
+  justify-self: start;
+  margin-top: 4px;
+}
+
+.kb-scene-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* ── Help ─────────────────────────────────────────────────────────────── */
+
+.kb-help {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px 28px;
   margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--kb-line-soft);
+}
+
+.kb-help h3 {
+  margin: 0 0 4px;
+  font-size: 0.92rem;
+}
+
+.kb-help p {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: var(--kb-muted);
+}
+
+.kb-help .kb-help-keys {
+  grid-column: 1 / -1;
+  font-size: 0.78rem;
+}
+
+.kb-help kbd {
+  font-size: 0.72rem;
+  padding: 1px 5px;
+}
+
+/* ── Export dialog ────────────────────────────────────────────────────── */
+
+.kb-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  /* A bounded track: left to size itself, the column grows to the longest
+     unwrapped line of code and centres the dialog thousands of px away. */
+  grid-template-columns: minmax(0, 1fr);
+  place-items: center;
+  padding: 24px;
+  background: rgb(0 0 0 / 45%);
+  animation: kb-fade 140ms ease;
+}
+
+.kb-dialog {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  width: min(940px, 100%);
+  max-height: min(88vh, 900px);
+  border: 1px solid var(--kb-line-soft);
+  border-radius: 16px;
+  background: var(--kb-bg);
+  color: var(--kb-text);
+  box-shadow: 0 24px 64px rgb(0 0 0 / 30%);
+  animation: kb-rise 160ms ease;
+}
+
+.kb-dialog:focus {
+  outline: none;
+}
+
+.kb-dialog-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 20px 10px;
+}
+
+.kb-dialog-title {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.kb-dialog-sub {
+  margin: 2px 0 0;
+  font-size: 0.84rem;
+  color: var(--kb-muted);
+}
+
+.kb-dialog-warn {
+  margin: 0 20px 8px;
+}
+
+.kb-dialog-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--kb-line-soft);
+  overflow-x: auto;
+}
+
+.kb-dialog-tab {
+  padding: 8px 10px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--kb-muted);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.kb-dialog-tab:hover {
+  color: var(--kb-text);
+}
+
+.kb-dialog-tab-on {
+  border-bottom-color: var(--kb-accent);
+  color: var(--kb-text);
+}
+
+.kb-dialog-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1 1 auto;
+  padding: 12px 20px 0;
+}
+
+.kb-dialog-file-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin-bottom: 10px;
+}
+
+.kb-dialog-note {
+  flex: 1 1 300px;
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--kb-muted);
+}
+
+.kb-dialog-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.kb-dialog-code {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+}
+
+.kb-dialog-code > div {
+  margin-bottom: 0;
+}
+
+.kb-dialog-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  padding: 14px 20px 18px;
+  border-top: 1px solid var(--kb-line-soft);
+  margin-top: 12px;
+}
+
+.kb-share {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 360px;
   min-width: 0;
 }
 
-.kb-code-title {
-  margin: 20px 0 4px;
-  font-size: 1.1rem;
+.kb-share-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--kb-muted);
+  white-space: nowrap;
 }
 
-.kb-code .kb-note {
-  margin-bottom: 10px;
-  color: var(--ifm-color-emphasis-700);
+.kb-share-url {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
-.kb-code .kb-note code {
-  margin: 0 3px;
-  background: var(--ifm-color-emphasis-200);
+/* ── Toast ────────────────────────────────────────────────────────────── */
+
+.kb-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: calc(100vw - 32px);
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: var(--ifm-color-emphasis-900);
+  color: var(--ifm-color-emphasis-0, #fff);
+  font-size: 0.85rem;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 25%);
+  transform: translateX(-50%);
+  animation: kb-toast 180ms ease;
 }
 
-@media (max-width: 700px) {
-  .kb-device {
+.kb-toast .kb-link {
+  color: var(--ifm-color-primary-lighter);
+}
+
+@keyframes kb-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes kb-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes kb-toast {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kb-dialog-backdrop,
+  .kb-dialog,
+  .kb-toast {
+    animation: none;
+  }
+}
+
+/* ── Narrower screens ─────────────────────────────────────────────────── */
+
+@media (max-width: 1240px) {
+  .kb-workspace {
+    grid-template-columns: 184px minmax(0, 1fr) 330px;
+  }
+
+  .kb-control-thumb {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Tablet: the controls become a strip across the top. */
+@media (max-width: 1020px) {
+  .kb-workspace {
+    grid-template-columns: minmax(0, 1fr) 330px;
+    grid-template-areas:
+      "side side"
+      "stage inspector";
+  }
+
+  .kb-sidebar {
+    position: static;
+    padding: 6px;
+  }
+
+  .kb-sidebar > .kb-panel-title {
+    display: none;
+  }
+
+  .kb-control-list {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .kb-control-list > li {
+    flex: 0 0 auto;
+  }
+
+  .kb-control-scene {
+    margin: 0 0 0 4px;
+    padding: 0 0 0 6px;
+    border-top: none;
+    border-left: 1px solid var(--kb-line-soft);
+  }
+
+  .kb-control {
+    width: auto;
+    padding: 4px 10px 4px 4px;
+  }
+
+  .kb-control-thumb {
+    width: 36px;
+    height: 36px;
+  }
+
+  .kb-control-status {
+    max-width: 120px;
+  }
+}
+
+/* Phone: one column. The stage stays pinned under the navbar while the
+   inspector scrolls beneath it, so every edit is visible as you make it. */
+@media (max-width: 760px) {
+  .kb {
+    padding: 10px 16px 40px;
+    --kb-top: var(--ifm-navbar-height, 60px);
+  }
+
+  .kb-toolbar {
+    gap: 8px;
+  }
+
+  .kb-toolbar-title {
+    flex-basis: 100%;
+  }
+
+  .kb-title {
+    font-size: 1.05rem;
+  }
+
+  .kb-name {
+    max-width: none;
+  }
+
+  .kb-toolbar-actions {
+    width: 100%;
+  }
+
+  .kb-preset {
+    flex: 1 1 auto;
+  }
+
+  .kb-preset-select {
+    width: 100%;
+    max-width: none;
+  }
+
+  .kb-hide-narrow {
+    display: none;
+  }
+
+  .kb-workspace {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "side"
+      "stage"
+      "inspector";
+    gap: 10px;
+  }
+
+  .kb-control-status {
+    display: none;
+  }
+
+  .kb-control {
+    padding-right: 12px;
+  }
+
+  .kb-control-thumb {
+    width: 30px;
+    height: 30px;
+  }
+
+  .kb-stage {
+    z-index: 5;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    gap: 6px;
+    padding: 6px 0;
+    background: var(--kb-bg);
+  }
+
+  .kb-stage-frame {
+    flex: 0 0 auto;
+    height: 38vh;
+    min-height: 220px;
+  }
+
+  .kb-stage-panel {
     padding: 16px;
-    border-radius: 22px;
   }
 
-  .kb-screen {
-    padding: 20px 12px;
+  .kb-stage-control {
+    padding: 12px;
   }
 
-  .kb-chip {
-    width: 100px;
+  .kb-stage-foot {
+    min-height: 0;
   }
+
+  .kb-inspector {
+    padding: 12px;
+  }
+
+  .kb-lightpad {
+    width: 112px;
+    height: 112px;
+  }
+
+  .kb-dialog-backdrop {
+    padding: 0;
+    place-items: end stretch;
+  }
+
+  .kb-dialog {
+    width: 100%;
+    max-height: 92vh;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .kb-dialog-head,
+  .kb-dialog-body,
+  .kb-dialog-foot {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .kb-dialog-tabs {
+    padding: 0 14px;
+  }
+
+  .kb-share {
+    flex-wrap: wrap;
+  }
+
+  .kb-share-label {
+    width: 100%;
+  }
+}
+
+/* A large stage, a small control: on wide screens the control is drawn
+   bigger. `zoom` rather than a transform, so dragging the knob still maps
+   1:1 to the pointer. */
+@media (min-width: 1021px) and (min-height: 700px) {
+  .kb-stage-control {
+    zoom: 1.6;
+  }
+}
+
+/* The dialog's fixed rows never give way to the code: the tab strip scrolls
+   sideways, which lets a flex item shrink to nothing unless told not to. */
+.kb-dialog-head,
+.kb-dialog-warn,
+.kb-dialog-tabs,
+.kb-dialog-file-bar,
+.kb-dialog-foot {
+  flex-shrink: 0;
 }

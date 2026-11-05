@@ -26,11 +26,11 @@ export type FamilyName = "rotary" | "travel" | "press" | "latch" | "bank";
 export const FAMILIES: FamilyName[] = ["rotary", "travel", "press", "latch", "bank"];
 
 export const FAMILY_LABELS: Record<FamilyName, string> = {
-  rotary: "Knobs — rotary",
-  travel: "Faders & sliders — travel",
-  press: "Buttons — press",
-  latch: "Switches — latch",
-  bank: "Key banks — bank"
+  rotary: "Knobs",
+  travel: "Faders & sliders",
+  press: "Buttons",
+  latch: "Switches",
+  bank: "Key banks"
 };
 
 type Frames = Partial<Record<FrameName, Piece[]>>;
@@ -90,7 +90,7 @@ export type FamilyCode = { code: string; imports: string[]; looks: string[] };
  *  the elements that say so are dropped: `both` is the default, and it is
  *  also what an element written before the field existed reads as. */
 export function elementsFor(cfg: KitConfig, family: FamilyName, upright: boolean): KitElement[] {
-  const elements = cfg[family].elements ?? [];
+  const elements = (cfg[family].elements ?? []).filter((element) => !element.hidden);
   return family === "travel"
     ? elements.filter((element) => elementApplies(element, upright))
     : elements;

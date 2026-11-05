@@ -1,552 +1,861 @@
-/* The Kit Builder, as a device.
+/* The Kit Builder.
  *
- *  A tab per control, the control itself large enough to see, and under it
- *  its parts — each one a rendering of that part alone, and each one a tab
- *  into the form that edits it. There is no second, shallower mode: what you
- *  are always editing is the real thing, a list of parts and shapes per
- *  frame, which is what writing a kit is. A shipped look is where the list
- *  starts, not a wall you stop at.
+ *  Three columns, like any design tool: the controls on the left, the one
+ *  you're working on in the middle — running, in the kit's own light — and
+ *  its layers and their properties on the right. What you edit is always the
+ *  real thing: a list of library parts and shapes per frame, which is what a
+ *  kit is. A shipped look is a starting point, not a mode.
  *
  *  What comes out is a module and, when shapes are involved, the stylesheet
- *  it imports — the same stylesheet everything on this page is running. */
+ *  it imports — the same stylesheet this page is running. */
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import CodeBlock from "@theme/CodeBlock";
-import { AmbientProvider } from "@ambientcss/components";
-import type { AmbientTheme } from "@ambientcss/components";
-import { CONTROL_TABS, ControlStage, KitStyles, PartThumb, Stage } from "./Preview";
-import type { ControlTab } from "./Preview";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Link from "@docusaurus/Link";
 import { buildStyles, emitKit, emitUsage, styleFileName } from "./emit";
-import { FAMILIES, FAMILY_LABELS, elementsFor } from "./catalog";
+import { FAMILIES, FAMILY_LABELS } from "./catalog";
 import type { FamilyName } from "./catalog";
 import {
   DEFAULT_CONFIG,
+  KIT_PRESETS,
+  applyKitPreset,
   decodeConfig,
   encodeConfig,
   fileName,
+  isPristine,
   kitIdent,
   seedPatch,
   themeIdent
 } from "./config";
-import type { KitConfig } from "./config";
-import { FRAMES, FRAME_NOTES, defaultPart, defaultShape } from "./model";
+import type { KitConfig, KitPresetName } from "./config";
+import { FRAMES, defaultPart, defaultShape, duplicateElement, elementApplies } from "./model";
 import type { FrameName, KitElement, PartName } from "./model";
 import { FAMILY_PARTS, PARTS, partDefaults } from "./parts";
-import { ControlEditor, ElementEditor, SceneEditor, elementLabel } from "./Editors";
-import { TextField } from "./Fields";
+import { ControlEditor, FRAME_INFO, LayerEditor, SCENE_PRESETS, SceneEditor, elementLabel } from "./Editors";
+import { Note, Segmented, Slider, Toggle } from "./Fields";
+import { CONTROLS, Canvas, ControlPreview, KitStyles, Rack, Thumb, isolate } from "./Stage";
+import type { ControlDef, ControlId, PreviewState } from "./Stage";
+import { ExportDialog, Icon, useCopy } from "./ExportDialog";
+import type { ExportFile } from "./ExportDialog";
+import { useHistory } from "./useHistory";
+import { SEED_LABELS } from "./seeds";
 import type { SeedName } from "./seeds";
 import "./kit-builder.css";
 
-/** The room the BUILDER stands in, which is not the room the kit stands in.
- *  Fixed on purpose: the scene sliders move the rack, and a device whose own
- *  casing swung with them would make it impossible to tell which of the two
- *  you had just changed. */
-const CHROME: AmbientTheme = {
-  lightX: -1,
-  lightY: -1,
-  keyLight: 0.86,
-  fillLight: 0.7,
-  lightHue: 222,
-  lightSaturation: 10,
-  highlightColor: "#8ab4f8",
-  lumeHue: 205
-};
+const STORAGE_KEY = "ambientcss:kit-builder";
 
-type TabId = string;
+/* ── Loading and saving ───────────────────────────────────────────────── */
 
-function hashConfig(): KitConfig | null {
-  if (typeof window === "undefined") return null;
+/** A link wins; otherwise whatever you had open last time. */
+function initialConfig(): KitConfig {
+  if (typeof window === "undefined") return DEFAULT_CONFIG;
   const hash = window.location.hash;
-  return hash.startsWith("#s=") ? decodeConfig(hash.slice(3)) : null;
+  if (hash.startsWith("#s=")) {
+    const fromLink = decodeConfig(hash.slice(3));
+    if (fromLink) return fromLink;
+  }
+  try {
+    const saved = window.localStorage.getItem(STORAGE_KEY);
+    const fromStorage = saved ? decodeConfig(saved) : null;
+    if (fromStorage) return fromStorage;
+  } catch {
+    /* Storage can be blocked; starting fresh is the right answer then. */
+  }
+  return DEFAULT_CONFIG;
 }
 
-function download(name: string, contents: string) {
-  const blob = new Blob([contents], { type: "text/plain;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = name;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  /* Not synchronously: the click has only been dispatched, and revoking the
-     object URL in the same tick races the download starting. */
-  window.setTimeout(() => URL.revokeObjectURL(url), 0);
-}
+/* ── Helpers ──────────────────────────────────────────────────────────── */
 
-/** The chips, in paint order — which is the order the frames are listed in,
- *  and then the order within a frame. Reordering a part is moving it past
- *  its neighbour in the same frame, because that is the only move that
- *  changes anything. */
-function chipOrder(config: KitConfig, tab: ControlTab): KitElement[] {
-  const visible = elementsFor(config, tab.family, tab.upright);
+/** A control's layers as the list shows them: in paint order, and — for the
+ *  two travel controls — only the layers that reach this one. Hidden layers
+ *  stay in the list; that is where you turn them back on. */
+function layersFor(config: KitConfig, control: ControlDef): KitElement[] {
+  const all = config[control.family].elements ?? [];
+  const visible =
+    control.family === "travel" ? all.filter((element) => elementApplies(element, control.upright)) : all;
   return FRAMES.flatMap((frame) => visible.filter((element) => element.frame === frame));
 }
 
+function controlStatus(config: KitConfig, family: FamilyName): string {
+  const state = config[family];
+  if (!state.dressed) return "Library default";
+  return `${SEED_LABELS[state.seed]}${isPristine(config, family) ? "" : " · edited"}`;
+}
+
+function isTyping(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  if (target.isContentEditable || target.tagName === "TEXTAREA" || target.tagName === "SELECT") return true;
+  if (target.tagName !== "INPUT") return false;
+  const type = (target as HTMLInputElement).type;
+  return type === "text" || type === "search" || type === "url" || type === "number";
+}
+
+type Selection = { kind: "control"; id: ControlId } | { kind: "scene" };
+
+type Toast = { id: number; message: string; undo?: boolean };
+
+/* ── The page ─────────────────────────────────────────────────────────── */
+
 export default function KitBuilder() {
-  const [config, setConfig] = useState<KitConfig>(() => hashConfig() ?? DEFAULT_CONFIG);
-  /* The config a moment after it stopped changing. The big stage runs on the
-     live one — it has to follow a drag — but the address bar, the code
-     blocks and the thumbnails run on this.
+  const history = useHistory<KitConfig>(initialConfig);
+  const config = history.state;
+  const setConfig = history.set;
 
-     A range slider fires on every pixel of a drag: writing the URL from that
-     would be hundreds of `replaceState` calls, which Chrome throttles and
-     Safari refuses outright past about a hundred in thirty seconds. And a
-     row of thumbnails rebuilding a kit each at 60Hz is how a nicer-looking
-     builder ends up feeling worse than the old one. */
+  /* The config a moment after it stopped changing. The stage runs live — it
+     has to follow a drag — but the address bar, the code and the thumbnails
+     run on this: a slider fires on every pixel, and Safari refuses more than
+     about a hundred `replaceState` calls in thirty seconds. */
   const [settled, setSettled] = useState<KitConfig>(config);
-  const [tabId, setTabId] = useState<TabId>("knob");
-  /* Per tab, because coming back to the knob should put you back where you
-     were standing. `null` is the control itself. */
-  const [selected, setSelected] = useState<Record<TabId, string | null>>({});
-  const [adding, setAdding] = useState(false);
-  const [showCode, setShowCode] = useState(false);
-  const [menu, setMenu] = useState(false);
-  const [shareUrl, setShareUrl] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
-
   useEffect(() => {
     const timer = window.setTimeout(() => setSettled(config), 250);
     return () => window.clearTimeout(timer);
   }, [config]);
 
-  /* The config round-trips through the address bar, so a look can be sent to
-     someone as a link rather than as a paragraph describing it. */
+  const [selection, setSelection] = useState<Selection>({ kind: "control", id: "knob" });
+  const [lastControl, setLastControl] = useState<ControlId>("knob");
+  /* Per control, so coming back to the knob puts you back where you were. */
+  const [picked, setPicked] = useState<Partial<Record<ControlId, string | null>>>({});
+  const [stageView, setStageView] = useState<"control" | "rack">("control");
+  const [size, setSize] = useState<"sm" | "md" | "lg">("lg");
+  const [solo, setSolo] = useState(false);
+  const [preview, setPreview] = useState<PreviewState>({ value: 62, on: true, bank: "2" });
+  const [adding, setAdding] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [toast, setToast] = useState<Toast | null>(null);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [copied, copy] = useCopy();
+  const toastTimer = useRef<number | undefined>(undefined);
+
+  const notify = useCallback((message: string, undo = false) => {
+    window.clearTimeout(toastTimer.current);
+    setToast({ id: Date.now(), message, undo });
+    toastTimer.current = window.setTimeout(() => setToast(null), 4000);
+  }, []);
+
+  /* Saved twice: in the address bar, so a look can be sent as a link, and in
+     storage, so closing the tab does not throw an afternoon away. */
   useEffect(() => {
     const encoded = encodeConfig(settled);
     window.history.replaceState(null, "", `#s=${encoded}`);
     setShareUrl(`${window.location.origin}${window.location.pathname}#s=${encoded}`);
+    try {
+      window.localStorage.setItem(STORAGE_KEY, encoded);
+    } catch {
+      /* Private mode, or storage full: the link still carries it. */
+    }
   }, [settled]);
 
-  const patchFamily = useCallback((family: FamilyName, values: Record<string, unknown>) => {
-    setConfig((prev) => ({ ...prev, [family]: { ...prev[family], ...values } }));
-  }, []);
+  /* ── What is selected ───────────────────────────────────────────────── */
 
-  const patchScene = useCallback((key: "theme" | "panel", values: Record<string, unknown>) => {
-    setConfig((prev) => ({ ...prev, [key]: { ...prev[key], ...values } }));
-  }, []);
+  const controlId = selection.kind === "control" ? selection.id : lastControl;
+  const control = CONTROLS.find((candidate) => candidate.id === controlId) ?? CONTROLS[0]!;
+  const family = control.family;
+  const layers = layersFor(config, control);
+  const pickedId = selection.kind === "control" ? (picked[control.id] ?? null) : null;
+  const current = layers.find((element) => element.id === pickedId) ?? null;
 
-  const applySeed = useCallback((family: FamilyName, seed: SeedName) => {
-    setConfig((prev) => {
-      const current = prev[family] as { root?: Record<string, number | boolean> };
-      return { ...prev, [family]: { ...prev[family], ...seedPatch(family, seed, current.root) } };
-    });
-  }, []);
-
-  const setElements = useCallback((family: FamilyName, elements: KitElement[]) => {
-    setConfig((prev) => ({ ...prev, [family]: { ...prev[family], elements } }));
-  }, []);
-
-  const tab = CONTROL_TABS.find((candidate) => candidate.id === tabId);
-  const family = tab?.family;
-  const elements = tab ? chipOrder(config, tab) : [];
-  const pick = tab ? (selected[tab.id] ?? null) : null;
-  const current = elements.find((element) => element.id === pick) ?? null;
-
-  const select = (id: string | null) => {
-    if (!tab) return;
+  const selectControl = (id: ControlId) => {
+    setSelection({ kind: "control", id });
+    setLastControl(id);
     setAdding(false);
-    setSelected((prev) => ({ ...prev, [tab.id]: id }));
+    setStageView("control");
   };
 
-  /* ── Element edits ──────────────────────────────────────────────────── */
-
-  const replace = (next: KitElement) => {
-    if (!family) return;
-    setElements(
-      family,
-      (config[family].elements ?? []).map((element) => (element.id === next.id ? next : element))
-    );
+  const selectLayer = (id: string | null) => {
+    setAdding(false);
+    setPicked((prev) => ({ ...prev, [control.id]: id }));
+    if (id === null) setSolo(false);
   };
 
-  const remove = (id: string) => {
-    if (!family) return;
-    setElements(family, (config[family].elements ?? []).filter((element) => element.id !== id));
-    select(null);
+  /* ── Edits ──────────────────────────────────────────────────────────── */
+
+  const setElements = useCallback(
+    (target: FamilyName, update: (elements: KitElement[]) => KitElement[]) => {
+      setConfig((prev) => ({ ...prev, [target]: { ...prev[target], elements: update(prev[target].elements ?? []) } }));
+    },
+    [setConfig]
+  );
+
+  const patchFamily = useCallback(
+    (target: FamilyName, values: Record<string, unknown>) => {
+      setConfig((prev) => ({ ...prev, [target]: { ...prev[target], ...values } }));
+    },
+    [setConfig]
+  );
+
+  const patchScene = useCallback(
+    (key: "theme" | "panel", values: Record<string, unknown>) => {
+      setConfig((prev) => ({ ...prev, [key]: { ...prev[key], ...values } }));
+    },
+    [setConfig]
+  );
+
+  const applySeed = useCallback(
+    (target: FamilyName, seed: SeedName) => {
+      setConfig((prev) => {
+        const root = (prev[target] as { root?: Record<string, number | boolean> }).root;
+        return { ...prev, [target]: { ...prev[target], ...seedPatch(target, seed, root), dressed: true } };
+      });
+    },
+    [setConfig]
+  );
+
+  const applyPreset = (preset: KitPresetName) => {
+    setConfig((prev) => applyKitPreset(prev, preset));
+    setPicked({});
+    notify(`Started from ${KIT_PRESETS.find((p) => p.id === preset)?.label ?? preset}.`, true);
   };
 
-  /* Order inside a frame is paint order, so moving an element is moving it
-     past its neighbour in the same frame — and specifically past the
-     neighbour the strip is SHOWING, which on the travel tabs is not the same
-     list: swapping a slider's track with a fader's is a move you cannot
-     watch happen. */
+  const replace = (next: KitElement) =>
+    setElements(family, (elements) => elements.map((element) => (element.id === next.id ? next : element)));
+
+  const remove = (element: KitElement) => {
+    setElements(family, (elements) => elements.filter((candidate) => candidate.id !== element.id));
+    selectLayer(null);
+    notify(`Removed ${elementLabel(element)}.`, true);
+  };
+
+  const duplicate = (element: KitElement) => {
+    const all = config[family].elements ?? [];
+    const taken = all.flatMap((candidate) => (candidate.kind === "shape" ? [candidate.name] : []));
+    const copyOf = duplicateElement(element, taken);
+    setElements(family, (elements) => {
+      const at = elements.findIndex((candidate) => candidate.id === element.id);
+      return [...elements.slice(0, at + 1), copyOf, ...elements.slice(at + 1)];
+    });
+    selectLayer(copyOf.id);
+  };
+
+  const toggleHidden = (element: KitElement) =>
+    replace({ ...element, hidden: !element.hidden } as KitElement);
+
+  /* Order inside a frame is paint order, so moving is swapping with the
+     neighbour in the same frame — the neighbour the LIST shows, which on the
+     travel controls is not the whole list. */
   const neighbour = (element: KitElement, direction: -1 | 1): KitElement | undefined => {
-    const siblings = elements.filter((candidate) => candidate.frame === element.frame);
+    const siblings = layers.filter((candidate) => candidate.frame === element.frame);
     return siblings[siblings.indexOf(element) + direction];
   };
 
   const move = (element: KitElement, direction: -1 | 1) => {
-    if (!family) return;
     const swap = neighbour(element, direction);
     if (!swap) return;
-    setElements(
-      family,
-      (config[family].elements ?? []).map((candidate) =>
+    setElements(family, (elements) =>
+      elements.map((candidate) =>
         candidate.id === element.id ? swap : candidate.id === swap.id ? element : candidate
       )
     );
   };
 
   const add = (what: PartName | "shape") => {
-    if (!family || !tab) return;
     setAdding(false);
     const all = config[family].elements ?? [];
+    let element: KitElement;
     if (what === "shape") {
-      const frame: FrameName = "actuator";
-      const shape = defaultShape(frame, `shape-${all.length + 1}`);
-      /* A press control's frames are `display: contents` markers and the cap
-         is what gives the control its size, so a key starts in flow. An
-         absolutely-positioned one collapses the button to nothing — which
-         looks like a bug rather than a choice. */
+      const taken = all.flatMap((candidate) => (candidate.kind === "shape" ? [candidate.name] : []));
+      let i = 1;
+      while (taken.includes(`shape-${i}`)) i += 1;
+      const shape = defaultShape("actuator", `shape-${i}`);
+      /* A button's frames are `display: contents` markers and the cap gives
+         it a size, so a new layer on a button wraps its label. An absolute
+         one would collapse the button to nothing, which reads as a bug. */
       if (family === "press") {
         shape.box = { ...shape.box, place: "flow", width: 11, height: 8.3, radius: "soft" };
         shape.content = "legend";
       }
-      /* An element added while looking at the slider tab has to be visible
-         on the slider tab, or it lands in a list you are not looking at. */
-      if (family === "travel") shape.only = tab.upright ? "vertical" : "horizontal";
-      setElements(family, [...all, shape]);
-      setSelected((prev) => ({ ...prev, [tab.id]: shape.id }));
-      return;
+      element = shape;
+    } else {
+      element = { ...defaultPart(PARTS[what].frame, what), props: partDefaults(what) };
     }
-    const part = { ...defaultPart(PARTS[what].frame, what), props: partDefaults(what) };
-    if (family === "travel") part.only = tab.upright ? "vertical" : "horizontal";
-    setElements(family, [...all, part]);
-    setSelected((prev) => ({ ...prev, [tab.id]: part.id }));
+    /* Added while looking at the slider, it has to show on the slider. */
+    if (family === "travel") element.only = control.upright ? "vertical" : "horizontal";
+    setElements(family, (elements) => [...elements, element]);
+    if (!config[family].dressed) patchFamily(family, { dressed: true });
+    selectLayer(element.id);
   };
+
+  /* ── Keyboard ───────────────────────────────────────────────────────── */
+
+  const keyState = useRef({ current, remove, undo: history.undo, redo: history.redo, exporting });
+  keyState.current = { current, remove, undo: history.undo, redo: history.redo, exporting };
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      const state = keyState.current;
+      if (state.exporting || isTyping(event.target)) return;
+      const mod = event.metaKey || event.ctrlKey;
+      if (mod && event.key.toLowerCase() === "z") {
+        event.preventDefault();
+        if (event.shiftKey) state.redo();
+        else state.undo();
+      } else if (mod && event.key.toLowerCase() === "y") {
+        event.preventDefault();
+        state.redo();
+      } else if (
+        (event.key === "Delete" || event.key === "Backspace") &&
+        state.current &&
+        /* Only from the layer list or the stage — never from a stray focus
+           somewhere in the form. */
+        (event.target === document.body ||
+          (event.target instanceof Element && !!event.target.closest(".kb-layers, .kb-stage")))
+      ) {
+        event.preventDefault();
+        state.remove(state.current);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   /* ── Output ─────────────────────────────────────────────────────────── */
 
-  const source = useMemo(() => emitKit(settled, shareUrl ?? undefined), [settled, shareUrl]);
-  const usage = useMemo(() => emitUsage(settled), [settled]);
-  const styles = useMemo(() => buildStyles(settled), [settled]);
-  const file = fileName(settled.name);
-  const cssFile = styleFileName(settled);
-
-  const copyLink = useCallback(() => {
-    if (!shareUrl || !navigator.clipboard) return;
-    void navigator.clipboard.writeText(shareUrl).then(() => {
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1600);
+  const files = useMemo<ExportFile[]>(() => {
+    const styles = buildStyles(settled);
+    const out: ExportFile[] = [
+      {
+        id: "kit",
+        label: fileName(settled.name),
+        name: fileName(settled.name),
+        language: "tsx",
+        note: `Exports ${kitIdent(settled.name)} and the scene it was tuned under, ${themeIdent(settled.name)}. Imports only parts @ambientcss/components exports.`,
+        contents: emitKit(settled, shareUrl ?? undefined)
+      }
+    ];
+    if (styles) {
+      out.push({
+        id: "css",
+        label: styleFileName(settled),
+        name: styleFileName(settled),
+        language: "css",
+        note: "The shapes, as rules. The kit file imports it. Every rule is two classes wide, so it wins over the library's own styles whatever the import order.",
+        contents: styles
+      });
+    }
+    out.push({
+      id: "usage",
+      label: "Usage",
+      name: "rack.tsx",
+      language: "tsx",
+      note: "Put the kit above your controls. The controls themselves don't change.",
+      contents: emitUsage(settled)
     });
-  }, [shareUrl]);
+    return out;
+  }, [settled, shareUrl]);
 
-  const dressesNothing = FAMILIES.every((candidate) => !config[candidate].dressed);
-  const undressed = family ? !config[family].dressed : false;
+  const hiddenCount = FAMILIES.reduce(
+    (sum, candidate) => sum + (config[candidate].elements ?? []).filter((element) => element.hidden).length,
+    0
+  );
+
+  /* ── Stage ──────────────────────────────────────────────────────────── */
+
+  const stageConfig = useMemo(
+    () => (solo && current ? isolate(config, family, current.id) : config),
+    [solo, current, config, family]
+  );
+  const showRack = stageView === "rack" || selection.kind === "scene";
+  const undressed = !config[family].dressed;
+  const activeScene = SCENE_PRESETS.find((preset) =>
+    Object.entries(preset.theme).every(([key, value]) => config.theme[key as keyof KitConfig["theme"]] === value)
+  );
+
+  /* ── Render ─────────────────────────────────────────────────────────── */
 
   return (
     <div className="kb">
-      <header className="kb-intro">
-        <h1 className="kb-intro-title">Kit Builder</h1>
-        <p className="kb-intro-text">
-          A tab per control, and under each one the parts it is made of. Open a part and
-          you are editing the real thing — a list of parts and shapes per frame, which is
-          what writing a kit is. <code>&lt;/&gt;</code> shows the file this makes;{" "}
-          <code>↑</code> hands it to you. Nothing on this page is a picture of the kit:
-          every rendering is the module and the stylesheet you take away, running.
-        </p>
-      </header>
+      <KitStyles config={stageConfig} highlight={!showRack && current ? { family, element: current } : null} />
 
-      <AmbientProvider theme={CHROME} className="kb-chrome">
-        <div className="kb-device ambient amb-surface amb-chamfer amb-elevation-2 amb-mat-blasted">
-          {/* Live, not settled: the stylesheet IS the shapes. Debouncing it
-              would leave the stage holding unstyled spans for a quarter of a
-              second after every edit — and a shape slider would not move
-              anything until you let go of it. */}
-          <KitStyles config={config} />
+      <header className="kb-toolbar">
+        <div className="kb-toolbar-title">
+          <h1 className="kb-title">Kit Builder</h1>
+          <label className="kb-name">
+            <span className="kb-visually-hidden">Kit name</span>
+            <input
+              className="kb-name-input"
+              value={config.name}
+              spellCheck={false}
+              onChange={(e) => {
+                const name = e.target.value;
+                setConfig((prev) => ({ ...prev, name }));
+              }}
+            />
+          </label>
+        </div>
 
-          <div className="kb-bar">
-            <div className="kb-name amb-groove">
-              <input
-                className="kb-name-input"
-                value={config.name}
-                spellCheck={false}
-                aria-label="Kit name"
-                onChange={(e) => setConfig((prev) => ({ ...prev, name: e.target.value }))}
-              />
-            </div>
-            <button
-              type="button"
-              className={`kb-key${showCode ? " kb-key-on" : ""}`}
-              title="Show the file this makes"
-              aria-pressed={showCode}
-              onClick={() => {
-                setShowCode((on) => !on);
-                setMenu(false);
+        <div className="kb-toolbar-actions">
+          <label className="kb-preset">
+            <span className="kb-visually-hidden">Start the whole kit from</span>
+            <select
+              className="kb-select kb-preset-select"
+              value=""
+              onChange={(e) => {
+                if (e.target.value) applyPreset(e.target.value as KitPresetName);
               }}
             >
-              &lt;/&gt;
+              <option value="" disabled>
+                Start from…
+              </option>
+              {KIT_PRESETS.map((preset) => (
+                <option key={preset.id} value={preset.id}>
+                  {preset.label} — {preset.note}
+                </option>
+              ))}
+            </select>
+          </label>
+          <div className="kb-btn-group">
+            <button
+              type="button"
+              className="kb-btn kb-btn-icon"
+              title="Undo (Ctrl/⌘ Z)"
+              aria-label="Undo"
+              disabled={!history.canUndo}
+              onClick={history.undo}
+            >
+              <Icon name="undo" />
             </button>
-            <div className="kb-menu-anchor">
-              <button
-                type="button"
-                className={`kb-key${menu ? " kb-key-on" : ""}`}
-                title="Take it away"
-                aria-expanded={menu}
-                onClick={() => setMenu((on) => !on)}
-              >
-                ↑
-              </button>
-              {menu ? (
-                <>
-                  {/* A menu that only closes on the button that opened it is a
-                      menu you have to remember how to escape. */}
+            <button
+              type="button"
+              className="kb-btn kb-btn-icon"
+              title="Redo (Ctrl/⌘ Shift Z)"
+              aria-label="Redo"
+              disabled={!history.canRedo}
+              onClick={history.redo}
+            >
+              <Icon name="redo" />
+            </button>
+          </div>
+          <button
+            type="button"
+            className="kb-btn kb-hide-narrow"
+            disabled={!shareUrl}
+            onClick={() => shareUrl && copy("link", shareUrl)}
+          >
+            <Icon name={copied === "link" ? "check" : "link"} />
+            {copied === "link" ? "Copied" : "Copy link"}
+          </button>
+          <button type="button" className="kb-btn kb-btn-primary" onClick={() => setExporting(true)}>
+            <Icon name="code" />
+            Export
+          </button>
+        </div>
+      </header>
+
+      <div className="kb-workspace">
+        {/* ── Controls ── */}
+        <nav className="kb-sidebar" aria-label="Controls">
+          <h2 className="kb-panel-title">Controls</h2>
+          <ul className="kb-control-list">
+            {CONTROLS.map((candidate) => {
+              const on = selection.kind === "control" && selection.id === candidate.id;
+              return (
+                <li key={candidate.id} className={`kb-control${on ? " kb-control-on" : ""}`}>
+                  {/* The thumbnail is a real control (a button, for the
+                      button), so it sits beside the hit target rather than
+                      inside it: a button may not contain a button. */}
+                  <span className="kb-control-thumb">
+                    <Thumb config={settled} control={candidate} />
+                  </span>
+                  <span className="kb-control-text">
+                    <span className="kb-control-name">{candidate.label}</span>
+                    <span className="kb-control-status">{controlStatus(settled, candidate.family)}</span>
+                  </span>
                   <button
                     type="button"
-                    className="kb-scrim"
-                    aria-label="Close the menu"
-                    onClick={() => setMenu(false)}
+                    className="kb-hit"
+                    aria-label={`${candidate.label}: ${controlStatus(settled, candidate.family)}`}
+                    aria-current={on ? "true" : undefined}
+                    onClick={() => selectControl(candidate.id)}
                   />
-                  <div className="kb-menu">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        download(file, source);
-                        setMenu(false);
-                      }}
-                    >
-                      Download {file}
-                    </button>
-                    {styles ? (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          download(cssFile, styles);
-                          setMenu(false);
-                        }}
-                      >
-                        Download {cssFile}
-                      </button>
-                    ) : null}
-                    <button type="button" onClick={copyLink} disabled={!shareUrl}>
-                      {copied ? "Link copied" : "Copy link to this kit"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setConfig(DEFAULT_CONFIG);
-                        setMenu(false);
-                      }}
-                    >
-                      Reset everything
-                    </button>
-                  </div>
-                </>
-              ) : null}
-            </div>
-          </div>
-
-          <nav className="kb-tabs" aria-label="Controls">
-            {[...CONTROL_TABS, { id: "kit", label: "Kit" }].map((candidate) => (
+                </li>
+              );
+            })}
+            <li className={`kb-control kb-control-scene${selection.kind === "scene" ? " kb-control-on" : ""}`}>
+              <span className="kb-control-thumb kb-control-icon">
+                <Icon name="sun" size={20} />
+              </span>
+              <span className="kb-control-text">
+                <span className="kb-control-name">Scene</span>
+                <span className="kb-control-status">{activeScene ? activeScene.label : "Custom light"}</span>
+              </span>
               <button
-                key={candidate.id}
                 type="button"
-                className={`kb-tab${tabId === candidate.id ? " kb-tab-on" : ""}`}
-                aria-current={tabId === candidate.id}
+                className="kb-hit"
+                aria-label="Scene and lighting"
+                aria-current={selection.kind === "scene" ? "true" : undefined}
                 onClick={() => {
-                  setTabId(candidate.id);
+                  setSelection({ kind: "scene" });
                   setAdding(false);
                 }}
-              >
-                {candidate.label}
-              </button>
-            ))}
-          </nav>
+              />
+            </li>
+          </ul>
+        </nav>
 
-          <div className="kb-screen amb-groove">
-            {tab ? <ControlStage config={config} tab={tab} /> : <Stage config={config} />}
+        {/* ── Stage ── */}
+        <main className="kb-stage">
+          <div className="kb-stage-bar">
+            <div className="kb-seg-group" role="radiogroup" aria-label="Stage view">
+              <button
+                type="button"
+                role="radio"
+                aria-checked={!showRack}
+                className={`kb-seg${!showRack ? " kb-seg-on" : ""}`}
+                onClick={() => {
+                  setStageView("control");
+                  if (selection.kind === "scene") setSelection({ kind: "control", id: lastControl });
+                }}
+              >
+                {control.label}
+              </button>
+              <button
+                type="button"
+                role="radio"
+                aria-checked={showRack}
+                className={`kb-seg${showRack ? " kb-seg-on" : ""}`}
+                onClick={() => setStageView("rack")}
+              >
+                Whole rack
+              </button>
+            </div>
+            {!showRack ? (
+              <div className="kb-stage-tools">
+                {current ? (
+                  <button
+                    type="button"
+                    className={`kb-btn kb-btn-small${solo ? " kb-btn-on" : ""}`}
+                    aria-pressed={solo}
+                    title="Show only the selected layer"
+                    onClick={() => setSolo((on) => !on)}
+                  >
+                    <Icon name="focus" size={14} />
+                    Isolate
+                  </button>
+                ) : null}
+                <div className="kb-seg-group" role="radiogroup" aria-label="Preview size">
+                  {(["sm", "md", "lg"] as const).map((candidate) => (
+                    <button
+                      key={candidate}
+                      type="button"
+                      role="radio"
+                      aria-checked={size === candidate}
+                      className={`kb-seg${size === candidate ? " kb-seg-on" : ""}`}
+                      onClick={() => setSize(candidate)}
+                    >
+                      {candidate === "sm" ? "S" : candidate === "md" ? "M" : "L"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
           </div>
 
-          {tab ? (
+          <div className={`kb-stage-frame${showRack ? " kb-stage-frame-rack" : ""}`}>
+            <Canvas config={stageConfig}>
+              {showRack ? (
+                <Rack state={preview} onState={(patch) => setPreview((prev) => ({ ...prev, ...patch }))} />
+              ) : (
+                <div className="kb-stage-control">
+                  <ControlPreview
+                    control={control}
+                    size={size}
+                    state={preview}
+                    onState={(patch) => setPreview((prev) => ({ ...prev, ...patch }))}
+                  />
+                </div>
+              )}
+            </Canvas>
+            {!showRack && undressed ? (
+              <div className="kb-stage-badge">Library default — this kit doesn't dress {FAMILY_LABELS[family].toLowerCase()}</div>
+            ) : null}
+            {solo && current && !showRack ? <div className="kb-stage-badge">Showing only {elementLabel(current)}</div> : null}
+          </div>
+
+          {!showRack ? (
+            <div className="kb-stage-foot">
+              {control.id === "knob" || control.id === "fader" || control.id === "slider" ? (
+                <Slider
+                  label="Try a value"
+                  value={preview.value}
+                  min={0}
+                  max={100}
+                  unit="%"
+                  onChange={(value) => setPreview((prev) => ({ ...prev, value }))}
+                />
+              ) : null}
+              {control.id === "switch" ? (
+                <Toggle label="Try it" checked={preview.on} onChange={(on) => setPreview((prev) => ({ ...prev, on }))} />
+              ) : null}
+              {control.id === "bank" ? (
+                <Segmented
+                  label="Selected key"
+                  value={preview.bank}
+                  options={["1", "2", "3", "4"].map((value) => ({ value, label: value }))}
+                  onChange={(bank) => setPreview((prev) => ({ ...prev, bank }))}
+                />
+              ) : null}
+              {control.id === "button" ? <Note>Press the button on the stage to try it.</Note> : null}
+            </div>
+          ) : (
+            <div className="kb-stage-foot">
+              <Note>Every control here is an ordinary component. Only the kit above them changed.</Note>
+            </div>
+          )}
+        </main>
+
+        {/* ── Inspector ── */}
+        <aside className="kb-inspector" aria-label="Inspector">
+          {selection.kind === "scene" ? (
             <>
-              <div className="kb-chips" data-tab={tab.id} role="tablist" aria-label="Parts">
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={pick === null}
-                  className={`kb-chip${pick === null ? " kb-chip-on" : ""}`}
-                  onClick={() => select(null)}
-                >
-                  <span className="kb-chip-art">
-                    <PartThumb config={settled} tab={tab} elementId={null} />
-                  </span>
-                  <span className="kb-chip-name">the control</span>
-                </button>
-
-                {elements.map((element) => (
-                  <button
-                    key={element.id}
-                    type="button"
-                    role="tab"
-                    aria-selected={pick === element.id}
-                    className={`kb-chip${pick === element.id ? " kb-chip-on" : ""}`}
-                    onClick={() => select(element.id)}
-                  >
-                    <span className="kb-chip-art">
-                      <PartThumb config={settled} tab={tab} elementId={element.id} />
-                    </span>
-                    <span className="kb-chip-name">{elementLabel(element)}</span>
-                    <span className="kb-chip-frame">{element.frame}</span>
-                  </button>
-                ))}
-
-                <button
-                  type="button"
-                  className={`kb-chip kb-chip-add${adding ? " kb-chip-on" : ""}`}
-                  onClick={() => setAdding((on) => !on)}
-                >
-                  <span className="kb-chip-art kb-chip-plus">+</span>
-                  <span className="kb-chip-name">add a part</span>
-                </button>
+              <div className="kb-inspector-head">
+                <h2 className="kb-inspector-title">Scene</h2>
               </div>
-
-              {undressed ? (
-                <p className="kb-note kb-note-wide">
-                  This family is left undressed, so what you are looking at is{" "}
-                  <code>groundedKit</code> showing through. Its parts are still here — turn{" "}
-                  <em>Dress this family</em> back on to put them back.
-                </p>
+              <SceneEditor config={config} patch={patchScene} />
+            </>
+          ) : (
+            <>
+              <div className="kb-inspector-head">
+                <h2 className="kb-inspector-title">{control.label}</h2>
+                <span className="kb-pill">{controlStatus(config, family)}</span>
+              </div>
+              {control.family === "travel" ? (
+                <Note>The fader and slider share one layer list. Layers can be limited to one of them.</Note>
               ) : null}
 
-              <div className="kb-form">
+              <div className="kb-layers">
+                <div className="kb-layers-head">
+                  <h3 className="kb-panel-title">Layers</h3>
+                  <button
+                    type="button"
+                    className={`kb-btn kb-btn-small${adding ? " kb-btn-on" : ""}`}
+                    aria-expanded={adding}
+                    onClick={() => setAdding((on) => !on)}
+                  >
+                    <Icon name="plus" size={14} />
+                    Add
+                  </button>
+                </div>
+
                 {adding ? (
-                  <div className="kb-add">
-                    <p className="kb-note kb-note-wide">
-                      A shape is a <code>&lt;span&gt;</code> and a rule in the stylesheet this
-                      page writes — which is what every part below is made of.
-                    </p>
+                  <div className="kb-add-menu">
                     <button type="button" className="kb-add-item" onClick={() => add("shape")}>
-                      <strong>a shape</strong>
-                      <span>you draw it: a box, a structure, a surface, a colour</span>
+                      <strong>Shape</strong>
+                      <span>Draw your own: a box with a structure, surface and colour.</span>
                     </button>
-                    {(FAMILY_PARTS[family ?? ""] ?? []).map((name) => (
-                      <button
-                        key={name}
-                        type="button"
-                        className="kb-add-item"
-                        onClick={() => add(name)}
-                      >
+                    {(FAMILY_PARTS[family] ?? []).map((name) => (
+                      <button key={name} type="button" className="kb-add-item" onClick={() => add(name)}>
                         <strong>{PARTS[name].label}</strong>
-                        <span>{PARTS[name].note}</span>
+                        <span>
+                          {PARTS[name].note.charAt(0).toUpperCase() + PARTS[name].note.slice(1)}.
+                        </span>
                       </button>
                     ))}
                   </div>
-                ) : current && family ? (
-                  <>
-                    <div className="kb-form-head">
-                      <h2 className="kb-form-title">{elementLabel(current)}</h2>
-                      <span className="kb-badge" title={FRAME_NOTES[current.frame]}>
-                        {current.frame}
-                      </span>
-                      <button
-                        type="button"
-                        className="kb-icon"
-                        title="paint earlier"
-                        disabled={!neighbour(current, -1)}
-                        onClick={() => move(current, -1)}
-                      >
-                        ▲
-                      </button>
-                      <button
-                        type="button"
-                        className="kb-icon"
-                        title="paint later"
-                        disabled={!neighbour(current, 1)}
-                        onClick={() => move(current, 1)}
-                      >
-                        ▼
-                      </button>
-                      <button
-                        type="button"
-                        className="kb-icon"
-                        title="remove this part"
-                        onClick={() => remove(current.id)}
-                      >
-                        ✕
-                      </button>
-                    </div>
-                    <div className="kb-fields">
-                      <ElementEditor
-                        element={current}
-                        family={family}
-                        onChange={(next) => replace(next)}
-                      />
-                    </div>
-                  </>
-                ) : family ? (
-                  <>
-                    <div className="kb-form-head">
-                      <h2 className="kb-form-title">{FAMILY_LABELS[family]}</h2>
-                    </div>
-                    <div className="kb-fields">
-                      <ControlEditor
-                        family={family}
-                        config={config}
-                        patch={patchFamily}
-                        onSeed={applySeed}
-                      />
-                    </div>
-                  </>
                 ) : null}
+
+                <button
+                  type="button"
+                  className={`kb-layer-settings${current === null ? " kb-layer-settings-on" : ""}`}
+                  onClick={() => selectLayer(null)}
+                >
+                  <Icon name="sliders" size={14} />
+                  Control settings
+                </button>
+
+                {layers.length === 0 ? (
+                  <p className="kb-empty">No layers yet. Add a shape or a part to start drawing.</p>
+                ) : (
+                  FRAMES.map((frame) => {
+                    const inFrame = layers.filter((element) => element.frame === frame);
+                    if (inFrame.length === 0) return null;
+                    return (
+                      <div key={frame} className="kb-frame">
+                        <div className="kb-frame-head" title={FRAME_INFO[frame].note}>
+                          <span>{FRAME_INFO[frame].label}</span>
+                          <span className="kb-frame-note">{FRAME_INFO[frame].note}</span>
+                        </div>
+                        <ul className="kb-layer-list">
+                          {inFrame.map((element) => (
+                            <LayerRow
+                              key={element.id}
+                              element={element}
+                              control={control}
+                              config={settled}
+                              selected={current?.id === element.id}
+                              canUp={!!neighbour(element, -1)}
+                              canDown={!!neighbour(element, 1)}
+                              onSelect={() => selectLayer(current?.id === element.id ? null : element.id)}
+                              onToggle={() => toggleHidden(element)}
+                              onMove={(direction) => move(element, direction)}
+                            />
+                          ))}
+                        </ul>
+                      </div>
+                    );
+                  })
+                )}
               </div>
+
+              {current ? (
+                <div className="kb-props">
+                  <div className="kb-props-head">
+                    <button type="button" className="kb-btn kb-btn-ghost kb-btn-icon" aria-label="Back to control settings" onClick={() => selectLayer(null)}>
+                      <Icon name="back" />
+                    </button>
+                    <h3 className="kb-props-title">{elementLabel(current)}</h3>
+                    <span className="kb-pill">{current.kind === "part" ? "Library part" : "Shape"}</span>
+                    <button type="button" className="kb-btn kb-btn-ghost kb-btn-icon" title="Duplicate" aria-label="Duplicate layer" onClick={() => duplicate(current)}>
+                      <Icon name="duplicate" />
+                    </button>
+                    <button type="button" className="kb-btn kb-btn-ghost kb-btn-icon kb-btn-danger" title="Delete (Del)" aria-label="Delete layer" onClick={() => remove(current)}>
+                      <Icon name="trash" />
+                    </button>
+                  </div>
+                  <LayerEditor element={current} family={family} onChange={replace} />
+                </div>
+              ) : (
+                <div className="kb-props">
+                  {undressed ? (
+                    <Note tone="warn">
+                      This kit doesn't dress {FAMILY_LABELS[family].toLowerCase()}, so the stage shows the library's
+                      grounded look. Turn on <em>Dress it</em> to use the layers above.
+                    </Note>
+                  ) : null}
+                  <ControlEditor family={family} config={config} patch={patchFamily} onSeed={applySeed} />
+                </div>
+              )}
             </>
-          ) : (
-            <div className="kb-form">
-              <div className="kb-form-head">
-                <h2 className="kb-form-title">The kit, and the room it stands in</h2>
-              </div>
-              <div className="kb-fields">
-                <TextField
-                  label="Name"
-                  hint={`exports ${kitIdent(config.name)} and ${themeIdent(config.name)}`}
-                  value={config.name}
-                  onChange={(name) => setConfig((prev) => ({ ...prev, name }))}
-                />
-                <SceneEditor config={config} patch={patchScene} />
-              </div>
-              {dressesNothing ? (
-                <p className="kb-note kb-note-wide">
-                  Every family is undressed, so this kit dresses nothing and every control falls
-                  through to <code>groundedKit</code>. Still a valid kit — just not yet a look.
-                </p>
-              ) : null}
-            </div>
           )}
-        </div>
-      </AmbientProvider>
+        </aside>
+      </div>
 
-      {showCode ? (
-        <div className="kb-code">
-          <h2 className="kb-code-title">{file}</h2>
-          <p className="kb-note">
-            The whole kit. Drop it in your project — it imports only parts that{" "}
-            <code>@ambientcss/components</code> exports.
+      <section className="kb-help" aria-label="How it works">
+        <div>
+          <h3>Layers and frames</h3>
+          <p>
+            A control has four frames, painted in order: <strong>Panel</strong> (printed behind it),{" "}
+            <strong>Base</strong>, <strong>Moving</strong> (turns or slides with the value) and{" "}
+            <strong>Top</strong>. Each frame holds layers.
           </p>
-          <CodeBlock language="tsx" title={file}>
-            {source}
-          </CodeBlock>
+        </div>
+        <div>
+          <h3>Parts and shapes</h3>
+          <p>
+            A layer is either a <strong>library part</strong> from <code>@ambientcss/components</code>, or a{" "}
+            <strong>shape</strong>: a <code>&lt;span&gt;</code> with a generated CSS rule. The console kit is
+            mostly shapes.
+          </p>
+        </div>
+        <div>
+          <h3>What you get</h3>
+          <p>
+            A <code>ControlKit</code> module and, if you used shapes, its stylesheet. Wrap your controls in{" "}
+            <code>&lt;AmbientKitProvider&gt;</code>. Read more in the <Link to="/ambient-components/kits">kits guide</Link>.
+          </p>
+        </div>
+        <p className="kb-help-keys">
+          <kbd>Ctrl/⌘ Z</kbd> undo · <kbd>Ctrl/⌘ Shift Z</kbd> redo · <kbd>Del</kbd> delete layer · your work is saved in
+          this browser and in the page link.
+        </p>
+      </section>
 
-          {styles ? (
-            <>
-              <h2 className="kb-code-title">{cssFile}</h2>
-              <p className="kb-note">
-                The shapes, as rules — and the very stylesheet the device above is running. Every
-                rule is two classes wide, so it beats the library's own on specificity rather than
-                on import order, which the app that consumes the kit controls and this file does
-                not.
-              </p>
-              <CodeBlock language="css" title={cssFile}>
-                {styles}
-              </CodeBlock>
-            </>
+      {exporting ? (
+        <ExportDialog files={files} shareUrl={shareUrl} hiddenCount={hiddenCount} onClose={() => setExporting(false)} />
+      ) : null}
+
+      {toast ? (
+        <div className="kb-toast" role="status" key={toast.id}>
+          <span>{toast.message}</span>
+          {toast.undo ? (
+            <button
+              type="button"
+              className="kb-link"
+              onClick={() => {
+                history.undo();
+                setToast(null);
+              }}
+            >
+              Undo
+            </button>
           ) : null}
-
-          <h2 className="kb-code-title">Using it</h2>
-          <CodeBlock language="tsx" title="rack.tsx">
-            {usage}
-          </CodeBlock>
         </div>
       ) : null}
     </div>
   );
 }
+
+/* ── One row in the layer list ────────────────────────────────────────── */
+
+function LayerRow({
+  element,
+  control,
+  config,
+  selected,
+  canUp,
+  canDown,
+  onSelect,
+  onToggle,
+  onMove
+}: {
+  element: KitElement;
+  control: ControlDef;
+  config: KitConfig;
+  selected: boolean;
+  canUp: boolean;
+  canDown: boolean;
+  onSelect: () => void;
+  onToggle: () => void;
+  onMove: (direction: -1 | 1) => void;
+}) {
+  const label = elementLabel(element);
+  return (
+    <li className={`kb-layer${selected ? " kb-layer-on" : ""}${element.hidden ? " kb-layer-hidden" : ""}`}>
+      <span className="kb-layer-main">
+        <span className="kb-layer-thumb">
+          <Thumb config={config} control={control} elementId={element.id} />
+        </span>
+        <button type="button" className="kb-hit" aria-label={`Edit ${label}`} aria-pressed={selected} onClick={onSelect} />
+        <span className="kb-layer-text">
+          <span className="kb-layer-name">{label}</span>
+          <span className="kb-layer-kind">
+            {element.kind === "part" ? "Part" : "Shape"}
+            {element.only && element.only !== "both" ? ` · ${element.only === "vertical" ? "fader only" : "slider only"}` : ""}
+            {element.bankScope === "panel" ? " · rail" : ""}
+            {element.bankState && element.bankState !== "both" ? ` · ${element.bankState === "on" ? "selected" : "unselected"}` : ""}
+          </span>
+        </span>
+      </span>
+      <span className="kb-layer-tools">
+        <button
+          type="button"
+          className="kb-btn kb-btn-ghost kb-btn-icon kb-btn-tiny"
+          aria-label={element.hidden ? `Show ${label}` : `Hide ${label}`}
+          title={element.hidden ? "Show" : "Hide"}
+          onClick={onToggle}
+        >
+          <Icon name={element.hidden ? "eyeOff" : "eye"} size={14} />
+        </button>
+        <button
+          type="button"
+          className="kb-btn kb-btn-ghost kb-btn-icon kb-btn-tiny"
+          aria-label={`Paint ${label} earlier`}
+          title="Paint earlier"
+          disabled={!canUp}
+          onClick={() => onMove(-1)}
+        >
+          <Icon name="up" size={14} />
+        </button>
+        <button
+          type="button"
+          className="kb-btn kb-btn-ghost kb-btn-icon kb-btn-tiny"
+          aria-label={`Paint ${label} later`}
+          title="Paint later"
+          disabled={!canDown}
+          onClick={() => onMove(1)}
+        >
+          <Icon name="down" size={14} />
+        </button>
+      </span>
+    </li>
+  );
+}
+
+export type { FrameName };

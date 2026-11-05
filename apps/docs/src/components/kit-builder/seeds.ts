@@ -26,11 +26,11 @@ import type {
 export type SeedName = "grounded" | "console" | "console-shapes" | "radio" | "empty";
 
 export const SEED_LABELS: Record<SeedName, string> = {
-  grounded: "grounded parts",
-  console: "console parts",
-  "console-shapes": "console, in shapes",
-  radio: "radio (Rams-style)",
-  empty: "empty"
+  grounded: "Grounded",
+  console: "Console",
+  "console-shapes": "Console, from shapes",
+  radio: "Radio buttons",
+  empty: "Blank"
 };
 
 function part(
@@ -201,6 +201,8 @@ export function seedElements(family: string, seed: SeedName): KitElement[] {
      bank's lamp colour on — a different cast, not the same cap repainted,
      which is the one case a key needs `bankState` at all. Reproduces
      `bankRadio()` in the library's own grounded kit. */
+  if (family === "bank" && seed === "console") return [part("actuator", "ConsoleKey")];
+
   if (family === "bank" && seed === "radio") {
     return [
       part("actuator", "ButtonCap", { material: "matte" }, undefined, "off"),
@@ -217,7 +219,7 @@ export function seedElements(family: string, seed: SeedName): KitElement[] {
 export function seedsFor(family: string): SeedName[] {
   if (family === "rotary" || family === "latch")
     return ["grounded", "console", "console-shapes", "empty"];
-  if (family === "bank") return ["grounded", "radio", "empty"];
+  if (family === "bank") return ["grounded", "console", "radio", "empty"];
   return ["grounded", "empty"];
 }
 
@@ -264,6 +266,8 @@ export function seedRootClass(family: string, seed: SeedName): SeedClasses {
   /* The radio bank has no shared rail — each key is its own pushbutton, so
      it wears none of the grooved-rail look the lamp-lit key does. */
   if (family === "bank" && seed === "radio") return { rootClass: "amb-select-radio", rootClassH: "" };
+  if (family === "bank" && seed === "console")
+    return { rootClass: "amb-console-bank amb-groove", rootClassH: "" };
   return { rootClass: "amb-select amb-groove", rootClassH: "" };
 }
 

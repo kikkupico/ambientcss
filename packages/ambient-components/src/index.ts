@@ -105,6 +105,7 @@ export type { ConsoleKnobProps, ConsoleToggleProps } from "./kits/console";
 
 export {
   ConsoleBar,
+  ConsoleKey,
   ConsoleMarks,
   ConsoleWell,
   ToggleTrack,

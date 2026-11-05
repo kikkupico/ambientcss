@@ -4,7 +4,7 @@
 
 import type { AmbientMaterial } from "@ambientcss/components";
 import type { KitElement } from "./model";
-import { seedElements, seedRoot, seedRootClass } from "./seeds";
+import { seedElements, seedRoot, seedRootClass, seedsFor } from "./seeds";
 import type { SeedName } from "./seeds";
 
 /** A material choice, plus the "say nothing" option — a part that is handed
@@ -166,6 +166,85 @@ export function seedPatch(
     ...(family === "travel" ? { rootClassH: classes.rootClassH } : null),
     ...(root ? { root: { ...currentRoot, ...root } } : null)
   };
+}
+
+/* ── Whole-kit starting points ────────────────────────────────────────── */
+
+/** A starting point for the whole kit at once: a seed per family, and which
+ *  families are left to fall through. Applying one is the same as picking
+ *  each family's "Start from" by hand — it is a shortcut, not a mode. */
+export type KitPresetName = "grounded" | "console" | "console-shapes" | "empty";
+
+export const KIT_PRESETS: { id: KitPresetName; label: string; note: string }[] = [
+  {
+    id: "grounded",
+    label: "Grounded",
+    note: "The library's default hardware look, every part ready to change."
+  },
+  {
+    id: "console",
+    label: "Console",
+    note: "Mixer-desk knobs, pill toggles and keys. Faders and buttons stay grounded."
+  },
+  {
+    id: "console-shapes",
+    label: "Console, from shapes",
+    note: "The console knob and toggle rebuilt from plain shapes, so you can take them apart."
+  },
+  {
+    id: "empty",
+    label: "Blank",
+    note: "Empty controls. Draw every part yourself."
+  }
+];
+
+const FAMILY_KEYS = ["rotary", "travel", "press", "latch", "bank"] as const;
+
+function presetSeed(preset: KitPresetName, family: string): { dressed: boolean; seed: SeedName } {
+  if (preset === "grounded" || preset === "empty") return { dressed: true, seed: preset };
+  const wanted: SeedName = preset === "console-shapes" && family === "bank" ? "console" : preset;
+  return seedsFor(family).includes(wanted)
+    ? { dressed: true, seed: wanted }
+    : /* consoleKit has no opinion about faders or buttons, so neither does
+         a kit started from it: they fall through to grounded. */
+      { dressed: false, seed: "grounded" };
+}
+
+export function applyKitPreset(cfg: KitConfig, preset: KitPresetName): KitConfig {
+  const next = { ...cfg } as KitConfig;
+  for (const family of FAMILY_KEYS) {
+    const { dressed, seed } = presetSeed(preset, family);
+    const current = cfg[family] as { root?: Record<string, number | boolean> };
+    (next as Record<string, unknown>)[family] = {
+      ...cfg[family],
+      ...seedPatch(family, seed, current.root),
+      dressed
+    };
+  }
+  /* The console knob is an absolute-position pot: it grabs where you press,
+     over a 280° sweep. That is part of the look consoleKit ships. */
+  const consoleFeel = preset === "console" || preset === "console-shapes";
+  next.rotary = {
+    ...next.rotary,
+    input: consoleFeel ? "angle" : "default",
+    travel: consoleFeel ? 280 : null,
+    animate: "default"
+  };
+  next.travel = { ...next.travel, animate: "default" };
+  next.latch = { ...next.latch, animate: "default" };
+  return next;
+}
+
+/** Whether a family still matches the seed it started from — ids aside,
+ *  since every seeding mints new ones. */
+export function isPristine(cfg: KitConfig, family: (typeof FAMILY_KEYS)[number]): boolean {
+  const state = cfg[family];
+  const strip = (elements: KitElement[]) =>
+    JSON.stringify(elements.map(({ id: _id, ...rest }) => rest));
+  return (
+    strip(state.elements) === strip(seedElements(family, state.seed)) &&
+    state.rootClass === seedRootClass(family, state.seed).rootClass
+  );
 }
 
 /* ── Naming ───────────────────────────────────────────────────────────── */

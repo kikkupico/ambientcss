@@ -300,7 +300,7 @@ export function emitCss(cfg: KitConfig, slug: string, families: FamilyName[]): s
     if (root.length > 0) bodies.push(rule(`.${rootClass(slug, family)}`, root));
 
     for (const element of elements) {
-      if (element.kind !== "shape") continue;
+      if (element.kind !== "shape" || element.hidden) continue;
       usesShapes = true;
       if (element.steadyLight) usesMount = true;
       if (element.paint.transition) usesTransition = true;
