@@ -10,6 +10,7 @@
  *  glass cap is a lens in `base` and a cap in `actuator`; swap them and the
  *  lamp goes out. */
 
+import { useState } from "react";
 import type { ReactNode } from "react";
 import { FRAMES } from "./model";
 import type {
@@ -595,6 +596,70 @@ export function ControlEditor({
         {advanced}
       </Section>
     </>
+  );
+}
+
+/* ── One version of a control ─────────────────────────────────────────── */
+
+/** Name, order and removal of the version being edited. The name is what an
+ *  app writes — `<AmbientSwitch variant="toggle" />` — so it is committed on
+ *  blur, cleaned up and made unique, rather than rewritten as you type. */
+export function VersionEditor({
+  name,
+  isDefault,
+  preset,
+  onRename,
+  onMakeDefault,
+  onDelete
+}: {
+  name: string;
+  isDefault: boolean;
+  preset: string;
+  onRename: (name: string) => void;
+  onMakeDefault: () => void;
+  onDelete: () => void;
+}) {
+  const [draft, setDraft] = useState<string | null>(null);
+  const commit = () => {
+    if (draft !== null && draft.trim() !== "" && draft !== name) onRename(draft);
+    setDraft(null);
+  };
+  return (
+    <Section title="Version">
+      <div className="kb-row">
+        <label className="kb-row-label" htmlFor="kb-version-name">
+          Name
+        </label>
+        <div className="kb-row-control">
+          <input
+            id="kb-version-name"
+            className="kb-text kb-mono"
+            value={draft ?? name}
+            spellCheck={false}
+            onChange={(e) => setDraft(e.target.value)}
+            onBlur={commit}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") commit();
+              if (e.key === "Escape") setDraft(null);
+            }}
+          />
+          <p className="kb-hint">
+            Apps pick it with <code>{`<${preset} variant="${name}" />`}</code>
+            {isDefault ? ". It's also what they get without asking." : "."}
+          </p>
+        </div>
+      </div>
+      <div className="kb-version-actions">
+        {!isDefault ? (
+          <button type="button" className="kb-btn kb-btn-small" onClick={onMakeDefault}>
+            Make default
+          </button>
+        ) : null}
+        <button type="button" className="kb-btn kb-btn-small kb-btn-danger" onClick={onDelete}>
+          Delete version
+        </button>
+      </div>
+    </Section>
   );
 }
 

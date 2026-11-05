@@ -41,7 +41,12 @@ export type Piece = { node: ReactNode; code: string; imports: string[] };
 /** What a part may need from the control it is being dressed into. Only one
  *  thing so far, and it is not decoration: a button's legend is the caller's
  *  and arrives through the look, so whatever part carries it has to be told. */
-export type BuildContext = { children?: ReactNode | undefined };
+export type BuildContext = {
+  children?: ReactNode | undefined;
+  /** What generated class names are scoped by: the family, or the family
+   *  and version name (`latch-toggle`) for a version after the first. */
+  scope?: string | undefined;
+};
 
 /* ── helpers shared by both views ─────────────────────────────────────── */
 
@@ -324,7 +329,8 @@ export function shapePiece(
   family: string,
   ctx: BuildContext
 ): Piece {
-  const classes = [...shapeAmbientClasses(shape), shapeClass(slug, family, shape)].join(" ");
+  const scope = ctx.scope ?? family;
+  const classes = [...shapeAmbientClasses(shape), shapeClass(slug, scope, shape)].join(" ");
   const content = shapeContent(shape, ctx);
 
   const inner = content.code
@@ -339,7 +345,7 @@ export function shapePiece(
 
   if (!shape.steadyLight) return { ...inner, imports: [] };
 
-  const mount = mountClass(slug, family, shape);
+  const mount = mountClass(slug, scope, shape);
   return {
     node: <span className={mount}>{inner.node}</span>,
     code: `<span className="${mount}">${inner.code}</span>`,

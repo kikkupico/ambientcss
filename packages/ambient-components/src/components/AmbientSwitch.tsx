@@ -15,6 +15,11 @@ export type AmbientSwitchProps = Omit<AmbientLatchProps, "parts" | "size"> & {
   /** A lamp above the switch. `true` for the scene's own colour, or any
    *  CSS colour string. */
   led?: boolean | string | undefined;
+  /** Which of the active kit's versions of this control to draw — a kit
+   *  may ship a pill switch and a toggle switch side by side. Names are the
+   *  kit's own (see `ControlKit.variants`); an unknown name, or none, draws
+   *  the kit's first. */
+  variant?: string | undefined;
   /** Look options in the active kit's vocabulary. */
   look?: KitLook | undefined;
 };
@@ -31,6 +36,7 @@ export function AmbientSwitch({
   size = "md",
   led,
   label,
+  variant,
   look,
   value,
   defaultValue,
@@ -41,7 +47,7 @@ export function AmbientSwitch({
 }: AmbientSwitchProps) {
   const labelId = useId();
   const [on, setOn] = useControllableValue(value, defaultValue ?? false, onChange);
-  const { dress, defaults } = useDress("latch", { ...look }, groundedKit.latch!);
+  const { dress, defaults } = useDress("latch", { variant, ...look }, groundedKit.latch!);
 
   const control = (
     <AmbientLatch

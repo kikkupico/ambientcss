@@ -17,6 +17,7 @@ import type { BuildContext, Piece } from "./parts";
 import { rootClass, rootDeclarations } from "./css";
 import { FRAMES, elementApplies, elementBankScope, elementBankState } from "./model";
 import type { FrameName, KitElement } from "./model";
+import { projectVariant, variantIdent, variantNames, variantScope } from "./config";
 import type { KitConfig, MaterialChoice } from "./config";
 
 export type { Piece } from "./parts";
@@ -82,7 +83,14 @@ function partsCode(frames: Frames, pad: string): string {
   return keyedFramesCode("parts", frames, pad);
 }
 
-export type FamilyCode = { code: string; imports: string[]; looks: string[] };
+export type FamilyCode = {
+  code: string;
+  imports: string[];
+  looks: string[];
+  /** Module-level declarations the property needs — one dress function per
+   *  version, when a family has more than one. */
+  preamble?: string | undefined;
+};
 
 /* ── One family, dressed ──────────────────────────────────────────────── */
 
@@ -110,13 +118,18 @@ function frames(
   return out;
 }
 
+/* Everything below builds ONE version of a family, named by `scope` — the
+   bare family for the default version, `latch-toggle` for another. The
+   scope only reaches class names; which family it is decides everything
+   else. */
+
 /** The root class: the library classes this look keeps, plus the generated
  *  one carrying whatever tokens no library class is providing. */
-function className(cfg: KitConfig, family: FamilyName, slug: string, upright: boolean): string {
+function className(cfg: KitConfig, family: FamilyName, slug: string, upright: boolean, scope: string): string {
   const state = cfg[family];
-  const library = family === "travel" && !upright ? cfg.travel.rootClassH : state.rootClass;
+  const library = family === "travel" && !upright ? (cfg.travel.rootClassH ?? "") : state.rootClass;
   const hasRoot = rootDeclarations(cfg, family).length > 0;
-  return classes(library, hasRoot && rootClass(slug, family));
+  return classes(library, hasRoot && rootClass(slug, scope));
 }
 
 function build(
@@ -124,11 +137,12 @@ function build(
   slug: string,
   family: FamilyName,
   upright: boolean,
-  ctx: BuildContext
+  ctx: BuildContext,
+  scope: string = family
 ): Build {
   return {
-    className: className(cfg, family, slug, upright),
-    frames: frames(elementsFor(cfg, family, upright), slug, family, ctx)
+    className: className(cfg, family, slug, upright, scope),
+    frames: frames(elementsFor(cfg, family, upright), slug, family, { ...ctx, scope })
   };
 }
 
@@ -149,7 +163,8 @@ type BankBuild = {
   split: boolean;
 };
 
-function buildBank(cfg: KitConfig, slug: string, ctx: BuildContext): BankBuild {
+function buildBank(cfg: KitConfig, slug: string, base: BuildContext, scope = "bank"): BankBuild {
+  const ctx = { ...base, scope };
   const elements = elementsFor(cfg, "bank", true);
   const panelElements = elements.filter((element) => elementBankScope(element) === "panel");
   const keyElements = elements.filter((element) => elementBankScope(element) === "key");
@@ -158,7 +173,7 @@ function buildBank(cfg: KitConfig, slug: string, ctx: BuildContext): BankBuild {
   const onElements = keyElements.filter((element) => elementBankState(element) !== "off");
   const offElements = keyElements.filter((element) => elementBankState(element) !== "on");
   return {
-    className: className(cfg, "bank", slug, true),
+    className: className(cfg, "bank", slug, true, scope),
     panel: frames(panelElements, slug, "bank", ctx),
     key: frames(sharedElements, slug, "bank", ctx),
     on: frames(onElements, slug, "bank", ctx),
@@ -169,15 +184,16 @@ function buildBank(cfg: KitConfig, slug: string, ctx: BuildContext): BankBuild {
 
 /* ── The two products ─────────────────────────────────────────────────── */
 
-/** The live dressing function for a family. */
-export function familyDress(
+/** The live dressing function for one version of a family. */
+function versionDress(
   cfg: KitConfig,
   slug: string,
-  family: FamilyName
+  family: FamilyName,
+  scope: string
 ): (look: KitLook) => KitDress {
   if (family === "travel") {
     return (look) => {
-      const made = build(cfg, slug, "travel", look.orientation === "vertical", {});
+      const made = build(cfg, slug, "travel", look.orientation === "vertical", {}, scope);
       return { className: made.className, parts: toParts(made.frames) };
     };
   }
@@ -186,7 +202,7 @@ export function familyDress(
      legend has to be handed it. */
   if (family === "press") {
     return (look) => {
-      const made = build(cfg, slug, "press", true, { children: look.children as ReactNode });
+      const made = build(cfg, slug, "press", true, { children: look.children as ReactNode }, scope);
       return { className: made.className, parts: toParts(made.frames) };
     };
   }
@@ -195,7 +211,7 @@ export function familyDress(
      when the builder actually holds a state-only element — the common case,
      the same markup restyled through `[data-on]`, needs neither. */
   if (family === "bank") {
-    const made = buildBank(cfg, slug, {});
+    const made = buildBank(cfg, slug, {}, scope);
     return () => {
       const dress: KitDress = { className: made.className, parts: toParts(made.key) };
       if (hasFrames(made.panel)) dress.panelParts = toParts(made.panel);
@@ -207,15 +223,33 @@ export function familyDress(
     };
   }
 
-  const made = build(cfg, slug, family, true, {});
+  const made = build(cfg, slug, family, true, {}, scope);
   return () => ({ className: made.className, parts: toParts(made.frames) });
 }
 
-/** The same family as source. */
-export function familyCode(cfg: KitConfig, slug: string, family: FamilyName): FamilyCode {
+/** The live dressing function for a family: one version, or a dispatch on
+ *  `look.variant` over several — an unknown name gets the default. */
+export function familyDress(
+  cfg: KitConfig,
+  slug: string,
+  family: FamilyName
+): (look: KitLook) => KitDress {
+  const names = variantNames(cfg, family);
+  const versions = names.map((name, i) =>
+    versionDress(projectVariant(cfg, family, i), slug, family, variantScope(family, name, i))
+  );
+  if (versions.length === 1) return versions[0]!;
+  return (look) => {
+    const at = typeof look.variant === "string" ? names.indexOf(look.variant) : -1;
+    return versions[at > 0 ? at : 0]!(look);
+  };
+}
+
+/** One version of a family as source, written as an object property. */
+function versionCode(cfg: KitConfig, slug: string, family: FamilyName, scope: string): FamilyCode {
   if (family === "travel") {
-    const vertical = build(cfg, slug, "travel", true, {});
-    const horizontal = build(cfg, slug, "travel", false, {});
+    const vertical = build(cfg, slug, "travel", true, {}, scope);
+    const horizontal = build(cfg, slug, "travel", false, {}, scope);
     const sameParts = partsCode(vertical.frames, "      ") === partsCode(horizontal.frames, "      ");
     const code = sameParts
       ? [
@@ -246,7 +280,7 @@ export function familyCode(cfg: KitConfig, slug: string, family: FamilyName): Fa
   }
 
   if (family === "press") {
-    const made = build(cfg, slug, "press", true, {});
+    const made = build(cfg, slug, "press", true, {}, scope);
     return {
       code: [
         `  press: (look) => ({`,
@@ -266,7 +300,7 @@ export function familyCode(cfg: KitConfig, slug: string, family: FamilyName): Fa
   }
 
   if (family === "bank") {
-    const made = buildBank(cfg, slug, {});
+    const made = buildBank(cfg, slug, {}, scope);
     const body = [`    className: "${made.className}",`];
     if (hasFrames(made.panel)) body.push(keyedFramesCode("panelParts", made.panel, "    ") + ",");
     body.push(
@@ -290,7 +324,7 @@ export function familyCode(cfg: KitConfig, slug: string, family: FamilyName): Fa
     };
   }
 
-  const made = build(cfg, slug, family, true, {});
+  const made = build(cfg, slug, family, true, {}, scope);
   return {
     code: [
       `  ${family}: () => ({`,
@@ -300,6 +334,50 @@ export function familyCode(cfg: KitConfig, slug: string, family: FamilyName): Fa
     ].join("\n"),
     imports: importsOf(made.frames),
     looks: []
+  };
+}
+
+/** A version's property code, turned into a module-level declaration:
+ *  `  latch: (look) => ({…}),` becomes `const latchToggle: … = (look) => ({…});`.
+ *  The property format is this file's own, so the rewrite is exact. */
+function asDeclaration(code: string, family: string, ident: string): string {
+  const lines = code.split("\n").map((line) => (line.startsWith("  ") ? line.slice(2) : line));
+  lines[0] = lines[0]!.replace(`${family}: `, `const ${ident}: (look: KitLook) => KitDress = `);
+  const last = lines.length - 1;
+  lines[last] = lines[last]!.replace(/,$/, ";");
+  return lines.join("\n");
+}
+
+/** A family as source: its one version as a property, or — with several —
+ *  each version as a function and the property a switch on `look.variant`. */
+export function familyCode(cfg: KitConfig, slug: string, family: FamilyName): FamilyCode {
+  const names = variantNames(cfg, family);
+  const versions = names.map((name, i) =>
+    versionCode(projectVariant(cfg, family, i), slug, family, variantScope(family, name, i))
+  );
+  if (versions.length === 1) return versions[0]!;
+
+  const idents = names.map((name) => variantIdent(family, name));
+  const looks: string[] = [];
+  for (const version of versions) for (const key of version.looks) if (!looks.includes(key)) looks.push(key);
+  const cases = names
+    .slice(1)
+    .map((name, i) => `      case "${name}":\n        return ${idents[i + 1]}(look);`);
+  return {
+    code: [
+      `  ${family}: (look) => {`,
+      `    switch (look.variant) {`,
+      ...cases,
+      `      default:`,
+      `        return ${idents[0]}(look);`,
+      `    }`,
+      `  },`
+    ].join("\n"),
+    imports: versions.flatMap((version) => version.imports),
+    looks,
+    preamble: versions
+      .map((version, i) => `/* ${family}, variant "${names[i]}"${i === 0 ? " — the default" : ""} */\n${asDeclaration(version.code, family, idents[i]!)}`)
+      .join("\n\n")
   };
 }
 

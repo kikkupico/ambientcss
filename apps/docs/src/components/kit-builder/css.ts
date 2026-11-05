@@ -5,6 +5,7 @@
  *  writes, so what you are looking at is literally the stylesheet you take
  *  away. There is no second implementation to keep in step. */
 
+import { getVariants, projectVariant, variantScope } from "./config";
 import type { KitConfig } from "./config";
 import type { FamilyName } from "./catalog";
 import { mountSelector, shapeSelector } from "./model";
@@ -199,7 +200,7 @@ function rule(selector: string, declarations: string[]): string {
   return `${selector} {\n${declarations.map((line) => `  ${line};`).join("\n")}\n}`;
 }
 
-function shapeRules(slug: string, family: FamilyName, shape: ShapeElement): string[] {
+function shapeRules(slug: string, family: string, shape: ShapeElement): string[] {
   const rules: string[] = [];
 
   if (shape.steadyLight) {
@@ -279,7 +280,7 @@ export function rootDeclarations(cfg: KitConfig, family: FamilyName): string[] {
   return out;
 }
 
-export function rootClass(slug: string, family: FamilyName): string {
+export function rootClass(slug: string, family: string): string {
   return `${slug}-${family}-root`;
 }
 
@@ -294,18 +295,23 @@ export function emitCss(cfg: KitConfig, slug: string, families: FamilyName[]): s
   const bodies: string[] = [];
   let usesTransition = false;
   for (const family of families) {
-    const elements = cfg[family].elements ?? [];
+    /* Each version is its own set of rules, scoped by its name — so two
+       versions may each have a `track` without the rules colliding. */
+    getVariants(cfg, family).forEach((variant, index) => {
+      const version = projectVariant(cfg, family, index);
+      const scope = variantScope(family, variant.name, index);
 
-    const root = rootDeclarations(cfg, family);
-    if (root.length > 0) bodies.push(rule(`.${rootClass(slug, family)}`, root));
+      const root = rootDeclarations(version, family);
+      if (root.length > 0) bodies.push(rule(`.${rootClass(slug, scope)}`, root));
 
-    for (const element of elements) {
-      if (element.kind !== "shape" || element.hidden) continue;
-      usesShapes = true;
-      if (element.steadyLight) usesMount = true;
-      if (element.paint.transition) usesTransition = true;
-      bodies.push(...shapeRules(slug, family, element));
-    }
+      for (const element of version[family].elements ?? []) {
+        if (element.kind !== "shape" || element.hidden) continue;
+        usesShapes = true;
+        if (element.steadyLight) usesMount = true;
+        if (element.paint.transition) usesTransition = true;
+        bodies.push(...shapeRules(slug, scope, element));
+      }
+    });
   }
 
   if (bodies.length === 0) return "";

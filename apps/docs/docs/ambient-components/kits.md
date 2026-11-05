@@ -61,13 +61,14 @@ export const neon: ControlKit = {
 };
 ```
 
-Three things and no more:
+The fields:
 
 | Field | What it does |
 | --- | --- |
 | `<family>` | `(look) => { parts, className }` for `rotary`, `travel`, `press`, `latch`, `bank` |
 | `defaults` | presentation-only prop defaults — `travel`, `input`, `animate` |
 | `looks` | which look keys each family honours, used to warn in development |
+| `variants` | the named versions each family draws, default first — see [below](#more-than-one-version-of-a-control) |
 
 **A kit may be partial.** `consoleKit` dresses knobs, switches and key banks
 and lets faders and buttons fall through to `groundedKit`. That is what a
@@ -84,6 +85,52 @@ mechanism does not know it exists.
 **`className` replaces, it does not join.** The root class is part of the
 look: `.amb-knob` carries the grounded knob's own token table, and a kit
 that replaces the parts has no use for it.
+
+## More than one version of a control
+
+A kit is not limited to one look per family. A desk might want a pill
+switch for most things and a lit toggle for the master bus — both latches,
+both in the same kit. Every preset takes a `variant` prop, which reaches the
+family's function as `look.variant`; the function branches on it, and
+`variants` lists the names so a misspelt one warns in development:
+
+```tsx
+import type { ControlKit, KitDress, KitLook } from "@ambientcss/components";
+import { SwitchPill, SwitchTrack, ToggleThumb, ToggleTrack } from "@ambientcss/components";
+
+const latchPill = (): KitDress => ({
+  className: "amb-switch",
+  parts: { base: <SwitchTrack />, actuator: <SwitchPill /> }
+});
+
+const latchToggle = (): KitDress => ({
+  className: "amb-console-toggle",
+  parts: { base: <ToggleTrack />, actuator: <ToggleThumb /> }
+});
+
+export const deskKit: ControlKit = {
+  name: "desk",
+  latch: (look: KitLook) => (look.variant === "toggle" ? latchToggle() : latchPill()),
+  variants: { latch: ["pill", "toggle"] },
+  looks: { latch: [] }
+};
+```
+
+```tsx
+<AmbientKitProvider kit={deskKit}>
+  <AmbientSwitch label="MUTE" />                    {/* pill — the default */}
+  <AmbientSwitch label="MASTER" variant="toggle" />
+</AmbientKitProvider>
+```
+
+The first name is the default: a control with no `variant`, or one the kit
+does not have, gets it. A family the kit leaves to `groundedKit` ignores
+`variant` entirely, the same way it ignores any other kit's look props.
+
+In the [Kit Builder](/kit-builder), **Add version** above a control's layers
+starts another version — a copy of the one you are on, or a fresh start from
+any seed — and each version has its own layers and root class. Name it, and
+the export writes one dress function per version and the switch above.
 
 ## Composing a kit without code
 

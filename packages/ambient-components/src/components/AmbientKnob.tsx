@@ -26,6 +26,11 @@ export type AmbientKnobProps = Omit<AmbientRotaryProps, "parts" | "size"> & {
   markers?: AmbientKnobMarkers | undefined;
   indicator?: AmbientKnobIndicator | undefined;
   size?: AmbientKnobSize | undefined;
+  /** Which of the active kit's versions of this control to draw — a kit
+   *  may ship a pill switch and a toggle switch side by side. Names are the
+   *  kit's own (see `ControlKit.variants`); an unknown name, or none, draws
+   *  the kit's first. */
+  variant?: string | undefined;
   /** Look options in another kit's vocabulary.
    *
    *  The five props above are the *grounded* kit's words. A kit that dresses
@@ -46,6 +51,7 @@ export function AmbientKnob({
   knurlColor,
   markers,
   indicator,
+  variant,
   look,
   size = "md",
   className,
@@ -56,7 +62,7 @@ export function AmbientKnob({
 }: AmbientKnobProps) {
   const { dress, defaults } = useDress(
     "rotary",
-    { material, knurling, knurlColor, markers, indicator, ...look },
+    { variant, material, knurling, knurlColor, markers, indicator, ...look },
     groundedKit.rotary!
   );
 

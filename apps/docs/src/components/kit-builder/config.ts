@@ -40,6 +40,22 @@ export type InputChoice = "default" | "drag" | "angle" | "delta";
  *  elements per frame, plus the class its root wears. A "shipped look" is
  *  not a mode — it is a seed for that list, which is why picking `console
  *  parts` and then opening the housing works at all. */
+/** The fields that make up one VERSION of a family — what it draws and
+ *  what its root wears. Everything else on a family (whether it is dressed,
+ *  how it feels to turn) is shared by every version. */
+export const VARIANT_KEYS = ["seed", "elements", "rootClass", "rootClassH", "root"] as const;
+
+export type VariantFields = {
+  seed: SeedName;
+  elements: KitElement[];
+  rootClass: string;
+  rootClassH?: string | undefined;
+  root?: Record<string, number | boolean> | undefined;
+};
+
+/** A further version of a family, beyond the default one. */
+export type ExtraVariant = VariantFields & { name: string };
+
 export type CustomState = {
   /** Off means the family is left undressed and falls through to grounded —
    *  which is what a real third-party kit does with most of them. */
@@ -49,6 +65,13 @@ export type CustomState = {
   /** The library classes the control root keeps. `className` replaces rather
    *  than joins, so this string is the whole of what the root inherits. */
   rootClass: string;
+  /** The default version's name — what `variant="…"` calls it. */
+  variantName?: string | undefined;
+  /** Every version after the default. A kit may draw a pill switch AND a
+   *  toggle switch; the caller picks with the preset's `variant` prop. The
+   *  family's own fields above are the default version, which is also how a
+   *  link made before versions existed still reads. */
+  variants?: ExtraVariant[] | undefined;
 };
 
 export type KitConfig = {
@@ -218,7 +241,11 @@ export function applyKitPreset(cfg: KitConfig, preset: KitPresetName): KitConfig
     (next as Record<string, unknown>)[family] = {
       ...cfg[family],
       ...seedPatch(family, seed, current.root),
-      dressed
+      dressed,
+      /* A new starting point for the whole kit is one version per control;
+         undo brings any others back. */
+      variantName: undefined,
+      variants: undefined
     };
   }
   /* The console knob is an absolute-position pot: it grabs where you press,
@@ -237,14 +264,137 @@ export function applyKitPreset(cfg: KitConfig, preset: KitPresetName): KitConfig
 
 /** Whether a family still matches the seed it started from — ids aside,
  *  since every seeding mints new ones. */
-export function isPristine(cfg: KitConfig, family: (typeof FAMILY_KEYS)[number]): boolean {
-  const state = cfg[family];
+export function isPristine(cfg: KitConfig, family: (typeof FAMILY_KEYS)[number], index = 0): boolean {
+  const state = projectVariant(cfg, family, index)[family];
   const strip = (elements: KitElement[]) =>
     JSON.stringify(elements.map(({ id: _id, ...rest }) => rest));
   return (
     strip(state.elements) === strip(seedElements(family, state.seed)) &&
     state.rootClass === seedRootClass(family, state.seed).rootClass
   );
+}
+
+/* ── Versions ───────────────────────────────────────────────────────── */
+
+export type FamilyKey = (typeof FAMILY_KEYS)[number];
+
+export const DEFAULT_VARIANT = "default";
+
+/** One version, as a record: the default one is read off the family itself. */
+export type VariantRecord = ExtraVariant;
+
+function pickVariant(source: Record<string, unknown>): VariantFields {
+  const out: Record<string, unknown> = {};
+  for (const key of VARIANT_KEYS) if (source[key] !== undefined) out[key] = source[key];
+  return out as VariantFields;
+}
+
+export function getVariants(cfg: KitConfig, family: FamilyKey): VariantRecord[] {
+  const state = cfg[family];
+  return [
+    { ...pickVariant(state as unknown as Record<string, unknown>), name: state.variantName ?? DEFAULT_VARIANT },
+    ...(state.variants ?? [])
+  ];
+}
+
+export function variantNames(cfg: KitConfig, family: FamilyKey): string[] {
+  return getVariants(cfg, family).map((variant) => variant.name);
+}
+
+/** Write a list of versions back: the first becomes the family's own
+ *  fields, the rest its `variants`. */
+export function setVariants(cfg: KitConfig, family: FamilyKey, list: VariantRecord[]): KitConfig {
+  const [first, ...rest] = list;
+  if (!first) return cfg;
+  const { name, ...fields } = first;
+  return {
+    ...cfg,
+    [family]: {
+      ...cfg[family],
+      ...fields,
+      variantName: name === DEFAULT_VARIANT ? undefined : name,
+      variants: rest.length > 0 ? rest : undefined
+    }
+  };
+}
+
+/** The config as if version `index` were the family's only version. Every
+ *  engine function reads a family off the config, so this is how they all
+ *  learn to speak about one version without each being taught. */
+export function projectVariant(cfg: KitConfig, family: FamilyKey, index: number): KitConfig {
+  if (index === 0) return cfg;
+  const variant = cfg[family].variants?.[index - 1];
+  if (!variant) return cfg;
+  const { name, ...fields } = variant;
+  return { ...cfg, [family]: { ...cfg[family], ...fields, variantName: name, variants: undefined } };
+}
+
+/** What a version's generated classes are scoped by. The default version
+ *  keeps the bare family, so a kit with one version writes the same CSS it
+ *  always did; the others carry their name, so two versions may each have a
+ *  `track` shape without their rules colliding. */
+export function variantScope(family: string, name: string, index: number): string {
+  return index === 0 ? family : `${family}-${name}`;
+}
+
+/** Change one version in place. */
+export function updateVariant(
+  cfg: KitConfig,
+  family: FamilyKey,
+  index: number,
+  update: (fields: VariantRecord) => VariantRecord
+): KitConfig {
+  const list = getVariants(cfg, family);
+  if (!list[index]) return cfg;
+  return setVariants(cfg, family, list.map((variant, i) => (i === index ? update(variant) : variant)));
+}
+
+/** Patch a family from a form: the version's own keys go to that version,
+ *  the rest (dressed, feel) to the family. */
+export function patchVariant(
+  cfg: KitConfig,
+  family: FamilyKey,
+  index: number,
+  values: Record<string, unknown>
+): KitConfig {
+  const own: Record<string, unknown> = {};
+  const shared: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(values)) {
+    ((VARIANT_KEYS as readonly string[]).includes(key) ? own : shared)[key] = value;
+  }
+  const next = { ...cfg, [family]: { ...cfg[family], ...shared } } as KitConfig;
+  return Object.keys(own).length > 0
+    ? updateVariant(next, family, index, (variant) => ({ ...variant, ...own }) as VariantRecord)
+    : next;
+}
+
+/** A version name: kebab, because it is written into class names and into
+ *  `variant="…"` at the call site. */
+export function variantSlug(name: string): string {
+  return (
+    name
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "version"
+  );
+}
+
+export function uniqueVariantName(taken: string[], wanted: string): string {
+  const stem = variantSlug(wanted);
+  if (!taken.includes(stem)) return stem;
+  let i = 2;
+  while (taken.includes(`${stem}-${i}`)) i += 1;
+  return `${stem}-${i}`;
+}
+
+/** The binding a version's dress function is exported under: `latchToggle`. */
+export function variantIdent(family: string, name: string): string {
+  const pascal = variantSlug(name)
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join("");
+  return `${family}${/^[0-9]/.test(pascal) ? `V${pascal}` : pascal}`;
 }
 
 /* ── Naming ───────────────────────────────────────────────────────────── */

@@ -21,23 +21,32 @@ import {
   decodeConfig,
   encodeConfig,
   fileName,
+  getVariants,
   isPristine,
   kitIdent,
+  patchVariant,
+  projectVariant,
   seedPatch,
-  themeIdent
+  setVariants,
+  themeIdent,
+  uniqueVariantName,
+  updateVariant,
+  variantNames,
+  variantScope
 } from "./config";
 import type { KitConfig, KitPresetName } from "./config";
 import { FRAMES, defaultPart, defaultShape, duplicateElement, elementApplies } from "./model";
+import { newId } from "./model";
 import type { FrameName, KitElement, PartName } from "./model";
 import { FAMILY_PARTS, PARTS, partDefaults } from "./parts";
-import { ControlEditor, FRAME_INFO, LayerEditor, SCENE_PRESETS, SceneEditor, elementLabel } from "./Editors";
+import { ControlEditor, FRAME_INFO, LayerEditor, SCENE_PRESETS, SceneEditor, VersionEditor, elementLabel } from "./Editors";
 import { Note, Segmented, Slider, Toggle } from "./Fields";
 import { CONTROLS, Canvas, ControlPreview, KitStyles, Rack, Thumb, isolate } from "./Stage";
-import type { ControlDef, ControlId, PreviewState } from "./Stage";
+import type { ControlDef, ControlId, PreviewState, RackVersion } from "./Stage";
 import { ExportDialog, Icon, useCopy } from "./ExportDialog";
 import type { ExportFile } from "./ExportDialog";
 import { useHistory } from "./useHistory";
-import { SEED_LABELS } from "./seeds";
+import { SEED_LABELS, seedsFor } from "./seeds";
 import type { SeedName } from "./seeds";
 import "./kit-builder.css";
 
@@ -78,8 +87,20 @@ function layersFor(config: KitConfig, control: ControlDef): KitElement[] {
 function controlStatus(config: KitConfig, family: FamilyName): string {
   const state = config[family];
   if (!state.dressed) return "Library default";
+  const versions = variantNames(config, family).length;
+  if (versions > 1) return `${versions} versions`;
   return `${SEED_LABELS[state.seed]}${isPristine(config, family) ? "" : " · edited"}`;
 }
+
+/** The preset an app writes for each control, for the "how to pick it" hint. */
+export const PRESET_NAMES: Record<ControlId, string> = {
+  knob: "AmbientKnob",
+  fader: "AmbientFader",
+  slider: "AmbientSlider",
+  button: "AmbientButton",
+  switch: "AmbientSwitch",
+  bank: "AmbientSelect"
+};
 
 function isTyping(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
@@ -114,6 +135,10 @@ export default function KitBuilder() {
   const [lastControl, setLastControl] = useState<ControlId>("knob");
   /* Per control, so coming back to the knob puts you back where you were. */
   const [picked, setPicked] = useState<Partial<Record<ControlId, string | null>>>({});
+  /* Per family, not per control: the fader and slider share their versions
+     the same way they share their layers. */
+  const [versionPick, setVersionPick] = useState<Partial<Record<FamilyName, number>>>({});
+  const [addingVersion, setAddingVersion] = useState(false);
   const [stageView, setStageView] = useState<"control" | "rack">("control");
   const [size, setSize] = useState<"sm" | "md" | "lg">("lg");
   const [solo, setSolo] = useState(false);
@@ -149,7 +174,22 @@ export default function KitBuilder() {
   const controlId = selection.kind === "control" ? selection.id : lastControl;
   const control = CONTROLS.find((candidate) => candidate.id === controlId) ?? CONTROLS[0]!;
   const family = control.family;
-  const layers = layersFor(config, control);
+  const versionNames = variantNames(config, family);
+  const vIndex = Math.min(versionPick[family] ?? 0, versionNames.length - 1);
+  const vName = versionNames[vIndex]!;
+  const multi = versionNames.length > 1;
+  /* The config as if this version were the family's only one — what every
+     form reads from. Writes go back through the version helpers. */
+  /* Thumbnails render the SETTLED config, so they take version names from
+     it too — a name from the live config can be a rename ahead of the kit
+     the thumbnail is running. */
+  const settledNames = variantNames(settled, family);
+  const thumbVersion = (index: number) => {
+    const name = settledNames[index];
+    return settledNames.length > 1 && name ? { index, name } : undefined;
+  };
+  const vcfg = useMemo(() => projectVariant(config, family, vIndex), [config, family, vIndex]);
+  const layers = layersFor(vcfg, control);
   const pickedId = selection.kind === "control" ? (picked[control.id] ?? null) : null;
   const current = layers.find((element) => element.id === pickedId) ?? null;
 
@@ -157,6 +197,7 @@ export default function KitBuilder() {
     setSelection({ kind: "control", id });
     setLastControl(id);
     setAdding(false);
+    setAddingVersion(false);
     setStageView("control");
   };
 
@@ -168,19 +209,15 @@ export default function KitBuilder() {
 
   /* ── Edits ──────────────────────────────────────────────────────────── */
 
-  const setElements = useCallback(
-    (target: FamilyName, update: (elements: KitElement[]) => KitElement[]) => {
-      setConfig((prev) => ({ ...prev, [target]: { ...prev[target], elements: update(prev[target].elements ?? []) } }));
-    },
-    [setConfig]
-  );
+  /* Layer and look edits land on the version being edited; feel and
+     "dressed" are the family's, shared by every version. */
+  const setElements = (target: FamilyName, update: (elements: KitElement[]) => KitElement[]) =>
+    setConfig((prev) =>
+      updateVariant(prev, target, vIndex, (variant) => ({ ...variant, elements: update(variant.elements ?? []) }))
+    );
 
-  const patchFamily = useCallback(
-    (target: FamilyName, values: Record<string, unknown>) => {
-      setConfig((prev) => ({ ...prev, [target]: { ...prev[target], ...values } }));
-    },
-    [setConfig]
-  );
+  const patchFamily = (target: FamilyName, values: Record<string, unknown>) =>
+    setConfig((prev) => patchVariant(prev, target, vIndex, values));
 
   const patchScene = useCallback(
     (key: "theme" | "panel", values: Record<string, unknown>) => {
@@ -189,15 +226,64 @@ export default function KitBuilder() {
     [setConfig]
   );
 
-  const applySeed = useCallback(
-    (target: FamilyName, seed: SeedName) => {
-      setConfig((prev) => {
-        const root = (prev[target] as { root?: Record<string, number | boolean> }).root;
-        return { ...prev, [target]: { ...prev[target], ...seedPatch(target, seed, root), dressed: true } };
-      });
-    },
-    [setConfig]
-  );
+  const applySeed = (target: FamilyName, seed: SeedName) =>
+    setConfig((prev) => {
+      const root = getVariants(prev, target)[vIndex]?.root;
+      return patchVariant(prev, target, vIndex, { ...seedPatch(target, seed, root), dressed: true });
+    });
+
+  /* ── Versions ───────────────────────────────────────────────────────── */
+
+  const pickVersion = (index: number) => {
+    setVersionPick((prev) => ({ ...prev, [family]: index }));
+    setAddingVersion(false);
+    setAdding(false);
+    setSolo(false);
+  };
+
+  /** A new version: a copy of the one you are on, or a fresh start. */
+  const addVersion = (from: "copy" | SeedName) => {
+    const list = getVariants(config, family);
+    const base = list[vIndex]!;
+    const fields =
+      from === "copy"
+        ? { ...base, elements: base.elements.map((element) => ({ ...element, id: newId() })) }
+        : { ...base, ...(seedPatch(family, from, base.root) as Partial<typeof base>) };
+    const name = uniqueVariantName(
+      list.map((variant) => variant.name),
+      from === "copy" ? `${base.name}-copy` : from === "empty" ? "blank" : SEED_LABELS[from]
+    );
+    setConfig((prev) =>
+      setVariants({ ...prev, [family]: { ...prev[family], dressed: true } }, family, [...getVariants(prev, family), { ...fields, name }])
+    );
+    pickVersion(list.length);
+    selectLayer(null);
+    notify(`Added the "${name}" version.`, true);
+  };
+
+  const renameVersion = (name: string) =>
+    setConfig((prev) => {
+      const list = getVariants(prev, family);
+      const taken = list.filter((_, i) => i !== vIndex).map((variant) => variant.name);
+      return updateVariant(prev, family, vIndex, (variant) => ({ ...variant, name: uniqueVariantName(taken, name) }));
+    });
+
+  const makeDefault = () => {
+    setConfig((prev) => {
+      const list = getVariants(prev, family);
+      const chosen = list[vIndex];
+      if (!chosen) return prev;
+      return setVariants(prev, family, [chosen, ...list.filter((_, i) => i !== vIndex)]);
+    });
+    pickVersion(0);
+  };
+
+  const removeVersion = () => {
+    setConfig((prev) => setVariants(prev, family, getVariants(prev, family).filter((_, i) => i !== vIndex)));
+    pickVersion(Math.max(0, vIndex - 1));
+    selectLayer(null);
+    notify(`Deleted the "${vName}" version.`, true);
+  };
 
   const applyPreset = (preset: KitPresetName) => {
     setConfig((prev) => applyKitPreset(prev, preset));
@@ -215,7 +301,7 @@ export default function KitBuilder() {
   };
 
   const duplicate = (element: KitElement) => {
-    const all = config[family].elements ?? [];
+    const all = vcfg[family].elements ?? [];
     const taken = all.flatMap((candidate) => (candidate.kind === "shape" ? [candidate.name] : []));
     const copyOf = duplicateElement(element, taken);
     setElements(family, (elements) => {
@@ -248,7 +334,7 @@ export default function KitBuilder() {
 
   const add = (what: PartName | "shape") => {
     setAdding(false);
-    const all = config[family].elements ?? [];
+    const all = vcfg[family].elements ?? [];
     let element: KitElement;
     if (what === "shape") {
       const taken = all.flatMap((candidate) => (candidate.kind === "shape" ? [candidate.name] : []));
@@ -342,15 +428,29 @@ export default function KitBuilder() {
   }, [settled, shareUrl]);
 
   const hiddenCount = FAMILIES.reduce(
-    (sum, candidate) => sum + (config[candidate].elements ?? []).filter((element) => element.hidden).length,
+    (sum, candidate) =>
+      sum +
+      getVariants(config, candidate).reduce(
+        (inner, variant) => inner + variant.elements.filter((element) => element.hidden).length,
+        0
+      ),
     0
+  );
+
+  /* Every version past the defaults, for the rack's own row. */
+  const rackVersions: RackVersion[] = FAMILIES.flatMap((candidate) =>
+    config[candidate].dressed
+      ? variantNames(config, candidate)
+          .slice(1)
+          .map((name) => ({ family: candidate, name }))
+      : []
   );
 
   /* ── Stage ──────────────────────────────────────────────────────────── */
 
   const stageConfig = useMemo(
-    () => (solo && current ? isolate(config, family, current.id) : config),
-    [solo, current, config, family]
+    () => (solo && current ? isolate(config, family, current.id, vIndex) : config),
+    [solo, current, config, family, vIndex]
   );
   const showRack = stageView === "rack" || selection.kind === "scene";
   const undressed = !config[family].dressed;
@@ -362,7 +462,7 @@ export default function KitBuilder() {
 
   return (
     <div className="kb">
-      <KitStyles config={stageConfig} highlight={!showRack && current ? { family, element: current } : null} />
+      <KitStyles config={stageConfig} highlight={!showRack && current ? { scope: variantScope(family, vName, vIndex), element: current } : null} />
 
       <header className="kb-toolbar">
         <div className="kb-toolbar-title">
@@ -551,10 +651,15 @@ export default function KitBuilder() {
           <div className={`kb-stage-frame${showRack ? " kb-stage-frame-rack" : ""}`}>
             <Canvas config={stageConfig}>
               {showRack ? (
-                <Rack state={preview} onState={(patch) => setPreview((prev) => ({ ...prev, ...patch }))} />
+                <Rack
+                  state={preview}
+                  versions={rackVersions}
+                  onState={(patch) => setPreview((prev) => ({ ...prev, ...patch }))}
+                />
               ) : (
                 <div className="kb-stage-control">
                   <ControlPreview
+                    variant={multi ? vName : undefined}
                     control={control}
                     size={size}
                     state={preview}
@@ -620,6 +725,59 @@ export default function KitBuilder() {
                 <Note>The fader and slider share one layer list. Layers can be limited to one of them.</Note>
               ) : null}
 
+              <div className="kb-versions">
+                <div className="kb-layers-head">
+                  <h3 className="kb-panel-title">Versions</h3>
+                  <button
+                    type="button"
+                    className={`kb-btn kb-btn-small${addingVersion ? " kb-btn-on" : ""}`}
+                    aria-expanded={addingVersion}
+                    onClick={() => setAddingVersion((on) => !on)}
+                  >
+                    <Icon name="plus" size={14} />
+                    Add version
+                  </button>
+                </div>
+                <div className="kb-version-tabs" role="tablist" aria-label={`${control.label} versions`}>
+                  {versionNames.map((name, i) => (
+                    <span key={name} className={`kb-chip kb-version${i === vIndex ? " kb-chip-on" : ""}`}>
+                      <span className="kb-version-thumb">
+                        <Thumb config={settled} control={control} version={thumbVersion(i)} />
+                      </span>
+                      {name}
+                      {i === 0 && multi ? <span className="kb-version-default">default</span> : null}
+                      <button
+                        type="button"
+                        role="tab"
+                        className="kb-hit"
+                        aria-label={`${name}${i === 0 ? " (default)" : ""}`}
+                        aria-selected={i === vIndex}
+                        onClick={() => pickVersion(i)}
+                      />
+                    </span>
+                  ))}
+                </div>
+                {addingVersion ? (
+                  <div className="kb-add-menu">
+                    <button type="button" className="kb-add-item" onClick={() => addVersion("copy")}>
+                      <strong>Copy of “{vName}”</strong>
+                      <span>Start from this version's layers and change what differs.</span>
+                    </button>
+                    {seedsFor(family).map((seed) => (
+                      <button key={seed} type="button" className="kb-add-item" onClick={() => addVersion(seed)}>
+                        <strong>{SEED_LABELS[seed]}</strong>
+                        <span>A new version starting from the {SEED_LABELS[seed].toLowerCase()} look.</span>
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
+                {!multi && !addingVersion ? (
+                  <p className="kb-hint">
+                    Add a version to ship, say, a pill switch and a toggle switch in one kit. Apps pick one by name.
+                  </p>
+                ) : null}
+              </div>
+
               <div className="kb-layers">
                 <div className="kb-layers-head">
                   <h3 className="kb-panel-title">Layers</h3>
@@ -678,6 +836,7 @@ export default function KitBuilder() {
                               key={element.id}
                               element={element}
                               control={control}
+                              version={thumbVersion(vIndex)}
                               config={settled}
                               selected={current?.id === element.id}
                               canUp={!!neighbour(element, -1)}
@@ -719,7 +878,18 @@ export default function KitBuilder() {
                       grounded look. Turn on <em>Dress it</em> to use the layers above.
                     </Note>
                   ) : null}
-                  <ControlEditor family={family} config={config} patch={patchFamily} onSeed={applySeed} />
+                  {multi ? (
+                    <VersionEditor
+                      key={`${family}:${vIndex}`}
+                      name={vName}
+                      isDefault={vIndex === 0}
+                      preset={PRESET_NAMES[control.id]}
+                      onRename={renameVersion}
+                      onMakeDefault={makeDefault}
+                      onDelete={removeVersion}
+                    />
+                  ) : null}
+                  <ControlEditor family={family} config={vcfg} patch={patchFamily} onSeed={applySeed} />
                 </div>
               )}
             </>
@@ -787,6 +957,7 @@ export default function KitBuilder() {
 function LayerRow({
   element,
   control,
+  version,
   config,
   selected,
   canUp,
@@ -797,6 +968,7 @@ function LayerRow({
 }: {
   element: KitElement;
   control: ControlDef;
+  version?: { index: number; name: string } | undefined;
   config: KitConfig;
   selected: boolean;
   canUp: boolean;
@@ -810,7 +982,7 @@ function LayerRow({
     <li className={`kb-layer${selected ? " kb-layer-on" : ""}${element.hidden ? " kb-layer-hidden" : ""}`}>
       <span className="kb-layer-main">
         <span className="kb-layer-thumb">
-          <Thumb config={config} control={control} elementId={element.id} />
+          <Thumb config={config} control={control} elementId={element.id} version={version} />
         </span>
         <button type="button" className="kb-hit" aria-label={`Edit ${label}`} aria-pressed={selected} onClick={onSelect} />
         <span className="kb-layer-text">

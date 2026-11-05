@@ -19,7 +19,7 @@ import {
 } from "@ambientcss/components";
 import { buildKit, buildStyles, buildTheme } from "./emit";
 import type { KitConfig } from "./config";
-import { kitSlug } from "./config";
+import { getVariants, kitSlug, setVariants, updateVariant } from "./config";
 import type { FamilyName } from "./catalog";
 import { shapeSelector } from "./model";
 import type { KitElement } from "./model";
@@ -82,7 +82,8 @@ export function KitStyles({
   highlight
 }: {
   config: KitConfig;
-  highlight?: { family: FamilyName; element: KitElement } | null;
+  /** `scope` is the version's class scope — the family, or `latch-toggle`. */
+  highlight?: { scope: string; element: KitElement } | null;
 }) {
   /* Every shape's rule, hidden or not: a rule for an element that is not
      rendered is harmless, and the thumbnail of a hidden or isolated layer
@@ -90,7 +91,7 @@ export function KitStyles({
   const styles = useMemo(() => buildStyles(unhideAll(config)), [config]);
   const outline =
     highlight && highlight.element.kind === "shape" && !highlight.element.hidden
-      ? `.kb-stage-canvas ${shapeSelector(kitSlug(config.name), highlight.family, highlight.element)} {` +
+      ? `.kb-stage-canvas ${shapeSelector(kitSlug(config.name), highlight.scope, highlight.element)} {` +
         ` outline: 1.5px dashed var(--kb-accent, #3b82f6); outline-offset: 2px; }`
       : "";
   return (
@@ -102,15 +103,18 @@ export function KitStyles({
 }
 
 function unhideAll(config: KitConfig): KitConfig {
-  const next = { ...config } as Record<string, unknown>;
+  let next = config;
   for (const family of ["rotary", "travel", "press", "latch", "bank"] as const) {
-    next[family] = {
-      ...config[family],
-      dressed: true,
-      elements: config[family].elements.map((element) => (element.hidden ? { ...element, hidden: false } : element))
-    };
+    next = setVariants(
+      { ...next, [family]: { ...next[family], dressed: true } },
+      family,
+      getVariants(next, family).map((variant) => ({
+        ...variant,
+        elements: variant.elements.map((element) => (element.hidden ? { ...element, hidden: false } : element))
+      }))
+    );
   }
-  return next as KitConfig;
+  return next;
 }
 
 /* ── Isolating one layer ──────────────────────────────────────────────── */
@@ -123,21 +127,16 @@ function sizesTheControl(family: FamilyName, element: KitElement) {
   return element.kind === "part" || element.box.place === "flow";
 }
 
-export function isolate(config: KitConfig, family: FamilyName, id: string | null): KitConfig {
+export function isolate(config: KitConfig, family: FamilyName, id: string | null, version = 0): KitConfig {
   if (id === null) return config;
-  const elements = config[family].elements ?? [];
-  return {
-    ...config,
-    [family]: {
-      ...config[family],
-      /* Always dressed, and the chosen layer always visible: a thumbnail of
-         a hidden layer should still show what the layer is. */
-      dressed: true,
-      elements: elements
-        .filter((element) => element.id === id || (sizesTheControl(family, element) && !element.hidden))
-        .map((element) => (element.id === id ? { ...element, hidden: false } : element))
-    }
-  };
+  /* Always dressed, and the chosen layer always visible: a thumbnail of a
+     hidden layer should still show what the layer is. */
+  return updateVariant({ ...config, [family]: { ...config[family], dressed: true } }, family, version, (variant) => ({
+    ...variant,
+    elements: variant.elements
+      .filter((element) => element.id === id || (sizesTheControl(family, element) && !element.hidden))
+      .map((element) => (element.id === id ? { ...element, hidden: false } : element))
+  }));
 }
 
 /* ── One control ──────────────────────────────────────────────────────── */
@@ -153,39 +152,48 @@ export function ControlPreview({
   size,
   state,
   onState,
-  label = true
+  label = true,
+  variant
 }: {
   control: ControlDef;
   size: "sm" | "md" | "lg";
   state: PreviewState;
   onState?: (patch: Partial<PreviewState>) => void;
   label?: boolean;
+  /** Which of the kit's versions to draw — passed exactly as an app would,
+   *  so the preview runs the same dispatch the exported kit does. */
+  variant?: string | undefined;
 }) {
   const set = onState ?? (() => undefined);
   switch (control.id) {
     case "knob":
       return (
-        <AmbientKnob label={label ? "LEVEL" : undefined} size={size} value={state.value} onChange={(value) => set({ value })} />
+        <AmbientKnob label={label ? "LEVEL" : undefined} size={size} variant={variant} value={state.value} onChange={(value) => set({ value })} />
       );
     case "fader":
       return (
-        <AmbientFader label={label ? "LEVEL" : undefined} size={size} value={state.value} onChange={(value) => set({ value })} />
+        <AmbientFader label={label ? "LEVEL" : undefined} size={size} variant={variant} value={state.value} onChange={(value) => set({ value })} />
       );
     case "slider":
       return (
-        <AmbientSlider label={label ? "LEVEL" : undefined} size={size} value={state.value} onChange={(value) => set({ value })} />
+        <AmbientSlider label={label ? "LEVEL" : undefined} size={size} variant={variant} value={state.value} onChange={(value) => set({ value })} />
       );
     case "button":
-      return <AmbientButton size={size}>PLAY</AmbientButton>;
+      return (
+        <AmbientButton size={size} variant={variant}>
+          PLAY
+        </AmbientButton>
+      );
     case "switch":
       return (
-        <AmbientSwitch label={label ? "ON" : undefined} size={size} led value={state.on} onChange={(on) => set({ on })} />
+        <AmbientSwitch label={label ? "ON" : undefined} size={size} variant={variant} led value={state.on} onChange={(on) => set({ on })} />
       );
     case "bank":
       return (
         <AmbientSelect
           label={label ? "BANK" : undefined}
           size={size}
+          variant={variant}
           options={BANK}
           orientation="horizontal"
           value={state.bank}
@@ -199,12 +207,18 @@ export function ControlPreview({
 
 /** Every family at once — the claim the page exists to make: the call sites
  *  are the ordinary ones and only the kit above them changed. */
+export type RackVersion = { family: FamilyName; name: string };
+
 export function Rack({
   state,
-  onState
+  onState,
+  versions = []
 }: {
   state: PreviewState;
   onState: (patch: Partial<PreviewState>) => void;
+  /** The kit's versions beyond each family's default, shown in a row of
+   *  their own so the whole kit is on the rack, not just its defaults. */
+  versions?: RackVersion[];
 }) {
   return (
     <div className="kb-rack">
@@ -231,6 +245,33 @@ export function Rack({
         <AmbientButton>REC</AmbientButton>
         <AmbientButton disabled>OFF</AmbientButton>
       </div>
+      {versions.length > 0 ? (
+        <div className="kb-rack-row kb-rack-versions">
+          {versions.map(({ family, name }) => {
+            const label = name.toUpperCase();
+            const key = `${family}:${name}`;
+            if (family === "rotary") return <AmbientKnob key={key} label={label} variant={name} defaultValue={50} />;
+            if (family === "travel") return <AmbientSlider key={key} label={label} variant={name} defaultValue={50} />;
+            if (family === "press")
+              return (
+                <AmbientButton key={key} variant={name}>
+                  {label}
+                </AmbientButton>
+              );
+            if (family === "latch") return <AmbientSwitch key={key} label={label} variant={name} defaultValue />;
+            return (
+              <AmbientSelect
+                key={key}
+                label={label}
+                variant={name}
+                options={BANK.slice(0, 3)}
+                orientation="horizontal"
+                defaultValue="1"
+              />
+            );
+          })}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -254,21 +295,24 @@ const THUMB_STATE: PreviewState = { value: 62, on: true, bank: "1" };
 export function Thumb({
   config,
   control,
-  elementId = null
+  elementId = null,
+  version
 }: {
   config: KitConfig;
   control: ControlDef;
   elementId?: string | null;
+  version?: { index: number; name: string } | undefined;
 }) {
+  const index = version?.index ?? 0;
   const alone = useMemo(
-    () => isolate(config, control.family, elementId),
-    [config, control.family, elementId]
+    () => isolate(config, control.family, elementId, index),
+    [config, control.family, elementId, index]
   );
   return (
     <Scene config={alone} className="kb-thumb amb-surface">
       {/* Inert rather than disabled: a disabled control is a look of its own. */}
       <div className="kb-thumb-art" data-control={control.id} {...({ inert: "" } as Record<string, string>)}>
-        <ControlPreview control={control} size="sm" state={THUMB_STATE} label={false} />
+        <ControlPreview control={control} size="sm" state={THUMB_STATE} label={false} variant={version?.name} />
       </div>
     </Scene>
   );

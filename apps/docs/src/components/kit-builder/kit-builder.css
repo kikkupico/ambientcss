@@ -1730,3 +1730,79 @@
 .kb-dialog-foot {
   flex-shrink: 0;
 }
+
+/* ── Versions ─────────────────────────────────────────────────────────── */
+
+.kb-versions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--kb-line-soft);
+  border-radius: 12px;
+  background: var(--kb-bg);
+}
+
+.kb-version-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.kb-version {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 10px 0 3px;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.78rem;
+}
+
+.kb-version-thumb {
+  position: relative;
+  display: grid;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.kb-version-thumb .kb-thumb-art {
+  --kb-thumb-scale: 0.3;
+}
+
+.kb-version-thumb .kb-thumb-art[data-control="fader"] {
+  --kb-thumb-scale: 0.17;
+}
+
+.kb-version-thumb .kb-thumb-art[data-control="slider"],
+.kb-version-thumb .kb-thumb-art[data-control="bank"] {
+  --kb-thumb-scale: 0.2;
+}
+
+.kb-version-default {
+  font-family: var(--ifm-font-family-base);
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: var(--kb-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.kb-version-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.kb-rack-versions {
+  padding-top: 20px;
+  border-top: 1px dashed color-mix(in srgb, var(--amb-label, #888) 30%, transparent);
+}
+
+.kb-rack .kb-rack-versions {
+  justify-self: stretch;
+}

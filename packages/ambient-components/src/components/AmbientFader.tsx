@@ -11,6 +11,11 @@ export type AmbientFaderSize = "sm" | "md" | "lg";
 export type AmbientFaderProps = Omit<AmbientTravelProps, "parts" | "size" | "orientation"> & {
   material?: AmbientMaterial | undefined;
   size?: AmbientFaderSize | undefined;
+  /** Which of the active kit's versions of this control to draw — a kit
+   *  may ship a pill switch and a toggle switch side by side. Names are the
+   *  kit's own (see `ControlKit.variants`); an unknown name, or none, draws
+   *  the kit's first. */
+  variant?: string | undefined;
   /** Look options in the active kit's vocabulary. */
   look?: KitLook | undefined;
 };
@@ -19,6 +24,7 @@ export type AmbientFaderProps = Omit<AmbientTravelProps, "parts" | "size" | "ori
  *  which `AmbientTravel` already does for a vertical track. */
 export function AmbientFader({
   material,
+  variant,
   look,
   size = "md",
   animate,
@@ -27,7 +33,7 @@ export function AmbientFader({
 }: AmbientFaderProps) {
   const { dress, defaults } = useDress(
     "travel",
-    { material, orientation: "vertical", ...look },
+    { variant, material, orientation: "vertical", ...look },
     groundedKit.travel!
   );
   return (
