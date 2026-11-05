@@ -14,8 +14,8 @@
  *    arcade     a dark room and glossy shapes: buttons in four colours, a
  *               trackball, a ball-top joystick, keys that light when chosen
  *    lab        nothing but library parts and their options, re-chosen
- *    pastel     a consumer gadget: glossy pastel bodies, custom switch
- *               geometry, light from straight above
+ *    glass      frosted panes floating over light that brightens with
+ *               the value; primary, danger and ghost buttons
  *    blueprint  no lighting at all — flat line drawing, to show a kit does
  *               not have to be skeuomorphic */
 
@@ -547,20 +547,68 @@ const lab = kit({
   panel: { material: "brushed" }
 });
 
-/* ── Pastel gadget ────────────────────────────────────────────────────── */
+/* ── Glass ────────────────────────────────────────────────────────────── */
 
-const pastel = kit({
-  name: "pastel",
+const GLOW = "#8b5cf6";
+
+/** A frosted pane. Glass makes its own milky face over whatever is behind
+ *  it, so it wears no surface colour; and it only frosts what sits at a
+ *  distance, so it floats — the elevation is what turns the glow under it
+ *  into a soft lit pane rather than a sharp blob. */
+const PANE = {
+  structure: "body",
+  surface: "none",
+  edge: "chamfer",
+  thickness: 1,
+  elevation: 1.6,
+  material: "glass",
+  fill: "none"
+} as const;
+
+/** A button: a coloured light under a floating pane, or bare glass. */
+function glassButton(light: string | null): KitElement[] {
+  return [
+    ...(light
+      ? [
+          shape("base", "light", {
+            box: { place: "fill", inset: 10, radius: "pill" },
+            paint: { ...FLAT, fill: "colour", colour: light }
+          })
+        ]
+      : []),
+    shape("actuator", "pane", {
+      box: { place: "flow", width: 14, height: 7, radius: "inherit" },
+      /* "label" colours the legend: a <button> does not inherit text
+         colour, so without it the browser's own black shows through. */
+      paint: { ...PANE, elevation: 1.2, fill: "label" },
+      content: "legend",
+      textSize: 0.19
+    })
+  ];
+}
+
+/* Modern glass: frosted panes floating over light. Every control has a
+   glow under it — on the knob, the fader and the switch it brightens with
+   the value — and the pane above blurs it into a soft lit surface, which
+   is the whole look. Three button versions: a violet primary, a red
+   danger, and bare ghost glass. */
+const glass = kit({
+  name: "glass",
   rotary: {
     ...drawn(
       [
-        shape("base", "puck", {
-          box: { place: "fill", inset: 4, radius: "circle" },
-          paint: { structure: "body", surface: "convex", edge: "fillet-2", thickness: 1.4, material: "shiny", fill: "albedo", colour: "#f6b8c8" }
+        shape("base", "aura", {
+          box: { place: "fill", inset: 6, radius: "circle" },
+          paint: { ...FLAT, fill: "accent-travel", transition: true }
+        }),
+        shape("actuator", "lens", {
+          box: { place: "fill", inset: 0, radius: "circle" },
+          paint: PANE,
+          steadyLight: true
         }),
         shape("actuator", "dot", {
-          box: { place: "centre", width: 14, height: 14, y: -26, radius: "circle" },
-          paint: { ...FLAT, fill: "accent" }
+          box: { place: "centre", width: 9, height: 9, y: -32, radius: "circle" },
+          paint: { ...FLAT, fill: "colour", colour: "#ffffff" }
         })
       ],
       "amb-knob"
@@ -570,32 +618,32 @@ const pastel = kit({
   travel: {
     ...drawn(
       [
-        shape("base", "groove", {
+        shape("base", "rail", {
           box: { place: "fill", inset: 0, radius: "pill" },
           paint: { structure: "groove", surface: "none", edge: "none", thickness: 0.3, fill: "accent-travel", transition: true }
         }),
-        shape("actuator", "bead", {
-          box: { place: "fill", inset: 0, radius: "pill" },
-          paint: { structure: "body", surface: "convex", edge: "fillet", thickness: 1, material: "shiny", fill: "albedo", colour: "#ffffff" }
+        shape("actuator", "pane", {
+          box: { place: "fill", inset: 0, radius: "soft", softness: 30 },
+          paint: PANE
+        }),
+        shape("actuator", "line", {
+          box: { place: "centre", width: 56, height: 6, radius: "pill" },
+          paint: { ...FLAT, fill: "colour", colour: "#ffffff" }
         })
       ],
       "amb-fader"
     ),
     rootClassH: "amb-slider"
   },
-  press: drawn(
-    [
-      shape("actuator", "pill", {
-        box: { place: "flow", width: 16, height: 8, radius: "pill" },
-        paint: { structure: "body", surface: "convex", edge: "fillet", thickness: 1, material: "shiny", fill: "albedo", colour: "#bfe3ff" },
-        content: "legend",
-        textSize: 0.2
-      })
-    ],
-    "amb-button"
-  ),
-  /* A round thumb in a short track: geometry no library class gives, so the
-     kit states it on the switch's own root. */
+  press: {
+    ...drawn(glassButton(GLOW), "amb-button"),
+    variantName: "primary",
+    variants: [
+      version("danger", { seed: "empty", rootClass: "amb-button", elements: glassButton("#ff4d6d") }),
+      version("ghost", { seed: "empty", rootClass: "amb-button", elements: glassButton(null) })
+    ]
+  },
+  /* A round pane in a short track, which no library class sizes. */
   latch: {
     ...drawn(
       [
@@ -603,28 +651,47 @@ const pastel = kit({
           box: { place: "fill", inset: 0, radius: "pill" },
           paint: { structure: "groove", surface: "none", edge: "none", thickness: 0.35, fill: "accent-travel", transition: true }
         }),
-        shape("actuator", "thumb", {
+        shape("actuator", "pane", {
           box: { place: "fill", inset: 0, radius: "circle" },
-          paint: { structure: "body", surface: "convex", edge: "fillet", thickness: 1.2, material: "shiny", fill: "albedo", colour: "#ffffff" }
+          paint: { ...PANE, elevation: 1 }
         })
       ],
       "amb-switch"
     ),
-    root: { on: true, trackW: 12, trackH: 6.6, thumbW: 0.46, thumbH: 0.84, inset: 0.08 }
+    root: { on: true, trackW: 12, trackH: 6.4, thumbW: 0.44, thumbH: 0.86, inset: 0.07 }
   },
-  bank: seeded("bank", "grounded"),
+  /* Every key is a pane; only the chosen one has a light under it — the
+     lamp-and-diffuser idea, drawn from two shapes. It glows onto the rail
+     too, so it opts into the bank's glow. */
+  bank: drawn(
+    [
+      {
+        ...shape("base", "light", {
+          box: { place: "fill", inset: 14, radius: "circle" },
+          paint: { ...FLAT, fill: "accent" }
+        }),
+        bankState: "on"
+      },
+      shape("actuator", "pane", {
+        box: { place: "fill", inset: 0, radius: "inherit" },
+        paint: { ...PANE, elevation: 1 }
+      })
+    ],
+    "amb-select amb-select-glow"
+  ),
   theme: {
-    lightX: 0,
+    lightX: -0.5,
     lightY: -1,
-    keyLight: 0.92,
-    fillLight: 0.8,
-    lightHue: 330,
-    lightSaturation: 30,
-    lumeHue: 160,
-    highlightColor: "#3ccf9e",
-    accent: "#3ccf9e"
+    keyLight: 0.8,
+    fillLight: 0.62,
+    lightHue: 250,
+    lightSaturation: 22,
+    lumeHue: 260,
+    highlightColor: GLOW,
+    accent: GLOW,
+    label: "#e7e6ff"
   },
-  panel: { material: "shiny" }
+  panel: { material: "matte", albedo: "#1c1d3a" }
 });
 
 /* ── Blueprint ────────────────────────────────────────────────────────── */
@@ -763,11 +830,11 @@ export const SAMPLE_KITS: SampleKit[] = [
     config: lab
   },
   {
-    id: "pastel",
-    name: "Pastel gadget",
-    tagline: "Soft glossy pastels lit from straight above, with a round-thumb switch.",
-    shows: ["Shapes", "Custom switch geometry", "Overhead light"],
-    config: pastel
+    id: "glass",
+    name: "Glass",
+    tagline: "Frosted panes floating over light that brightens with the value, on deep indigo.",
+    shows: ["Glass material", "Lit by value", "Versions", "Elevation"],
+    config: glass
   },
   {
     id: "blueprint",
