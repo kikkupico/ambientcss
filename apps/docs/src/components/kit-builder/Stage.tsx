@@ -50,6 +50,16 @@ const BANK = [{ value: "1" }, { value: "2" }, { value: "3" }, { value: "4" }];
 
 /* ── The kit, as the preview runs it ──────────────────────────────────── */
 
+/** The scene settings that are custom properties rather than theme fields:
+ *  the accent, a panel colour every part inherits, and the label colour. */
+export function sceneStyle(config: KitConfig): Record<string, string> {
+  const out: Record<string, string> = {};
+  if (config.theme.accent) out["--ambx-accent"] = config.theme.accent;
+  if (config.panel.albedo) out["--amb-albedo"] = config.panel.albedo;
+  if (config.theme.label) out["--amb-label"] = config.theme.label;
+  return out;
+}
+
 export function Scene({
   config,
   className,
@@ -63,12 +73,11 @@ export function Scene({
 }) {
   const kit = useMemo(() => buildKit(config), [config]);
   const theme = useMemo(() => buildTheme(config), [config]);
-  const accent = config.theme.accent;
   return (
     <AmbientProvider
       theme={theme}
       className={className}
-      style={{ ...(accent ? { "--ambx-accent": accent } : null), ...style } as CSSProperties}
+      style={{ ...sceneStyle(config), ...style } as CSSProperties}
     >
       <AmbientKitProvider kit={kit}>{children}</AmbientKitProvider>
     </AmbientProvider>

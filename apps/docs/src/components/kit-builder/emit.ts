@@ -221,9 +221,15 @@ export function emitUsage(cfg: KitConfig): string {
   const accent = cfg.theme.accent;
   const module = `./${kitSlug(cfg.name)}`;
 
-  const providerProps = accent
-    ? `theme={${theme}} style={{ "--ambx-accent": "${accent}" } as CSSProperties}`
-    : `theme={${theme}}`;
+  /* Custom properties the scene sets beside the theme: the accent, the
+     panel colour (inherited by every part that has none of its own) and
+     the label colour. */
+  const vars: string[] = [];
+  if (accent) vars.push(`"--ambx-accent": "${accent}"`);
+  if (cfg.panel.albedo) vars.push(`"--amb-albedo": "${cfg.panel.albedo}"`);
+  if (cfg.theme.label) vars.push(`"--amb-label": "${cfg.theme.label}"`);
+  const providerProps =
+    vars.length > 0 ? `theme={${theme}} style={{ ${vars.join(", ")} } as CSSProperties}` : `theme={${theme}}`;
 
   /* One line per extra version, so the snippet shows how one is picked. */
   const PRESET: Record<FamilyName, { name: string; jsx: (variant: string) => string }> = {
@@ -247,7 +253,7 @@ export function emitUsage(cfg: KitConfig): string {
   }
 
   return [
-    accent ? `import type { CSSProperties } from "react";` : null,
+    vars.length > 0 ? `import type { CSSProperties } from "react";` : null,
     `import {`,
     `  AmbientProvider,`,
     `  AmbientKitProvider,`,

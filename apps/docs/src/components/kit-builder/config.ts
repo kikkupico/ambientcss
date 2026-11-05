@@ -113,9 +113,15 @@ export type KitConfig = {
     /** `--ambx-accent`, read by parts that light up. Not an `AmbientTheme`
      *  field — it goes on the wrapper as a custom property. */
     accent: string | null;
+    /** `--amb-label`, overriding the label colour the light would give.
+     *  A dark panel under a bright lamp needs light print. */
+    label?: string | null | undefined;
   };
   panel: {
     material: AmbientMaterial;
+    /** `--amb-albedo` — the panel's own colour, which every part inside
+     *  inherits unless it states its own. Unset is the calibrated grey. */
+    albedo?: string | null | undefined;
   };
 };
 
@@ -164,10 +170,12 @@ export const DEFAULT_CONFIG: KitConfig = {
     lightSaturation: 14,
     highlightColor: "#7dd3fc",
     lumeHue: 190,
-    accent: null
+    accent: null,
+    label: null
   },
   panel: {
-    material: "matte"
+    material: "matte",
+    albedo: null
   }
 };
 

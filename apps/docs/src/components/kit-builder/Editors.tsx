@@ -267,7 +267,12 @@ function ShapeFields({
             { value: "circle", label: "Circle" },
             { value: "pill", label: "Pill" },
             { value: "soft", label: "Rounded" },
-            { value: "sharp", label: "Square" }
+            { value: "sharp", label: "Square" },
+            {
+              value: "inherit",
+              label: "Match container",
+              title: "Takes the corners of the button or key it sits in, so it nests without clipping."
+            }
           ]}
           onChange={(radius) => box({ radius })}
         />
@@ -744,6 +749,22 @@ export function SceneEditor({
           onChange={(highlightColor) => patch("theme", { highlightColor: highlightColor ?? "#7dd3fc" })}
         />
         <Slider label="Lume hue" hint="Tint of recesses in a dark room." value={theme.lumeHue} min={0} max={360} unit="°" onChange={(lumeHue) => patch("theme", { lumeHue })} />
+        <ColorInput
+          label="Panel colour"
+          hint="Everything on the panel inherits it, unless it has a colour of its own."
+          value={config.panel.albedo ?? null}
+          fallback="#3a3f44"
+          unsetLabel="Default grey"
+          onChange={(albedo) => patch("panel", { albedo })}
+        />
+        <ColorInput
+          label="Label colour"
+          hint="Unset, labels darken and lighten with the key light."
+          value={config.theme.label ?? null}
+          fallback="#eeeeee"
+          unsetLabel="Follows the light"
+          onChange={(label) => patch("theme", { label })}
+        />
         <Select
           label="Panel"
           value={config.panel.material}

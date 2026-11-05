@@ -74,7 +74,10 @@ export type ShapePlace = "fill" | "centre" | "edge" | "flow";
 
 export type ShapeAnchor = "top" | "bottom" | "left" | "right" | "above" | "below" | "outside-left" | "outside-right";
 
-export type ShapeRadius = "circle" | "pill" | "sharp" | "soft";
+/** `inherit` takes the corner of whatever box the shape sits in — a
+ *  button's well, a bank key — so a cap nests in its seat without its
+ *  corners cutting across the seat's curve. */
+export type ShapeRadius = "circle" | "pill" | "sharp" | "soft" | "inherit";
 
 /** The three structures an element can have, and they do not combine.
  *

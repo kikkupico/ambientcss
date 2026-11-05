@@ -8,10 +8,11 @@
  *  They are chosen to differ along every axis a kit has:
  *
  *    studio     library parts only, and versions — two knobs, two switches
- *    bakelite   shapes with material colour: domed bodies, a chicken-head
- *               pointer that holds the light as it turns, ivory keys
- *    neon       a dark room, and colour driven by value with no JavaScript:
- *               rings and tracks that light up as they move
+ *    cockpit    versions everywhere: a selector knob with printed positions
+ *               and a trim knob, a toggle and a guarded toggle, annunciator
+ *               buttons in three colours
+ *    arcade     a dark room and glossy shapes: buttons in four colours, a
+ *               trackball, a ball-top joystick, keys that light when chosen
  *    lab        nothing but library parts and their options, re-chosen
  *    pastel     a consumer gadget: glossy pastel bodies, custom switch
  *               geometry, light from straight above
@@ -137,183 +138,355 @@ const studio = kit({
   panel: { material: "blasted" }
 });
 
-/* ── Bakelite radio ───────────────────────────────────────────────────── */
+/* ── Cockpit ──────────────────────────────────────────────────────────── */
 
-const IVORY = "#efe4cc";
-const BAKELITE = "#4a2a18";
+const GUNMETAL = "#202326";
 
-const bakelite = kit({
-  name: "bakelite",
+/** A label printed on the panel at an angle around the knob, on its own
+ *  sweep: 0° is straight up, and the 270° pot runs from -135° to +135°. */
+function dialLabel(text: string, angle: number, radius = 72) {
+  const rad = (angle * Math.PI) / 180;
+  return shape("panel", `pos-${text.toLowerCase()}`, {
+    box: {
+      place: "centre",
+      x: Math.round(radius * Math.sin(rad) * 10) / 10,
+      y: Math.round(-radius * Math.cos(rad) * 10) / 10
+    },
+    paint: { structure: "plain", surface: "none", edge: "none", fill: "label" },
+    content: "text",
+    text,
+    textSize: 0.13
+  });
+}
+
+/** An annunciator: a lit square lens carrying the button's own label. */
+function lamp(colour: string): KitElement[] {
+  return [
+    shape("actuator", "lens", {
+      box: { place: "flow", width: 13, height: 7, radius: "inherit" },
+      paint: { structure: "body", surface: "flat", edge: "chamfer", thickness: 0.8, material: "shiny", fill: "albedo", colour },
+      content: "legend",
+      textSize: 0.17
+    })
+  ];
+}
+
+/** A chrome bat in a dark slot — the toggle every cockpit has. */
+function toggleElements(): KitElement[] {
+  return [
+    shape("base", "slot", {
+      box: { place: "fill", inset: 0, radius: "pill" },
+      paint: { structure: "groove", surface: "none", edge: "none", thickness: 0.5, fill: "lume" }
+    }),
+    shape("actuator", "bat", {
+      box: { place: "fill", inset: 6, radius: "circle" },
+      paint: { structure: "body", surface: "convex", edge: "fillet", thickness: 1.4, material: "brushed-round", fill: "albedo", colour: "#d9dde1" }
+    })
+  ];
+}
+
+/* Mission hardware. A selector knob with its positions printed round it, a
+   trim knob for fine work, a throttle, a mode bank with annunciator lamps,
+   and two versions of the switch — the second with a red guard either side,
+   because some switches should take two moves to throw. The push buttons
+   come in three colours, one version each. */
+const cockpit = kit({
+  name: "cockpit",
   rotary: {
     ...drawn(
       [
-        part("panel", "ScaleRing", { count: 11 }),
-        shape("base", "body", {
+        dialLabel("OFF", -135),
+        dialLabel("1", -67.5),
+        dialLabel("2", 0),
+        dialLabel("3", 67.5),
+        dialLabel("4", 135),
+        /* A spun-metal skirt under a black head: the classic selector. */
+        shape("base", "skirt", {
           box: { place: "fill", inset: 4, radius: "circle" },
-          paint: { structure: "body", surface: "convex", edge: "fillet-2", thickness: 1.6, material: "shiny", fill: "albedo", colour: BAKELITE }
+          paint: { structure: "body", surface: "flat", edge: "chamfer-2", thickness: 1.2, material: "brushed-round", fill: "albedo", colour: "#c4c8cc" }
         }),
-        /* A chicken-head pointer. It rides the turning frame, so it holds
-           the light: its lit edge stays where the lamp is at every angle. */
-        shape("actuator", "pointer", {
-          box: { place: "centre", width: 16, height: 62, y: -14, radius: "pill" },
-          paint: { structure: "body", surface: "convex", edge: "fillet", thickness: 0.8, elevation: 0, material: "shiny", fill: "albedo", colour: IVORY },
+        /* A chicken-head pointer: a long bar across the knob that keeps its
+           lit edge where the lamp is as it turns. */
+        shape("actuator", "head", {
+          box: { place: "centre", width: 34, height: 96, radius: "pill" },
+          paint: { structure: "body", surface: "convex", edge: "fillet-2", thickness: 2, elevation: 0, material: "matte", fill: "albedo", colour: "#141618" },
           steadyLight: true
-        })
-      ],
-      "amb-knob amb-knob-markers-full"
-    ),
-    root: { clearanceTop: 0, clearanceSides: 0 }
-  },
-  press: drawn(
-    [
-      shape("actuator", "key", {
-        box: { place: "flow", width: 12, height: 6, radius: "soft", softness: 6 },
-        paint: { structure: "body", surface: "convex", edge: "fillet", thickness: 1, material: "shiny", fill: "albedo", colour: IVORY },
-        content: "legend",
-        textSize: 0.24
-      })
-    ],
-    "amb-button amb-groove"
-  ),
-  latch: {
-    ...drawn(
-      [
-        shape("base", "slot", {
-          box: { place: "fill", inset: 0, radius: "pill" },
-          paint: { structure: "groove", surface: "none", edge: "none", thickness: 0.45, fill: "lume" }
         }),
-        shape("actuator", "lever", {
-          box: { place: "fill", inset: 0, radius: "pill" },
-          paint: { structure: "body", surface: "convex", edge: "fillet", thickness: 1, material: "shiny", fill: "albedo", colour: IVORY }
-        })
-      ],
-      "amb-switch"
-    )
-  },
-  /* Faders fall through to grounded: a kit does not have to dress every
-     control, and a radio has no faders. */
-  travel: { ...DEFAULT_CONFIG.travel, dressed: false },
-  bank: seeded("bank", "radio"),
-  theme: {
-    lightX: -0.6,
-    lightY: -1,
-    keyLight: 0.86,
-    fillLight: 0.7,
-    lightHue: 32,
-    lightSaturation: 30,
-    lumeHue: 36,
-    highlightColor: "#f0b660",
-    accent: "#e09a3a"
-  },
-  panel: { material: "matte" }
-});
-
-/* ── Neon synth ───────────────────────────────────────────────────────── */
-
-const NIGHT_CAP = "#24223a";
-
-/* Every coloured thing here is "lit by value": it mixes the accent in from
-   the control's own --ambx-percent, so a knob's ring glows brighter as it
-   turns up — in the stylesheet, with no React state involved. */
-const neon = kit({
-  name: "neon",
-  rotary: {
-    ...drawn(
-      [
-        shape("base", "well", {
-          box: { place: "fill", inset: 0, radius: "circle" },
-          paint: { structure: "groove", surface: "none", edge: "none", thickness: 0.3, fill: "lume" }
-        }),
-        shape("base", "glow", {
-          box: { place: "fill", inset: 5, radius: "circle" },
-          paint: { ...FLAT, fill: "accent-travel", transition: true }
-        }),
-        shape("actuator", "cap", {
-          box: { place: "fill", inset: 16, radius: "circle" },
-          paint: { structure: "body", surface: "flat", edge: "chamfer", thickness: 1, elevation: 0, fill: "albedo", colour: NIGHT_CAP }
-        }),
-        shape("actuator", "tick", {
-          box: { place: "centre", width: 6, height: 20, y: -22, radius: "pill" },
-          paint: { ...FLAT, fill: "accent" }
+        shape("actuator", "line", {
+          box: { place: "centre", width: 5, height: 36, y: -27, radius: "pill" },
+          paint: { ...FLAT, fill: "colour", colour: "#f2f2ec" }
         })
       ],
       "amb-knob"
     ),
-    root: { clearanceTop: 0, clearanceSides: 0 }
+    variantName: "selector",
+    root: { clearanceTop: 30, clearanceSides: 36 },
+    variants: [
+      version("trim", {
+        seed: "grounded",
+        rootClass: "amb-knob",
+        elements: [
+          part("base", "KnobBody", { material: "blasted" }),
+          part("actuator", "KnurledFace", { material: "matte", color: GUNMETAL }),
+          part("actuator", "IndicatorBar")
+        ],
+        root: { clearanceTop: 0, clearanceSides: 0 }
+      })
+    ],
+    animate: "snap"
   },
   travel: {
     ...drawn(
       [
         shape("base", "slot", {
           box: { place: "fill", inset: 0, radius: "pill" },
-          paint: { structure: "groove", surface: "none", edge: "none", thickness: 0.5, fill: "accent-travel", transition: true }
+          paint: { structure: "groove", surface: "none", edge: "none", thickness: 0.7, fill: "lume" }
         }),
-        shape("actuator", "cap", {
-          box: { place: "fill", inset: 0, radius: "soft", softness: 8 },
-          paint: { structure: "body", surface: "flat", edge: "chamfer", thickness: 1, fill: "albedo", colour: NIGHT_CAP }
+        shape("actuator", "handle", {
+          box: { place: "fill", inset: 0, radius: "soft", softness: 12 },
+          paint: { structure: "body", surface: "flat", edge: "chamfer-2", thickness: 1.6, material: "matte", fill: "albedo", colour: GUNMETAL }
         }),
-        shape("actuator", "line", {
-          box: { place: "centre", width: 70, height: 8, radius: "pill" },
-          paint: { ...FLAT, fill: "accent" }
-        })
+        ...[-18, 0, 18].map((y, i) =>
+          shape("actuator", `grip-${i + 1}`, {
+            box: { place: "centre", width: 62, height: 5, y, radius: "pill" },
+            paint: { ...FLAT, fill: "colour", colour: "#8d949b" }
+          })
+        )
       ],
       "amb-fader"
     ),
     rootClassH: "amb-slider"
   },
-  press: drawn(
+  press: {
+    ...drawn(lamp("#e8322f"), "amb-button"),
+    variantName: "master",
+    variants: [
+      version("caution", { seed: "empty", rootClass: "amb-button", elements: lamp("#ffb000") }),
+      version("go", { seed: "empty", rootClass: "amb-button", elements: lamp("#2fcf68") })
+    ]
+  },
+  latch: {
+    ...drawn(toggleElements(), "amb-switch"),
+    variantName: "toggle",
+    /* A round bat needs a square thumb box, which no library class gives. */
+    root: { on: true, trackW: 12, trackH: 6, thumbW: 0.42, thumbH: 0.84, inset: 0.08 },
+    variants: [
+      version("guarded", {
+        seed: "empty",
+        rootClass: "amb-switch",
+        root: { on: true, trackW: 12, trackH: 6, thumbW: 0.42, thumbH: 0.84, inset: 0.08 },
+        elements: [
+          ...(["outside-left", "outside-right"] as const).map((anchor, i) =>
+            shape("panel", i === 0 ? "guard-left" : "guard-right", {
+              box: { place: "edge", anchor, y: 6, width: 14, height: 150, radius: "pill" },
+              paint: { structure: "body", surface: "convex", edge: "fillet", thickness: 1.2, material: "shiny", fill: "albedo", colour: "#c8102e" }
+            })
+          ),
+          ...toggleElements()
+        ]
+      })
+    ]
+  },
+  /* A mode bank whose selected key lights its annunciator strip amber; the
+     others show the strip dark. Two markups, one per state. */
+  bank: drawn(
     [
       shape("actuator", "key", {
-        box: { place: "flow", width: 12, height: 7, radius: "soft", softness: 5 },
-        /* A key with a neon outline. The legend takes the room's own label
-           colour, which a dark room turns light. */
-        paint: { structure: "body", surface: "flat", edge: "chamfer", thickness: 1, fill: "label", ring: 1.5, ringColour: "#ff3fb4" },
-        content: "legend",
-        textSize: 0.2
+        box: { place: "fill", inset: 0, radius: "inherit" },
+        paint: { structure: "body", surface: "flat", edge: "chamfer", thickness: 0.8, fill: "albedo", colour: "#2a2e33" }
+      }),
+      {
+        ...shape("fixture", "lamp-lit", {
+          box: { place: "centre", width: 64, height: 20, radius: "soft", softness: 2 },
+          paint: { ...FLAT, fill: "accent" }
+        }),
+        bankState: "on"
+      },
+      {
+        ...shape("fixture", "lamp-dark", {
+          box: { place: "centre", width: 64, height: 20, radius: "soft", softness: 2 },
+          paint: { ...FLAT, fill: "colour", colour: "#45402c" }
+        }),
+        bankState: "off"
+      }
+    ],
+    "amb-select amb-groove"
+  ),
+  /* A bright cockpit, not a dark one: the panel is dark because it is
+     painted dark, so the lamp still throws real shadows and the recesses
+     stay black. The print is white, as instrument panels are. */
+  theme: {
+    lightX: -0.5,
+    lightY: -1,
+    keyLight: 0.82,
+    fillLight: 0.62,
+    lightHue: 210,
+    lightSaturation: 6,
+    lumeHue: 40,
+    highlightColor: "#ffb000",
+    accent: "#ffb000",
+    label: "#ecebe4"
+  },
+  panel: { material: "blasted", albedo: "#3b4045" }
+});
+
+/* ── Arcade cabinet ───────────────────────────────────────────────────── */
+
+const ARCADE_RED = "#e2262f";
+
+/** A domed arcade button: a black bezel, a glossy plunger in `colour`, and
+ *  the caller's label printed small across it. */
+function arcadeButton(colour: string): KitElement[] {
+  return [
+    shape("base", "bezel", {
+      box: { place: "fill", inset: 0, radius: "circle" },
+      paint: { structure: "body", surface: "flat", edge: "chamfer", thickness: 0.6, material: "shiny", fill: "albedo", colour: "#141418" }
+    }),
+    shape("actuator", "plunger", {
+      box: { place: "fill", inset: 15, radius: "circle" },
+      paint: { structure: "body", surface: "convex", edge: "fillet-2", thickness: 1.4, material: "shiny", fill: "albedo", colour }
+    }),
+    shape("fixture", "legend", {
+      box: { place: "centre" },
+      paint: { ...FLAT, fill: "colour", colour: "#ffffff" },
+      content: "legend",
+      textSize: 0.17
+    })
+  ];
+}
+
+/* After hours in an arcade: a trackball (or a spinner, its other version),
+   a ball-top joystick riding the fader slot, a bank whose chosen key lights
+   up yellow, and the buttons in four colours — one version each, so a
+   cabinet can wire up `<AmbientButton variant="blue">`. */
+const arcade = kit({
+  name: "arcade",
+  rotary: {
+    ...drawn(
+      [
+        shape("base", "cup", {
+          box: { place: "fill", inset: 0, radius: "circle" },
+          paint: { structure: "groove", surface: "none", edge: "none", thickness: 0.45, fill: "lume" }
+        }),
+        shape("base", "ball", {
+          box: { place: "fill", inset: 7, radius: "circle" },
+          paint: { structure: "body", surface: "convex", edge: "fillet-2", thickness: 2, material: "shiny", fill: "albedo", colour: ARCADE_RED }
+        }),
+        /* The ball itself stays put — its shine is the room's — and a white
+           fleck turns with the value, which is how a trackball reads. */
+        shape("actuator", "fleck", {
+          box: { place: "centre", width: 10, height: 10, y: -27, radius: "circle" },
+          paint: { ...FLAT, fill: "colour", colour: "#fff3f0" }
+        })
+      ],
+      "amb-knob"
+    ),
+    variantName: "trackball",
+    root: { clearanceTop: 0, clearanceSides: 0 },
+    variants: [
+      version("spinner", {
+        seed: "grounded",
+        rootClass: "amb-knob",
+        elements: [
+          part("base", "KnobBody", { material: "shiny" }),
+          part("actuator", "KnurledFace", { material: "shiny", color: "#18181c" }),
+          part("actuator", "IndicatorDot")
+        ],
+        root: { clearanceTop: 0, clearanceSides: 0 }
       })
     ],
-    "amb-button amb-groove"
-  ),
+    input: "delta"
+  },
+  travel: {
+    ...drawn(
+      [
+        shape("base", "slot", {
+          box: { place: "fill", inset: 0, radius: "pill" },
+          paint: { structure: "groove", surface: "none", edge: "none", thickness: 0.6, fill: "lume" }
+        }),
+        /* On the fader, a ball-top joystick: a stem with the ball above it.
+           The slider gets just the ball. */
+        {
+          ...shape("actuator", "stem", {
+            box: { place: "centre", width: 26, height: 56, y: 20, radius: "pill" },
+            paint: { structure: "body", surface: "convex", edge: "fillet", thickness: 0.8, material: "shiny", fill: "albedo", colour: "#1c1c20" }
+          }),
+          only: "vertical"
+        },
+        {
+          ...shape("actuator", "ball", {
+            box: { place: "centre", width: 100, height: 66.7, y: -12, radius: "circle" },
+            paint: { structure: "body", surface: "convex", edge: "fillet-2", thickness: 2, material: "shiny", fill: "albedo", colour: ARCADE_RED }
+          }),
+          only: "vertical"
+        },
+        {
+          ...shape("actuator", "ball-h", {
+            box: { place: "fill", inset: 0, radius: "circle" },
+            paint: { structure: "body", surface: "convex", edge: "fillet-2", thickness: 2, material: "shiny", fill: "albedo", colour: ARCADE_RED }
+          }),
+          only: "horizontal"
+        }
+      ],
+      "amb-fader"
+    ),
+    rootClassH: "amb-slider"
+  },
+  press: {
+    ...drawn(arcadeButton(ARCADE_RED), "amb-button amb-button-round"),
+    variantName: "red",
+    variants: [
+      version("yellow", { seed: "empty", rootClass: "amb-button amb-button-round", elements: arcadeButton("#ffcf1a") }),
+      version("green", { seed: "empty", rootClass: "amb-button amb-button-round", elements: arcadeButton("#1fc35a") }),
+      version("blue", { seed: "empty", rootClass: "amb-button amb-button-round", elements: arcadeButton("#1f7bff") })
+    ]
+  },
   latch: drawn(
     [
       shape("base", "track", {
         box: { place: "fill", inset: 0, radius: "pill" },
         paint: { structure: "groove", surface: "none", edge: "none", thickness: 0.4, fill: "accent-travel", transition: true }
       }),
-      shape("actuator", "thumb", {
+      shape("actuator", "cap", {
         box: { place: "fill", inset: 0, radius: "pill" },
-        paint: { structure: "body", surface: "flat", edge: "fillet", thickness: 1, fill: "albedo", colour: "#e8e6f4" }
+        paint: { structure: "body", surface: "convex", edge: "fillet", thickness: 1.2, material: "shiny", fill: "albedo", colour: "#18181c" }
       })
     ],
     "amb-switch"
   ),
-  /* A key bank whose selected key has a lamp its neighbours do not — the
-     "Selected" state, which is different markup rather than a restyle. */
   bank: drawn(
     [
-      shape("actuator", "face", {
-        box: { place: "fill", inset: 0, radius: "soft", softness: 6 },
-        paint: { structure: "body", surface: "flat", edge: "chamfer", thickness: 0.8, fill: "albedo", colour: NIGHT_CAP }
-      }),
-      { ...shape("fixture", "lamp", {
-        box: { place: "centre", width: 30, height: 30, radius: "circle" },
-        paint: { ...FLAT, fill: "accent", ring: 3, ringColour: "#ffd6f0" }
-      }), bankState: "on" }
+      {
+        ...shape("actuator", "key", {
+          box: { place: "fill", inset: 0, radius: "inherit" },
+          paint: { structure: "body", surface: "convex", edge: "fillet", thickness: 0.9, material: "shiny", fill: "albedo", colour: "#2a2a32" }
+        }),
+        bankState: "off"
+      },
+      {
+        ...shape("actuator", "key-lit", {
+          box: { place: "fill", inset: 0, radius: "inherit" },
+          paint: { structure: "body", surface: "convex", edge: "fillet", thickness: 0.4, material: "shiny", fill: "albedo", colour: "#ffcf1a" }
+        }),
+        bankState: "on"
+      }
     ],
     "amb-select amb-groove"
   ),
+  /* Glossy black laminate under a cool overhead, with a violet cast. */
   theme: {
-    lightX: -0.6,
+    lightX: -0.4,
     lightY: -1,
-    keyLight: 0.12,
-    fillLight: 0.32,
-    lightHue: 250,
-    lightSaturation: 12,
-    lumeHue: 300,
-    highlightColor: "#ff3fb4",
-    accent: "#ff3fb4"
+    keyLight: 0.78,
+    fillLight: 0.6,
+    lightHue: 265,
+    lightSaturation: 26,
+    lumeHue: 280,
+    highlightColor: "#ffcf1a",
+    accent: "#ffcf1a",
+    label: "#d9d3ff"
   },
-  panel: { material: "matte" }
+  panel: { material: "shiny", albedo: "#17141f" }
 });
 
 /* ── Lab instrument ───────────────────────────────────────────────────── */
@@ -510,7 +683,7 @@ const blueprint = kit({
   press: drawn(
     [
       shape("actuator", "frame", {
-        box: { place: "flow", width: 13, height: 6, radius: "soft", softness: 3 },
+        box: { place: "flow", width: 13, height: 6, radius: "inherit" },
         paint: { ...FLAT, fill: "colour", colour: INK, ring: 3, ringColour: INK },
         content: "legend",
         textSize: 0.2
@@ -535,7 +708,7 @@ const blueprint = kit({
   bank: drawn(
     [
       shape("actuator", "box", {
-        box: { place: "fill", inset: 0, radius: "soft", softness: 4 },
+        box: { place: "fill", inset: 0, radius: "inherit" },
         paint: { ...FLAT, fill: "colour", colour: "#2a5592", ring: 3, ringColour: INK }
       }),
       { ...shape("fixture", "mark", {
@@ -568,18 +741,18 @@ export const SAMPLE_KITS: SampleKit[] = [
     config: studio
   },
   {
-    id: "bakelite",
-    name: "Bakelite radio",
-    tagline: "Glossy brown domes, an ivory chicken-head pointer that holds the light as it turns, ivory keys.",
-    shows: ["Shapes", "Material colour", "Hold the light", "Partial kit"],
-    config: bakelite
+    id: "cockpit",
+    name: "Cockpit",
+    tagline: "A chicken-head selector with its positions printed round it, a guarded toggle, and annunciator buttons in three colours.",
+    shows: ["Versions", "Panel graphics", "Hold the light", "State-only lamps"],
+    config: cockpit
   },
   {
-    id: "neon",
-    name: "Neon synth",
-    tagline: "A dark room where rings and tracks glow brighter as their value rises.",
-    shows: ["Dark scene", "Lit by value", "Selected-only lamp"],
-    config: neon
+    id: "arcade",
+    name: "Arcade cabinet",
+    tagline: "Domed buttons in four colours, a trackball, a ball-top joystick, and keys that light up when chosen.",
+    shows: ["Versions", "Dark scene", "Glossy shapes", "Lit by value"],
+    config: arcade
   },
   {
     id: "lab",
