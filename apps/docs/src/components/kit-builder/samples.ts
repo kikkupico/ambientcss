@@ -14,8 +14,8 @@
  *    arcade     a dark room and glossy shapes: buttons in four colours, a
  *               trackball, a ball-top joystick, keys that light when chosen
  *    lab        nothing but library parts and their options, re-chosen
- *    glass      Apple-style: graphite and white, frosted panes over soft
- *               light, filled / tinted / plain buttons
+ *    glass      frosted panes floating over softly tinted light that
+ *               brightens with the value; primary, danger and ghost buttons
  *    blueprint  no lighting at all — flat line drawing, to show a kit does
  *               not have to be skeuomorphic */
 
@@ -549,14 +549,13 @@ const lab = kit({
 
 /* ── Glass ────────────────────────────────────────────────────────────── */
 
-/* Apple-style glass: graphite, white and frosted panes, nothing coloured.
-   The accent is an off-white, so everything "lit by value" glows white —
-   light under glass rather than a hue. */
-const SNOW = "#f5f5f7";
+/* A tint, not a colour: a greyed lavender, strong enough to warm the glass
+   and quiet enough that the glass is still what you see. */
+const GLOW = "#a49cd6";
 
 /** A frosted pane. Glass makes its own milky face over whatever is behind
  *  it, so it wears no surface colour; and it only frosts what sits at a
- *  distance, so it floats — the elevation is what turns the light under it
+ *  distance, so it floats — the elevation is what turns the glow under it
  *  into a soft lit pane rather than a sharp blob. */
 const PANE = {
   structure: "body",
@@ -568,40 +567,40 @@ const PANE = {
   fill: "none"
 } as const;
 
-/** A pill button: a glass pane over a light, or bare glass. The light's
- *  strength is the whole difference between Apple's filled, tinted and
- *  plain styles. */
-function glassButton(light: string | null, ink?: string): KitElement[] {
+/** A button: a coloured light under a floating pane, or bare glass. */
+function glassButton(light: string | null): KitElement[] {
   return [
     ...(light
       ? [
           shape("base", "light", {
-            box: { place: "fill", inset: 8, radius: "pill" },
+            box: { place: "fill", inset: 10, radius: "pill" },
             paint: { ...FLAT, fill: "colour", colour: light }
           })
         ]
       : []),
     shape("actuator", "pane", {
-      box: { place: "flow", width: 15, height: 7, radius: "inherit" },
+      box: { place: "flow", width: 14, height: 7, radius: "inherit" },
       /* "label" colours the legend: a <button> does not inherit text
          colour, so without it the browser's own black shows through. */
-      paint: { ...PANE, elevation: 1.2, ...(ink ? { fill: "colour", colour: ink } : { fill: "label" }) },
+      paint: { ...PANE, elevation: 1.2, fill: "label" },
       content: "legend",
       textSize: 0.19
     })
   ];
 }
 
+/* Modern glass: frosted panes floating over softly tinted light. Every control has a
+   glow under it — on the knob, the fader and the switch it brightens with
+   the value — and the pane above blurs it into a soft lit surface, which
+   is the whole look. Three button versions: a violet primary, a red
+   danger, and bare ghost glass. */
 const glass = kit({
   name: "glass",
   rotary: {
     ...drawn(
       [
-        /* White light under the dial, rising with the value. */
-        /* A core rather than a floodlight: the rim stays dark glass, so
-           the dial keeps its depth as the light comes up. */
         shape("base", "aura", {
-          box: { place: "fill", inset: 22, radius: "circle" },
+          box: { place: "fill", inset: 6, radius: "circle" },
           paint: { ...FLAT, fill: "accent-travel", transition: true }
         }),
         shape("actuator", "lens", {
@@ -609,8 +608,8 @@ const glass = kit({
           paint: PANE,
           steadyLight: true
         }),
-        shape("actuator", "tick", {
-          box: { place: "centre", width: 6, height: 16, y: -31, radius: "pill" },
+        shape("actuator", "dot", {
+          box: { place: "centre", width: 9, height: 9, y: -32, radius: "circle" },
           paint: { ...FLAT, fill: "colour", colour: "#ffffff" }
         })
       ],
@@ -623,11 +622,15 @@ const glass = kit({
       [
         shape("base", "rail", {
           box: { place: "fill", inset: 0, radius: "pill" },
-          paint: { structure: "groove", surface: "none", edge: "none", thickness: 0.25, fill: "accent-travel", transition: true }
+          paint: { structure: "groove", surface: "none", edge: "none", thickness: 0.3, fill: "accent-travel", transition: true }
         }),
         shape("actuator", "pane", {
-          box: { place: "fill", inset: 0, radius: "pill" },
+          box: { place: "fill", inset: 0, radius: "soft", softness: 30 },
           paint: PANE
+        }),
+        shape("actuator", "line", {
+          box: { place: "centre", width: 56, height: 6, radius: "pill" },
+          paint: { ...FLAT, fill: "colour", colour: "#ffffff" }
         })
       ],
       "amb-fader"
@@ -635,69 +638,64 @@ const glass = kit({
     rootClassH: "amb-slider"
   },
   press: {
-    /* Filled is bright glass, so its legend is dark ink, as Apple's is. */
-    ...drawn(glassButton("#e5e5ea", "#1d1d1f"), "amb-button"),
-    variantName: "filled",
+    /* The buttons' light sits a shade deeper than the glow, so the white
+       legend over it stays legible. */
+    ...drawn(glassButton("#8a83c0"), "amb-button"),
+    variantName: "primary",
     variants: [
-      version("tinted", { seed: "empty", rootClass: "amb-button", elements: glassButton("#6e6e73") }),
-      version("plain", { seed: "empty", rootClass: "amb-button", elements: glassButton(null) })
+      version("danger", { seed: "empty", rootClass: "amb-button", elements: glassButton("#b97585") }),
+      version("ghost", { seed: "empty", rootClass: "amb-button", elements: glassButton(null) })
     ]
   },
-  /* The iOS switch: a solid white thumb with a soft shadow, over a track
-     that goes from graphite to light as it turns on. A round thumb in a
-     short track is geometry no library class gives. */
+  /* A round pane in a short track, which no library class sizes. */
   latch: {
     ...drawn(
       [
         shape("base", "track", {
           box: { place: "fill", inset: 0, radius: "pill" },
-          paint: { structure: "groove", surface: "none", edge: "none", thickness: 0.3, fill: "accent-travel", transition: true }
+          paint: { structure: "groove", surface: "none", edge: "none", thickness: 0.35, fill: "accent-travel", transition: true }
         }),
-        shape("actuator", "thumb", {
+        shape("actuator", "pane", {
           box: { place: "fill", inset: 0, radius: "circle" },
-          /* A hairline edge keeps the thumb legible on a lit track. */
-          paint: { structure: "body", surface: "flat", edge: "fillet", thickness: 1, elevation: 0.4, material: "matte", fill: "albedo", colour: "#ffffff", ring: 2, ringColour: "#c7c7cc" }
+          paint: { ...PANE, elevation: 1 }
         })
       ],
       "amb-switch"
     ),
-    root: { on: true, trackW: 12.5, trackH: 7, thumbW: 0.43, thumbH: 0.84, inset: 0.08 }
+    root: { on: true, trackW: 12, trackH: 6.4, thumbW: 0.44, thumbH: 0.86, inset: 0.07 }
   },
-  /* A segmented control: a dark rail, and only the chosen segment is a
-     raised glass pill with light under it. No glow onto the rail — Apple
-     does not spill light. */
+  /* Every key is a pane; only the chosen one has a light under it — the
+     lamp-and-diffuser idea, drawn from two shapes. It glows onto the rail
+     too, so it opts into the bank's glow. */
   bank: drawn(
     [
       {
         ...shape("base", "light", {
-          box: { place: "fill", inset: 14, radius: "pill" },
-          paint: { ...FLAT, fill: "colour", colour: "#8e8e93" }
+          box: { place: "fill", inset: 14, radius: "circle" },
+          paint: { ...FLAT, fill: "accent" }
         }),
         bankState: "on"
       },
-      {
-        ...shape("actuator", "pane", {
-          box: { place: "fill", inset: 6, radius: "inherit" },
-          paint: { ...PANE, elevation: 0.8 }
-        }),
-        bankState: "on"
-      }
+      shape("actuator", "pane", {
+        box: { place: "fill", inset: 0, radius: "inherit" },
+        paint: { ...PANE, elevation: 1 }
+      })
     ],
-    "amb-select"
+    "amb-select amb-select-glow"
   ),
   theme: {
-    lightX: 0,
+    lightX: -0.5,
     lightY: -1,
-    keyLight: 0.86,
-    fillLight: 0.7,
-    lightHue: 230,
-    lightSaturation: 4,
-    lumeHue: 230,
-    highlightColor: SNOW,
-    accent: SNOW,
-    label: "#d1d1d6"
+    keyLight: 0.8,
+    fillLight: 0.62,
+    lightHue: 245,
+    lightSaturation: 10,
+    lumeHue: 250,
+    highlightColor: GLOW,
+    accent: GLOW,
+    label: "#e3e2ee"
   },
-  panel: { material: "matte", albedo: "#1d1d20" }
+  panel: { material: "matte", albedo: "#1d1e2a" }
 });
 
 /* ── Blueprint ────────────────────────────────────────────────────────── */
@@ -838,8 +836,8 @@ export const SAMPLE_KITS: SampleKit[] = [
   {
     id: "glass",
     name: "Glass",
-    tagline: "Apple-style glass in graphite and white: frosted panes over soft light, an iOS switch, a segmented control.",
-    shows: ["Glass material", "Lit by value", "Versions", "Neutral palette"],
+    tagline: "Frosted panes floating over softly tinted light that brightens with the value.",
+    shows: ["Glass material", "Lit by value", "Versions", "Elevation"],
     config: glass
   },
   {

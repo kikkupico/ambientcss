@@ -48,7 +48,7 @@ point, not a dependency.
 | [Cockpit](/kit-builder?sample=cockpit) | Versions throughout — a chicken-head selector with its positions printed round it and a knurled trim knob, a toggle and a guarded toggle with red guard rails, annunciator buttons in red, amber and green — on a dark painted panel with white print |
 | [Arcade cabinet](/kit-builder?sample=arcade) | Domed arcade buttons in four colour versions, a trackball whose fleck turns with the value (or a spinner), a ball-top joystick on the fader, and keys that light up when chosen, on glossy black laminate |
 | [Lab instrument](/kit-builder?sample=lab) | Not a single shape — library parts re-chosen and re-finished, with snap motion and a round-button version |
-| [Glass](/kit-builder?sample=glass) | Apple-style glass in graphite and white: frosted panes over soft light that rises with the value, an iOS-style switch, a segmented-control key bank, and filled, tinted and plain button versions |
+| [Glass](/kit-builder?sample=glass) | Frosted glass panes floating over softly tinted light that brightens with the value, so a knob or fader fills with a lavender glow as it turns up; the selected key's light is diffused through its pane; primary, danger and ghost button versions |
 | [Blueprint](/kit-builder?sample=blueprint) | No lighting at all: flat line drawing and panel graphics, because a kit is paint and paint need not imitate hardware |
 
 ## What ships
